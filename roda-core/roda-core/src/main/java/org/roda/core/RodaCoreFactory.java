@@ -61,8 +61,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CloudSolrClient;
-import org.apache.solr.client.solrj.impl.ZkClientClusterStateProvider;
+import org.apache.solr.client.solrj.impl.*;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest.Create;
 import org.apache.solr.client.solrj.response.CollectionAdminResponse;
@@ -1307,7 +1306,17 @@ public class RodaCoreFactory {
       zkChroot = Optional.empty();
     }
 
-    CloudSolrClient cloudSolrClient = new CloudSolrClient.Builder(zkHosts, zkChroot).build();
+    Http2SolrClient.Builder http2ClientBuilder = new Http2SolrClient.Builder();
+
+    String username = getRodaConfigurationAsString(RodaConstants.CORE_SOLR_AUTH_USERNAME);
+    String password = getRodaConfigurationAsString(RodaConstants.CORE_SOLR_AUTH_PASSWORD);
+
+    if(username != null && !username.isBlank() && password != null && !password.isBlank() ) {
+      http2ClientBuilder.withBasicAuthCredentials(username, password);
+    }
+
+    CloudHttp2SolrClient cloudSolrClient = new CloudHttp2SolrClient.Builder(zkHosts, zkChroot).
+            withInternalClientBuilder(http2ClientBuilder).build();
 
     waitForSolrCluster(cloudSolrClient);
 
