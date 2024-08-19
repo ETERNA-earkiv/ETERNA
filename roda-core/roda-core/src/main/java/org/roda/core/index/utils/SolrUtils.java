@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.FactoryConfigurationError;
@@ -52,6 +53,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.RangeFacet;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrException;
@@ -79,11 +81,8 @@ import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.facet.FacetFieldResult;
-import org.roda.core.data.v2.index.facet.FacetParameter;
+import org.roda.core.data.v2.index.facet.*;
 import org.roda.core.data.v2.index.facet.FacetParameter.SORT;
-import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.AllFilterParameter;
 import org.roda.core.data.v2.index.filter.AndFiltersParameters;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
@@ -684,6 +683,7 @@ public class SolrUtils {
     Class<T> responseClass, Facets facets, List<String> liteFields) throws GenericException, NotSupportedException {
     final SolrDocumentList docList = response.getResults();
     final List<FacetFieldResult> facetResults = processFacetFields(facets, response.getFacetFields());
+    final List<FacetFieldResult> facetRanges = processFacetRanges(facets, response.getFacetRanges());
     final long offset = docList.getStart();
     final long limit = docList.size();
     final long totalCount = docList.getNumFound();
@@ -693,7 +693,7 @@ public class SolrUtils {
       docs.add(SolrCollectionRegistry.fromSolrDocument(responseClass, doc, liteFields));
     }
 
-    return new IndexResult<>(offset, limit, totalCount, docs, facetResults);
+    return new IndexResult<>(offset, limit, totalCount, docs, Stream.concat(facetResults.stream(), facetRanges.stream()).toList());
   }
 
   private static List<FacetFieldResult> processFacetFields(Facets facets, List<FacetField> facetFields) {
@@ -707,6 +707,28 @@ public class SolrUtils {
         for (Count count : facet.getValues()) {
           LOGGER.trace("   value:{} value:{}", count.getName(), count.getCount());
           facetResult.addFacetValue(count.getName(), count.getName(), count.getCount());
+        }
+        ret.add(facetResult);
+      }
+    }
+
+    return ret;
+  }
+
+  private static List<FacetFieldResult> processFacetRanges(Facets facets, List<RangeFacet> facetFields) {
+    List<FacetFieldResult> ret = new ArrayList<>();
+    FacetFieldResult facetResult;
+    if (facetFields != null) {
+      for (RangeFacet facet : facetFields) {
+        List counts = facet.getCounts();
+        LOGGER.trace("facet:{} count:{}", facet.getName(), counts.size());
+        facetResult = new FacetFieldResult(facet.getName(), counts.size(),
+                facets.getParameters().get(facet.getName()).getValues());
+        for (Object countObj : counts) {
+          if(countObj instanceof RangeFacet.Count count) {
+            LOGGER.trace("   value:{} value:{}", count.getValue(), count.getCount());
+            facetResult.addFacetValue(count.getValue(), count.getValue(), count.getCount());
+          }
         }
         ret.add(facetResult);
       }
@@ -1125,6 +1147,15 @@ public class SolrUtils {
           setQueryFacetParameter(query, (SimpleFacetParameter) facetParameter);
           appendValuesUsingOROperator(filterQuery, facetParameter.getName(),
             facetParameter.getValues(), true);
+        } else if (facetParameter instanceof RangeFacetParameter) {
+          query.add("facet", "true");
+          query.add("facet.range", facetParameter.getName());
+          query.add(String.format("f.%s.facet.range.start", facetParameter.getName()),
+                  ((RangeFacetParameter) facetParameter).getStart());
+          query.add(String.format("f.%s.facet.range.end", facetParameter.getName()),
+                  ((RangeFacetParameter) facetParameter).getEnd());
+          query.add(String.format("f.%s.facet.range.gap", facetParameter.getName()),
+                  ((RangeFacetParameter) facetParameter).getGap());
         } else {
           LOGGER.error("Unsupported facet parameter class: {}", facetParameter.getClass().getName());
         }
