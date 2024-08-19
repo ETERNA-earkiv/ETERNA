@@ -19,8 +19,6 @@ import java.util.stream.Collectors;
 public class ScatteredFSRegexConfig implements ScatteredFSConfig {
   private Pattern pattern;
 
-  private Matcher matcher;
-
   private boolean isDirectory;
 
   private String replacement;
@@ -47,8 +45,6 @@ public class ScatteredFSRegexConfig implements ScatteredFSConfig {
 
     this.pattern = Pattern.compile(regex);
 
-    this.matcher = this.pattern.matcher("");
-
     this.folderDepth = Paths.get(rule).getNameCount();
 
     this.isDirectory = type.equals("directory");
@@ -74,17 +70,17 @@ public class ScatteredFSRegexConfig implements ScatteredFSConfig {
   }
 
   public Path getScatteredPath(String id) {
-    this.matcher.reset(id);
+    Matcher matcher = this.pattern.matcher(id);
 
-    Path scatteredPath = Paths.get(this.matcher.replaceAll(this.replacement));
+    Path scatteredPath = Paths.get(matcher.replaceAll(this.replacement));
     scatteredPath = scatteredPath.resolve(id);
 
     return scatteredPath;
   }
 
   public boolean isValidName(Path path) {
-    this.matcher.reset(path.getFileName().toString());
-    return this.matcher.matches();
+    Matcher matcher = this.pattern.matcher(path.getFileName().toString());
+    return matcher.matches();
   }
 
   public boolean isDirectory() {

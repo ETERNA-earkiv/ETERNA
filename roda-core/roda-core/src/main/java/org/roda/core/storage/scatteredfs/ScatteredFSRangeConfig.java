@@ -19,8 +19,6 @@ import java.util.stream.Collectors;
 public class ScatteredFSRangeConfig implements ScatteredFSConfig {
   private Pattern pattern;
 
-  private Matcher matcher;
-
   private boolean isDirectory;
 
   private List<ScatteredFSRange> ranges;
@@ -37,7 +35,6 @@ public class ScatteredFSRangeConfig implements ScatteredFSConfig {
 
     if (!regex.isEmpty()) {
       this.pattern = Pattern.compile(regex);
-      this.matcher = this.pattern.matcher("");
     }
 
     this.isDirectory = type.equals("directory");
@@ -103,8 +100,8 @@ public class ScatteredFSRangeConfig implements ScatteredFSConfig {
   }
 
   public boolean isValidName(Path path) {
-    this.matcher.reset(path.getFileName().toString());
-    return this.matcher.matches();
+    Matcher matcher = this.pattern.matcher(path.getFileName().toString());
+    return matcher.matches();
   }
 
   public boolean isDirectory() {
