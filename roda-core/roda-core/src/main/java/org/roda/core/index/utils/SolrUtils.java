@@ -684,6 +684,8 @@ public class SolrUtils {
     final SolrDocumentList docList = response.getResults();
     final List<FacetFieldResult> facetResults = processFacetFields(facets, response.getFacetFields());
     final List<FacetFieldResult> facetRanges = processFacetRanges(facets, response.getFacetRanges());
+    facetResults.addAll(facetRanges);
+
     final long offset = docList.getStart();
     final long limit = docList.size();
     final long totalCount = docList.getNumFound();
@@ -693,7 +695,7 @@ public class SolrUtils {
       docs.add(SolrCollectionRegistry.fromSolrDocument(responseClass, doc, liteFields));
     }
 
-    return new IndexResult<>(offset, limit, totalCount, docs, Stream.concat(facetResults.stream(), facetRanges.stream()).toList());
+    return new IndexResult<>(offset, limit, totalCount, docs, facetResults);
   }
 
   private static List<FacetFieldResult> processFacetFields(Facets facets, List<FacetField> facetFields) {
