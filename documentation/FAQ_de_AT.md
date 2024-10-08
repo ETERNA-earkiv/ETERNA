@@ -1,12 +1,12 @@
 # Häufig gestellte Fragen
 
-Die von RODA-Benutzern häufig gestellten Fragen und deren Antworten.
+Die von ETERNA-Benutzern häufig gestellten Fragen und deren Antworten.
 
-Haben Sie eine Frage, die hier nicht gestellt wurde? Erstellen Sie [eine Anfrage] (https://github.com/keeps/roda/issues/new) auf GitHub und markieren Sie sie mit dem Vermerk "Frage".
+Haben Sie eine Frage, die hier nicht gestellt wurde? Erstellen Sie [eine Anfrage] (https://github.com/ETERNA-earkiv/ETERNA/issues/new) auf GitHub und markieren Sie sie mit dem Vermerk "Frage".
 
 ## Viewers
 
-### Kann man Dateien direkt auf der Web-Oberfläche von RODA ansehen?
+### Kann man Dateien direkt auf der Web-Oberfläche von ETERNA ansehen?
 
 Das System verfügt über vordefinierte Viewer für bestimmte Standardformate (z.B. PDF, Bilder, HTML 5 Multimediaformate, etc.).
 
@@ -14,11 +14,11 @@ Spezielle Formate benötigen spezielle Viewer oder Konverter, um sie an bestehen
 
 ## Metadaten
 
-### Welche beschreibenden Metadatenformate werden von RODA unterstützt?
+### Welche beschreibenden Metadatenformate werden von ETERNA unterstützt?
 
-Alle beschreibenden Metadatenformate werden unterstützt, solange es Grammatik in XML Schema (XSD) gibt, um sie zu validieren. Standardmäßig wird RODA mit Dublin Core und Encoded Archival Description 2002 konfiguriert. Weitere Schemata können hinzugefügt werden.
+Alle beschreibenden Metadatenformate werden unterstützt, solange es Grammatik in XML Schema (XSD) gibt, um sie zu validieren. Standardmäßig wird ETERNA mit Dublin Core und Encoded Archival Description 2002 konfiguriert. Weitere Schemata können hinzugefügt werden.
 
-### Kann RODA mehrere Klassifizierungssysteme unterstützen?
+### Kann ETERNA mehrere Klassifizierungssysteme unterstützen?
 
 Das System ermöglicht eine Definition von mehreren hierarchischen Strukturen, in denen Datensätze abgelegt werden können. Die beschreibenden Metadaten können jedem Knoten dieser Strukturen zugewiesen werden. Sie können sich es als ein Datei-/Ordnersystem vorstellen, in dem jeder Ordner benutzerdefinierte Metadaten im EAD- oder DC-Format (oder in jedem anderen Format) enthalten kann. Jeder dieser "Ordner" (oder Platzhalter) kann ein Bestand, eine Sammlung, eine Serie, oder ein Aggregat, usw. sein.
 
@@ -85,7 +85,7 @@ Dies ist eine komplexe Frage, die nicht mit ein paar Zeilen beantwortet werden k
 
 ### Wie unterstützt die Anwendung die Beurteilung, die Auswahl und die Definition von Aufbewahrungsfristen?
 
-RODA bietet einen komplexen Workflow für die Entsorgung von Datensätzen. Weitere Informationen finden Sie in [Entsorgung](Disposal.md).
+ETERNA bietet einen komplexen Workflow für die Entsorgung von Datensätzen. Weitere Informationen finden Sie in [Entsorgung](Disposal.md).
 
 ### Protokolliert das System die Suchinteraktionen?
 
@@ -103,6 +103,6 @@ Nicht wirklich. Ein aktueller Browser ist ausreichend.
 
 Eine vollständige Anleitung zum Hinzufügen einer neuen Sprache in das System finden Sie unter: [Übersetzungsleitfaden](Translation_Guide.md).
 
-### Wie richtet man die Entwicklungsumgebung für RODA ein?
+### Wie richtet man die Entwicklungsumgebung für ETERNA ein?
 
 Eine vollständige Anleitung zum Einrichten der Entwicklungsumgebung finden Sie unter: [Leitfaden für Entwickler](Developers_Guide.md).

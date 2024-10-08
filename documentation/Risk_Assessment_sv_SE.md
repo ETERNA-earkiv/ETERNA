@@ -1,10 +1,10 @@
 # Riskbedömning
 
-RODA levereras med ett riskregister förinstallerat med över 80 stycken bevaranderisker som erhållits från verktygssatsen [Digital Repository Audit Method Based on Risk Assessment (DRAMBORA)](http://www.repositoryaudit.eu) utvecklad av [Digital Curation Center ( DCC)](http://www.dcc.ac.uk) och DigitalPreservationEurope (DPE).
+ETERNA levereras med ett riskregister förinstallerat med över 80 stycken bevaranderisker som erhållits från verktygssatsen [Digital Repository Audit Method Based on Risk Assessment (DRAMBORA)](http://www.repositoryaudit.eu) utvecklad av [Digital Curation Center ( DCC)](http://www.dcc.ac.uk) och DigitalPreservationEurope (DPE).
 
 Den innehåller också ett riskregister som kan hanteras från användargränssnittet och flera insticksprogram för riskbedömning som uppdaterar information om riskregistret.
 
-## Hur bedömer och minskar man bevaranderisker i RODA?
+## Hur bedömer och minskar man bevaranderisker i ETERNA?
 
 Du vill börja göra riskbedömningsprocesser i ditt arkiv. Till exempel så kanske du vill starta en process för att konvertera filer från format som inte längre är hållbara (t.ex. för att det uppstår en ny risk för att ett givet filformat inte kommer att stödjas i framtiden).
 
@@ -16,7 +16,7 @@ I grund och botten skulle du vilja ha ett arbetsflöde för följande hypotetisk
 
 Det finns flera sätt att hantera nya risker och påbörja en bevarandeåtgärd för att minska dessa, så vi fokuserar bara på hur vi skulle lösa just detta exempel:
 
-Föreställ dig att jag, som har rätt behörigheter i RODA, vet att Word 95 är ett format i riskzonen. Då skulle jag gå till riskregistret och registrera den risken, beskriva alla saker jag vet om just den risken och utse möjliga åtgärder för att minska den (t.ex. migrera den till ett nytt format).
+Föreställ dig att jag, som har rätt behörigheter i ETERNA, vet att Word 95 är ett format i riskzonen. Då skulle jag gå till riskregistret och registrera den risken, beskriva alla saker jag vet om just den risken och utse möjliga åtgärder för att minska den (t.ex. migrera den till ett nytt format).
 
 (En annan möjlighet skulle vara att använda ett plugin som skulle göra denna typ av analys automatiskt, men det finns inget sådant plugin för tillfället. Det skulle behöva utvecklas.)
 
@@ -28,7 +28,7 @@ Du kan sedan sänka risknivån eftersom det inte finns fler Word 95-filer i syst
 
 Det jag just förklarade är det manuella arbetsflödet, eftersom vi för närvarande inte har ett plugin för riskupptäckt av föråldrade format. Det pluginet skulle dock mycket väl kunna utvecklas. Begränsningsstegen skulle i så fall startas direkt från riskhanteringsgränssnittet.
 
-När det gäller tillgängliga konverteringsplugin stödjer RODA för närvarande de vanliga (stora bild-, video-, ord- och ljud) formaten. Nischformat kommer alltid att finnas i varje verksamhet och i så fall måste plugins för särskilda ändamål utvecklas.
+När det gäller tillgängliga konverteringsplugin stödjer ETERNA för närvarande de vanliga (stora bild-, video-, ord- och ljud) formaten. Nischformat kommer alltid att finnas i varje verksamhet och i så fall måste plugins för särskilda ändamål utvecklas.
 
 ## Har du en idé om ett plugin för riskbedömning?
 

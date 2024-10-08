@@ -2,7 +2,7 @@
 
 # Formatnormalisierungsrichtlinie
 
-RODA unterstützt jedes Dateiformat, verfügt aber nur über Werkzeuge zur automatischen Konvertierung von Formaten in Erhaltungsformate (Normalisierung) für eine begrenzte Anzahl von Dateiformaten und Objektklassen.
+ETERNA unterstützt jedes Dateiformat, verfügt aber nur über Werkzeuge zur automatischen Konvertierung von Formaten in Erhaltungsformate (Normalisierung) für eine begrenzte Anzahl von Dateiformaten und Objektklassen.
 
 Auf dieser Seite finden Sie die Standardzuordnung zwischen Formaten und Objektklassen, sowie eine Tabelle mit Empfehlungen für eine Normalisierungsrichtlinie.
 

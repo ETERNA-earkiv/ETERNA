@@ -21,23 +21,23 @@ The following search operators are at your disposal:
 There are several steps to do it:
 
 1. Generate SIPs with your new descriptive metadata type and version
-2. Configure RODA to index your new descriptive metadata format
-3. Configure RODA to show fields in the advanced search menu
+2. Configure ETERNA to index your new descriptive metadata format
+3. Configure ETERNA to show fields in the advanced search menu
 
 Optional:
-* Configure RODA to display your metadata
-* Configure RODA to allow to edit your metadata with a form
+* Configure ETERNA to display your metadata
+* Configure ETERNA to allow to edit your metadata with a form
 
 
 ### 1. Generate SIPs with your new desc. metadata type and version
 On the SIP you must define the descriptive metadata type and version. As you are using your own, you should define metadata type OTHER, other metadata type e.g. "GolikSwe" and metadata type version e.g. "1". This can be done directly in the METS or using the [RODA-in application](http://rodain.roda-community.org/) or the [commons-ip library](https://github.com/keeps/commons-ip).
 
-### 2. Configure RODA to index your new desc. metadata format
-On RODA, you must configure how it can index this file. To do so, you must define the XSLT under `$RODA_HOME/config/crosswalks/ingest/` with a name that is calculated by your metadata type and version.
+### 2. Configure ETERNA to index your new desc. metadata format
+On ETERNA, you must configure how it can index this file. To do so, you must define the XSLT under `$RODA_HOME/config/crosswalks/ingest/` with a name that is calculated by your metadata type and version.
 
 On the example with metadata type=OTHER, other metadata type="GolikSwe" and metadata version 1, you must create the file  `$RODA_HOME/config/crosswalks/ingest/golikswe_1.xslt`.
 
-You can look at examples in the `$RODA_HOME/example-config/crosswalks/dissemination/ingest/` or the [online version](https://github.com/keeps/roda/tree/master/roda-core/roda-core/src/main/resources/config/crosswalks/ingest).
+You can look at examples in the `$RODA_HOME/example-config/crosswalks/dissemination/ingest/` or the [online version](https://github.com/ETERNA-earkiv/ETERNA/tree/main/roda-core/roda-core/src/main/resources/config/crosswalks/ingest).
 
 The resulting XML must be something like:
 ```xml
@@ -51,14 +51,14 @@ The resulting XML must be something like:
 Rules:
 - There are some reserved field names, specially `title`, `dateInitial` and `dateFinal`, that define what appear on the lists
 - You can add new specific fields, but must always add a suffix for the data type. The most used suffixes are "\_txt" (any string tokenized), "\_ss" (non-tokenized strings for identifiers), "\_dd" for ISO1601 dates.
-- The definition of the reserved fields names is made [here](https://github.com/keeps/roda/blob/master/roda-core/roda-core/src/main/java/org/roda/core/index/schema/collections/AIPCollection.java#L61) but you may need to also access [here](https://github.com/keeps/roda/blob/master/roda-common/roda-common-data/src/main/java/org/roda/core/data/common/RodaConstants.java#L604) to find out the final name.
-- A complete list of suffixes and fields types is available at the [SOLR base schema](https://github.com/keeps/roda/blob/master/roda-core/roda-core/src/main/resources/config/index/common/conf/managed-schema).
+- The definition of the reserved fields names is made [here](https://github.com/ETERNA-earkiv/ETERNA/blob/main/roda-core/roda-core/src/main/java/org/roda/core/index/schema/collections/AIPCollection.java#L61) but you may need to also access [here](https://github.com/ETERNA-earkiv/ETERNA/blob/main/roda-common/roda-common-data/src/main/java/org/roda/core/data/common/RodaConstants.java#L604) to find out the final name.
+- A complete list of suffixes and fields types is available at the [SOLR base schema](https://github.com/ETERNA-earkiv/ETERNA/blob/main/roda-core/roda-core/src/main/resources/config/index/common/conf/managed-schema).
 
 To apply the changes on the stylesheet you must ingest new content or re-index existing content.
 
-### 3. Configure RODA to show fields in the advanced search menu
+### 3. Configure ETERNA to show fields in the advanced search menu
 
-Change your `roda-wui.properties` to [add an new advanced search field item](https://github.com/keeps/roda/blob/master/roda-ui/roda-wui/src/main/resources/config/roda-wui.properties#L165):
+Change your `roda-wui.properties` to [add an new advanced search field item](https://github.com/ETERNA-earkiv/ETERNA/blob/main/roda-ui/roda-wui/src/main/resources/config/roda-wui.properties#L165):
 
 ```javaproperties
 ui.search.fields.IndexedAIP = destructiondate # add new field to the list of fields for items (i.e. AIPs), other options are representations or files
@@ -69,13 +69,13 @@ ui.search.fields.IndexedAIP.destructiondate.fixed = true # if it appears on adva
 ```
 You should also add the necessary translations to your `$RODA_HOME/config/i18n/ServerMessages.properties`, and in all languages you which to support.
 
-Add [a translation for your new metadata type and version](https://github.com/keeps/roda/blob/master/roda-ui/roda-wui/src/main/resources/config/i18n/ServerMessages.properties#L121):
+Add [a translation for your new metadata type and version](https://github.com/ETERNA-earkiv/ETERNA/blob/main/roda-ui/roda-wui/src/main/resources/config/i18n/ServerMessages.properties#L121):
 
 ```javaproperties
 ui.browse.metadata.descriptive.type.golikswe_1=Golik SWE (version 1)
 ```
 
-Add [translations for your fields](https://github.com/keeps/roda/blob/master/roda-ui/roda-wui/src/main/resources/config/i18n/ServerMessages.properties#L2):
+Add [translations for your fields](https://github.com/ETERNA-earkiv/ETERNA/blob/main/roda-ui/roda-wui/src/main/resources/config/i18n/ServerMessages.properties#L2):
 
 ```javaproperties
 ui.search.fields.IndexedAIP.destructiondate= Destruction Date

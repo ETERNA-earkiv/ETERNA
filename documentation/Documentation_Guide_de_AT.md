@@ -1,6 +1,6 @@
 # Dokumentationsleitfaden
 
-Der gesamte Text in RODA, einschließlich der `Hilfe-Seiten`, der `Funktionsbeschreibung` und der `HTML-Seiten`, befindet sich im Verzeichnis `[RODA_HOME]/example-config/theme/`.
+Der gesamte Text in ETERNA, einschließlich der `Hilfe-Seiten`, der `Funktionsbeschreibung` und der `HTML-Seiten`, befindet sich im Verzeichnis `[RODA_HOME]/example-config/theme/`.
 
 Um den vorhandenen Inhalt zu aktualisieren, sollten Sie die zu aktualisierende Datei von `[RODA_HOME]/example-config/theme/` nach `[RODA_HOME]/config/theme/` kopieren und im Zielordner bearbeiten.
 

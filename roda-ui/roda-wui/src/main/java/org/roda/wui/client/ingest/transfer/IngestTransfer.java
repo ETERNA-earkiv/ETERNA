@@ -23,7 +23,6 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
-import org.roda.wui.client.common.UpSalePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.TransferredResourceActions;
@@ -157,9 +156,6 @@ public class IngestTransfer extends Composite {
   @UiField
   FlowPanel ingestTransferDescription;
 
-  @UiField
-  SimplePanel ingestTransferPanel;
-
   @UiField(provided = true)
   TransferredResourceSearch resourceSearch;
 
@@ -235,13 +231,6 @@ public class IngestTransfer extends Composite {
       TransferredResourceActions.get(null), actionCallback);
 
     initWidget(uiBinder.createAndBindUi(this));
-    UpSalePanel widgets = new UpSalePanel(messages.dropFolderInformationText(), messages.learnMore(),
-      ConfigurationManager.getString(RodaConstants.UI_SERVICE_DROPFOLDER_URL), cardIdentifier);
-    ingestTransferPanel.setWidget(widgets);
-
-    if (dropfolderActive){
-      ingestTransferPanel.setVisible(false);
-    }
 
     navigationToolbar.setHeader(messages.oneOfAObject(TransferredResource.class.getName()));
 
@@ -258,15 +247,11 @@ public class IngestTransfer extends Composite {
       itemDates.setText("");
       download.setVisible(false);
       navigationToolbar.setVisible(false);
-      if (!dropfolderActive){
-        ingestTransferPanel.setVisible(JavascriptUtils.accessLocalStorage(cardIdentifier));
-      }
       lastScanned.setText("");
     } else {
       navigationToolbar.updateBreadcrumb(resource);
       navigationToolbar.withObject(resource).build();
       navigationToolbar.setVisible(true);
-      ingestTransferPanel.setVisible(false);
       ingestTransferTitle.setVisible(false);
       ingestTransferDescription.setVisible(false);
 

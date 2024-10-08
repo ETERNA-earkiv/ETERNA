@@ -2,14 +2,14 @@
 
 Bei der Erstellung einer neuen intellektuellen Entität ist einer der Schritte die Auswahl des beschreibenden Metadatentyps.
 
-Dies bezieht sich auf das zu verwendende Schema für beschreibende Metadaten, wobei RODA standardmäßig die folgenden Optionen unterstützt:
+Dies bezieht sich auf das zu verwendende Schema für beschreibende Metadaten, wobei ETERNA standardmäßig die folgenden Optionen unterstützt:
 
 * **[EAD 2002](https://www.loc.gov/ead/)**: Encoded Archival Description (EAD) Version 2002 ist ein XML-Standard für die Kodierung von archivischen Findmitteln, der vom Technical Subcommittee for Encoded Archival Standards der Society of American Archivists in Zusammenarbeit mit der Library of Congress gepflegt wird. Er wird hauptsächlich von Archiven verwendet, um sowohl digital entstandene als auch analoge Dokumente zu beschreiben.
 * **[Dublin Core](https://www.dublincore.org/schemas/xmls/)**: Die Dublin Core (DC) Metadaten-Initiative unterstützt Innovationen bei der Gestaltung von Metadaten und bewährte Verfahren. Zu den derzeit empfohlenen Schemata gehört das *Simple DC XML schema, Version 2002-12-12*, das Begriffe für Simple Dublin Core definiert, d.h. die 15 Elemente aus dem Namensraum http://purl.org/dc/elements/1.1/, ohne Verwendung von Kodierungsschemata oder Elementverfeinerungen.
-* **[Schlüsselwert](https://github.com/keeps/roda/blob/master/roda-core/roda-core/src/main/resources/config/schemas/key-value.xsd)**: Ein RODA-internes einfaches Beschreibungsschema für die Definition von Schlüsselwert-Metadaten, wobei der Metadaten-Schlüssel das Element identifiziert (z.B. "Titel") und der Wert den Inhalt des Metadatenelements.
+* **[Schlüsselwert](https://github.com/ETERNA-earkiv/ETERNA/blob/main/roda-core/roda-core/src/main/resources/config/schemas/key-value.xsd)**: Ein RODA-internes einfaches Beschreibungsschema für die Definition von Schlüsselwert-Metadaten, wobei der Metadaten-Schlüssel das Element identifiziert (z.B. "Titel") und der Wert den Inhalt des Metadatenelements.
 *  **Andere**: Generischer XML-Typ, für den kein Schema definiert ist.
 
-Neue Metadatentypen können zu RODA hinzugefügt werden, indem die Dokumentation [Metadata Format](Metadata_Formats.md) befolgt wird.
+Neue Metadatentypen können zu ETERNA hinzugefügt werden, indem die Dokumentation [Metadata Format](Metadata_Formats.md) befolgt wird.
 
 | beschreibendes Metadatentyp | Überprüfung           | Indexierung         | Visualisierung         | Ausgabe      |
 |---------------------------|----------------------|------------------|-----------------------|--------------|

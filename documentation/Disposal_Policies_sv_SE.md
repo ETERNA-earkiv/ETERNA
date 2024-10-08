@@ -8,7 +8,7 @@ Gallringsscheman anger minimikraven för underhålls-, bevarande- eller gallring
 
 Enligt [MoReq2010®](https://moreq.info/) är "Gallringsscheman avgörande för att hantera bevarandeobjekt eftersom MoReq2010® specificerar att ett bevarandeobjekt i ett MCRS endast får gallras som en del av en gallringsprocess som styrs av gallringsschemat som tilldelats det bevarandeobjektet . Det är bevarandeobjektets gallringsschema som avgör hur länge ett bevarandeobjekt bevaras och hur den därefter gallras vid slutet av dess bevarandeperiod."
 
-RODA stödjer tre typer av gallringsåtgärder:
+ETERNA stödjer tre typer av gallringsåtgärder:
 
 1. Behåll permanent;
 2. Granska i slutet av bevarandeperioden;
@@ -52,7 +52,7 @@ När ett bevarandeobjekts gallringsåtgärd är inställd på granskning är den
 
 #### Gallringslivscykeln
 
-Gallringen av bevarandeobjekt har vissa begränsningar. Hur objekten gallras beror på innehållet i dess komponenter. RODA kan rensa beskrivande metadata med hjälp av [XSLT (eXtensible Stylesheet Language Transformations)](http://www.w3.org/standards/xml/transformation.html). Alla filer som är associerade med objektet gallras och lämnar objektet i ett gallrat tillstånd.
+Gallringen av bevarandeobjekt har vissa begränsningar. Hur objekten gallras beror på innehållet i dess komponenter. ETERNA kan rensa beskrivande metadata med hjälp av [XSLT (eXtensible Stylesheet Language Transformations)](http://www.w3.org/standards/xml/transformation.html). Alla filer som är associerade med objektet gallras och lämnar objektet i ett gallrat tillstånd.
 
 ![Desctuction life cycle](images/destruction_life_cycle.png "Livscykel förstöring")
 
@@ -78,7 +78,7 @@ Följande attribut kategoriseras som gallringsregler:
 
 Urvalsmetod för den mekanism som matchar regler med arkivobjekten i systemet och matchar mot lämpligt gallringsschema.
 
-Det finns två typer av utvalsmetoder i RODA:
+Det finns två typer av utvalsmetoder i ETERNA:
 
 * Child of (Barn): om arkivobjekt är underliggande till ett specifikt AIP.
 * Metadatafält: om arkivobjektet har ett specifikt värde.

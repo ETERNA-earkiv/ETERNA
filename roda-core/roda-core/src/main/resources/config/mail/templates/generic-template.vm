@@ -31,7 +31,7 @@
 	</head>
 	<body>
 		<p>Dear <em>{{recipient}}</em>,</p>
-		<p>RODA wants to inform you that a process has just finished. The details of the job are as follows:</p>
+		<p>ETERNA wants to inform you that a process has just finished. The details of the job are as follows:</p>
 		
 		<h2><strong>Job details</strong></h2>	
 		<strong>Name:</strong> {{name}}<br/>
@@ -51,7 +51,7 @@
 					
 		<p>If you are not related to the process before mentioned, please ignore this e-mail.</p>
 		<hr>
-		<p>RODA - Repository of Authentic Digital Objects</p>
+		<p>ETERNA - Repository of Authentic Digital Objects</p>
 		<p>An open-source digital repository designed for preservation</p>
 	</body>
 <html>

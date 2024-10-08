@@ -12,15 +12,15 @@ people can find, install and use the component.
 - Find the folder that corresponds to you Marketplace item type e.g.:`components`
 - Create a folder in with a unique vendor name e.g.: `KEEP_SOLUTIONS`
 - Add [the metadata file](#metadata-file) in json format with component information
-- Create a pull request to the RODA Community git repository
+- Create a pull request to the ETERNA git repository
 
 ## Validation
-The RODA development team will check if the pull request complies with the community rules. 
+The ETERNA development team will check if the pull request complies with the community rules. 
 If it complies, the component will be published in [https://market.roda-community.org/](https://market.roda-community.org/)
 
 ## Metadata file
 
-The metadata file contains the necessary information for the Market and RODA to make the component available for other users.
+The metadata file contains the necessary information for the Market and ETERNA to make the component available for other users.
 
 ### Requirements
 - The file must be in json format
@@ -30,14 +30,14 @@ The metadata file contains the necessary information for the Market and RODA to 
 | Name          | Description                                                                                    |
 |---------------|------------------------------------------------------------------------------------------------|
 | id            | The component  classname                                                                       |
-| name          | The name that will be displayed in the Market and in the RODA interface                        |
+| name          | The name that will be displayed in the Market and in the ETERNA interface                        |
 | type          | Component  type                                                                                |
 | version       | Component version                                                                              |
-| description   | The description that will be displayed in the Market and in the RODA interface                 |
+| description   | The description that will be displayed in the Market and in the ETERNA interface                 |
 | license       | Name of the license and url to license                                                         |
 | homepage      | A URL to the Marketplace's git repository or a web page with details on how to obtain the item |
 | vendor        | The component vendor name and link to vendor's homepage                                        |
-| compatibility | List of RODA versions supported by the component                                               |
+| compatibility | List of ETERNA versions supported by the component                                               |
 | price         | component's price                                                                              |
 | plugin        | Leave this attribute as shown below                                                            |
 | lang          | Languages supported by this component                                                          |

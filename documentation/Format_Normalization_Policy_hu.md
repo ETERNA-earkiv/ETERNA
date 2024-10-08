@@ -2,7 +2,7 @@
 
 # Formátumnormalizálási szabályzat
 
-A RODA bármilyen fájlformátumot támogat, de csak a fájlformátumok és objektumosztályok korlátozott körére vonatkozóan rendelkezik a formátumok megőrzési formátumokká való automatikus átalakítására (normalizálás) szolgáló eszközökkel.
+A ETERNA bármilyen fájlformátumot támogat, de csak a fájlformátumok és objektumosztályok korlátozott körére vonatkozóan rendelkezik a formátumok megőrzési formátumokká való automatikus átalakítására (normalizálás) szolgáló eszközökkel.
 
 Ezen az oldalon megtalálja a formátumok és objektumosztályok közötti alapértelmezett leképezést, valamint a normalizálási házirendre vonatkozó ajánlásokat tartalmazó táblázatot.
 

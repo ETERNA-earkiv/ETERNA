@@ -2,7 +2,7 @@
 
 Diese Seite enthält Informationen darüber, wie neue Statistiken auf der Grundlage der im Repository verfügbaren Informationen konfiguriert werden können. Um diese Informationen zu verstehen, muss man ein fortgeschrittener Benutzer mit Kenntnissen in HTML, CSS und Javascript sein.
 
-Die Statistiken funktionieren, indem Abfragen an RODA über die API gesendet werden (weitere Informationen finden Sie in der API-Dokumentation), die Ergebnisse gesammelt und als Grafiken dargestellt werden. Der gesamte Prozess wird auf der Client-Seite durch Javascript ausgeführt.
+Die Statistiken funktionieren, indem Abfragen an ETERNA über die API gesendet werden (weitere Informationen finden Sie in der API-Dokumentation), die Ergebnisse gesammelt und als Grafiken dargestellt werden. Der gesamte Prozess wird auf der Client-Seite durch Javascript ausgeführt.
 
 Die folgenden Abschnitte enthalten Codeschnipsel, die zur Anzeige von Statistiken über den Status des Repositorys verwendet werden können. Sie brauchen die Code-Ausschnitte in eine neue HTML-Seite einzubinden und die mitgelieferte Javascript-Engine kümmert sich um die gesamte Kommunikation, Arbeitslast und Darstellung. Neue Grafiken und Statistiken können durch Änderung der in den Ausschnitten enthaltenen Datenparameter (z.B. Datenquellenfilter) erstellt werden.
 

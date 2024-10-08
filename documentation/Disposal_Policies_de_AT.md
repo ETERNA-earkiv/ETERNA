@@ -8,7 +8,7 @@ Entsorgungspläne legen die Mindestanforderungen für die Pflege, Aufbewahrung o
 
 In [MoReq2010®](https://moreq.info/) heißt es: "Entsorgungspläne sind entscheidend für die Verwaltung von Aufzeichnungen, da MoReq2010® festlegt, dass eine Aufzeichnung in einem MCRS nur im Rahmen eines Entsorgungsprozesses vernichtet werden darf, der durch den dieser Aufzeichnung zugewiesenen Entsorgungsplan geregelt wird. Es ist der Entsorgungsplan der Aufzeichnung, der bestimmt, wie lange eine Aufzeichnung aufbewahrt wird und wie sie am Ende der Aufbewahrungsfrist entsorgt wird.
 
-RODA unterstützt drei Arten von Entsorgungsaktionen:
+ETERNA unterstützt drei Arten von Entsorgungsaktionen:
 
 1. Dauerhaft aufbewahren;
 2. Überprüfung am Ende der Aufbewahrungsfrist;
@@ -52,7 +52,7 @@ Wenn die Beseitigungsmaßnahme für einen Datensatz auf Überprüfung gesetzt wi
 
 #### Lebenszyklus der Vernichtung
 
-Die Vernichtung von Unterlagen unterliegt besonderen Beschränkungen. Wie die Datensätze vernichtet werden, hängt von der Art des Inhalts ihrer Komponenten ab. Mit RODA können beschreibende Metadaten mit Hilfe von [XSLT (eXtensible Stylesheet Language Transformations)] (http://www.w3.org/standards/xml/transformation.html) beschnitten werden. Alle mit dem Datensatz verknüpften Dateien werden vernichtet, so dass sich der Datensatz in einem zerstörten Zustand befindet.
+Die Vernichtung von Unterlagen unterliegt besonderen Beschränkungen. Wie die Datensätze vernichtet werden, hängt von der Art des Inhalts ihrer Komponenten ab. Mit ETERNA können beschreibende Metadaten mit Hilfe von [XSLT (eXtensible Stylesheet Language Transformations)] (http://www.w3.org/standards/xml/transformation.html) beschnitten werden. Alle mit dem Datensatz verknüpften Dateien werden vernichtet, so dass sich der Datensatz in einem zerstörten Zustand befindet.
 
 ![Lebenszyklus der Vernichtung](images/destruction_life_cycle.png "Lebenszyklus der Vernichtung")
 
@@ -78,7 +78,7 @@ Folgende Eigenschaften/Merkmale kategorisieren eine Entsorgungsregel:
 
 Die Auswahlmethode ist der Mechanismus, der für den Abgleich der Regeln mit den Datensätzen im Repository und die Anwendung des Entsorgungsplans verantwortlich ist.
 
-Bei RODA gibt es zwei Arten von Auswahlmethoden:
+Bei ETERNA gibt es zwei Arten von Auswahlmethoden:
 
 * Kindelement von: wenn der Datensatz direkt unter einem bestimmten AIP liegt.
 * Metadatenfeld: wenn der Datensatz einen beschreibenden Metadatenwert hat.

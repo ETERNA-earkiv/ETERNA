@@ -12,15 +12,15 @@ para que outras pessoas possam encontrar, instalar e usar o plugin.
 - Encontre a pasta que corresponde ao tipo do item que pretende publicar no Marketplace, como por exemplo `plugins`
 - Crie uma pasta com o nome único do fornecedor , como por exemplo `KEEP_SOLUTIONS`
 - Adicione o [ficheiro de metadados](#metadata-file) no formato json com as informações do plugin
-- Crie um pull request para o repositório git do RODA Community
+- Crie um pull request para o repositório git do ETERNA
 
 ## Validação
-A equipa de desenvolvimento do RODA irá verificar se o pull requeste está em conformidade com as regras da comunidade.
+A equipa de desenvolvimento do ETERNA irá verificar se o pull requeste está em conformidade com as regras da comunidade.
 Se estiver em conformidade, o plugin será publicado em [https://market.roda-community.org/](https://market.roda-community.org/)
 
 ## Ficheiro de metadados
 
-O Ficheiro de metadados contém as informações necessárias para que o Market e o RODA disponibilizem o plugin para outros utilizadores.
+O Ficheiro de metadados contém as informações necessárias para que o Market e o ETERNA disponibilizem o plugin para outros utilizadores.
 
 ### Requisitos
 - O ficheiro deve estar no formato json
@@ -30,16 +30,16 @@ O Ficheiro de metadados contém as informações necessárias para que o Market 
 | Name          | Description                                                                                                         |
 |---------------|---------------------------------------------------------------------------------------------------------------------|
 | id            | O classname do plugin                                                                                               |
-| name          | O nome que será exibido no Market e na interface RODA                                                               |
+| name          | O nome que será exibido no Market e na interface ETERNA                                                               |
 | type          | O Tipo do plugin                                                                                                    |
 | version       | A versão do plugin                                                                                                  |
-| description   | A descrição que será exibida no Market e na interface RODA                                                          |
+| description   | A descrição que será exibida no Market e na interface ETERNA                                                          |
 | license       | Nome da licensa e endereço para a licensa                                                                           |
 | homepage      | Uma URL para ou o repositório git do plugin ou uma página Web com detalhes sobre como obter o plug-in               |
 | vendor        | O nome do fornecedor do plugin                                                                                      |
-| compatibility | Lista de versões do RODA suportadas pelo plugin                                                                     |
+| compatibility | Lista de versões do ETERNA suportadas pelo plugin                                                                     |
 | price         | Custo do plugin                                                                                                     |
-| plugin        | As categorias em que o plugin se encaixa, o classname dos objetos do RODA que podem ser alvo do plugin e o seu tipo |
+| plugin        | As categorias em que o plugin se encaixa, o classname dos objetos do ETERNA que podem ser alvo do plugin e o seu tipo |
 | lang          | Linguagens suportadas por este plugin                                                                               |
 | region        | Regiões suportadas por este plugin                                                                                  |
 

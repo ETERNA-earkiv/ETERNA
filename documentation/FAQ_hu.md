@@ -1,12 +1,12 @@
 # Gyakran ismételt kérdések
 
-A RODA felhasználók által gyakran feltett kérdések és az azokra adott válaszok.
+A ETERNA felhasználók által gyakran feltett kérdések és az azokra adott válaszok.
 
-Van olyan égető kérdése, ami nincs itt? Csak [hozz létre egy problémát](https://github.com/keeps/roda/issues/new) a GitHubon, és jelöld meg a "kérdés" címkével.
+Van olyan égető kérdése, ami nincs itt? Csak [hozz létre egy problémát](https://github.com/ETERNA-earkiv/ETERNA/issues/new) a GitHubon, és jelöld meg a "kérdés" címkével.
 
 ## Nézők
 
-### Megnézhetünk fájlokat közvetlenül a RODA webes felületén?
+### Megnézhetünk fájlokat közvetlenül a ETERNA webes felületén?
 
 A rendszer néhány előre definiált megjelenítővel rendelkezik bizonyos szabványos formátumokhoz (pl. PDF, képek, HTML 5 multimédiaformátumok, stb.).
 
@@ -14,11 +14,11 @@ A speciális formátumoknak speciális megjelenítőkre vagy konvertálóprogram
 
 ## Metaadat
 
-### Milyen leíró metaadat-formátumokat támogat a RODA?
+### Milyen leíró metaadat-formátumokat támogat a ETERNA?
 
-Minden leíró metaadat-formátum támogatott, amennyiben van egy XML-séma (XSD) nyelvtan az érvényesítéshez. A RODA alapértelmezés szerint a Dublin Core és a 2002-es kódolt archívumleírással van konfigurálva. További sémák is hozzáadhatók.
+Minden leíró metaadat-formátum támogatott, amennyiben van egy XML-séma (XSD) nyelvtan az érvényesítéshez. A ETERNA alapértelmezés szerint a Dublin Core és a 2002-es kódolt archívumleírással van konfigurálva. További sémák is hozzáadhatók.
 
-### Támogathat-e a RODA több osztályozási sémát?
+### Támogathat-e a ETERNA több osztályozási sémát?
 
 A rendszer lehetővé teszi több hierarchikus struktúra meghatározását, ahol a rekordok elhelyezhetők. E struktúrák minden egyes csomópontjához leíró metaadatokat rendelhetünk. Képzeljük el ezt egy fájl/mappa rendszerként, ahol minden mappához egyéni metaadatok tartozhatnak EAD vagy DC formátumban (vagy bármilyen más formátumban). Minden ilyen "mappa" (vagy helyőrző) lehet állomány, gyűjtemény, sorozat, sorozat, gyűjteményegyüttes stb.
 
@@ -85,7 +85,7 @@ Ez egy összetett kérdés, amelyre nem lehet néhány sornyi szövegben válasz
 
 ### Hogyan támogatja az alkalmazás az értékelést, a megőrzési időszakok meghatározását?
 
-A RODA komplex munkafolyamatot biztosít a nyilvántartások megsemmisítéséhez. További információkért kérjük, olvassa el a [Disposal](Disposal.md) című dokumentumot.
+A ETERNA komplex munkafolyamatot biztosít a nyilvántartások megsemmisítéséhez. További információkért kérjük, olvassa el a [Disposal](Disposal.md) című dokumentumot.
 
 ### Is the system logging search interactions?
 
@@ -103,6 +103,6 @@ Nem igazán. Egy modern böngésző elegendő.
 
 Az új nyelvek rendszerbe való felvételére vonatkozó teljes körű utasítások a következő címen érhetők el: [Fordítási útmutató](Translation_Guide.md).
 
-### Hogyan állítsuk be a fejlesztési környezetet a RODA számára?
+### Hogyan állítsuk be a fejlesztési környezetet a ETERNA számára?
 
 A fejlesztőkörnyezet beállítására vonatkozó teljes körű utasítások a következő címen érhetők el: [Fejlesztői útmutató](Developers_Guide.md).

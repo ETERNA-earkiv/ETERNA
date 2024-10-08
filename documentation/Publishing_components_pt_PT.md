@@ -12,15 +12,15 @@ para que outras pessoas possam encontrar, instalar e usar o componente.
 - Encontre a pasta que corresponde ao tipo do item que pretende publicar no Marketplace, como por exemplo `components`
 - Crie uma pasta com o nome único do fornecedor , como por exemplo `KEEP_SOLUTIONS`
 - Adicione o [ficheiro de metadados](#metadata-file) no formato json com as informações do componente
-- Crie um pull request para o repositório git do RODA Community
+- Crie um pull request para o repositório git do ETERNA
 
 ## Validação
-A equipa de desenvolvimento do RODA irá verificar se o pull requeste está em conformidade com as regras da comunidade.
+A equipa de desenvolvimento do ETERNA irá verificar se o pull requeste está em conformidade com as regras da comunidade.
 Se estiver em conformidade, o componente será publicado em [https://market.roda-community.org/](https://market.roda-community.org/)
 
 ## Ficheiro de metadados
 
-O Ficheiro de metadados contém as informações necessárias para que o Market e o RODA disponibilizem o componente para outros utilizadores.
+O Ficheiro de metadados contém as informações necessárias para que o Market e o ETERNA disponibilizem o componente para outros utilizadores.
 
 ### Requisitos
 - O ficheiro deve estar no formato json
@@ -30,14 +30,14 @@ O Ficheiro de metadados contém as informações necessárias para que o Market 
 | Name             | Description                                                                                               |
 |------------------| --------------------------------------------------------------------------------------------------------- |
 | id               | O classname do componente                                                                                 |
-| name             | O nome que será exibido no Market e na interface RODA                                                     |
+| name             | O nome que será exibido no Market e na interface ETERNA                                                     |
 | type             | O Tipo do componente                                                                                      |
 | version          | A versão do componente                                                                                    |
-| description      | A descrição que será exibida no Market e na interface RODA                                                |
+| description      | A descrição que será exibida no Market e na interface ETERNA                                                |
 | license          | Nome da licensa e endereço para a licensa                                                                 |
 | homepage         | Uma URL para ou o repositório git do componente ou uma página Web com detalhes sobre como obter o plug-in |
 | vendor           | O nome do fornecedor do componente                                                                        |
-| compatibility    | Lista de versões do RODA suportadas pelo componente                                                       |
+| compatibility    | Lista de versões do ETERNA suportadas pelo componente                                                       |
 | price            | Custo do componente                                                                                       |
 | plugin           | Deixe este atributo como está no exemplo abaixo                                                           |
 | lang             | Linguagens suportadas por este componente                                                                 |

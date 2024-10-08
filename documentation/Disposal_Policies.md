@@ -8,7 +8,7 @@ Disposal schedules set the minimum requirements for the maintenance, retention o
 
 [MoReq2010®](https://moreq.info/) states "Disposal schedules are critical to managing records because MoReq2010® specifies that a record in an MCRS may only be destroyed as part of a disposal process governed by the disposal schedule assigned to that record. It is the record’s disposal schedule that determines how long a record is retained and how it is subsequently disposed of at the end of its retention period."
 
-RODA supports three types of disposal actions:
+ETERNA supports three types of disposal actions:
 
 1. Retain permanently;
 2. Review at the end of the retention period;
@@ -52,7 +52,7 @@ When a record’s disposal action is set to review, it is not immediately subjec
 
 #### Destruction life cycle
 
-The destruction of records is subject to particular constraints. How records are destroyed will depend on the nature of the content of their components. RODA allows to prune descriptive metadata using [XSLT (eXtensible Stylesheet Language Transformations)](http://www.w3.org/standards/xml/transformation.html). All the files associated to the record are destroyed leaving the record in a destroyed state. 
+The destruction of records is subject to particular constraints. How records are destroyed will depend on the nature of the content of their components. ETERNA allows to prune descriptive metadata using [XSLT (eXtensible Stylesheet Language Transformations)](http://www.w3.org/standards/xml/transformation.html). All the files associated to the record are destroyed leaving the record in a destroyed state. 
 
 ![Desctuction life cycle](images/destruction_life_cycle.png "Destruction life cycle")
 
@@ -78,7 +78,7 @@ The following attributes categorizes a disposal rule:
 
 Selection method is the mechanism responsible for matching the rules with the records in the repository and applying the disposal schedule.
 
-There are two types of selection method available on RODA:
+There are two types of selection method available on ETERNA:
 
 * Child of: if the record is directly under a certain AIP.
 * Metadata field: if the record has a descriptive metadata value. 

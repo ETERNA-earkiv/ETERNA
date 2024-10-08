@@ -7,7 +7,7 @@ After installing, direct your browser to the correct IP address (this depends on
 
 With this you will have access to all features.
 
-Then you can start using RODA:
+Then you can start using ETERNA:
 
 1. Go to Catalogue and click the button **NEW**, select Dublin Core and fill the title of your new collection.
 2. Go to **Ingest > Transfer** and upload files (e.g. PDF) or SIPs made by [RODA-in](http://rodain.roda-community.org/). SIPs will have metadata while PDFs wont. To know how to use RODA-in [watch the tutorials](http://rodain.roda-community.org/#tutorials).

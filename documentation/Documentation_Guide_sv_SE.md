@@ -1,6 +1,6 @@
 # Dokumentationsguide
 
-All statisk text i RODA, inklusive `Hjälpsidor`, `Funktionella beskrivningar` och statiska `Html-sidor` finns under `[RODA_HOME]/example-config/theme/`.
+All statisk text i ETERNA, inklusive `Hjälpsidor`, `Funktionella beskrivningar` och statiska `Html-sidor` finns under `[RODA_HOME]/example-config/theme/`.
 
 För att uppdatera befintligt innehåll kopierar du filen du vill uppdatera från `[RODA_HOME]/example-config/theme/` till `[RODA_HOME]/config/theme/` och redigerar i målmappen.
 

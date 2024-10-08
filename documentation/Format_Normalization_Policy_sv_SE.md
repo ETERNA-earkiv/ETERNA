@@ -2,7 +2,7 @@
 
 # Policy för formatnormalisering
 
-RODA stödjer alla format, men verktygen för att automatiskt konvertera filformat till arkivbeständiga format (normalisering), fungerar bara på ett antal filformat och objektklasser.  
+ETERNA stödjer alla format, men verktygen för att automatiskt konvertera filformat till arkivbeständiga format (normalisering), fungerar bara på ett antal filformat och objektklasser.  
 
 På den här sidan kan du se mappning mellan format och objektklasser och en tabell med rekommendationer för normalisering. 
 

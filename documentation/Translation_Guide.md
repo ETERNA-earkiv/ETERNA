@@ -1,19 +1,19 @@
 # Translation guide
 
-There is a new easier way to translate RODA to another language, with no need for technical skills, using Transifex. To check how to translate RODA using just source code please refer to the section "Translate using source code" below.
+There is a new easier way to translate ETERNA to another language, with no need for technical skills, using Transifex. To check how to translate ETERNA using just source code please refer to the section "Translate using source code" below.
 
 ## Translate using Transifex
 
 To start, go the site [https://www.transifex.com/roda-1/roda2/](https://www.transifex.com/roda-1/roda2/) and click the button **"Help translate RODA"**. 
 
-If you don't have an account create one or select one of the easy sign-up options. After log-in, add yourself to the RODA Community team and start translating RODA into one of the languages already being worked on. 
+If you don't have an account create one or select one of the easy sign-up options. After log-in, add yourself to the RODA Community team and start translating ETERNA into one of the languages already being worked on. 
 
-If your language is not on the list, click the button "Request language" for us to evaluate adding this new language to RODA.
+If your language is not on the list, click the button "Request language" for us to evaluate adding this new language to ETERNA.
 
 
 ## Translate using source code
 
-To translate RODA to a new language one needs to get the source files (as explained in the [Developer guide](Developers_Guide.md)) and add new message files for the new language.
+To translate ETERNA to a new language one needs to get the source files (as explained in the [Developer guide](Developers_Guide.md)) and add new message files for the new language.
 The existing message files containing localizable texts are listed below on RODA-WUI project (roda-ui/roda-wui).
  
 * src/main/resources/config/i18n/*.properties
@@ -50,6 +50,6 @@ MainPanel.error.CREATE_SIP=Une erreur s'est produite lors de la création de pac
 
 To add a new language (French, for example) to RODA-WUI, besides creating new message files like explained before, one needs to do the following steps for the new language appears in the interface:
 
-1. Edit file [src/main/java/org/roda/wui/RodaWUI.gwt.xml](https://github.com/keeps/roda/blob/master/roda-ui/roda-wui/src/main/java/org/roda/wui/RodaWUI.gwt.xml) and change it accordingly to the instructions in [GWT guide](https://developers.google.com/web-toolkit/doc/latest/DevGuideI18nLocale#LocaleModule).
+1. Edit file [src/main/java/org/roda/wui/RodaWUI.gwt.xml](https://github.com/ETERNA-earkiv/ETERNA/blob/main/roda-ui/roda-wui/src/main/java/org/roda/wui/RodaWUI.gwt.xml) and change it accordingly to the instructions in [GWT guide](https://developers.google.com/web-toolkit/doc/latest/DevGuideI18nLocale#LocaleModule).
 
 2. [Recompile the project](Developers_Guide.md) and you are ready to go.

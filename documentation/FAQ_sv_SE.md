@@ -1,8 +1,8 @@
 # Frågor och svar
 
-Vanliga frågor från RODA-användare och deras svar.
+Vanliga frågor från ETERNA-användare och deras svar.
 
-Har du en viktig fråga du inte hittar svaret på? Skapa en fråga [create an issue](https://github.com/keeps/roda/issues/new) på GitHub och markera det som "question".
+Har du en viktig fråga du inte hittar svaret på? Skapa en fråga [create an issue](https://github.com/ETERNA-earkiv/ETERNA/issues/new) på GitHub och markera det som "question".
 
 ## Visare
 
@@ -14,11 +14,11 @@ Specialformat behöver specialvisare eller konverterare som kan omvandla dem til
 
 ## Metadata
 
-### Vilka beskrivande metadata supporteras av RODA?
+### Vilka beskrivande metadata supporteras av ETERNA?
 
-Alla beskrivande metadataformat supporteras så länge det finns grammatik i ett XML-Schema (XSD) som kan validera det.  Som standard kommer RODA konfigurerat med Dublin Core och Encoded Archival Description 2002. Fler scheman kan läggas till.
+Alla beskrivande metadataformat supporteras så länge det finns grammatik i ett XML-Schema (XSD) som kan validera det.  Som standard kommer ETERNA konfigurerat med Dublin Core och Encoded Archival Description 2002. Fler scheman kan läggas till.
 
-### Kan RODA stödja flera klassificeringsscheman?
+### Kan ETERNA stödja flera klassificeringsscheman?
 
 Systemet möjliggör definition av flera hierarkiska strukturer där man kan placera informationsposter. Till var och en av noderna i dessa strukturer kan vi tilldela beskrivande metadata. Föreställ dig detta som ett fil-/mappsystem där varje mapp kan ha anpassad metadata i EAD- eller DC-format (eller något annat format för den delen). Var och en av dessa "mappar" (eller platshållare) kan vara ett arkiv, en samling, en serie eller en ackumulation, etc.
 
@@ -85,7 +85,7 @@ Detta är en komplex fråga som inte kan besvaras med bara några rader text. Me
 
 ### Hur stödjer systemet infromationsvärderingar, val av bevarandeperioder och gallringsfrister?
 
-RODA tillhandahåller ett komplext arbetsflöde för gallring av poster. Se [Disposal](Disposal.md) för mer information.
+ETERNA tillhandahåller ett komplext arbetsflöde för gallring av poster. Se [Disposal](Disposal.md) för mer information.
 
 ### Loggar systemet sökinteraktioner?
 
@@ -103,6 +103,6 @@ Inte riktigt. En modern webbläsare räcker.
 
 Fullständiga instruktioner för hur man lägger till ett nytt språk i systemet finns på: [Translation guide](Translation_Guide.md).
 
-### Hur sätter man upp en utvecklingsmiljö för RODA?
+### Hur sätter man upp en utvecklingsmiljö för ETERNA?
 
 Fullständiga instruktioner för hur man sätter upp en utvecklingsmiljö finns på: [Developers guide](Developers_Guide.md).

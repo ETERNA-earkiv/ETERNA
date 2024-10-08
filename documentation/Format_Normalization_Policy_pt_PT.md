@@ -3,7 +3,7 @@
 
 # Política de normalização de formatos
 
-O RODA suporta qualquer formato de ficheiro, mas apenas tem ferramentas para converter automaticamente para formatos de preservação (normalização) num conjunto limitado de formatos de ficheiro e classes de objetos.
+O ETERNA suporta qualquer formato de ficheiro, mas apenas tem ferramentas para converter automaticamente para formatos de preservação (normalização) num conjunto limitado de formatos de ficheiro e classes de objetos.
 
 Nesta página, poderá encontrar o mapeamento predefinido entre formatos e classes de objetos, e uma tabela de recomendações para uma política de normalização.
 

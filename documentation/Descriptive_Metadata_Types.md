@@ -2,14 +2,14 @@
 
 When creating a new intellectual entity, one of the steps is to select the "type" of descriptive metadata.
 
-This refers to the descriptive metadata scheme that will be used, and by default RODA supports the following options:
+This refers to the descriptive metadata scheme that will be used, and by default ETERNA supports the following options:
 
 * **[EAD 2002](https://www.loc.gov/ead/)**: Encoded Archival Description (EAD) version 2002 is an XML standard for encoding archiving finding aids, maintained by the Technical Subcommittee for Encoded Archival Standards of the Society of American Archivists, in partnership with the Library of Congress. It is mainly used by archives to describe both digitally-born and analog documents.
 * **[Dublin Core](https://www.dublincore.org/schemas/xmls/)**: The Dublin Core (DC) Metadata Initiative supports innovation in metadata design and best practices. Currently recommended schemas include the *Simple DC XML schema, version 2002-12-12*, which defines terms for Simple Dublin Core, i.e. the 15 elements from the http://purl.org/dc/elements/1.1/ namespace, with no use of encoding schemes or element refinements.
-* **[Key-value](https://github.com/keeps/roda/blob/master/roda-core/roda-core/src/main/resources/config/schemas/key-value.xsd)**: An RODA internal simple description schema for key-value metadata definition, where the metadata key identifies the element (e.g. "title") and the value the content of the metadata element.
+* **[Key-value](https://github.com/ETERNA-earkiv/ETERNA/blob/main/roda-core/roda-core/src/main/resources/config/schemas/key-value.xsd)**: An ETERNA internal simple description schema for key-value metadata definition, where the metadata key identifies the element (e.g. "title") and the value the content of the metadata element.
 *  **Other**: Generic XML type where no schema is defined.
 
-New metadata types can be added to RODA following the documentation [Metadata formats](Metadata_Formats.md).
+New metadata types can be added to ETERNA following the documentation [Metadata formats](Metadata_Formats.md).
 
 | Descriptive metadata type | Validation           | Indexing         | Visualization         | Edition      |
 |---------------------------|----------------------|------------------|-----------------------|--------------|

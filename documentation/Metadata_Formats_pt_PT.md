@@ -1,8 +1,8 @@
 # Formatos de metainformação
 
-RODA suporta qualquer formato de metainformação descritiva (i.e. metainformação descritiva tal como mencionado no OAIS) desde que seja representada por um ficheiro XML. Se possuí um formato de metainformação descritiva que não é baseado em XML (e.g. CSV, JSON. MARC21, etc) terá que converter para XML antes de ser incorporado no RODA. Existem diferentes ferramentas que permitem a conversão da maioria dos formatos para XML.
+ETERNA suporta qualquer formato de metainformação descritiva (i.e. metainformação descritiva tal como mencionado no OAIS) desde que seja representada por um ficheiro XML. Se possuí um formato de metainformação descritiva que não é baseado em XML (e.g. CSV, JSON. MARC21, etc) terá que converter para XML antes de ser incorporado no ETERNA. Existem diferentes ferramentas que permitem a conversão da maioria dos formatos para XML.
 
-Assim que a metainformação esteja disponível em XML esta está pronta para ser empacotada no SIP (Submission Information Package) e ingerida no repositório. Alternativamente, também é possível criar o ficheiro de metainformação diretamente no repositório e usando a funcionalidade fornecida pelo Catálogo. Quando o formato de metainformação é desconhecido para o RODA, o repositório tentará suportar, o melhor possível, sem precisar de nenhuma reconfiguração do sistema, contudo as seguintes limitação serão aplicadas:
+Assim que a metainformação esteja disponível em XML esta está pronta para ser empacotada no SIP (Submission Information Package) e ingerida no repositório. Alternativamente, também é possível criar o ficheiro de metainformação diretamente no repositório e usando a funcionalidade fornecida pelo Catálogo. Quando o formato de metainformação é desconhecido para o ETERNA, o repositório tentará suportar, o melhor possível, sem precisar de nenhuma reconfiguração do sistema, contudo as seguintes limitação serão aplicadas:
 
 #### Validação
 
@@ -18,17 +18,17 @@ Quando nenhum mapeamento de visualização estiver configured, um visualizador g
 
 #### Edição
 
-RODA precisa de ficheiros de configuração para perceber como os ficheiros de metainformação devem ser mostrado no âmbito da edição. Se nenhum ficheiro de configuração for fornecido, o repositório irá mostrar uma área de texto onde o utilizador tem a possibilidade de editar o XML diretamente.
+ETERNA precisa de ficheiros de configuração para perceber como os ficheiros de metainformação devem ser mostrado no âmbito da edição. Se nenhum ficheiro de configuração for fornecido, o repositório irá mostrar uma área de texto onde o utilizador tem a possibilidade de editar o XML diretamente.
 
-De forma a suportar novos formatos de metainformação, o repositório deverá ser configurado de acordo. As seguintes secções descrevem em detalhe o conjunto de ações necessárias para habilitar o RODA com esquemas de metainformação novos.
+De forma a suportar novos formatos de metainformação, o repositório deverá ser configurado de acordo. As seguintes secções descrevem em detalhe o conjunto de ações necessárias para habilitar o ETERNA com esquemas de metainformação novos.
 
 ## Ficheiros de melhorias de metainformação
 
-Para melhorar a experiência com a metainformação no RODA existem 4 ficheiros que precisam de ser adicionados à pasta de configurações do repositório. As seguintes secções descrevem e fornecem exemplos desses ficheiros.
+Para melhorar a experiência com a metainformação no ETERNA existem 4 ficheiros que precisam de ser adicionados à pasta de configurações do repositório. As seguintes secções descrevem e fornecem exemplos desses ficheiros.
 
 ### Validação
 
-RODA usa um [esquema XML](http://www.w3.org/standards/xml/schema) para validar a estrutura e os tipos de dados dos ficheiros de metainformação. A validação do esquema é usada durante o processo de ingestão para verificar se a metainformação incluída no SIP é válida de acordo com as restrições estabelecidas assim como quando a metainformação é editada através do catálogo.
+ETERNA usa um [esquema XML](http://www.w3.org/standards/xml/schema) para validar a estrutura e os tipos de dados dos ficheiros de metainformação. A validação do esquema é usada durante o processo de ingestão para verificar se a metainformação incluída no SIP é válida de acordo com as restrições estabelecidas assim como quando a metainformação é editada através do catálogo.
 
 Poderá usar um esquema padrão para o propósito da validação ou criar um específico com o grau de controlo que desejar, tais como verificar a instalação do repositório, campos obrigatórios, vocabulários controlados, etc.
 
@@ -290,7 +290,7 @@ O seguinte exemplo demonstra um ficheiro de mapa de índices para a metainforma�
 </xsl:stylesheet>
 ```
 
-O resultado produzido é um [documento Solr](https://wiki.apache.org/solr/UpdateXmlMessages) pronto a ser indexado pelo RODA. Ver o exemplo abaixo:
+O resultado produzido é um [documento Solr](https://wiki.apache.org/solr/UpdateXmlMessages) pronto a ser indexado pelo ETERNA. Ver o exemplo abaixo:
 
 ```
 <doc>
@@ -669,9 +669,9 @@ Depois de adicionar todos os arquivos descritos na seção anterior, é preciso 
 
 ### Ativar o novo formato de metadados
 
-Depois de adicionar os arquivos descritos anteriormente à sua pasta de configuração, você deve ativar o novo formato no arquivo de configuração principal do RODA.
+Depois de adicionar os arquivos descritos anteriormente à sua pasta de configuração, você deve ativar o novo formato no arquivo de configuração principal do ETERNA.
 
-Edite o ficheiro `[RODA_HOME]/config/roda-wui.properties` e adicione uma nova entrada tal como demonstrado no exemplo seguinte com o nome da metainformação descritiva adicionada. Fazendo com que o RODA esteja consciente do novo formato de metainformação.
+Edite o ficheiro `[RODA_HOME]/config/roda-wui.properties` e adicione uma nova entrada tal como demonstrado no exemplo seguinte com o nome da metainformação descritiva adicionada. Fazendo com que o ETERNA esteja consciente do novo formato de metainformação.
 
 ```
 ui.browser.metadata.descriptive.types = dc
@@ -681,7 +681,7 @@ ui.browser.metadata.descriptive.types = ead_2002
 
 ### Internacionalização de texto
 
-De forma a que o novo esquema de metainformação seja integrado de forma perfeita, deverá fornecer a informação sobre a internacionalização (i18n) para que o RODA saiba como mostrar a informação necessária ao utilizador na melhor forma possível.
+De forma a que o novo esquema de metainformação seja integrado de forma perfeita, deverá fornecer a informação sobre a internacionalização (i18n) para que o ETERNA saiba como mostrar a informação necessária ao utilizador na melhor forma possível.
 
 Edite o ficheiro `[RODA_HOME]/config/i18n/ServerMessages.properties` e adicione as seguintes entradas se necessárias, tendo em atenção que a última parte da chave corresponde ao código fornecido no ficheiro `[RODA_HOME]/config/roda-wui.properties` descrito na secção anterior:
 
@@ -691,7 +691,7 @@ ui.browse.metadata.descriptive.type.ead.3=Encoded Archival Description 3
 ui.browse.metadata.descriptive.type.ead.2002=Encoded Archival Description 2002
 ```
 
-Por fim deverá ser disponibilizadas as traduções para os nomes dos campos para que possam ser processadas pelo RODA durante a atividade de visualização. As traduções devem estar no ficheiro em `[RODA_HOME]/config/i18n/ServerMessages_pt_PT.properties` e serem adicionadas as entradas necessárias, assegurando que a última parte da chave corresponde com o `xsl:params` incluído no mapeamento da visualização.
+Por fim deverá ser disponibilizadas as traduções para os nomes dos campos para que possam ser processadas pelo ETERNA durante a atividade de visualização. As traduções devem estar no ficheiro em `[RODA_HOME]/config/i18n/ServerMessages_pt_PT.properties` e serem adicionadas as entradas necessárias, assegurando que a última parte da chave corresponde com o `xsl:params` incluído no mapeamento da visualização.
 
 O exemplo a seguir descreve como os nomes de campo no exemplo Simple Dublin Core devem ser exibidos na interface de utilizador.
 
@@ -734,4 +734,4 @@ As terminações das chaves anteriores devem corresponder às entradas xsl:param
 
 ### Recarregar configuração
 
-Depois de alterar os arquivos de configuração, deve-se reiniciar o RODA para que suas alterações se tornem efetivas. Pode-se fazer isso reiniciando o container ou o servidor de aplicação.
+Depois de alterar os arquivos de configuração, deve-se reiniciar o ETERNA para que suas alterações se tornem efetivas. Pode-se fazer isso reiniciando o container ou o servidor de aplicação.

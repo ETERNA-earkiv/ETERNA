@@ -2,14 +2,14 @@
 
 Új entitás létrehozásakor az egyik lépés a leíró metaadatok "típusának" kiválasztása.
 
-Ez a használt leíró metaadatsémára utal, és alapértelmezés szerint a RODA a következő opciókat támogatja:
+Ez a használt leíró metaadatsémára utal, és alapértelmezés szerint a ETERNA a következő opciókat támogatja:
 
 * **[EAD 2002](https://www.loc.gov/ead/)**: Az EAD (Encoded Archival Description) 2002-es verziója egy XML-szabvány az archiválási segédletek kódolására, amelyet az Amerikai Levéltárosok Társasága kódolt archiválási szabványok technikai albizottsága tart fenn a Kongresszusi Könyvtárral együttműködve. Elsősorban levéltárak használják mind a digitálisan keletkezett, mind az analóg dokumentumok leírására.
 * **[Dublin Core](https://www.dublincore.org/schemas/xmls/)**: A Dublin Core (DC) metaadat-kezdeményezés támogatja a metaadat-tervezés és a legjobb gyakorlatok innovációját. A jelenleg ajánlott sémák közé tartozik az *Simple DC XML séma, 2002-12-12 verzió*, amely az egyszerű Dublin Core, azaz a http://purl.org/dc/elements/1.1/ névtér 15 elemének kifejezéseit határozza meg, kódolási sémák vagy elemfinomítások használata nélkül.
-* **[Kulcs-érték](https://github.com/keeps/roda/blob/master/roda-core/roda-core/src/main/resources/config/schemas/key-value.xsd)**: A RODA belső egyszerű leírási séma a kulcs-érték metaadatok meghatározásához, ahol a metaadat kulcs az elemet azonosítja (pl. "cím"), az érték pedig a metaadatelem tartalmát.
+* **[Kulcs-érték](https://github.com/ETERNA-earkiv/ETERNA/blob/main/roda-core/roda-core/src/main/resources/config/schemas/key-value.xsd)**: A ETERNA belső egyszerű leírási séma a kulcs-érték metaadatok meghatározásához, ahol a metaadat kulcs az elemet azonosítja (pl. "cím"), az érték pedig a metaadatelem tartalmát.
 *  **Más**: Általános XML típus, ahol nincs séma definiálva.
 
-Új metaadattípusok adhatók hozzá a RODA-hoz a dokumentáció [Metaadatformátumok] (Metadata_Formats.md) szerint.
+Új metaadattípusok adhatók hozzá a ETERNA-hoz a dokumentáció [Metaadatformátumok] (Metadata_Formats.md) szerint.
 
 | Leíró metaadattípus | Hitelesítés           | Indexelés         | Vizualizáció         | Kiadvány      |
 |---------------------------|----------------------|------------------|-----------------------|--------------|

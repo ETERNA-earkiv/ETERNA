@@ -3,34 +3,39 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <name>RODA - Repositório de Objetos Digitais Autênticos</name>
-    <url>https://roda.keep.pt/</url>
+    <name>ETERNA </name>
+    <url>https://www.whitered.se/eterna</url>
     <groupId>org.roda-project</groupId>
-    <artifactId>roda</artifactId>
-    <version>5.7.0</version>
+    <artifactId>ETERNA</artifactId>
+    <version>0.1.0</version>
     <packaging>pom</packaging>
-    <description>RODA is a full-featured open-source digital preservation repository providing all the
+    <description>ETERNA is a full-featured open-source digital preservation repository providing all the
         functionality
         prescribed by the OAIS reference model.
     </description>
     <scm>
-        <url>https://github.com/KEEPS/RODA</url>
+        <url>https://github.com/ETERNA-earkiv/ETERNA</url>
     </scm>
     <organization>
-        <name>KEEP SOLUTIONS</name>
-        <url>https://www.keep.pt</url>
+        <name>White Red Consulting AB</name>
+        <url>https://www.whitered.se/</url>
     </organization>
     <distributionManagement>
         <repository>
             <id>github</id>
             <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/keeps/roda</url>
+            <url>https://maven.pkg.github.com/ETERNA-earkiv/ETERNA</url>
         </repository>
     </distributionManagement>
     <repositories>
         <repository>
             <id>github</id>
-            <name>GitHub Packages</name>
+            <name>ETERNA GitHub Packages</name>
+            <url>https://github.com/ETERNA-earkiv/*</url>
+        </repository>
+        <repository>
+            <id>github-keeps</id>
+            <name>Keeps GitHub Packages</name>
             <url>https://maven.pkg.github.com/keeps/*</url>
         </repository>
         <repository>
@@ -41,6 +46,14 @@
     </repositories>
     <developers>
         <developer>
+            <id>filiph-schaaf</id>
+            <name>Filiph Schaaf</name>
+            <email>filiph.schaaf@whitered.se</email>
+            <organization>White Red Consulting AB</organization>
+            <organizationUrl>https://www.whitered.se/</organizationUrl>
+            <timezone>0</timezone>
+        </developer>
+        <!--<developer>
             <id>lfaria</id>
             <name>Luis Faria</name>
             <email>lfaria@keep.pt</email>
@@ -48,14 +61,14 @@
             <organizationUrl>https://www.keep.pt</organizationUrl>
             <timezone>0</timezone>
         </developer>
-        <!--developer>
+        <developer>
             <id>hsilva</id>
             <name>Helder Silva</name>
             <email>hsilva@keep.pt</email>
             <organization>KEEP SOLUTIONS</organization>
             <organizationUrl>https://www.keep.pt</organizationUrl>
             <timezone>0</timezone>
-        </developer-->
+        </developer
         <developer>
             <id>mguimaraes</id>
             <name>Miguel Guimarães</name>
@@ -72,22 +85,22 @@
             <organizationUrl>https://www.keep.pt</organizationUrl>
             <timezone>0</timezone>
         </developer>
-        <!--developer>
+        <developer>
             <id>jgomes</id>
             <name>João Gomes</name>
             <email>jgomes@keep.pt</email>
             <organization>KEEP SOLUTIONS</organization>
             <organizationUrl>https://www.keep.pt</organizationUrl>
             <timezone>0</timezone>
-        </developer-->
-        <!--developer>
+        </developer>
+        <developer>
             <id>syusupov</id>
             <name>Shahzod Yusupov</name>
             <email>syusupov@keep.pt</email>
             <organization>KEEP SOLUTIONS</organization>
             <organizationUrl>https://www.keep.pt</organizationUrl>
             <timezone>0</timezone>
-        </developer-->
+        </developer>
         <developer>
             <id>alindo</id>
             <name>António Lindo</name>
@@ -104,6 +117,7 @@
             <organizationUrl>https://www.keep.pt</organizationUrl>
             <timezone>0</timezone>
         </developer>
+        -->
     </developers>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -278,7 +292,7 @@
                         <keyword>copyright</keyword>
                     </keywords>
                     <properties>
-                        <project.license.url>https://github.com/keeps/roda</project.license.url>
+                        <project.license.url>https://github.com/ETERNA-earkiv/ETERNA</project.license.url>
                     </properties>
                     <includes>
                         <include>**/*.java</include>

@@ -7,7 +7,7 @@ Efter installation, gå till rätt IP-adress i din webbläsare (denna beror på 
 
 Med dessa kommer du ha tillgång till alla funktioner i systemet.
 
-Nu kan du börja använda RODA:
+Nu kan du börja använda ETERNA:
 
 1. Till till Katalogen och klicka på **NY**, välj Dublin Core och namnge din nya samling.
 2. Gå till **Leverans > Inleverans** och ladda upp filer (t.ex. PDF) eller SIP:ar från [Roda-In](https://rodain.roda-community.org/). SIP:ar kommer att ha metadata kopplat till sig men det kommer inte PDF:erna. För mer information om RODA-in [se här]/https://rodain.roda-community.org/#tutorials).

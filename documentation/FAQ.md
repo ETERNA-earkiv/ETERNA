@@ -1,12 +1,12 @@
 # Frequently Asked Questions
 
-Frequent questions that are asked by RODA users and their answers.
+Frequent questions that are asked by ETERNA users and their answers.
 
-Do you have a burning question that is not here? Just [create an issue](https://github.com/keeps/roda/issues/new) on GitHub and mark it with a "question" label.
+Do you have a burning question that is not here? Just [create an issue](https://github.com/ETERNA-earkiv/ETERNA/issues/new) on GitHub and mark it with a "question" label.
 
 ## Viewers
 
-### Can we preview files directly on the Web interface of RODA?
+### Can we preview files directly on the Web interface of ETERNA?
 
 The system comes with a few predefined viewers for certain standard formats (e.g. PDF, images, HTML 5 multimedia formats, etc.).
 
@@ -14,11 +14,11 @@ Special formats need special viewers or converters to adapt them to existing vie
 
 ## Metadata
 
-### What descriptive metadata formats are supported by RODA?
+### What descriptive metadata formats are supported by ETERNA?
 
-All descriptive metadata formats are supported as long as there is a grammar in XML Schema (XSD) to validate it. By default, RODA comes configured with Dublin Core and Encoded Archival Description 2002. More schemas can be added.
+All descriptive metadata formats are supported as long as there is a grammar in XML Schema (XSD) to validate it. By default, ETERNA comes configured with Dublin Core and Encoded Archival Description 2002. More schemas can be added.
 
-### Can RODA support multiple classification schemes?
+### Can ETERNA support multiple classification schemes?
 
 The system enables the definition of multiple hierarchical structures where one can place records. To each of the nodes of these structures we can assign descriptive metadata. Picture this as a file/folder system where each folder can have custom metadata in EAD or DC format (or any other format for that matter). Each of these “folders” (or placeholders) can be a fonds, collection, series, or aggregation, etc.
 
@@ -85,7 +85,7 @@ This is a complex question that cannot be answered in just a few lines of text. 
 
 ### How does the application support appraisal, selection the definition of retention periods?
 
-RODA provides a complex workflow for disposal of records. Please refer to [Disposal](Disposal.md) for more information.
+ETERNA provides a complex workflow for disposal of records. Please refer to [Disposal](Disposal.md) for more information.
 
 ### Is the system logging search interactions?
 
@@ -103,6 +103,6 @@ Not really. A modern browser is sufficient.
 
 Complete instructions on how to add a new language to the system are available at: [Translation guide](Translation_Guide.md).
 
-### How to set up the development environment for RODA?
+### How to set up the development environment for ETERNA?
 
 Complete instructions on how to set up the development environment are available at: [Developers guide](Developers_Guide.md).

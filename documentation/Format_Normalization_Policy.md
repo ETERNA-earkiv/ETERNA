@@ -2,7 +2,7 @@
 
 # Format normalization policy
 
-RODA supports any file format, but only has tools to automatically convert formats into preservation formats (normalization) to a limited set of file formats and object classes.
+ETERNA supports any file format, but only has tools to automatically convert formats into preservation formats (normalization) to a limited set of file formats and object classes.
 
 In this page you will find the default mapping between formats and object classes, and a table of recommendations for a normalization policy.
 

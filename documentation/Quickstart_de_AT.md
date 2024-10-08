@@ -7,7 +7,7 @@ Nach der Installation öffnen Sie Ihren Browser und geben Sie die richtige IP-Ad
 
 Mit diesen Anmeldedaten erhalten Sie Zugriff auf alle Funktionen.
 
-Jetzt können Sie RODA beginnen:
+Jetzt können Sie ETERNA beginnen:
 
 1. Wählen Sie den Menüpunkt Katalog und klicken Sie auf die Schaltfläche **NEU**, wählen Sie "Dublin Core" aus und geben Sie den Titel Ihrer neuen Sammlung ein.
 2. Wählen Sie **Ingest > Transfer** und laden Sie Dateien (z. B. PDF) oder SIPs hoch, die mit [RODA-in](http://rodain.roda-community.org/) erstellt wurden. SIPs enthalten Metadaten, während PDFs dies nicht tun. Um zu erfahren, wie RODA-in verwendet wird, [schauen Sie sich die Tutorials an](http://rodain.roda-community.org/#tutorials).

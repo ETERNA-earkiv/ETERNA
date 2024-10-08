@@ -2,7 +2,7 @@
 
 Den här sidan ger information om hur du konfigurerar ny statistik baserat på den information som finns tillgänglig i e-arkivet. För att förstå denna information måste man vara en avancerad användare med kunskaper inom HTML, CSS och Javascript.
 
-Statistik fungerar genom att frågor skickas till RODA med hjälp av dess API (läs API-dokumentationen för mer information), samla in resultaten och presentera dem grafiskt. Hela processen görs på klientsidan av Javascript.
+Statistik fungerar genom att frågor skickas till ETERNA med hjälp av dess API (läs API-dokumentationen för mer information), samla in resultaten och presentera dem grafiskt. Hela processen görs på klientsidan av Javascript.
 
 Följande avsnitt tillhandahåller kodsnuttar som man kan använda för att visa statistik om e-arkivets statistik. Man behöver bara inkludera kodsnuttarna på en ny HTML-sida, så kommer medföljande Javascript-motorn att hantera all kommunikation, arbetsbelastning och presentation. Ny grafer och statistik kan skapas genom att ändra frågeparametrarna för "data" som ingår i utdragen (t.ex. datakälla-filter).
 

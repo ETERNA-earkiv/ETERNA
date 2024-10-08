@@ -1,57 +1,56 @@
-# Documentation
+# ETERNA - E-Archive
 
-RODA is a **digital repository solution** that delivers functionality for all the main units of the OAIS reference model. RODA is capable of ingesting, managing and providing access to the various types of digital content produced by large corporations or public bodies. RODA is based on open-source technologies and is supported by existing standards such as the Open Archival Information System (OAIS), Metadata Encoding and Transmission Standard (METS), Encoded Archival Description (EAD), Dublin Core (DC) and PREMIS (Preservation Metadata).
+**ETERNA** is a fully open-source E-Archive system designed to meet the Open Archival Information System (OAIS) reference model requirements, providing institutions and organizations with a standardized solution for long-term digital preservation. ETERNA ensures flexibility, sustainability, and full control over archival processes and data.
 
-This page links to an assortment of **technical information articles** that will help users, developers, translators and implementers to adapt this product to their particular needs.
+## Key Features
 
-## Table of contents
+- **Comprehensive OAIS Compliance**  
+  ETERNA adheres to the OAIS Reference Model (ISO 14721:2012) for the management and preservation of digital archives, ensuring a trusted system for long-term data preservation.
 
-Among others articles, in this series of documentation you will find information on:
+- **Support for Key Archival Standards**  
+  ETERNA integrates various standardized archival formats, ensuring compatibility and interoperability with major archival and preservation frameworks:
+  - **METS (Metadata Encoding and Transmission Standard)**  
+    Describes the structure, metadata, and relationships within digital objects.
+  - **EAD (Encoded Archival Description)**  
+    Provides a standard for encoding archival finding aids and collections data.
+  - **E-ARK (European Archival Records and Knowledge Preservation)**  
+    Offers practical specifications for preserving and transferring digital records.
+  - **PREMIS (Preservation Metadata: Implementation Strategies)**  
+    Implements a preservation metadata standard to support the management of digital objects over time.
 
-- [Overview](Overview.md)
-- Usage
-    - [Quick start](Quickstart.md)
-    - [Advanced search](Advanced_Search.md)
-    - [Pre-ingest](Pre_Ingest.md)
-    - [Descriptive metadata types](Descriptive_Metadata_Types.md)
-    - [Edit descriptive metadata](EditDescriptiveMetadata.md)
-    - [Risk assessment](Risk_Assessment.md)
-    - [Representation Information](Representation_Information.md)
-    - [Format normalization policy](Format_Normalization_Policy.md)
-    - [Disposal Policies](Disposal_Policies.md)
-- [Support](https://www.roda-community.org/#bellhop_bell-support)
-- [Installation](https://www.roda-community.org/deploys/)
-- Configuration
-    - [Statistics](Statistics.md)
-    - [Metadata formats](Metadata_Formats.md)
-    - [External Authentication with CAS protocol](Central_Authentication_Service.md)
-    - [Disposal feature](Disposal.md)
-    - [Default AIP Permissions](Permissions.md)
-- Contributing
-    - [Developers guide](Developers_Guide.md)
-    - [Translation guide](Translation_Guide.md)
-    - [Documentation guide](Documentation_Guide.md)
-    - [Publishing plugins](Publishing_plugins.md)
-- [Troubleshooting](Troubleshooting.md)
-- [FAQ](FAQ.md)
-- [History](History.md)
-- [License](LICENSE.md)
+- **Open Source, No Vendor Lock-in**  
+  ETERNA is completely open-source under the LGPL-3.0 License, empowering users with the freedom to modify, extend, and adapt the system without reliance on any proprietary solutions or vendors.
 
-## Standards and specifications
+- **Extensible and Modular Architecture**  
+  ETERNA is designed with a modular architecture that allows easy extension and integration with third-party systems and additional archival formats or metadata schemas.
 
-### Package specifications
+- **Scalable and Efficient**  
+  Built for performance, ETERNA supports scalable digital archiving solutions that can handle both small and large-scale collections with ease.
 
-* [E-ARK Common Specification for Information Packages](http://www.dilcis.eu/specifications/common-specification)
-* [E-ARK Submission Information Package specification](http://www.dilcis.eu/specifications/sip)
-* [E-ARK Archival Information Package specification](http://www.dilcis.eu/specifications/aip)
-* [E-ARK Dissemination Information Package specification](http://www.dilcis.eu/specifications/dip)
+- **Comprehensive Ingest and Access Workflows**  
+  ETERNA provides robust workflows for ingesting, managing, and providing access to archival information, supporting both large datasets and granular digital objects.
 
-### Standards
+## System Overview
 
-* [ISO 14721:2012 - Space data and information transfer systems - Open archival information system (OAIS) - Reference model](http://www.iso.org/iso/catalogue_detail.htm?csnumber=57284) ([Magenta book](https://public.ccsds.org/pubs/650x0m2.pdf))
-* [ISO 16363:2012 - Space data and information transfer systems - Audit and certification of trustworthy digital repositories](http://www.iso.org/iso/catalogue_detail.htm?csnumber=56510) ([TRAC version](https://www.crl.edu/sites/default/files/d6/attachments/pages/trac_0.pdf))
-* [eCH-0165 SIARD Format Specification 2.0](https://www.ech.ch/vechweb/page?p=dossier&documentNumber=eCH-0165&documentVersion=2.0)
+The ETERNA E-archive system is designed to manage and preserve digital objects in accordance with OAIS, covering the following core functions:
 
-### Other
+- **Ingest**: Handles the preparation, validation, and submission of digital objects into the archive.
+- **Archival Storage**: Ensures the long time storage and preservation of digital objects.
+- **Data Management**: Supports the maintenance, indexing, and metadata management of archival information.
+- **Access**: Provides controlled access to digital objects, supporting retrieval and delivery of archived materials based on access policies.
+- **Preservation Planning**: Ensures ongoing preservation of digital content through format migration, metadata updates, and risk assessment.
+- **Administration**: Manages user roles, access policies, auditing, and administrative tasks.
 
-* [Digital Repository Audit Method Based on Risk Assessment (DRAMBORA)](http://www.repositoryaudit.eu/download/)
+## License
+
+This project is licensed under the LGPL-3.0 License - see the [LICENSE](LICENSE) file for details.
+
+## Community and Support
+
+- **Discussions**: Join the conversation on our [forums](http://eterna.whitered.se).
+- **Issues**: If you encounter any issues, please submit a report in the [Issues](https://github.com/ETERNA-earkiv/ETERNA/issues) section.
+- **Email**: Reach us at earkiv@whitered.se for additional help.
+
+## Acknowledgments
+
+ETERNA is forked from [RODA](https://github.com/keeps/roda) from KEEP SOLUTIONS.

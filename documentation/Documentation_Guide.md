@@ -1,6 +1,6 @@
 # Documentation guide
 
-All static text in RODA, which includes `help pages`, `functionality description`, and static `html pages`, are located under the `[RODA_HOME]/example-config/theme/`.
+All static text in ETERNA, which includes `help pages`, `functionality description`, and static `html pages`, are located under the `[RODA_HOME]/example-config/theme/`.
 
 To update the existing content, you should copy the file you want to update from `[RODA_HOME]/example-config/theme/` to `[RODA_HOME]/config/theme/` and edit it in the destination folder.
 

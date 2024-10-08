@@ -2,7 +2,7 @@
 
 Esta página fornece informações sobre como configurar novas estatísticas com base nas informações disponíveis no repositório. É importante saber que, para entender esta informação, é preciso ser-se um utilizador avançado com conhecimento de HTML, CSS e Javascript.
 
-As estatísticas trabalham enviando pedidos ao RODA por meio da sua API (inspecionar a documentação da API para obter mais informações), coletando os resultados e apresentando-os como gráficos. Todo o processo é feito no lado do cliente por Javascript.
+As estatísticas trabalham enviando pedidos ao ETERNA por meio da sua API (inspecionar a documentação da API para obter mais informações), coletando os resultados e apresentando-os como gráficos. Todo o processo é feito no lado do cliente por Javascript.
 
 As secções a seguir fornecem trechos de código que podem ser usados ​​para exibir estatísticas sobre o estado do repositório. É só preciso incluir os snippets de código numa nova página HTML e o mecanismo de Javascript incluído irá lidar com toda a comunicação, carga de trabalho e apresentação. Novos gráficos e estatísticas podem ser criados alterando os parâmetros do pedido "data" incluídos nos snippets (e.g. data-source-filters).
 

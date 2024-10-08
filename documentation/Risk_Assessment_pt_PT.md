@@ -1,10 +1,10 @@
 # Avaliação de riscos
 
-O RODA vem com um sistema de gestão de riscos pré-carregado com mais de 80 riscos de preservação obtidos do [Digital Repository Audit Method Based on Risk Assessment (DRAMBORA)](http://www.repositoryaudit.eu) desenvolvido pelo [Digital Curation Centre (DCC)](http://www.dcc.ac.uk) e pela DigitalPreservationEurope (DPE).
+O ETERNA vem com um sistema de gestão de riscos pré-carregado com mais de 80 riscos de preservação obtidos do [Digital Repository Audit Method Based on Risk Assessment (DRAMBORA)](http://www.repositoryaudit.eu) desenvolvido pelo [Digital Curation Centre (DCC)](http://www.dcc.ac.uk) e pela DigitalPreservationEurope (DPE).
 
 Também incorpora um Registo de Riscos que pode ser gerido a partir do UI e vários plugins de Avaliação de Riscos que atualizam a informação no Registo de Riscos.
 
-## Como avaliar e mitigar riscos de preservação no RODA?
+## Como avaliar e mitigar riscos de preservação no ETERNA?
 
 Então, quer começar a fazer processos de avaliação de riscos no seu repositório. Por exemplo, quer começar um processo para converter ficheiros de formatos que já não são suportados(ex. porque apareceu um novo risco de um dado formato de ficheiro não ser suportado no futuro).
 
@@ -28,7 +28,7 @@ Podem então diminuir o nível de risco porque já não há mais ficheiros de Wo
 
 O que acabei de explicar é o fluxo de trabalho manual, uma vez que não temos atualmente um plugin de deteção de risco de obsolescência de formatos. Mas esse plugin pode muito bem ser desenvolvido. Os passos para a mitigação seriam, neste caso, iniciados logo a partir da interface de gestão de riscos.
 
-No que diz respeito aos plugins de conversão disponíveis, o RODA atualmente suporta os suspeitos do costume (formatos mais convencionais de imagem, vídeo, texto e aúdio). Formatos de nicho irão sempre existir em cada instituição, e nesse caso, serão desenvolvidos plugins específicos.
+No que diz respeito aos plugins de conversão disponíveis, o ETERNA atualmente suporta os suspeitos do costume (formatos mais convencionais de imagem, vídeo, texto e aúdio). Formatos de nicho irão sempre existir em cada instituição, e nesse caso, serão desenvolvidos plugins específicos.
 
 ## Tem uma ideia para um plugin de avaliação de riscos?
 

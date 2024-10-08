@@ -1,9 +1,9 @@
 
 # Överblick
 
-RODA är ett komplett digitalt arkiv som levererar funktionalitet för alla huvudenheterna i OAIS-modellen. RODA kan ta in, hantera och ge tillgång till olika typer av digitala objekt som produceras av stora företag eller offentliga förvaltningar. RODA är baserat på öppen källkodsteknologi och stöds av befintliga standarder så som OAIS, METS, EAD och PREMIS.
+ETERNA är ett komplett digitalt arkiv som levererar funktionalitet för alla huvudenheterna i OAIS-modellen. ETERNA kan ta in, hantera och ge tillgång till olika typer av digitala objekt som produceras av stora företag eller offentliga förvaltningar. ETERNA är baserat på öppen källkodsteknologi och stöds av befintliga standarder så som OAIS, METS, EAD och PREMIS.
 
-RODA implementerar också en rad specifikationer och standarder. För att veta mer om OAIS-informationspaketen som RODA implementerar, vänligen läs [Digital Information LifeCycle Interoperability Standards Board](http://www.dilcis.eu/)  på GitHub https://github.com/dilcisboard.
+ETERNA implementerar också en rad specifikationer och standarder. För att veta mer om OAIS-informationspaketen som ETERNA implementerar, vänligen läs [Digital Information LifeCycle Interoperability Standards Board](http://www.dilcis.eu/)  på GitHub https://github.com/dilcisboard.
 
 ## Funktioner
 
@@ -23,13 +23,13 @@ RODA implementerar också en rad specifikationer och standarder. För att veta m
 * 100% kompatibelt med E-ARK SIP, AIP, och DIP specifikationer
 * Stöd för teman
 
-För mer information, besök gärna RODA:s webbplats:
-**<https://www.roda-community.org>**
+För mer information, besök gärna ETERNA:s webbplats:
+**<https://www.whitered.se/eterna>**
 
 
 ## Funktioner
 
-RODA har UI-stöd för följande funktionella enheter.
+ETERNA har UI-stöd för följande funktionella enheter.
 
 ### Katalog
 
@@ -63,7 +63,7 @@ Ankomstkontroll är en process för att avgöra om informationen och annat mater
 
 ### Arkivvårdsjobb
 
-Arkivvårdsjobb är åtgärder som utförs på innehållet i arkivet och som syftar till att förbättra tillgängligheten till arkiverade filer eller att minska riskerna vid digital bevarande. Inom RODA hanteras arkivvårdsjobb av en exekveringsmodul. Exekveringsmodulen tillåter användare med rätt behörighet att köra arkivvårdsjobb för en given uppsättning data (AIP, representationer eller filer). Arkivvårdsjobben inkluderar formatkonverteringar, verifieringar av kontrollsummor, rapportering (t.ex. för att automatiskt skickade SIP-gokännande/avvisning-meddelanden) och viruskontroller etc. 
+Arkivvårdsjobb är åtgärder som utförs på innehållet i arkivet och som syftar till att förbättra tillgängligheten till arkiverade filer eller att minska riskerna vid digital bevarande. Inom ETERNA hanteras arkivvårdsjobb av en exekveringsmodul. Exekveringsmodulen tillåter användare med rätt behörighet att köra arkivvårdsjobb för en given uppsättning data (AIP, representationer eller filer). Arkivvårdsjobben inkluderar formatkonverteringar, verifieringar av kontrollsummor, rapportering (t.ex. för att automatiskt skickade SIP-gokännande/avvisning-meddelanden) och viruskontroller etc. 
 
 ### Interna åtgärder
 
@@ -79,7 +79,7 @@ Händelseloggar är speciella filer som registrerar viktiga händelser som sker 
 
 ### Notiser
 
-Notifieringar i RODA är ett sätt att informera användaren om specifika händelser i systemet. Informationen skickas i ett mail, som innehåller en beskrivning av händelsen och en länk där användaren kan bekräfta. 
+Notifieringar i ETERNA är ett sätt att informera användaren om specifika händelser i systemet. Informationen skickas i ett mail, som innehåller en beskrivning av händelsen och en länk där användaren kan bekräfta. 
 
 ### Statistik
 

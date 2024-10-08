@@ -1,8 +1,8 @@
 # Metadata formats
 
-RODA supports any descriptive metadata format (i.e. Descriptive Information as stated in the OAIS) as long as it represented by an XML file. If you have a descriptive metadata format that is not based on XML (e.g. CSV, JSON, MARC21, etc.), you will have to convert it to XML before you can use in RODA. Several tools exist on the Web that allow you to convert most data formats into XML.
+ETERNA supports any descriptive metadata format (i.e. Descriptive Information as stated in the OAIS) as long as it represented by an XML file. If you have a descriptive metadata format that is not based on XML (e.g. CSV, JSON, MARC21, etc.), you will have to convert it to XML before you can use in ETERNA. Several tools exist on the Web that allow you to convert most data formats into XML.
 
-Once you have your metadata in XML you are ready to package it into a Submission Information Package (SIP) and ingest it on the repository. Alternatively, you may want to create a metadata file directly on the repository by using the functionality provided by the Catalogue. When the metadata format is new to RODA, the repository will do its best to support without the need to do any reconfiguration of system, however, the following limitations apply:
+Once you have your metadata in XML you are ready to package it into a Submission Information Package (SIP) and ingest it on the repository. Alternatively, you may want to create a metadata file directly on the repository by using the functionality provided by the Catalogue. When the metadata format is new to ETERNA, the repository will do its best to support without the need to do any reconfiguration of system, however, the following limitations apply:
 
 #### Validation
 
@@ -18,17 +18,17 @@ When no visualization mappings are configured, a generic metadata viewer will be
 
 #### Edition
 
-RODA needs a configuration file to inform how metadata files should be displayed for editing purposes. If no such configuration exists, the repository will display a text area where the user is able to edit the XML directly.
+ETERNA needs a configuration file to inform how metadata files should be displayed for editing purposes. If no such configuration exists, the repository will display a text area where the user is able to edit the XML directly.
 
-In order to support new metadata formats, the repository must be configured accordingly. The following sections describe in detail the set of actions that need to be performed to fully support a new metadata schema in RODA.
+In order to support new metadata formats, the repository must be configured accordingly. The following sections describe in detail the set of actions that need to be performed to fully support a new metadata schema in ETERNA.
 
 ## Metadata enhancement files
 
-To enhance the metadata experience in RODA there are 4 files that need to be added to the repository configuration folders. The following sections describe and provide examples of such files.
+To enhance the metadata experience in ETERNA there are 4 files that need to be added to the repository configuration folders. The following sections describe and provide examples of such files.
 
 ### Validation
 
-RODA uses a [XML schema](http://www.w3.org/standards/xml/schema) to validate the structure and data types of the provided metadata file. The Validation schema will be used during ingest process to check if the metadata included in the SIP is valid according the the established constraints, as well as when the metadata is edited via the catalogue.
+ETERNA uses a [XML schema](http://www.w3.org/standards/xml/schema) to validate the structure and data types of the provided metadata file. The Validation schema will be used during ingest process to check if the metadata included in the SIP is valid according the the established constraints, as well as when the metadata is edited via the catalogue.
 
 You may use a standard schema file for validation purposes or create a specific one that verifies all the particular conditions that you need to check in your repository installation, e.g. mandatory fields, closed-vocabularies for the values of certain elements, etc.
 
@@ -290,7 +290,7 @@ The following is an example of an Index map for the Simple Dublin Core example.
 </xsl:stylesheet>
 ```
 
-The output produced by this stylesheet is a [Solr document](https://wiki.apache.org/solr/UpdateXmlMessages) ready to be indexed by the RODA search engine. See example bellow:
+The output produced by this stylesheet is a [Solr document](https://wiki.apache.org/solr/UpdateXmlMessages) ready to be indexed by the ETERNA search engine. See example bellow:
 
 ```
 <doc>
@@ -666,9 +666,9 @@ After adding all the files described on the previous section, one needs to enabl
 
 ### Enable the new metadata format
 
-After you added the previously described files to your configuration folder, you must enable the new format in the RODA main configuration file.
+After you added the previously described files to your configuration folder, you must enable the new format in the ETERNA main configuration file.
 
-Edit the `[RODA_HOME]/config/roda-wui.properties` file and add a new entry as the ones shown in the following example with the name of your recently added metadata format. This will make RODA aware of the new metadata format.
+Edit the `[RODA_HOME]/config/roda-wui.properties` file and add a new entry as the ones shown in the following example with the name of your recently added metadata format. This will make ETERNA aware of the new metadata format.
 
 ```
 ui.browser.metadata.descriptive.types = dc
@@ -678,7 +678,7 @@ ui.browser.metadata.descriptive.types = ead_2002
 
 ### Internationalization of strings
 
-In order to have your new metadata schema nicely integrated, your must provide internationalization information (i18n) so that RODA knows how to display the necessary information on the user interface in the best way possible.
+In order to have your new metadata schema nicely integrated, your must provide internationalization information (i18n) so that ETERNA knows how to display the necessary information on the user interface in the best way possible.
 
 Edit the `[RODA_HOME]/config/i18n/ServerMessages.properties` file and add the following entries as necessary making sure that the last part of the key matches the code provided on the `[RODA_HOME]/config/roda-wui.properties` file described on the previous section:
 
@@ -688,7 +688,7 @@ ui.browse.metadata.descriptive.type.ead.3=Encoded Archival Description 3
 ui.browse.metadata.descriptive.type.ead.2002=Encoded Archival Description 2002
 ```
 
-Finally one should provide translations for the field names to be processed by RODA via the _vizualization_ config file. In order to to that, one must edit the `[RODA_HOME]/config/i18n/ServerMessages.properties` file and add the following entries as necessary, making sure that the last part of the key matches the `xsl:params`included in the visualization map.
+Finally one should provide translations for the field names to be processed by ETERNA via the _vizualization_ config file. In order to to that, one must edit the `[RODA_HOME]/config/i18n/ServerMessages.properties` file and add the following entries as necessary, making sure that the last part of the key matches the `xsl:params`included in the visualization map.
 
 The following example depicts how the field names in the Simple Dublin Core example should be displayed in the user interface.
 
@@ -732,4 +732,4 @@ The previous key endings should match the ones on the xsl:param entries as follo
 
 ### Reload configuration
 
-After changing the configuration files you must restart RODA so that your changes become effective. Do that by restarting your container or your application server.
+After changing the configuration files you must restart ETERNA so that your changes become effective. Do that by restarting your container or your application server.

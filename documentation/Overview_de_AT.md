@@ -1,9 +1,9 @@
 
 # Übersicht
 
-RODA ist ein umfassendes digitales Repository, das Funktionalitäten für alle Hauptbereiche des OAIS-Referenzmodells bietet. RODA kann verschiedene Arten von digitalen Objekten, die von großen Unternehmen oder öffentlichen Einrichtungen erstellt wurden, aufnehmen, verwalten und den Zugriff darauf ermöglichen. RODA basiert auf Open-Source-Technologien und unterstützt bestehende Standards wie OAIS, METS, EAD und PREMIS.
+ETERNA ist ein umfassendes digitales Repository, das Funktionalitäten für alle Hauptbereiche des OAIS-Referenzmodells bietet. ETERNA kann verschiedene Arten von digitalen Objekten, die von großen Unternehmen oder öffentlichen Einrichtungen erstellt wurden, aufnehmen, verwalten und den Zugriff darauf ermöglichen. ETERNA basiert auf Open-Source-Technologien und unterstützt bestehende Standards wie OAIS, METS, EAD und PREMIS.
 
-RODA implementiert auch eine Reihe von Spezifikationen und Standards. Um mehr über die OAIS Information Packages zu erfahren, die RODA implementiert, besuchen Sie bitte die Repositories des [Digital Information LifeCycle Interoperability Standards Board](http://www.dilcis.eu/) auf GitHub unter https://github.com/dilcisboard.
+ETERNA implementiert auch eine Reihe von Spezifikationen und Standards. Um mehr über die OAIS Information Packages zu erfahren, die ETERNA implementiert, besuchen Sie bitte die Repositories des [Digital Information LifeCycle Interoperability Standards Board](http://www.dilcis.eu/) auf GitHub unter https://github.com/dilcisboard.
 
 ## Funktionen
 
@@ -23,13 +23,13 @@ RODA implementiert auch eine Reihe von Spezifikationen und Standards. Um mehr ü
 * 100 % kompatibel mit E-ARK SIP-, AIP- und DIP-Spezifikationen
 * Unterstützung für Themen
 
-Für weitere Informationen besuchen Sie bitte die RODA-Website:
-**<https://www.roda-community.org>**
+Für weitere Informationen besuchen Sie bitte die ETERNA-Website:
+**<https://www.whitered.se/eterna>**
 
 
 ## Funktionen
 
-RODA bietet eine Benutzeroberfläche für die folgenden Funktionseinheiten.
+ETERNA bietet eine Benutzeroberfläche für die folgenden Funktionseinheiten.
 
 ### Katalog
 
@@ -63,7 +63,7 @@ Bei der Bewertung wird festgestellt, ob Unterlagen und andere Materialien einen 
 
 ### Präservation Maßnahmen
 
-Erhaltungsmaßnahmen sind Aufgaben, die am Inhalt des Repositorys durchgeführt werden, um die Zugänglichkeit der archivierten Dateien zu verbessern oder die Risiken der digitalen Bewahrung zu mindern. Innerhalb von RODA werden Erhaltungsmaßnahmen von einem Auftragsausführungsmodul durchgeführt. Mit dem Modul zur Auftragsausführung kann der Repository-Manager Aktionen für einen bestimmten Datensatz (AIPs, Repräsentationen oder Dateien) ausführen. Zu den Erhaltungsmaßnahmen gehören Formatkonvertierungen, Prüfsummenüberprüfungen, Berichterstellung (z. B. automatischer Versand von SIP-Annahme-/Ablehnungs-E-Mails), Virenprüfungen usw.
+Erhaltungsmaßnahmen sind Aufgaben, die am Inhalt des Repositorys durchgeführt werden, um die Zugänglichkeit der archivierten Dateien zu verbessern oder die Risiken der digitalen Bewahrung zu mindern. Innerhalb von ETERNA werden Erhaltungsmaßnahmen von einem Auftragsausführungsmodul durchgeführt. Mit dem Modul zur Auftragsausführung kann der Repository-Manager Aktionen für einen bestimmten Datensatz (AIPs, Repräsentationen oder Dateien) ausführen. Zu den Erhaltungsmaßnahmen gehören Formatkonvertierungen, Prüfsummenüberprüfungen, Berichterstellung (z. B. automatischer Versand von SIP-Annahme-/Ablehnungs-E-Mails), Virenprüfungen usw.
 
 ### Interne Aktionen
 
@@ -79,7 +79,7 @@ Ereignisprotokolle sind spezielle Dateien, die signifikante Ereignisse im Reposi
 
 ### Benachrichtigungen
 
-Benachrichtigungen informieren RODA-Benutzer über bestimmte Ereignisse, die aufgetreten sind. Diese Kommunikation erfolgt durch das Versenden einer E-Mail, in der das spezifische Ereignis beschrieben wird und der Benutzer es bestätigen kann.
+Benachrichtigungen informieren ETERNA-Benutzer über bestimmte Ereignisse, die aufgetreten sind. Diese Kommunikation erfolgt durch das Versenden einer E-Mail, in der das spezifische Ereignis beschrieben wird und der Benutzer es bestätigen kann.
 
 ### Statistiken
 

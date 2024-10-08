@@ -1,9 +1,9 @@
 
 # Overview
 
-RODA is a complete digital repository that delivers functionality for all the main units of the OAIS reference model. RODA is capable of ingesting, managing and providing access to the various types of digital objects produced by large corporations or public bodies. RODA is based on open-source technologies and is supported by existing standards such as the OAIS, METS, EAD and PREMIS.
+ETERNA is a complete digital repository that delivers functionality for all the main units of the OAIS reference model. ETERNA is capable of ingesting, managing and providing access to the various types of digital objects produced by large corporations or public bodies. ETERNA is based on open-source technologies and is supported by existing standards such as the OAIS, METS, EAD and PREMIS.
 
-RODA also implements a series of specifications and standards. To know more about the OAIS Information Packages that RODA implements, please check out the [Digital Information LifeCycle Interoperability Standards Board](http://www.dilcis.eu/) repositories on GitHub at https://github.com/dilcisboard.
+ETERNA also implements a series of specifications and standards. To know more about the OAIS Information Packages that ETERNA implements, please check out the [Digital Information LifeCycle Interoperability Standards Board](http://www.dilcis.eu/) repositories on GitHub at https://github.com/dilcisboard.
 
 ## Features
 
@@ -23,13 +23,13 @@ RODA also implements a series of specifications and standards. To know more abou
 * 100% compatible with E-ARK SIP, AIP, and DIP specifications
 * Support for themess
 
-For more information, please feel free to visit the RODA website:
-**<https://www.roda-community.org>**
+For more information, please feel free to visit the ETERNA website:
+**<https://www.whitered.se/eterna>**
 
 
 ## Functions
 
-RODA has UI support for the following functional entities.
+ETERNA has UI support for the following functional entities.
 
 ### Catalogue
 
@@ -63,7 +63,7 @@ Assessment is the process of determining whether records and other materials hav
 
 ### Preservation actions
 
-Preservation actions are tasks performed on the contents of the repository that aim to enhance the accessibility of archived files or to mitigate digital preservation risks. Within RODA, preservation actions are handled by a job execution module. The job execution module allows the repository manager to run actions over a given set of data (AIPs, representations or files). Preservation actions include format conversions, checksum verifications, reporting (e.g. to automatically send SIP acceptance/rejection emails), virus checks, etc.
+Preservation actions are tasks performed on the contents of the repository that aim to enhance the accessibility of archived files or to mitigate digital preservation risks. Within ETERNA, preservation actions are handled by a job execution module. The job execution module allows the repository manager to run actions over a given set of data (AIPs, representations or files). Preservation actions include format conversions, checksum verifications, reporting (e.g. to automatically send SIP acceptance/rejection emails), virus checks, etc.
 
 ### Internal actions
 
@@ -79,7 +79,7 @@ Event logs are special files that record significant events that happen in the r
 
 ### Notifications
 
-Notifications are a way to inform RODA users that certain events have occurred. This communication consists of sending an email describing the specific event, where the user may acknowledge it.
+Notifications are a way to inform ETERNA users that certain events have occurred. This communication consists of sending an email describing the specific event, where the user may acknowledge it.
 
 ### Statistics
 

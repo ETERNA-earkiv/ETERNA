@@ -1,10 +1,10 @@
 # Risk assessment
 
-RODA comes with a Risk Registry pre-loaded with 80+ preservation risks obtained from the [Digital Repository Audit Method Based on Risk Assessment (DRAMBORA)](http://www.repositoryaudit.eu) toolkit developed by the [Digital Curation Centre (DCC)](http://www.dcc.ac.uk) and DigitalPreservationEurope (DPE).
+ETERNA comes with a Risk Registry pre-loaded with 80+ preservation risks obtained from the [Digital Repository Audit Method Based on Risk Assessment (DRAMBORA)](http://www.repositoryaudit.eu) toolkit developed by the [Digital Curation Centre (DCC)](http://www.dcc.ac.uk) and DigitalPreservationEurope (DPE).
 
 It also incorporates a Risk Registry that can be managed from the UI and several Risk Assessment plugins that update information on the Risk Registry.
 
-## How to assess and mitigate preservation risks in RODA?
+## How to assess and mitigate preservation risks in ETERNA?
 
 So, you want to start doing risk assesment processes in your repository. For example, you want to start a process to convert files from formats that are not sustainable any more (eg. because a new risk appears that a given file format won't be supported in the future).
 
@@ -28,7 +28,7 @@ You could then lower the risk level as there are no more word 95 files in the sy
 
 What I just explained is the manual workflow, as we don’t currently have a format-obsolescence-risk-detection-plugin. But that plugin could very well be developed. The mitigation steps would, in that case, be started right from the risk management interface.
 
-In what concerns available conversion plugins,  RODA currently supports the usual suspects (major image, video, word and audio formats). Niche formats will always exist in every institution, and in that case, special purpose plugins will have to be developed.
+In what concerns available conversion plugins,  ETERNA currently supports the usual suspects (major image, video, word and audio formats). Niche formats will always exist in every institution, and in that case, special purpose plugins will have to be developed.
 
 ## Have an idea for a risk assessment plugin?
 

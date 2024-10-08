@@ -16,7 +16,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.wui.client.common.UpSalePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.Ingest;
@@ -100,10 +99,6 @@ public class IngestProcess extends Composite {
   @UiField
   FlowPanel contentFlowPanel;
 
-  @UiField(provided = true)
-  UpSalePanel ingestPanel;
-
-
   private IngestProcess() {
     Filter jobIngestFilter = new Filter(
       new SimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INGEST.name()));
@@ -113,16 +108,7 @@ public class IngestProcess extends Composite {
     jobSearch = new JobSearch("IngestProcess_jobs", "IngestProcess_reports", jobIngestFilter, jobReportIngestFilter,
       true, IngestTransfer.RESOLVER);
 
-    Boolean dropfolderActive = ConfigurationManager.getBoolean(false, RodaConstants.UI_SERVICE_DROPFOLDER_ACTIVE);
-
-    ingestPanel = new UpSalePanel(messages.dropFolderInformationText(), messages.learnMore() ,ConfigurationManager.getString(RodaConstants.UI_SERVICE_DROPFOLDER_URL), cardIdentifier);
     initWidget(uiBinder.createAndBindUi(this));
-
-    if(dropfolderActive){
-      ingestPanel.setVisible(false);
-    } else {
-      ingestPanel.setVisible(JavascriptUtils.accessLocalStorage(cardIdentifier));
-    }
 
     ingestProcessDescription.add(new HTMLWidgetWrapper("IngestProcessDescription.html"));
   }

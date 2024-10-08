@@ -28,6 +28,9 @@
 @def COLOR_SIDEBAR_BACKGROUND		eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.sidebar.background")');
 @def COLOR_TABLE_SIDEBAR_BACKGROUND	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.table.sidebar.background")');
 
+@def COLOR_BANNER_BACKGROUND	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.banner.background")');
+@def COLOR_BANNER_FOREGROUND	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.banner.foreground")');
+
 @def COLOR_FOOTER_BACKGROUND	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.footer.background")');
 @def COLOR_FOOTER_FOREGROUND	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.footer.foreground")');
 
@@ -524,7 +527,7 @@ div.inline {
     color: white;
 }
 
-#keeps-logo {
+#whitered-logo {
     width: 11rem;
 }
 
@@ -1999,27 +2002,28 @@ td.datePickerMonth, td.datePickerYear {
 				BANNER
 ************************************************/
 .banner {
-    background-color: COLOR_PRIMARY;
+    background-color: COLOR_BANNER_BACKGROUND;
+    color: COLOR_BANNER_FOREGROUND;
     position: relative;
-    height: 110px;
+    height: 140px;
 }
 
 .homeLink {
-    padding-left: 30px;
-    height: 110px;
+    padding-left: 35px;
+    height: 140px;
     cursor: pointer;
     cursor: hand;
 }
 
 .homeLogo {
-    height: 100px;
+    height: 70px;
     float: left;
-    margin-right: 20px;
-    margin-top: 4px;
+    margin: 35px;
+    margin-left: 0;
 }
 
 .homeText {
-    color: white;
+    color: COLOR_BANNER_FOREGROUND;
     font-weight: 400;
     font-size: 6rem;
     line-height: 110px;
@@ -2084,7 +2088,8 @@ td.datePickerMonth, td.datePickerYear {
     font-size: 1.4rem;
     font-variant: normal;
     color: COLOR_MENU_PRIMARY_TEXT;
-    padding: 5px 10px;
+    padding: 15px 12px;
+    line-height: 1;
     text-align: left;
 }
 
@@ -2330,7 +2335,7 @@ td.datePickerMonth, td.datePickerYear {
 				CONTENT PANEL
 ************************************************/
 .main .contentPanel {
-    min-height: 600px;
+    min-height: 560px;
 }
 
 .main .contentTitle {

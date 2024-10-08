@@ -15,7 +15,7 @@ TCPAddr localhost" | sudo tee /etc/clamav/clamd.conf
  ```
 
 ## Central environment
-RODA central instance that will control all the local RODA instances in a synchronized way.
+ETERNA central instance that will control all the local ETERNA instances in a synchronized way.
 
 ### Debug WUI
 
@@ -36,12 +36,12 @@ mvn -pl roda-ui/roda-wui -am spring-boot:run -Pdebug-main-central
 mvn -pl roda-ui/roda-wui -am gwt:codeserver -Pdebug-main -Dscope.gwt-dev=compile
 
 # Open codeserver http://127.0.0.1:9876/ and add bookmarks
-# Open RODA http://localhost:8080 and click the "Dev Mode On" bookmark
+# Open ETERNA http://localhost:8080 and click the "Dev Mode On" bookmark
 
 ```
 
 ## Local environment
-RODA local instance whose processes will be synchronized with a RODA central instance.
+ETERNA local instance whose processes will be synchronized with a ETERNA central instance.
 
 ### Debug WUI
 
@@ -61,6 +61,6 @@ mvn -pl roda-ui/roda-wui -am spring-boot:run -Pdebug-main-local
 mvn -pl roda-ui/roda-wui -am gwt:codeserver -Pdebug-main -Dscope.gwt-dev=compile
 
 # Open codeserver http://127.0.0.1:9876/ and add bookmarks
-# Open RODA http://localhost:8080 and click the "Dev Mode On" bookmark
+# Open ETERNA http://localhost:8080 and click the "Dev Mode On" bookmark
 
 ```

@@ -2,11 +2,11 @@
 
 Questões que nos chegam de utilizadores do roda e as suas respostas.
 
-Caso tenha uma questão que não esteja aqui pode [criar um issue](https://github.com/keeps/roda/issues/new) no GitHub e marcá-lo com a etiqueta "question".
+Caso tenha uma questão que não esteja aqui pode [criar um issue](https://github.com/ETERNA-earkiv/ETERNA/issues/new) no GitHub e marcá-lo com a etiqueta "question".
 
 ## Visualizadores
 
-### Podemos visualizar os ficheiros diretamente na interface do RODA?
+### Podemos visualizar os ficheiros diretamente na interface do ETERNA?
 
 O sistema vem com alguns visualizadores predefinidos para determinados formatos padrão (por exemplo, PDF, imagens, formatos HTML 5, etc.).
 
@@ -14,11 +14,11 @@ Formatos especiais precisam de visualizadores ou conversores especiais para adap
 
 ## Metainformação
 
-### Que formatos de metainformação descritiva é suportada pelo RODA?
+### Que formatos de metainformação descritiva é suportada pelo ETERNA?
 
-Todos os formatos de metainformação descritiva são suportados desde que haja uma gramática em XML Schema (XSD) para os validar. Por omissão, o RODA está configurado com Dublin Core e Encoded Archival Description 2002. Mais esquemas podem ser adicionados.
+Todos os formatos de metainformação descritiva são suportados desde que haja uma gramática em XML Schema (XSD) para os validar. Por omissão, o ETERNA está configurado com Dublin Core e Encoded Archival Description 2002. Mais esquemas podem ser adicionados.
 
-### O RODA suporta multíplos esquemas de classificação?
+### O ETERNA suporta multíplos esquemas de classificação?
 
 O sistema permite a definição de estruturas hierárquicas múltiplas onde podem ser colocados os registos. Cada um dos nós dessa estrutura pode ter uma metainformação descritiva associada. Imagina um sistema de ficheiros/diretórios onde cada diretório pode ter metainformação customizada no formato EAD ou DC (ou qualquer outro tipo). Cada um desses diretórios pode ser um fundo, uma coleção, uma séria ou uma agregação, etc.
 
@@ -66,7 +66,7 @@ Sim. Só pode ver os registos aos quais tem permissões de acesso.
 
 ### A auditoria é pesquisável e acessível de uma forma fácil de usar?
 
-Sim. Pode navegar no registo de atividades (conjunto de ações realizadas no repositório) ou na metainformação de preservação (lista de ações de preservação realizadas nos dados) diretamente na interface do RODA.
+Sim. Pode navegar no registo de atividades (conjunto de ações realizadas no repositório) ou na metainformação de preservação (lista de ações de preservação realizadas nos dados) diretamente na interface do ETERNA.
 
 ## Preservação
 
@@ -85,7 +85,7 @@ Esta é uma pergunta complexa que não pode ser respondida em apenas algumas lin
 
 ### Como a aplicação suporta a avaliação, seleção e definição de períodos de retenção?
 
-RODA oferece um worflow para a avaliação e seleção de registos. Por favor, remeta-se a [Política de avaliação e seleção](Disposal.md) para mais informação.
+ETERNA oferece um worflow para a avaliação e seleção de registos. Por favor, remeta-se a [Política de avaliação e seleção](Disposal.md) para mais informação.
 
 ### O sistema regista interações de pesquisa?
 
@@ -103,6 +103,6 @@ Na verdade, não. Um navegador moderno é suficiente.
 
 O [guia de tradução](Translation_Guide.md) contém as instruções para adicionar uma nova linguagem ao sistema.
 
-### Como preparar um sistema para desenvolvimento do RODA?
+### Como preparar um sistema para desenvolvimento do ETERNA?
 
-As instruções de preparação de um ambiente de desenvolvimento do RODA estão disponíveis no [guia de desenvolvimento](Developers_Guide.md).
+As instruções de preparação de um ambiente de desenvolvimento do ETERNA estão disponíveis no [guia de desenvolvimento](Developers_Guide.md).

@@ -1,8 +1,8 @@
 # Metaadatformátumok
 
-A RODA bármilyen leíró metaadatformátumot (azaz az OAIS-ban meghatározott leíró információt) támogat, amennyiben az XML-fájlban jelenik meg. Ha olyan leíró metaadatformátummal rendelkezik, amely nem XML alapú (pl. CSV, JSON, MARC21 stb.), akkor azt XML-be kell konvertálnia, mielőtt a RODA-ban használhatná. A weben számos olyan eszköz létezik, amely lehetővé teszi a legtöbb adatformátum XML-be történő konvertálását.
+A ETERNA bármilyen leíró metaadatformátumot (azaz az OAIS-ban meghatározott leíró információt) támogat, amennyiben az XML-fájlban jelenik meg. Ha olyan leíró metaadatformátummal rendelkezik, amely nem XML alapú (pl. CSV, JSON, MARC21 stb.), akkor azt XML-be kell konvertálnia, mielőtt a ETERNA-ban használhatná. A weben számos olyan eszköz létezik, amely lehetővé teszi a legtöbb adatformátum XML-be történő konvertálását.
 
-Ha a metaadatokat XML formátumban megkapta, akkor készen áll arra, hogy egy benyújtási információs csomagba (SIP) csomagolja, és a repozitóriumba bevigye. Alternatív megoldásként létrehozhat egy metaadatfájlt közvetlenül az adattárban a katalógus által biztosított funkciók segítségével. Ha a metaadat-formátum új a RODA számára, a repozitórium mindent megtesz, hogy támogassa, anélkül, hogy a rendszer újrakonfigurálására lenne szükség, azonban a következő korlátozások érvényesek:
+Ha a metaadatokat XML formátumban megkapta, akkor készen áll arra, hogy egy benyújtási információs csomagba (SIP) csomagolja, és a repozitóriumba bevigye. Alternatív megoldásként létrehozhat egy metaadatfájlt közvetlenül az adattárban a katalógus által biztosított funkciók segítségével. Ha a metaadat-formátum új a ETERNA számára, a repozitórium mindent megtesz, hogy támogassa, anélkül, hogy a rendszer újrakonfigurálására lenne szükség, azonban a következő korlátozások érvényesek:
 
 #### Hitelesítés
 
@@ -18,17 +18,17 @@ Ha nincs vizualizációs hozzárendelés konfigurálva, az XML-alapú metaadatok
 
 #### Kiadvány
 
-A RODA-nak szüksége van egy konfigurációs fájlra, amely tájékoztatja a metaadatfájlok szerkesztési célú megjelenítésének módjáról. Ha nincs ilyen konfiguráció, akkor a repozitórium egy szöveges területet jelenít meg, ahol a felhasználó közvetlenül szerkesztheti az XML-t.
+A ETERNA-nak szüksége van egy konfigurációs fájlra, amely tájékoztatja a metaadatfájlok szerkesztési célú megjelenítésének módjáról. Ha nincs ilyen konfiguráció, akkor a repozitórium egy szöveges területet jelenít meg, ahol a felhasználó közvetlenül szerkesztheti az XML-t.
 
-Az új metaadatformátumok támogatásához a repozitóriumot ennek megfelelően kell konfigurálni. A következő szakaszok részletesen ismertetik azokat a műveleteket, amelyeket el kell végezni ahhoz, hogy a RODA teljes mértékben támogassa az új metaadatsémákat.
+Az új metaadatformátumok támogatásához a repozitóriumot ennek megfelelően kell konfigurálni. A következő szakaszok részletesen ismertetik azokat a műveleteket, amelyeket el kell végezni ahhoz, hogy a ETERNA teljes mértékben támogassa az új metaadatsémákat.
 
 ## Metaadatjavító fájlok
 
-A metaadatok RODA-ban való használatának javítása érdekében 4 fájlt kell hozzáadni a repozitórium konfigurációs mappáihoz. A következő szakaszok leírják és példákat mutatnak be az ilyen fájlokra.
+A metaadatok ETERNA-ban való használatának javítása érdekében 4 fájlt kell hozzáadni a repozitórium konfigurációs mappáihoz. A következő szakaszok leírják és példákat mutatnak be az ilyen fájlokra.
 
 ### Hitelesítés
 
-A RODA egy [XML-séma](http://www.w3.org/standards/xml/schema) segítségével validálja a megadott metaadatfájl szerkezetét és adattípusait. A validációs sémát a beolvasási folyamat során arra használják, hogy ellenőrizzék, hogy a SIP-ben szereplő metaadatok érvényesek-e a megállapított korlátozásoknak megfelelően, valamint a metaadatok katalóguson keresztül történő szerkesztésekor.
+A ETERNA egy [XML-séma](http://www.w3.org/standards/xml/schema) segítségével validálja a megadott metaadatfájl szerkezetét és adattípusait. A validációs sémát a beolvasási folyamat során arra használják, hogy ellenőrizzék, hogy a SIP-ben szereplő metaadatok érvényesek-e a megállapított korlátozásoknak megfelelően, valamint a metaadatok katalóguson keresztül történő szerkesztésekor.
 
 Használhat egy szabványos sémafájlt érvényesítési célokra, vagy létrehozhat egy speciális sémafájlt, amely ellenőrzi az összes olyan különleges feltételt, amelyet a repozitórium telepítésénél ellenőrizni kell, pl. kötelező mezők, egyes elemek értékeire vonatkozó zárt szószedet stb.
 
@@ -290,7 +290,7 @@ A következő egy példa az Indextérképre az egyszerű Dublin Core példához.
 </xsl:stylesheet>
 ```
 
-A stíluslap által előállított kimenet egy [Solr dokumentum](https://wiki.apache.org/solr/UpdateXmlMessages), amelyet a RODA keresőmotor indexelhet. Lásd az alábbi példát:
+A stíluslap által előállított kimenet egy [Solr dokumentum](https://wiki.apache.org/solr/UpdateXmlMessages), amelyet a ETERNA keresőmotor indexelhet. Lásd az alábbi példát:
 
 ```
 <doc>
@@ -666,9 +666,9 @@ Miután az előző szakaszban leírt összes fájlt hozzáadtuk, engedélyeznün
 
 ### Az új metaadat-formátum engedélyezése
 
-Miután a korábban leírt fájlokat hozzáadta a konfigurációs mappához, engedélyeznie kell az új formátumot a RODA fő konfigurációs fájljában.
+Miután a korábban leírt fájlokat hozzáadta a konfigurációs mappához, engedélyeznie kell az új formátumot a ETERNA fő konfigurációs fájljában.
 
-Szerkessze a `[RODA_HOME]/config/roda-wui.properties` fájlt, és adjon hozzá egy új bejegyzést, mint a következő példában látható, a nemrég hozzáadott metaadatformátum nevével. Ezáltal a RODA tudomást szerez az új metaadatformátumról.
+Szerkessze a `[RODA_HOME]/config/roda-wui.properties` fájlt, és adjon hozzá egy új bejegyzést, mint a következő példában látható, a nemrég hozzáadott metaadatformátum nevével. Ezáltal a ETERNA tudomást szerez az új metaadatformátumról.
 
 ```
 ui.browser.metadata.descriptive.types = dc
@@ -678,7 +678,7 @@ ui.browser.metadata.descriptive.types = ead_2002
 
 ### A karakterláncok nemzetközivé tétele
 
-Ahhoz, hogy az új metaadatséma szépen integrálódjon, nemzetközivé kell tennie az információkat (i18n), hogy a RODA tudja, hogyan jelenítse meg a szükséges információkat a felhasználói felületen a lehető legjobb módon.
+Ahhoz, hogy az új metaadatséma szépen integrálódjon, nemzetközivé kell tennie az információkat (i18n), hogy a ETERNA tudja, hogyan jelenítse meg a szükséges információkat a felhasználói felületen a lehető legjobb módon.
 
 Szerkessze a `[RODA_HOME]/config/i18n/ServerMessages.properties` fájlt, és szükség szerint adja hozzá a következő bejegyzéseket, ügyelve arra, hogy a kulcs utolsó része megegyezzen az előző szakaszban leírt `[RODA_HOME]/config/roda-wui.properties` fájlban megadott kóddal:
 
@@ -688,7 +688,7 @@ ui.browse.metadata.descriptive.type.ead.3=Encoded Archival Description 3
 ui.browse.metadata.descriptive.type.ead.2002=Encoded Archival Description 2002
 ```
 
-Végül a _vizualization_ config fájlban meg kell adni a RODA által feldolgozandó mezőnevek fordítását. Ehhez szerkeszteni kell a `[RODA_HOME]/config/i18n/ServerMessages.properties` fájlt, és szükség szerint hozzáadni a következő bejegyzéseket, ügyelve arra, hogy a kulcs utolsó része megegyezzen a vizualizációs térképben szereplő `xsl:params`-szal.
+Végül a _vizualization_ config fájlban meg kell adni a ETERNA által feldolgozandó mezőnevek fordítását. Ehhez szerkeszteni kell a `[RODA_HOME]/config/i18n/ServerMessages.properties` fájlt, és szükség szerint hozzáadni a következő bejegyzéseket, ügyelve arra, hogy a kulcs utolsó része megegyezzen a vizualizációs térképben szereplő `xsl:params`-szal.
 
 A következő példa azt mutatja, hogy az egyszerű Dublin Core példában szereplő mezőneveket hogyan kell megjeleníteni a felhasználói felületen.
 
@@ -732,4 +732,4 @@ Az előző kulcsvégződéseknek meg kell egyezniük az xsl:param bejegyzésekbe
 
 ### Konfiguráció újratöltése
 
-A konfigurációs fájlok módosítása után újra kell indítania a RODA-t, hogy a módosítások érvénybe lépjenek. Ezt a tároló vagy az alkalmazáskiszolgáló újraindításával teheti meg.
+A konfigurációs fájlok módosítása után újra kell indítania a ETERNA-t, hogy a módosítások érvénybe lépjenek. Ezt a tároló vagy az alkalmazáskiszolgáló újraindításával teheti meg.

@@ -1,10 +1,10 @@
 # Risikobewertung
 
-RODA enthält ein Risikoregister mit mehr als 80 Präservationsrisiken [Digital Repository Audit Method Based on Risk Assessment (DRAMBORA)] (http://www.repositoryaudit.eu) Toolkit, das vom [Digital Curation Centre (DCC)] (http://www.dcc.ac.uk) und DigitalPreservationEurope (DPE) entwickelt wurde.
+ETERNA enthält ein Risikoregister mit mehr als 80 Präservationsrisiken [Digital Repository Audit Method Based on Risk Assessment (DRAMBORA)] (http://www.repositoryaudit.eu) Toolkit, das vom [Digital Curation Centre (DCC)] (http://www.dcc.ac.uk) und DigitalPreservationEurope (DPE) entwickelt wurde.
 
 Es umfasst auch ein Risikoregister, das über die Benutzeroberfläche verwaltet werden kann, sowie mehrere Plugins zur Risikobewertung, die Informationen im Risikoregister aktualisieren.
 
-## Wie können Präservationsrisiken in RODA bewertet und gemildert werden?
+## Wie können Präservationsrisiken in ETERNA bewertet und gemildert werden?
 
 Sie möchten Risikobewertungsprozesse in Ihrem Repository durchführen. Beispielsweise möchten Sie einen Prozess zur Konvertierung von Dateien aus Formaten starten, die nicht mehr tragfähig sind (z.B. weil ein neues Risiko besteht, dass ein bestimmtes Dateiformat in Zukunft nicht mehr unterstützt wird).
 
@@ -28,7 +28,7 @@ Sie könnten dann die Risikostufe herabsetzen, da sich keine Word-95-Dateien meh
 
 Dies ist der manuelle Arbeitsablauf, da wir derzeit kein Plugin für die Erkennung von Formatveralterungsrisiken haben. Ein solches Plugin könnte entwickelt werden. Die Schritte zur Risikominderung würden in diesem Fall direkt über die Risikomanagement-Schnittstelle eingeleitet.
 
-Was die verfügbaren Konvertierungs-Plugins angeht, so unterstützt RODA derzeit die üblichen Formate (die wichtigsten Bild-, Video-, Text- und Audioformate). Nischenformate wird es immer geben. In diesem Fall müssen spezielle Plugins entwickelt werden.
+Was die verfügbaren Konvertierungs-Plugins angeht, so unterstützt ETERNA derzeit die üblichen Formate (die wichtigsten Bild-, Video-, Text- und Audioformate). Nischenformate wird es immer geben. In diesem Fall müssen spezielle Plugins entwickelt werden.
 
 ## Haben Sie eine Idee für ein Plugin zur Risikobewertung?
 

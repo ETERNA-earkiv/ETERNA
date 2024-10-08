@@ -7,7 +7,7 @@ Depois de instalar, direcione o seu browser para o endereço de IP correto (isto
 
 Com isto terá acesso a todas as funcionalidades.
 
-Depois, pode iniciar usando o RODA:
+Depois, pode iniciar usando o ETERNA:
 
 1. Vá até Catálogo e clique no botão **Criar Entidade Intelectual**, selecione o Dublin Core e preencha o título da sua nova coleção. Caso o botão não esteja visível (por já existir uma entidade intelectual) dirija-se ao Kebab menu na barra de pesquisa e clique na opção **Criar Entidade Intelectual**.  
 2. Vá até **Ingestão > Transferência** e carregue os ficheiros (ex. PDF) ou os SIPs criados pelo [RODA-in](http://rodain.roda-community.org/). Os SIPs terão metadados enquanto que os PDFs não. Para aprender a usar o RODA-in [veja os tutoriais](http://rodain.roda-community.org/#tutorials).

@@ -21,7 +21,6 @@ import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.NoAsyncCallback;
-import org.roda.wui.client.common.UpSalePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -125,9 +124,6 @@ public class Login extends Composite {
   @UiField
   FlowPanel loggedInPanel;
 
-  @UiField(provided = true)
-  UpSalePanel casMessagePanel;
-
   @UiField
   InlineHTML loggedInMessage;
   @UiField
@@ -139,13 +135,7 @@ public class Login extends Composite {
   private List<String> serviceTokens = null;
 
   private Login() {
-    casMessagePanel = new UpSalePanel(messages.casTitleText(), messages.casInformationText(), messages.learnMore(),
-      ConfigurationManager.getString(RodaConstants.UI_SERVICE_CAS_URL), cardIdentifier);
     initWidget(uiBinder.createAndBindUi(this));
-
-    if (casActive) {
-      casMessagePanel.setVisible(false);
-    }
 
     addAttachHandler(new AttachEvent.Handler() {
       @Override
@@ -162,10 +152,6 @@ public class Login extends Composite {
     username.setText("");
     password.setText("");
     error.setText("");
-
-    if (!casActive) {
-      casMessagePanel.setVisible(JavascriptUtils.accessLocalStorage(cardIdentifier));
-    }
 
     resendEmail.setVisible(false);
     serviceTokens = historyTokens;

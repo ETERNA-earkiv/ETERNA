@@ -1,13 +1,13 @@
 # Signed Plugins
 
-The introduction of the digital signature verification feature for plugins in RODA represents an advanced approach to
+The introduction of the digital signature verification feature for plugins in ETERNA represents an advanced approach to
 ensuring the security, integrity, and authenticity of the plugins installed in the repository. All plugins published on
 the [https://market.roda-community.org/](https://market.roda-community.org) are certified with a digital signature, and
-the authenticity validation is performed by RODA through its internal truststore.
+the authenticity validation is performed by ETERNA through its internal truststore.
 
 ## Trusting External Sources
 
-RODA provides the flexibility to configure a custom truststore, allowing advanced users to install plugins from an
+ETERNA provides the flexibility to configure a custom truststore, allowing advanced users to install plugins from an
 external source they consider trustworthy. To achieve this, the following properties must be modified in the
 roda-core.properties file:
 
@@ -23,7 +23,7 @@ The custom truststore provided by the external source should be placed in:
 
 ## Providing trusted plugins
 
-For developers who want their plugins to be integrated and recognized as trusted in specific RODA installations without
+For developers who want their plugins to be integrated and recognized as trusted in specific ETERNA installations without
 the need to publish them on the [https://market.roda-community.org/](https://market.roda-community.org), the following
 procedures should be followed:
 
@@ -77,9 +77,9 @@ keytool -importcert -keystore keystore.p12 -storepass <changeit> -file licence.c
 jarsigner -keystore keystore.p12 -storepass <changeit> -signedjar "roda-plugin-example-1.0.0-signed.jar"  "roda-plugin-example-1.0.0.jar" licence
 ```
 
-9. Remove the unsigned plugin from the plugin package and install the plugin in RODA.
+9. Remove the unsigned plugin from the plugin package and install the plugin in ETERNA.
 
-This can be done as an intermediate step between maven compilation of a plugin and the docker build of the RODA image in
+This can be done as an intermediate step between maven compilation of a plugin and the docker build of the ETERNA image in
 a build script:
 
 https://github.com/keeps/roda-plugin-template/blob/master/build.sh
@@ -94,6 +94,6 @@ mvn clean package -Dmaven.test.skip -Denforcer.skip
 jarsigner -keystore signing-keystore.p12 -storepass password -signedjar target/${PLUGIN}/${PLUGIN}-1.0.0-signed.jar target/${PLUGIN}/${PLUGIN}-1.0.0.jar
 rm -f target/${PLUGIN}/${PLUGIN}-1.0.0.jar
 
-# Build RODA with plugin
+# Build ETERNA with plugin
 docker build $RODA_VERSION_ARG --build-arg PLUGIN=${PLUGIN} -t ${PLUGIN}  .
 ```

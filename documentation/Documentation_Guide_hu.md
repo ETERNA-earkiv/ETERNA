@@ -1,6 +1,6 @@
 # Dokumentációs segédlet
 
-A RODA összes statikus szövege, beleértve a `segédoldalakat`, a `funkcionalitás leírását` és a statikus `html oldalakat`, a `[RODA_HOME]/example-config/theme/` alatt található.
+A ETERNA összes statikus szövege, beleértve a `segédoldalakat`, a `funkcionalitás leírását` és a statikus `html oldalakat`, a `[RODA_HOME]/example-config/theme/` alatt található.
 
 A meglévő tartalom frissítéséhez másolja a frissíteni kívánt fájlt a `[RODA_HOME]/example-config/theme/` mappából a `[RODA_HOME]/config/theme/` mappába, és szerkessze azt a célmappában.
 
