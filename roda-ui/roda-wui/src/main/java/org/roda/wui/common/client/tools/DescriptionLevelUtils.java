@@ -22,7 +22,7 @@ public class DescriptionLevelUtils {
   @SuppressWarnings("unused")
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private static final String TOP_ICON = "<span class='roda-logo'></span>";
+  private static final String TOP_ICON = "<span class='fas fa-home'></span>";
 
   private DescriptionLevelUtils() {
   }

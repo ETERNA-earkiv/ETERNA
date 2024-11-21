@@ -137,9 +137,6 @@ public class BrowseTop extends Composite {
     // INIT
     initWidget(uiBinder.createAndBindUi(this));
 
-    // HEADER
-    title.setIcon(DescriptionLevelUtils.getTopIconSafeHtml());
-
     browseDescription.add(new HTMLWidgetWrapper("BrowseDescription.html"));
 
     // CSS

@@ -262,8 +262,6 @@ public class CreateDescriptiveMetadata extends Composite {
 
           if (aip.getLevel() != null) {
             title.setIcon(DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), false));
-          } else {
-            title.setIcon(DescriptionLevelUtils.getTopIconSafeHtml());
           }
 
           if (aip.getTitle() != null) {
