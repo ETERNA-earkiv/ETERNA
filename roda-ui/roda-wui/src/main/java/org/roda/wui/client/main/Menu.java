@@ -213,10 +213,6 @@ public class Menu extends Composite {
     administrationUser = administrationMenu.addItem(messages.title("administration_user"),
       createCommand(MemberManagement.RESOLVER.getHistoryPath()));
     administrationUser.addStyleName("administration_user_item");
-    administrationMarketplace = administrationMenu.addItem(messages.title("administration_market_place"),
-      createURLCommand(ConfigurationManager.getStringWithDefault(RodaConstants.UI_SERVICE_MARKETPLACE_DEFAULT_URL,
-        RodaConstants.UI_SERVICE_MARKETPLACE_URL)));
-    administrationMarketplace.addStyleName("administration_marketplace_item");
 
     disposalMenu = new AcessibleMenuBar(true);
     disposalPolicy = disposalMenu.addItem(messages.title("disposal_policies"),
