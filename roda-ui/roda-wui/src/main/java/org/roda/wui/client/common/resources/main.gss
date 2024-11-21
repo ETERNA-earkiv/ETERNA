@@ -51,9 +51,13 @@
 
 .html, html {
     font-size: 62.5%;
+    min-height: 100vh;
 }
 
 .body, body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
     font-size: 1.5em;
     line-height: 1.6;
     font-weight: 400;
@@ -495,6 +499,9 @@ div.inline {
 }
 
 .main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
     background-color: white;
 }
 
@@ -834,7 +841,6 @@ pre code {
 
 .row > .content {
     padding: 30px !important;
-    min-height: 600px;
 }
 
 .btn {
@@ -2005,21 +2011,17 @@ td.datePickerMonth, td.datePickerYear {
     background-color: COLOR_BANNER_BACKGROUND;
     color: COLOR_BANNER_FOREGROUND;
     position: relative;
-    height: 140px;
 }
 
 .homeLink {
-    padding-left: 35px;
-    height: 140px;
     cursor: pointer;
     cursor: hand;
 }
 
 .homeLogo {
-    height: 70px;
+    height: 60px;
     float: left;
-    margin: 35px;
-    margin-left: 0;
+    margin: 30px;
 }
 
 .homeText {
@@ -2335,7 +2337,7 @@ td.datePickerMonth, td.datePickerYear {
 				CONTENT PANEL
 ************************************************/
 .main .contentPanel {
-    min-height: 560px;
+    flex-grow: 1;
 }
 
 .main .contentTitle {
@@ -4625,12 +4627,10 @@ td.datePickerMonth, td.datePickerYear {
 
 .viewRepresentationFile-center {
     width: 100%;
-    min-height: 670px;
     position: relative;
 }
 
 .viewRepresentationFilePreview {
-    min-height: 670px;
     display: inline-block;
     vertical-align: top;
     width: 100%;
@@ -4654,7 +4654,6 @@ td.datePickerMonth, td.datePickerYear {
 .viewRepresentationPDFFilePreview {
     /*height: 100vh;
     box-sizing: border-box;*/
-    min-height: 765px;
     width: 100%;
     /*
       This works together with javascript code that
