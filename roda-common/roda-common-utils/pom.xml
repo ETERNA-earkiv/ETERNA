@@ -8,8 +8,8 @@
   <parent>
     <groupId>org.roda-project</groupId>
     <artifactId>roda-common</artifactId>
-    <version>5.7.0</version>
-    <relativePath>..</relativePath>
+    <version>0.1.0</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
   <build>
     <plugins>

@@ -6,9 +6,9 @@
 	<artifactId>roda-common</artifactId>
 	<parent>
 		<groupId>org.roda-project</groupId>
-		<artifactId>roda</artifactId>
-		<version>5.7.0</version>
-		<relativePath>..</relativePath>
+		<artifactId>ETERNA</artifactId>
+		<version>0.1.0</version>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<packaging>pom</packaging>
 	<modules>
