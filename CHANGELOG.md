@@ -1,6 +1,24 @@
-# Changelog
+# ETERNA Changelog
+## v0.1.0 (2024-11-27)
+#### Security
+- Fixed severe (CVSS v3.1 Base Score: 10.0) vulnerability in updateMyUser method
+- Fixed severe (CVSS v3.1 Base Score: 9.1) vulnerability in SIP ingest
 
-## v5.7.0 (05/09/2024)
+#### New features
+- Added support for Facet Range queries
+- Initial rebranding
+
+## v0.0.1 (2024-09-16)
+#### New features
+- Implemented new highly configurable Scattered FS Storage Service to spread files and folders to multiple sub-folders
+- Upgraded to CloudHttp2SolrClient and added support for Basic authentication to SOLR
+
+&nbsp;
+
+---
+
+# RODA Changelog
+## v5.7.0 (2024-09-05)
 #### Security
 - Several dependency major upgrades to fix security vulnerabilities
 - Improve HTTP headers security
@@ -10,7 +28,7 @@
 To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
 ---
 
-## v5.7.0-beta1 (21/06/2024)
+## v5.7.0-beta1 (2024-06-21)
 #### New features 
 
 - Replace Akka with Apache Pekko
@@ -20,7 +38,7 @@ To try out this version, check the [install instructions](https://github.com/kee
 To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
 ---
 
-## v5.6.5 (07/06/2024)
+## v5.6.5 (2024-06-07)
 #### Bug fixes
 
 - Roda fails to resolve other metadata with folders #3219
@@ -30,7 +48,7 @@ To try out this version, check the [install instructions](https://github.com/kee
 To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
 ---
 
-## v5.6.4 (06/06/2024)
+## v5.6.4 (2024-06-06)
 #### Bug fixes
 
 - Roda fails to reindex due to problem with other metadata files #3218
@@ -40,7 +58,7 @@ To try out this version, check the [install instructions](https://github.com/kee
 To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
 ---
 
-## v5.6.3 (23/05/2024)
+## v5.6.3 (2024-05-23)
 #### Bug fixes
 
 - Revert webjars-locator functionality
@@ -50,7 +68,7 @@ To try out this version, check the [install instructions](https://github.com/kee
 To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
 ---
 
-## v5.6.2 (22/05/2024)
+## v5.6.2 (2024-05-22)
 #### Bug fixes
 
 - Base roda overwrites the configuration regarding user permissions in roda-config.properties #3189
@@ -63,7 +81,7 @@ To try out this version, check the [install instructions](https://github.com/kee
 To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
 ---
 
-## v5.6.1 (03/05/2024)
+## v5.6.1 (2024-05-03)
 #### Bug fixes
 
 - Custom E-ARK SIP representation type not being set when ingesting a E-ARK SIP #3139
@@ -76,7 +94,7 @@ To try out this version, check the [install instructions](https://github.com/kee
 To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
 ---
 
-## v5.6.0 (04/04/2024)
+## v5.6.0 (2024-04-04)
 #### New features 
 
 - Auto refresh after the session expires
@@ -93,7 +111,7 @@ To try out this version, check the [install instructions](https://github.com/kee
 To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
 ---
 
-## v5.5.3 (13/03/2024)
+## v5.5.3 (2024-03-13)
 #### Security
 - Several dependency major upgrades to fix security vulnerabilities
 
@@ -102,7 +120,7 @@ To try out this version, check the [install instructions](https://github.com/kee
 To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
 ---
 
-## v5.5.2 (11/03/2024)
+## v5.5.2 (2024-03-11)
 #### Bug fixes
 - Fixed other metadata download #3117
 
@@ -116,7 +134,7 @@ To try out this version, check the [install instructions](https://github.com/kee
 
 ---
 
-## v5.5.1 (08/03/2024)
+## v5.5.1 (2024-03-08)
 #### Bug fixes
 - Remove "opt-in" from roda-core.properties #3113
 - Fix ns2 namespace in premis.xml when creating technical metadata  #3114 
@@ -131,7 +149,7 @@ To try out this version, check the [install instructions](https://github.com/kee
 
 ---
 
-## v5.5.0 (04/03/2024)
+## v5.5.0 (2024-03-04)
 #### New features
 -  Support for generic technical metadata creation and visualization #3097
 
@@ -147,7 +165,7 @@ To try out this version, check the [install instructions](https://github.com/kee
 To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
 ---
 
-## v5.4.0 (08/02/2024)
+## v5.4.0 (2024-02-08)
 #### New features
 -  Technological platforms major upgrade, which largely improves overall security, maintanability and performance #3055
 -  Adding support for the latest version of the [E-ARK SIP specification](https://dilcis.eu/specifications/sip) (version 2.1.0) #3046
@@ -173,7 +191,7 @@ To try out this version, check the [install instructions](https://github.com/kee
 To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
 ---
 
-## v5.3.1 (11/01/2024)
+## v5.3.1 (2024-01-11)
 #### Bug fixes:
 - Changed default permissions to old behaviour #3043
 
@@ -182,7 +200,7 @@ To try out this version, check the [install instructions](https://github.com/kee
 To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
 ---
 
-## v5.3.0 (14/12/2023)
+## v5.3.0 (2023-12-14)
 #### Enhancement:
 - Added tool tip to plugin license verification panel #2974
 #### New features:
@@ -199,7 +217,7 @@ To try out this version, check the [install instructions](https://github.com/kee
 To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
 ---
 
-## v5.2.5 (06/12/2023)
+## v5.2.5 (2023-12-06)
 #### Bug fixes:
 
 - Error sending ingestion failure notification via email #3023 
@@ -209,7 +227,7 @@ To try out this version, check the [install instructions](https://github.com/kee
 To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
 ---
 
-## v5.2.4 (10/11/2023)
+## v5.2.4 (2023-11-10)
 #### Enhancements:
 
 - Update Swedish translation language
@@ -221,7 +239,7 @@ To try out this version, check the [install instructions](https://github.com/kee
 
 ---
 
-## v5.2.3 (10/11/2023)
+## v5.2.3 (2023-11-10)
 #### What's new:
 
 - New German (Austrian) translation of the Web interface :austria: 
@@ -248,7 +266,7 @@ To try out this version, check the [install instructions](https://github.com/kee
 
 ---
 
-## v5.2.2 (04/10/2023)
+## v5.2.2 (2023-10-04)
 #### Bug fixes:
 - Fixed FileID when it is encoded #2963
 - Fixed API filter issue #2965
@@ -263,7 +281,7 @@ To try out this version, check the [install instructions](https://www.roda-commu
 
 ---
 
-## v5.2.1 (08/09/2023)
+## v5.2.1 (2023-09-08)
 #### Bug fixes:
 - Listing RODA objects via REST-API is not showing any results #2935
 - Preservation events page is not showing no events #2928
@@ -280,7 +298,7 @@ To try out this version, check the [install instructions](https://www.roda-commu
 
 ---
 
-## v5.2.0 (28/07/2023)
+## v5.2.0 (2023-07-28)
 #### Enhancements:
 - DIP must be deleted if it no longer contains any link with any entity. #2863
 - Ingest job report could expose if SIP is update #2212
@@ -299,7 +317,7 @@ To try out this version, check the [install instructions](https://www.roda-commu
 
 ---
 
-## v5.1.0 (20/06/2023)
+## v5.1.0 (2023-06-20)
 #### New features:
 
 - Added property to differentiate environments #2676 
@@ -330,7 +348,7 @@ To try out this version, check the [install instructions](https://www.roda-commu
 
 ---
 
-## v4.5.6 (04/05/2023)
+## v4.5.6 (2023-05-04)
 #### Bug fixes:
 
 - Option to disable user registration on server-side #2840 
@@ -341,11 +359,11 @@ docker pull ghcr.io/keeps/roda:v4.5.6
 ```
 ---
 
-## v5.1.0-RC (17/04/2023)
+## v5.1.0-RC (2023-04-17)
 
 ---
 
-## v4.5.5 (16/03/2023)
+## v4.5.5 (2023-03-16)
 #### Dependencies upgrade:
 - Bump commons-ip version from 2.3.0 to 2.3.2 
 
@@ -356,7 +374,7 @@ docker pull ghcr.io/keeps/roda:v4.5.5
 ```
 ---
 
-## v5.0.0 (13/03/2023)
+## v5.0.0 (2023-03-13)
 ### :warning: Breaking Changes
 RODA  5.X will use Apache Solr 9 as indexing system. If you have an existing RODA implementation with Solr 8 you will need to [upgrade the Solr to version 9](https://solr.apache.org/guide/solr/latest/upgrade-notes/major-changes-in-solr-9.html) and then rebuild all indexes on RODA.
 
@@ -402,7 +420,7 @@ To try out this version, check the [install instructions](https://github.com/kee
 
 ---
 
-## v4.5.4 (27/01/2023)
+## v4.5.4 (2023-01-27)
 #### Enhancements:
 
 - Add metric per percentage of retries #2299
@@ -413,7 +431,7 @@ docker pull keeps/roda:v4.5.4
 ```
 ---
 
-## v4.5.3 (25/01/2023)
+## v4.5.3 (2023-01-25)
 #### Bug fixes:
 
 - Support very large queries to Solr (fix regression) #2311
@@ -428,7 +446,7 @@ docker pull keeps/roda:v4.5.3
 ```
 ---
 
-## v4.5.2 (19/01/2023)
+## v4.5.2 (2023-01-19)
 #### Bug fixes:
 
 - Failsafe fallback policy misconfigured #2303
@@ -439,7 +457,7 @@ docker pull keeps/roda:v4.5.2
 ```
 ---
 
-## v4.5.1 (16/01/2023)
+## v4.5.1 (2023-01-16)
 #### Enhancements:
 
 - Refactor RetryPolicyBuilder #2296
