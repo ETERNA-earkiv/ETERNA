@@ -156,7 +156,7 @@ public class UserManagement extends RodaWuiController {
     IllegalOperationException, ValidationException, RequestNotValidException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
-    if (!user.getId().equals(modifiedUser.getId())) {
+    if (!user.getId().equals(modifiedUser.getId()) || !user.getName().equals(modifiedUser.getName())) {
       throw new IllegalOperationException("Trying to modify user information for another user");
     }
 
