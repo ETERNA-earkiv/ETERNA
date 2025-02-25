@@ -4652,8 +4652,8 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .viewRepresentationPDFFilePreview {
-    /*height: 100vh;
-    box-sizing: border-box;*/
+    height: 100dvh;
+    box-sizing: border-box;
     width: 100%;
     /*
       This works together with javascript code that
