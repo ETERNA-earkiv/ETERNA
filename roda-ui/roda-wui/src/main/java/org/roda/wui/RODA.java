@@ -233,11 +233,13 @@ public class RODA {
 
   @Bean
   public ServletContextInitializer servletContextInitializer() {
-    return new ServletContextInitializer() {
+    String secureString = System.getenv("ETERNA_SESSION_COOKIE_SECURE");
+    Boolean secure = secureString != null ? Boolean.parseBoolean(secureString) : true;
 
+    return new ServletContextInitializer() {
       @Override
       public void onStartup(ServletContext servletContext) throws ServletException {
-        servletContext.getSessionCookieConfig().setSecure(true);
+        servletContext.getSessionCookieConfig().setSecure(secure);
         servletContext.getSessionCookieConfig().setHttpOnly(true);
       }
     };
