@@ -31,6 +31,7 @@ import org.roda.wui.client.management.ResetPassword;
 import org.roda.wui.client.management.VerifyEmail;
 import org.roda.wui.client.planning.Planning;
 import org.roda.wui.client.process.Process;
+import org.roda.wui.client.redact.PDFRedactor;
 import org.roda.wui.client.search.Relation;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.client.welcome.Help;
@@ -120,6 +121,9 @@ public class ContentPanel extends SimplePanel {
 
     // Acknowlege page
     resolvers.add(AcknowledgeNotification.RESOLVER);
+
+    // PDF Redactor
+    resolvers.add(PDFRedactor.RESOLVER);
   }
 
   /**
