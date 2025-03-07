@@ -474,6 +474,8 @@ public interface ClientMessages extends Messages {
 
   String printButton();
 
+  String redactPdfButton();
+
   /*** Identify formats ***/
 
   String identifyFormatsButton();
