@@ -7,11 +7,7 @@
  */
 package org.roda.wui.client.common.actions;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -23,6 +19,7 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
@@ -36,7 +33,9 @@ import org.roda.wui.client.common.dialogs.SelectFileDialog;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.client.redact.PDFRedactor;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -94,7 +93,8 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
     IDENTIFY_FORMATS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
     SHOW_EVENTS(RodaConstants.PERMISSION_METHOD_FIND_PRESERVATION_EVENT),
-    SHOW_RISKS(RodaConstants.PERMISSION_METHOD_FIND_RISK);
+    SHOW_RISKS(RodaConstants.PERMISSION_METHOD_FIND_RISK),
+    REDACT_PDF(RodaConstants.PERMISSION_METHOD_CREATE_FILE);
 
     private List<String> methods;
 
@@ -155,7 +155,11 @@ public class FileActions extends AbstractActionable<IndexedFile> {
       if (file.isDirectory()) {
         canAct = POSSIBLE_ACTIONS_ON_SINGLE_FILE_DIRECTORY.contains(action);
       } else {
-        canAct = POSSIBLE_ACTIONS_ON_SINGLE_FILE_BITSTREAM.contains(action);
+        if (action == FileAction.REDACT_PDF) {
+          canAct = hasFileFormat(file, "application/pdf", "pdf");
+        } else {
+          canAct = POSSIBLE_ACTIONS_ON_SINGLE_FILE_BITSTREAM.contains(action);
+        }
       }
     }
 
@@ -206,6 +210,8 @@ public class FileActions extends AbstractActionable<IndexedFile> {
       move(file, callback);
     } else if (FileAction.REMOVE.equals(action)) {
       remove(file, callback);
+    } else if (FileAction.REDACT_PDF.equals(action)) {
+      redactPdf(file, callback);
     } else if (FileAction.NEW_PROCESS.equals(action)) {
       newProcess(file, callback);
     } else if (FileAction.IDENTIFY_FORMATS.equals(action)) {
@@ -608,6 +614,53 @@ public class FileActions extends AbstractActionable<IndexedFile> {
       });
   }
 
+  private String getFileExtension(String name) {
+    String extension = "";
+
+    if (name == null) {
+      return extension;
+    }
+
+    int dotIndex = name.lastIndexOf('.');
+    int unixPathSeparatorIndex = name.lastIndexOf('/');
+    int windowsPathSeparatorIndex = name.lastIndexOf('\\');
+
+    if (dotIndex > unixPathSeparatorIndex && dotIndex > windowsPathSeparatorIndex && dotIndex < name.length() - 1) {
+      extension = name.substring(dotIndex + 1);
+    }
+
+    return extension;
+  }
+
+  private boolean hasFileFormat(final IndexedFile file, final String mimeType, final String fileExtension) {
+    FileFormat fileFormat = file.getFileFormat();
+    String mime = fileFormat.getMimeType();
+    String extension = fileFormat.getExtension();
+    String fileIdExtension = getFileExtension(file.getId());
+
+    if (Objects.equals(mime, mimeType)) {
+      return true;
+    } else if (mime == null && extension != null && (extension.equalsIgnoreCase("." + fileExtension) || extension.equalsIgnoreCase(fileExtension))) {
+      return true;
+    } else {
+      return mime == null && extension == null && fileIdExtension.equalsIgnoreCase(fileExtension);
+    }
+  }
+
+  private void redactPdf(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
+    if (!hasFileFormat(file, "application/pdf", "pdf")) {
+      Dialogs.showInformationDialog("Error!", "Can only redact PDF-files.", "Ok", false);
+      callback.onSuccess(ActionImpact.NONE);
+      return;
+    }
+
+    List<String> historyItems = ListUtils.concat(
+            ListUtils.concat(Arrays.asList(file.getAipId(), file.getRepresentationId()), file.getPath()), file.getId());
+
+    callback.onSuccess(ActionImpact.NONE);
+    HistoryUtils.newHistory(PDFRedactor.RESOLVER, historyItems.toArray(new String[0]));
+  }
+
   @Override
   public ActionableBundle<IndexedFile> createActionsBundle() {
     ActionableBundle<IndexedFile> fileActionableBundle = new ActionableBundle<>();
@@ -626,6 +679,9 @@ public class FileActions extends AbstractActionable<IndexedFile> {
       "btn-plus-circle", "fileCreateFolderButton");
     managementGroup.addButton(messages.removeButton(), FileAction.REMOVE, ActionImpact.DESTROYED, "btn-ban",
       "fileRemoveButton");
+
+    // REDACTION
+    managementGroup.addButton(messages.redactPdfButton(), FileAction.REDACT_PDF, ActionImpact.UPDATED, "btn-eraser", "fileRedactButton");
 
     // PRESERVATION
     ActionableGroup<IndexedFile> preservationGroup = new ActionableGroup<>(messages.preservationTitle());
