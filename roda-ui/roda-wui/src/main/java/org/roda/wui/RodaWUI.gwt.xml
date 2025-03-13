@@ -31,6 +31,11 @@
 	<!-- Inherit required libraries -->
 	<inherits name="com.github.nmorel.gwtjackson.GwtJackson" />
 
+	<!-- Inherit Elemental2 -->
+	<inherits name="elemental2.core.Core" />
+	<inherits name="elemental2.dom.Dom" />
+	<inherits name="elemental2.promise.Promise" />
+
 	<!-- Inherit sub-projects -->
 	<!-- TODO: Remove the Common sub-module -->
 	<inherits name='org.roda.wui.common.Common' />
