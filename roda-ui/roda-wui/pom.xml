@@ -544,6 +544,21 @@
             <artifactId>gwt-jackson</artifactId>
             <version>0.15.4</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.elemental2</groupId>
+            <artifactId>elemental2-core</artifactId>
+            <version>1.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.elemental2</groupId>
+            <artifactId>elemental2-dom</artifactId>
+            <version>1.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.elemental2</groupId>
+            <artifactId>elemental2-promise</artifactId>
+            <version>1.2.1</version>
+        </dependency>
         <!-- WebJars https://www.webjars.org -->
         <dependency>
             <groupId>org.webjars</groupId>
