@@ -18,6 +18,46 @@
 ---
 
 # RODA Changelog
+## v5.7.3 (2025-04-03)
+#### Security
+-  Fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
+## v5.7.2 (2025-03-24)
+#### Bugs
+
+- Disposal confirmation cancel button message #3303
+
+#### Enhancements
+
+- Missing translations for disposal rules order panel #3312
+
+#### Security
+- Several major dependency upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
+## v5.7.1 (2025-01-08)
+#### Bug fixes
+
+- Fix built-in plugin "AIP ancestor hierarchy fix"
+- Deleting linked DIPs now longer increments objects processed (#3285)
+
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+
+---
+
+To try this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v5.7.0 (2024-09-05)
 #### Security
 - Several dependency major upgrades to fix security vulnerabilities

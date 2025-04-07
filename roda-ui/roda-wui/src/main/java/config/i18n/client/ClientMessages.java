@@ -2140,6 +2140,14 @@ public interface ClientMessages extends Messages {
 
   String editRulesOrder();
 
+  String editRulesOrderTop();
+
+  String editRulesOrderUp();
+
+  String editRulesOrderDown();
+
+  String editRulesOrderBottom();
+
   String confirmChangeRulesOrder();
 
   String deleteDisposalRuleDialogTitle();
