@@ -264,7 +264,7 @@
                                 </additionalClasspathElement>
                             </additionalClasspathElements>
                             <jvmArguments>
-                                -agentpath:/Applications/JProfiler.app/Contents/Resources/app/bin/macos/libjprofilerti.jnilib=port=33807,loopback
+                                -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=*:5005
                                 <!-- Remove after upgrade to spring-boot 3-->
                                 -Dorg.springframework.boot.logging.LoggingSystem=none
                                 <!-- Remove -->
