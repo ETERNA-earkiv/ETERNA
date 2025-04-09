@@ -10,13 +10,11 @@ package org.roda.wui.filter;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.RodaUtils;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class SecurityHeadersFilter implements Filter {
 
