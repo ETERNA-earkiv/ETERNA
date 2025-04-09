@@ -2,19 +2,19 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
- *
+ * <p>
  * https://github.com/keeps/roda
  */
 package org.roda.wui;
 
 import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
 import org.apereo.cas.client.session.SingleSignOutHttpSessionListener;
 import org.roda.wui.filter.OnOffFilter;
-import org.roda.wui.filter.SecurityHeadersFilter;
 import org.roda.wui.servlets.ContextListener;
 import org.roda.wui.servlets.RodaWuiServlet;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -27,9 +27,6 @@ import org.springframework.core.Ordered;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import jakarta.servlet.ServletContextListener;
-import jakarta.servlet.http.HttpServlet;
 
 @SpringBootApplication
 public class RODA {
@@ -61,7 +58,6 @@ public class RODA {
 
     return registrationBean;
   }
-
 
 
   @Bean
@@ -107,8 +103,7 @@ public class RODA {
     FilterRegistrationBean<OnOffFilter> registrationBean = new FilterRegistrationBean<>();
     registrationBean.setFilter(new OnOffFilter());
     registrationBean.setName("CasValidationFilter");
-    registrationBean.addInitParameter("inner-filter-class",
-      "org.apereo.cas.client.validation.Cas30ProxyReceivingTicketValidationFilter");
+    registrationBean.addInitParameter("inner-filter-class", "org.apereo.cas.client.validation.Cas30ProxyReceivingTicketValidationFilter");
     registrationBean.addInitParameter("config-prefix", "ui.filter.cas");
     registrationBean.addInitParameter("casServerUrlPrefix", "https://localhost:8443/cas");
     registrationBean.addInitParameter("serverName", "https://localhost:8888");
@@ -140,8 +135,7 @@ public class RODA {
     FilterRegistrationBean<OnOffFilter> registrationBean = new FilterRegistrationBean<>();
     registrationBean.setFilter(new OnOffFilter());
     registrationBean.setName("CasRequestWrapperFilter");
-    registrationBean.addInitParameter("inner-filter-class",
-      "org.apereo.cas.client.util.HttpServletRequestWrapperFilter");
+    registrationBean.addInitParameter("inner-filter-class", "org.apereo.cas.client.util.HttpServletRequestWrapperFilter");
     registrationBean.addInitParameter("config-prefix", "ui.filter.cas");
     registrationBean.addUrlPatterns("/*");
 
@@ -200,9 +194,12 @@ public class RODA {
   }
 
   @Bean
-  public FilterRegistrationBean<SecurityHeadersFilter> securityHeadersFilter() {
-    FilterRegistrationBean<SecurityHeadersFilter> registrationBean = new FilterRegistrationBean<>();
-    registrationBean.setFilter(new SecurityHeadersFilter());
+  public FilterRegistrationBean<OnOffFilter> securityHeadersFilter() {
+    FilterRegistrationBean<OnOffFilter> registrationBean = new FilterRegistrationBean<>();
+    registrationBean.setFilter(new OnOffFilter());
+    registrationBean.addInitParameter("inner-filter-class", "org.roda.wui.filter.SecurityHeadersFilter");
+    registrationBean.addInitParameter("config-prefix", "ui.filter.security");
+
     registrationBean.addUrlPatterns("/*"); // Apply the filter to all requests
     return registrationBean;
   }
