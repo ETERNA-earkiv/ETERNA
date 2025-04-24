@@ -43,10 +43,9 @@ import java.util.List;
 import static elemental2.dom.DomGlobal.fetch;
 
 public class PDFRedactor extends Composite {
-  public static final String JS_PATH = "pdf-redactor/assets/index.js";
-  public static final String CSS_PATH = "pdf-redactor/assets/index.css";
-  public static String[] requiredRoles = new String[]{"representation.view", "representation.read",
-          "representation.create", "representation.update"};
+  public static final String JS_PATH = "webjars/pdf-redactor/pdf-redactor.js";
+  public static final String CSS_PATH = "webjars/pdf-redactor/pdf-redactor.css";
+  public static String[] requiredRoles = new String[]{"representation.view", "representation.read", "representation.create", "representation.update"};
   private static PDFRedactor instance = null;
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -75,13 +74,10 @@ public class PDFRedactor extends Composite {
   private static final List<String> findRedactedRepresentationFieldsToReturn = new ArrayList<>();
 
   static {
-    findRedactedRepresentationFieldsToReturn.addAll(
-            Arrays.asList(RodaConstants.INDEX_ID, RodaConstants.INDEX_UUID, RodaConstants.REPRESENTATION_TITLE, RodaConstants.REPRESENTATION_TYPE));
+    findRedactedRepresentationFieldsToReturn.addAll(Arrays.asList(RodaConstants.INDEX_ID, RodaConstants.INDEX_UUID, RodaConstants.REPRESENTATION_TITLE, RodaConstants.REPRESENTATION_TYPE));
   }
 
-  private static final Sorter findRedactedRepresentationSorter = new Sorter(
-          new SortParameter(RodaConstants.REPRESENTATION_ID, false)
-  );
+  private static final Sorter findRedactedRepresentationSorter = new Sorter(new SortParameter(RodaConstants.REPRESENTATION_ID, false));
 
   private boolean initialized;
   private PDFRedactorPanel pdfRedactorPanel;
@@ -115,23 +111,20 @@ public class PDFRedactor extends Composite {
   }
 
   private void init(final IndexedFile file) {
-    if (!initialized) {
+    String downloadUrl = RestUtils.createRepresentationFileDownloadUri(file.getUUID()).asString();
+    String aipId = file.getAipId();
+
+    if (initialized) {
+      pdfRedactorPanel.unmount();
+      initPdfRedactorPanel(aipId, file, downloadUrl);
+    } else {
       initialized = true;
 
-      String downloadUrl = RestUtils.createRepresentationFileDownloadUri(file.getUUID()).asString();
-      //String uploadUrl = RestUtils.createFileUploadUri()
-      //BrowserService.Util.getInstance().upl
-
-      String aipId = file.getAipId();
-
-
-      new CssFileInjector(RestUtils.createThemeResourceUri(CSS_PATH, CSS_PATH, false).asString())
-              .setWindow(CssFileInjector.TOP_WINDOW).inject();
+      new CssFileInjector(CSS_PATH).setWindow(CssFileInjector.TOP_WINDOW).inject();
 
       pdfRedactorPanel = new PDFRedactorPanel();
 
-      ScriptModuleInjector scriptModuleInjector = new ScriptModuleInjector(
-              RestUtils.createThemeResourceUri(JS_PATH, JS_PATH, false).asString());
+      ScriptModuleInjector scriptModuleInjector = new ScriptModuleInjector(JS_PATH);
 
       scriptModuleInjector.setWindow(ScriptModuleInjector.TOP_WINDOW);
       scriptModuleInjector.setCallback(new Callback<Void, Exception>() {
@@ -142,41 +135,7 @@ public class PDFRedactor extends Composite {
 
         @Override
         public void onSuccess(Void unused) {
-          pdfRedactorPanel.setUrl(downloadUrl);
-          pdfRedactorPanel.render();
-          pdfRedactorPanel.setSaveCallback((Blob pdfData) -> {
-            getOrCreateRedactedRepresentation(aipId).then(
-                    (representation) -> {
-                      List<String> path = new ArrayList<>();
-                      path.addAll(file.getPath());
-
-                      consoleLog("path:");
-                      consoleLog(path);
-
-                      String uploadUri = RestUtils.createFileUploadUri(
-                              aipId,
-                              representation.getId(),
-                              path,
-                              "Saved redacted version"
-                      );
-
-                      consoleLog("uploadUri: " + uploadUri);
-
-                      FormData formData = new FormData();
-                      formData.append("upl", pdfData, file.getOriginalName());
-
-                      RequestInit requestInit = RequestInit.create();
-                      requestInit.setMethod("POST");
-                      requestInit.setBody(formData);
-
-                      fetch(uploadUri, requestInit);
-
-                      return null;
-                    }
-            );
-
-            return true;
-          });
+          initPdfRedactorPanel(aipId, file, downloadUrl);
         }
       });
 
@@ -184,71 +143,67 @@ public class PDFRedactor extends Composite {
     }
   }
 
+  private void initPdfRedactorPanel(final String aipId, final IndexedFile file, final String downloadUrl) {
+    pdfRedactorPanel.setUrl(downloadUrl);
+    pdfRedactorPanel.mount();
+    pdfRedactorPanel.setSaveCallback((Blob pdfData) -> {
+      getOrCreateRedactedRepresentation(aipId).then((representation) -> {
+        List<String> path = new ArrayList<>(file.getPath());
+
+        String uploadUrl = RestUtils.createFileUploadUri(aipId, representation.getId(), path, "Saved redacted version");
+
+        FormData formData = new FormData();
+        formData.append("upl", pdfData, file.getId());
+
+        RequestInit requestInit = RequestInit.create();
+        requestInit.setMethod("POST");
+        requestInit.setBody(formData);
+
+        fetch(uploadUrl, requestInit);
+
+        return null;
+      });
+
+      return true;
+    });
+  }
+
   private static Promise<IndexedRepresentation> getOrCreateRedactedRepresentation(String aipId) {
-    Filter findRedactedRepresentationFilter = new Filter(
-            new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aipId),
+    Filter findRedactedRepresentationFilter = new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aipId),
 
             // Make type configurable
-            new SimpleFilterParameter(RodaConstants.REPRESENTATION_TYPE, "Redacted")
-    );
+            new SimpleFilterParameter(RodaConstants.REPRESENTATION_TYPE, "Redacted"));
 
     final PromiseWrapper<IndexedRepresentation> repPromise = new PromiseWrapper<>();
     final PromiseAsyncCallback<IndexResult<IndexedRepresentation>> findRepPromise = new PromiseAsyncCallback<>();
-    findRepPromise.getPromise().<Void>then(
-            (result) -> {
-              if (result.getTotalCount() > 0) {
-                repPromise.resolve(result.getResults().get(0));
-              } else {
-                createRedactedRepresentation(aipId).then(repPromise::resolve).catch_(repPromise::reject);
-              }
-              return null;
-            }
-    ).catch_(repPromise::reject);
+    findRepPromise.getPromise().<Void>then((result) -> {
+      if (result.getTotalCount() > 0) {
+        repPromise.resolve(result.getResults().get(0));
+      } else {
+        createRedactedRepresentation(aipId).then(repPromise::resolve).catch_(repPromise::reject);
+      }
+      return null;
+    }).catch_(repPromise::reject);
 
-    BrowserService.Util.getInstance().find(
-            IndexedRepresentation.class.getName(),
-            findRedactedRepresentationFilter,
-            findRedactedRepresentationSorter,
-            new Sublist(0, 1),
-            Facets.NONE,
-            LocaleInfo.getCurrentLocale().getLocaleName(),
-            true,
-            findRedactedRepresentationFieldsToReturn,
-            findRepPromise
-    );
+    BrowserService.Util.getInstance().find(IndexedRepresentation.class.getName(), findRedactedRepresentationFilter, findRedactedRepresentationSorter, new Sublist(0, 1), Facets.NONE, LocaleInfo.getCurrentLocale().getLocaleName(), true, findRedactedRepresentationFieldsToReturn, findRepPromise);
 
     return repPromise.getPromise();
   }
 
   private static Promise<IndexedRepresentation> getRepresentationById(String aipId, String representationId) {
-    final Filter findRedactedRepresentationFilter = new Filter(
-            new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aipId),
-            new SimpleFilterParameter(RodaConstants.REPRESENTATION_ID, representationId)
-    );
+    final Filter findRedactedRepresentationFilter = new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aipId), new SimpleFilterParameter(RodaConstants.REPRESENTATION_ID, representationId));
 
     final PromiseWrapper<IndexedRepresentation> repPromise = new PromiseWrapper<>();
     final PromiseAsyncCallback<IndexResult<IndexedRepresentation>> findRepPromise = new PromiseAsyncCallback<>();
-    findRepPromise.getPromise().then(
-            (result) -> {
-              if (result.getTotalCount() > 0) {
-                return repPromise.resolve(result.getResults().get(0));
-              } else {
-                return repPromise.reject(new Exception("Could not find created representation for redacted files."));
-              }
-            }
-    ).catch_(repPromise::reject);
+    findRepPromise.getPromise().then((result) -> {
+      if (result.getTotalCount() > 0) {
+        return repPromise.resolve(result.getResults().get(0));
+      } else {
+        return repPromise.reject(new Exception("Could not find created representation for redacted files."));
+      }
+    }).catch_(repPromise::reject);
 
-    BrowserService.Util.getInstance().find(
-            IndexedRepresentation.class.getName(),
-            findRedactedRepresentationFilter,
-            findRedactedRepresentationSorter,
-            new Sublist(0, 1),
-            Facets.NONE,
-            LocaleInfo.getCurrentLocale().getLocaleName(),
-            true,
-            findRedactedRepresentationFieldsToReturn,
-            findRepPromise
-    );
+    BrowserService.Util.getInstance().find(IndexedRepresentation.class.getName(), findRedactedRepresentationFilter, findRedactedRepresentationSorter, new Sublist(0, 1), Facets.NONE, LocaleInfo.getCurrentLocale().getLocaleName(), true, findRedactedRepresentationFieldsToReturn, findRepPromise);
 
     return repPromise.getPromise();
   }
@@ -256,21 +211,15 @@ public class PDFRedactor extends Composite {
   private static Promise<IndexedRepresentation> createRedactedRepresentation(String aipId) {
     final PromiseWrapper<IndexedRepresentation> repPromise = new PromiseWrapper<>();
     final PromiseAsyncCallback<String> createRepPromise = new PromiseAsyncCallback<>();
-    createRepPromise.getPromise().then(
-            (representationId) -> {
-              getRepresentationById(aipId, representationId).then(
-                      (representation) -> {
-                        setRepresentationType(representation).then(
-                                (Void) -> repPromise.resolve(representation)
-                        ).catch_(repPromise::reject);
+    createRepPromise.getPromise().then((representationId) -> {
+      getRepresentationById(aipId, representationId).then((representation) -> {
+        setRepresentationType(representation).then((Void) -> repPromise.resolve(representation)).catch_(repPromise::reject);
 
-                        return null;
-                      }
-              );
+        return null;
+      });
 
-              return null;
-            }
-    ).catch_(repPromise::reject);
+      return null;
+    }).catch_(repPromise::reject);
 
     BrowserService.Util.getInstance().createRepresentation(aipId, "Creating representation for redacted files", createRepPromise);
 
@@ -278,18 +227,10 @@ public class PDFRedactor extends Composite {
   }
 
   private static Promise<Job> setRepresentationType(IndexedRepresentation representation) {
-    final SelectedItemsList<IndexedRepresentation> selectedItemsList = new SelectedItemsList<>(
-            Collections.singletonList(representation.getUUID()),
-            IndexedRepresentation.class.getName()
-    );
+    final SelectedItemsList<IndexedRepresentation> selectedItemsList = new SelectedItemsList<>(Collections.singletonList(representation.getUUID()), IndexedRepresentation.class.getName());
 
     final PromiseAsyncCallback<Job> changeRepTypeJobCallback = new PromiseAsyncCallback<>();
-    BrowserService.Util.getInstance().changeRepresentationType(
-            selectedItemsList,
-            "Redacted",
-            "Setting representation type to \"Redacted\"",
-            changeRepTypeJobCallback
-    );
+    BrowserService.Util.getInstance().changeRepresentationType(selectedItemsList, "Redacted", "Setting representation type to \"Redacted\"", changeRepTypeJobCallback);
 
     return changeRepTypeJobCallback.getPromise();
   }
@@ -301,19 +242,18 @@ public class PDFRedactor extends Composite {
       final List<String> filePath = new ArrayList<>(historyTokens.subList(2, historyTokens.size() - 1));
       final String fileId = historyTokens.get(historyTokens.size() - 1);
 
-      BrowserService.Util.getInstance().retrieveBrowseFileBundle(aipId, representationId, filePath, fileId,
-              Collections.emptyList(), new AsyncCallback<BrowseFileBundle>() {
-                @Override
-                public void onFailure(Throwable caught) {
-                  AsyncCallbackUtils.defaultFailureTreatment(caught);
-                }
+      BrowserService.Util.getInstance().retrieveBrowseFileBundle(aipId, representationId, filePath, fileId, Collections.emptyList(), new AsyncCallback<BrowseFileBundle>() {
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
 
-                @Override
-                public void onSuccess(final BrowseFileBundle bundle) {
-                  init(bundle.getFile());
-                  callback.onSuccess(pdfRedactorPanel);
-                }
-              });
+        @Override
+        public void onSuccess(final BrowseFileBundle bundle) {
+          init(bundle.getFile());
+          callback.onSuccess(pdfRedactorPanel);
+        }
+      });
     } else {
       HistoryUtils.newHistory(Theme.RESOLVER, "Error404.html");
       callback.onSuccess(null);

@@ -16,21 +16,15 @@ public class PDFRedactorObject {
   }
 
   @JsMethod
-  public static native void render(Element root);
+  public static native void mount(Element root);
+
+  @JsMethod
+  public static native void unmount();
 
   @JsMethod
   public static native void setUrl(String url);
 
   @JsMethod
   public static native void setSaveCallback(SaveCallback callback);
-
-  /*
-  public static void test() {
-    BrowserService.Util.getInstance().createRepresentation();
-    BrowserService.Util.getInstance().createFolder();
-    BrowserService.Util.getInstance().find();
-    RestUtils.createFileUploadUri()
-  }
-  */
 }
 
