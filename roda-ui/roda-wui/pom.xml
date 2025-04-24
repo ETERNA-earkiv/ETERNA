@@ -658,7 +658,7 @@
         <dependency>
             <groupId>se.whitered.eterna</groupId>
             <artifactId>pdf-redactor</artifactId>
-            <version>1.0.0</version>
+            <version>v1.0.0</version>
         </dependency>
         <!-- Spring boot -->
         <dependency>
