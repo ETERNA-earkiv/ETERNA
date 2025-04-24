@@ -24,8 +24,12 @@ public class PDFRedactorPanel extends Composite {
     PDFRedactorObject.setUrl(url);
   }
 
-  public void render() {
-    PDFRedactorObject.render(content.getElement());
+  public void mount() {
+    PDFRedactorObject.mount(content.getElement());
+  }
+
+  public void unmount() {
+    PDFRedactorObject.unmount();
   }
 
   public void setSaveCallback(PDFRedactorObject.SaveCallback callback) { PDFRedactorObject.setSaveCallback(callback); }

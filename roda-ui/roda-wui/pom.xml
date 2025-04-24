@@ -264,7 +264,7 @@
                                 </additionalClasspathElement>
                             </additionalClasspathElements>
                             <jvmArguments>
-                                -agentpath:/Applications/JProfiler.app/Contents/Resources/app/bin/macos/libjprofilerti.jnilib=port=33807,loopback
+                                -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=*:5005
                                 <!-- Remove after upgrade to spring-boot 3-->
                                 -Dorg.springframework.boot.logging.LoggingSystem=none
                                 <!-- Remove -->
@@ -654,6 +654,11 @@
             <groupId>org.webjars.bowergithub.eligrey</groupId>
             <artifactId>filesaver.js</artifactId>
             <version>2.0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>se.whitered.eterna</groupId>
+            <artifactId>pdf-redactor</artifactId>
+            <version>v1.0.0</version>
         </dependency>
         <!-- Spring boot -->
         <dependency>
