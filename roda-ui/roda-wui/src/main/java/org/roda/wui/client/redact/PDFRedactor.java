@@ -43,8 +43,8 @@ import java.util.List;
 import static elemental2.dom.DomGlobal.fetch;
 
 public class PDFRedactor extends Composite {
-  public static final String JS_PATH = "webjars/pdf-redactor/pdf-redactor.js";
-  public static final String CSS_PATH = "webjars/pdf-redactor/pdf-redactor.css";
+  public static final String JS_PATH = "webjars/pdf-redactor/1.0.0/pdf-redactor.js";
+  public static final String CSS_PATH = "webjars/pdf-redactor/1.0.0/pdf-redactor.css";
   public static String[] requiredRoles = new String[]{"representation.view", "representation.read", "representation.create", "representation.update"};
   private static PDFRedactor instance = null;
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
