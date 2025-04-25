@@ -236,7 +236,15 @@
 
     <filter>
         <filter-name>SecurityHeadersFilter</filter-name>
-        <filter-class>org.roda.wui.filter.SecurityHeadersFilter</filter-class>
+        <filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
+        <init-param>
+            <param-name>inner-filter-class</param-name>
+            <param-value>org.roda.wui.filter.SecurityHeadersFilter</param-value>
+        </init-param>
+        <init-param>
+            <param-name>config-prefix</param-name>
+            <param-value>ui.filter.security</param-value>
+        </init-param>
     </filter>
     <filter-mapping>
         <filter-name>SecurityHeadersFilter</filter-name>
