@@ -5449,6 +5449,23 @@ td.datePickerMonth, td.datePickerYear {
     width: 100%;
 }
 
+.permission-role-container {
+  margin-bottom: 2em;
+  padding: 1em;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #f5f5f5;
+}
+
+.permission-role-container-title {
+  font-size: 1.15em;
+  font-weight: bold;
+  color: #222222;
+  margin-bottom: 0.75em;
+  padding-bottom: 0.25em;
+  border-bottom: 1px solid rgb(0, 0, 0);
+}
+
 .permissions .permission {
     margin: 5px;
 }
@@ -5505,7 +5522,6 @@ td.datePickerMonth, td.datePickerYear {
 @media only screen and (max-width: 999px)  {
 	.permission {
 		padding-bottom: 40px;
-		background-color: white;
 	}
 }
 
