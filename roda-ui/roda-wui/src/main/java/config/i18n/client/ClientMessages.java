@@ -1633,6 +1633,10 @@ public interface ClientMessages extends Messages {
 
   String preferencesCancel();
 
+  // Roles Title
+
+  String roleTitle(@Select String role);
+
   // Roles Description
 
   String role(@Select String role);
