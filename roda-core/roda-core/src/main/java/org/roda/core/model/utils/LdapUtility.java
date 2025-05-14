@@ -1618,7 +1618,7 @@ public class LdapUtility {
   private Set<String> getDNsOfGroupsContainingMember(final CoreSession session, final String memberDN)
     throws LdapException {
     final Cursor<Entry> cursor = search(session, getGroupsDN(),
-      String.format("(&(%s=*)(%s=%s))", CN, UNIQUE_MEMBER, memberDN));
+      String.format("(&(%s=*)(%s=%s))", CN, UNIQUE_MEMBER, escapeLdapQuery(memberDN)));
     final Set<String> groupsDN = new HashSet<>();
     for (Entry entry : cursor) {
       groupsDN.add(entry.getDn().getName());
@@ -1640,7 +1640,7 @@ public class LdapUtility {
   private Set<String> getDNsOfActiveGroupsContainingMember(final CoreSession session, final String memberDN)
     throws LdapException {
     final Cursor<Entry> cursor = search(session, getGroupsDN(),
-      String.format("(&(%s=%s)(%s=%s))", UNIQUE_MEMBER, memberDN, SHADOW_INACTIVE, 0));
+      String.format("(&(%s=%s)(%s=%s))", UNIQUE_MEMBER, escapeLdapQuery(memberDN), SHADOW_INACTIVE, 0));
     final Set<String> groupsDN = new HashSet<>();
     for (Entry entry : cursor) {
       groupsDN.add(entry.getDn().getName());
@@ -1652,7 +1652,7 @@ public class LdapUtility {
     throws LdapException {
     final Set<String> rolesDN = new HashSet<>();
     final Cursor<Entry> cursor = search(session, getRolesDN(),
-      String.format("(&(cn=*)(%s=%s))", ROLE_OCCUPANT, memberDN));
+      String.format("(&(cn=*)(%s=%s))", ROLE_OCCUPANT, escapeLdapQuery(memberDN)));
     for (Entry entry : cursor) {
       rolesDN.add(entry.getDn().getName());
     }
@@ -1717,7 +1717,7 @@ public class LdapUtility {
   }
 
   private User getUserWithEmail(final CoreSession session, final String email) throws LdapException {
-    final Cursor<Entry> cursor = search(session, getPeopleDN(), String.format("(email=%s)", email));
+    final Cursor<Entry> cursor = search(session, getPeopleDN(), String.format("(email=%s)", escapeLdapQuery(email)));
     final Iterator<Entry> it = cursor.iterator();
     User user = null;
     while (it.hasNext() && user == null) {
@@ -2109,6 +2109,12 @@ public class LdapUtility {
       throw new GenericException(e);
     }
 
+  }
+
+  public static String escapeLdapQuery(final String ldapQuery) {
+    final String[] reservedCharacters = new String[]{"*", "(", ")", "\\", "\0"};
+    final String[] replacements = new String[]{"\\2A", "\\28", "\\29", "\\5C", "\\00"};
+    return StringUtils.replaceEach(ldapQuery, reservedCharacters, replacements);
   }
 
 }

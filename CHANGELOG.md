@@ -1,4 +1,20 @@
 # ETERNA Changelog
+## v0.2.0 (2025-05-13)
+#### New features
+- Added PDF Redaction tool
+- Grouped permission options into categories under Administration -> Users and groups
+- ETERNAs Content-Security-Policy is now configurable
+- ETERNAs Security related HTTP headers are now toggleable
+- The "Secure"-flag of HTTP Cookies is now toggleable to allow full functionality in HTTP (without TLS) even if ETERNA is not hosted on localhost
+
+#### Bug fixes
+- Properly escape LDAP queries containing special characters
+- Fixed broken height in the PDF Viewer
+
+#### Other changes
+- Removed unused link in main menu: Administration -> Monitoring
+- Removed unused languages
+
 ## v0.1.0 (2024-11-27)
 #### Security
 - Fixed severe (CVSS v3.1 Base Score: 10.0) vulnerability in updateMyUser method
@@ -18,6 +34,61 @@
 ---
 
 # RODA Changelog
+## v5.7.4 (2025-04-29)
+#### Enhancements
+-  Improve support for E-ARK SIP administrative metadata (amdSec) #3380
+
+#### Bug fixes
+-  NPE when editing a user via profile #3405
+
+#### Security
+-  Several major dependency upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
+## v5.7.3 (2025-04-03)
+#### Security
+-  Fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
+## v5.7.2 (2025-03-24)
+#### Bugs
+
+- Disposal confirmation cancel button message #3303
+
+#### Enhancements
+
+- Missing translations for disposal rules order panel #3312
+
+#### Security
+- Several major dependency upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
+## v5.7.1 (2025-01-08)
+#### Bug fixes
+
+- Fix built-in plugin "AIP ancestor hierarchy fix"
+- Deleting linked DIPs now longer increments objects processed (#3285)
+
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+
+---
+
+To try this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v5.7.0 (2024-09-05)
 #### Security
 - Several dependency major upgrades to fix security vulnerabilities

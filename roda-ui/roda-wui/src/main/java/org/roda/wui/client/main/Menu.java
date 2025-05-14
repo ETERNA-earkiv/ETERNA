@@ -108,9 +108,6 @@ public class Menu extends Composite {
   private MenuItem administrationNotifications;
   private MenuItem administrationStatistics;
   private MenuItem administrationDistributedInstances;
-  private MenuItem administrationMonitoring;
-  private MenuItem administrationMarketplace;
-  // private MenuItem administrationPreferences;
 
   private AcessibleMenuBar disposalMenu;
   private MenuItem disposalPolicy;
@@ -207,9 +204,6 @@ public class Menu extends Composite {
 
     String monitoringLink = ConfigurationManager.getStringWithDefault(RodaConstants.UI_SERVICE_MONITORING_DEFAULT_URL,
       RodaConstants.UI_SERVICE_MONITORING_URL);
-    administrationMonitoring = administrationMenu.addItem(messages.title("administration_monitoring"),
-      createURLCommand(monitoringLink));
-    administrationMonitoring.addStyleName("administration_monitoring_item");
     administrationUser = administrationMenu.addItem(messages.title("administration_user"),
       createCommand(MemberManagement.RESOLVER.getHistoryPath()));
     administrationUser.addStyleName("administration_user_item");

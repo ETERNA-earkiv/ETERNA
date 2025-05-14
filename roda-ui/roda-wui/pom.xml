@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.roda-project</groupId>
         <artifactId>roda-ui</artifactId>
-        <version>0.1.0</version>
+        <version>0.2.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <properties>
@@ -264,7 +264,7 @@
                                 </additionalClasspathElement>
                             </additionalClasspathElements>
                             <jvmArguments>
-                                -agentpath:/Applications/JProfiler.app/Contents/Resources/app/bin/macos/libjprofilerti.jnilib=port=33807,loopback
+                                -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=*:5005
                                 <!-- Remove after upgrade to spring-boot 3-->
                                 -Dorg.springframework.boot.logging.LoggingSystem=none
                                 <!-- Remove -->
@@ -544,6 +544,21 @@
             <artifactId>gwt-jackson</artifactId>
             <version>0.15.4</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.elemental2</groupId>
+            <artifactId>elemental2-core</artifactId>
+            <version>1.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.elemental2</groupId>
+            <artifactId>elemental2-dom</artifactId>
+            <version>1.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.elemental2</groupId>
+            <artifactId>elemental2-promise</artifactId>
+            <version>1.2.1</version>
+        </dependency>
         <!-- WebJars https://www.webjars.org -->
         <dependency>
             <groupId>org.webjars</groupId>
@@ -639,6 +654,11 @@
             <groupId>org.webjars.bowergithub.eligrey</groupId>
             <artifactId>filesaver.js</artifactId>
             <version>2.0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>se.whitered.eterna</groupId>
+            <artifactId>pdf-redactor</artifactId>
+            <version>1.0.0</version>
         </dependency>
         <!-- Spring boot -->
         <dependency>

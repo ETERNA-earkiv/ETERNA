@@ -16,7 +16,7 @@
 
 .fileRenameButton, .fileMoveButton, .fileUploadButton, .fileCreateFolderButton, 
 .fileRemoveButton, .fileNewProcessButton, .fileIdentifyFormatsButton, 
-.fileShowEventsButton, .fileShowRisksButton, .preservationTitleLabel {
+.fileShowEventsButton, .fileShowRisksButton, .fileRedactButton, .preservationTitleLabel {
 	display: none;
 }
 

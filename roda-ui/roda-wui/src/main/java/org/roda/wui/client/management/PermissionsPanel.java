@@ -13,7 +13,9 @@ package org.roda.wui.client.management;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Set;
 
@@ -171,7 +173,35 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
   }
 
   public void init(final AsyncCallback<Boolean> callback) {
+    Map<String, FlowPanel> rolePanels = new LinkedHashMap<>();
+    Map<String, Label> roleLabels = new LinkedHashMap<>();
+    List<String> roleTitleKeys = ConfigurationManager.getStringList("ui.roleTitle");
     List<String> roles = ConfigurationManager.getStringList("ui.role");
+
+    // Create panels for each group in the order defined by ui.roleTitle
+    for (String roleKey : roleTitleKeys) {
+      String roleTitle = null;
+      try {
+        roleTitle = messages.roleTitle(roleKey);
+      } catch (MissingResourceException e) {
+        // If not found, roleTitle remains null. No fallback here.
+        System.err.println("Missing i18n key for role title: " + roleKey);
+      }
+
+      FlowPanel rolePanel = new FlowPanel();
+      rolePanel.addStyleName("permission-role-container");
+
+      // Only add the label if a title was found
+      if (roleTitle != null) {
+        Label roleLabel = new Label(roleTitle);
+        roleLabel.addStyleName("permission-role-container-title");
+        rolePanel.add(roleLabel);
+        roleLabels.put(roleKey, roleLabel);
+      }
+
+      rolePanels.put(roleKey, rolePanel);
+    }
+
     for (String role : roles) {
       String description;
       try {
@@ -182,7 +212,20 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
 
       Permission permission = new Permission(role, description);
       permissions.add(permission);
-      PermissionsPanel.this.add(permission);
+
+      String roleKey = role.contains(".") ? role.substring(0, role.indexOf('.')) : "other";
+      FlowPanel rolePanel = rolePanels.get(roleKey);
+      if (rolePanel == null) {
+        // Fallback for unknown roles (not listed in ui.roleTitle)
+        // Create the panel but add NO title label.
+        rolePanel = new FlowPanel();
+        rolePanel.addStyleName("permission-role-container");
+
+        rolePanels.put(roleKey, rolePanel);
+        this.add(rolePanel);
+      }
+      rolePanel.add(permission);
+
       permission.addValueChangeHandler(new ValueChangeHandler<String>() {
 
         @Override
@@ -197,6 +240,11 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
       });
     }
 
+    // Add all group panels to the main PermissionsPanel in order
+    for (FlowPanel rolePanel : rolePanels.values()) {
+      this.add(rolePanel);
+    }
+
     loading.hide();
     callback.onSuccess(true);
   }
@@ -209,9 +257,9 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
    * Set all permissions defined by roles checked and set locked with parameters
    *
    * @param roles
-   *          roles of the permissions to check
+   *              roles of the permissions to check
    * @param lock
-   *          if permissions should also be locked
+   *              if permissions should also be locked
    */
   public void checkPermissions(Set<String> roles, boolean lock) {
     Iterator<String> it = roles.iterator();

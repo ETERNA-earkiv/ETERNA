@@ -69,6 +69,7 @@ public final class RodaConstants {
   public static final String TRANSFERRED_RESOURCES_UNSUCCESSFULLY_INGESTED_FOLDER = "UNSUCCESSFULLY_INGESTED";
   public static final String CORE_TRANSFERRED_RESOURCES_INGEST_MOVE_WHEN_AUTOACCEPT = "core.ingest.processed.move_when_autoaccept";
   public static final String CORE_TRANSFERRED_RESOURCES_DELETE_WHEN_SUCCESSFULLY_INGESTED = "core.ingest.delete_transfer_resource_after_successfully_ingested";
+  public static final String CORE_INGEST_SKIP_FIX_PARENTS = "core.ingest.skip.fix.parents";
   /*
    * Misc
    */
@@ -889,6 +890,7 @@ public final class RodaConstants {
   public static final String STORAGE_DIRECTORY_METADATA = "metadata";
   public static final String STORAGE_DIRECTORY_DESCRIPTIVE = "descriptive";
   public static final String STORAGE_DIRECTORY_PRESERVATION = "preservation";
+  public static final String STORAGE_DIRECTORY_TECHNICAL = "technical";
   public static final String STORAGE_DIRECTORY_OTHER_TECH_METADATA = "otherTechMd";
   public static final String STORAGE_DIRECTORY_REPRESENTATIONS = "representations";
   public static final String STORAGE_DIRECTORY_SUBMISSION = "submission";
@@ -1702,6 +1704,10 @@ public final class RodaConstants {
     public String toString() {
       return text;
     }
+  }
+
+  public static PreservationAgentType getPreservationAgentType(String type) {
+    return PreservationAgentType.valueOf(type);
   }
 
   public enum PreservationAgentRole {

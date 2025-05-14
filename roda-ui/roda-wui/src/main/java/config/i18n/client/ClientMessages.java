@@ -474,6 +474,8 @@ public interface ClientMessages extends Messages {
 
   String printButton();
 
+  String redactPdfButton();
+
   /*** Identify formats ***/
 
   String identifyFormatsButton();
@@ -1631,6 +1633,10 @@ public interface ClientMessages extends Messages {
 
   String preferencesCancel();
 
+  // Roles Title
+
+  String roleTitle(@Select String role);
+
   // Roles Description
 
   String role(@Select String role);
@@ -2137,6 +2143,14 @@ public interface ClientMessages extends Messages {
   String conditionActualParent();
 
   String editRulesOrder();
+
+  String editRulesOrderTop();
+
+  String editRulesOrderUp();
+
+  String editRulesOrderDown();
+
+  String editRulesOrderBottom();
 
   String confirmChangeRulesOrder();
 

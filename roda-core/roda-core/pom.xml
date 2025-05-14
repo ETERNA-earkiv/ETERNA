@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.roda-project</groupId>
 		<artifactId>eterna</artifactId>
-		<version>0.1.0</version>
+		<version>0.2.0</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 	<properties>
@@ -173,7 +173,7 @@
 		<dependency>
 			<groupId>org.apache.zookeeper</groupId>
 			<artifactId>zookeeper</artifactId>
-			<version>3.9.2</version>
+			<version>3.9.3</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.solr/solr-solrj-zookeeper -->
 		<dependency>
@@ -356,8 +356,9 @@
 			<artifactId>reflections</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.roda-project</groupId>
+			<groupId>org.roda-community</groupId>
 			<artifactId>commons-ip2</artifactId>
+			<version>2.10.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>

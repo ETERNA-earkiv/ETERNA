@@ -10,10 +10,13 @@
 
 	<!-- I18N -->
 	<extend-property name="locale" values="en" />
+	<!--
 	<extend-property name="locale" values="pt_PT" />
 	<extend-property name="locale" values="es_CL" />
 	<extend-property name="locale" values="fr" />
 	<extend-property name="locale" values="hu" />
+	-->
+	<extend-property name="locale" values="sv_SE" />
 	<set-property-fallback name="locale" value="en" />
 
 	<!-- Locale -->
@@ -29,6 +32,11 @@
 
 	<!-- Inherit required libraries -->
 	<inherits name="com.github.nmorel.gwtjackson.GwtJackson" />
+
+	<!-- Inherit Elemental2 -->
+	<inherits name="elemental2.core.Core" />
+	<inherits name="elemental2.dom.Dom" />
+	<inherits name="elemental2.promise.Promise" />
 
 	<!-- Inherit sub-projects -->
 	<!-- TODO: Remove the Common sub-module -->

@@ -23,7 +23,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <rodaPath>..</rodaPath>
         <gwt.version>2.11.0</gwt.version>
-        <roda.version>0.1.0</roda.version>
+        <roda.version>0.2.0</roda.version>
     </properties>
 
     <dependencies>
@@ -79,6 +79,21 @@
             <groupId>com.github.nmorel.gwtjackson</groupId>
             <artifactId>gwt-jackson</artifactId>
             <version>0.15.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.elemental2</groupId>
+            <artifactId>elemental2-core</artifactId>
+            <version>1.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.elemental2</groupId>
+            <artifactId>elemental2-dom</artifactId>
+            <version>1.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.elemental2</groupId>
+            <artifactId>elemental2-promise</artifactId>
+            <version>1.2.1</version>
         </dependency>
     </dependencies>
 
