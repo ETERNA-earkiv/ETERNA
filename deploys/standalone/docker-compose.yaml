@@ -44,7 +44,8 @@ services:
       - DOC_EXPANSION=none
       - VALIDATOR_URL=none
   roda:
-    image: ghcr.io/keeps/roda:latest
+    image: ghcr.io/eterna-earkiv/eterna:v0.3.0
+    container_name: eterna
     restart: unless-stopped
     ports:
       - "8080:8080"
@@ -53,7 +54,9 @@ services:
       - clamd
       - siegfried
     volumes:
-      - roda_data:/roda/data/
+      - /WhiteRed/eterna/data/storage:/roda/data/storage
+      - /WhiteRed/eterna/data/ldap:/roda/data/ldap
+      - /WhiteRed/eterna/data/log:/roda/log
     environment:
       # Solr Cloud configuration
       - RODA_CORE_SOLR_TYPE=CLOUD
