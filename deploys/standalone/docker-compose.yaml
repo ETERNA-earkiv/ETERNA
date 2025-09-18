@@ -54,9 +54,7 @@ services:
       - clamd
       - siegfried
     volumes:
-      - /WhiteRed/eterna/data/storage:/roda/data/storage
-      - /WhiteRed/eterna/data/ldap:/roda/data/ldap
-      - /WhiteRed/eterna/data/log:/roda/log
+      - roda_data:/roda/data/
     environment:
       # Solr Cloud configuration
       - RODA_CORE_SOLR_TYPE=CLOUD
