@@ -11,7 +11,7 @@ Requirements:
 
 ```sh
 # Download the docker compose
-wget https://github.com/ETERNA-earkiv/ETERNA/raw/master/deploys/standalone/docker-compose.yaml
+wget https://github.com/ETERNA-earkiv/ETERNA/raw/main/deploys/standalone/docker-compose.yaml
 
 # Start services:
 docker compose up -d
