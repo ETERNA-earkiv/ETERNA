@@ -6,7 +6,7 @@ Har du en viktig fråga du inte hittar svaret på? Skapa en fråga [create an is
 
 ## Visare
 
-### Kan vi förhandsgranska filer direkt i RODAs webbgränssnitt?
+### Kan vi förhandsgranska filer direkt i ETERNAs webbgränssnitt?
 
 Systemet kommer med ett antal fördefinierade visare för vissa standardformat (t.ex. PDF, bilder, HTML 5 multimedia format, etc.).
 
@@ -97,11 +97,6 @@ Ja. Varje aktivitet i systemet loggas.
 
 Inte riktigt. En modern webbläsare räcker.
 
-## Hur
-
-### Hur lägger man till ett nytt språk i systemet?
-
-Fullständiga instruktioner för hur man lägger till ett nytt språk i systemet finns på: [Translation guide](Translation_Guide.md).
 
 ### Hur sätter man upp en utvecklingsmiljö för ETERNA?
 

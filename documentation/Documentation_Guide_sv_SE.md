@@ -6,7 +6,7 @@ För att uppdatera befintligt innehåll kopierar du filen du vill uppdatera frå
 
 ## Lägg till ny hjälpsida
 
-För att lägga till nya ämnen till hjälpmenyn, kopiera filen `[RODA_HOME]/example-config/theme/README.md` (tillsammans med samtliga överstättningsfiler t.ex. `README_pt_PT.md`) till `[RODA_HOME]/config/theme/documentation`.
+För att lägga till nya ämnen till hjälpmenyn, kopiera filen `[RODA_HOME]/example-config/theme/README.md` (tillsammans med samtliga överstättningsfiler t.ex. `README_sv_SE.md`) till `[RODA_HOME]/config/theme/documentation`.
 
 Redigera den nya `README.md`-filen för att inkludera en länk till det nya hjälpämnet som ska skapas:
 

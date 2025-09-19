@@ -7,4 +7,4 @@ CAS kan sedan användas för att ansluta till många autentiseringsprotokoll och
 
 Att konfigurera integrationen med en extern autentisering kan vara svårt, professionella supporttjänster kan hjälpa till att säkerställa en säker och smidig integration. Dessa tjänster säkerställer att organisationer har tillgång till de resurser och det stöd de behöver för att effektivt hantera och underhålla en ETERNA-miljö på produktionsnivå, maximera investeringarna och säkerställa framgången för digitala bevarandeverksamheter.
 
-För att få mer information om hur du får professionell support i din region, vänligen kontakta [KEEP SOLUTIONS](https://www.keep.pt/en/contacts-proposals-information-telephone-address).
+För att få mer information om hur du får professionell support, vänligen kontakta [WhiteRed](https://whitered.se/eterna-e-arkiv/).

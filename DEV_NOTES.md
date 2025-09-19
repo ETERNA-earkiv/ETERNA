@@ -84,7 +84,7 @@ Snippet for docker run instructions:
 ```text
 ---
 
-To try out this version, check the [install instructions](https://github.com/ETERNA-earkiv/ETERNA/blob/master/deploys/standalone/README.md).
+To try out this version, check the [install instructions](https://github.com/ETERNA-earkiv/ETERNA/blob/main/deploys/standalone/README.md).
 
 ```
 

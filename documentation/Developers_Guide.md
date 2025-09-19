@@ -121,21 +121,16 @@ To increase the changes of you code being accepted and merged into ETERNA source
 
 All contributions to ETERNA are licensed on LGPL v3, which includes an explicit grant of patent rights, meaning that the developers who created or contributed to the code relinquish their patent rights with regard to any subsequent reuse of the software.
 
-### Translations
-
-If you would like to translate ETERNA to a new language please read the [Translation Guide](Translation_Guide.md).
-
 ### External plugins
 
 To create new plugins and use them to ETERNA it is necessary to:
 
 1. Create a new plugin project, see https://github.com/keeps/roda-plugin-template/
 2. Build the plugin and deploy the resulting zip (expanded) on **config/plugins/PLUGIN_NAME/**
-3. Publish plugin in market ([see instructions](./Publishing_plugins.md))
 
 ## REST API
 
-ETERNA is completely controlled via a REST API. This is great to develop external services or integrate other applications  with the repository. The documentation of the API is available at [https://demo.roda-community.org/api-docs/](https://demo.roda-community.org/api-docs/).
+ETERNA can be controlled via a REST API. This is great to develop external services or integrate other applications  with the repository.
 
 ### Developing 3rd party integrations
 

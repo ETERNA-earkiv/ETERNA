@@ -97,12 +97,6 @@ Yes. Every action in the system is logged.
 
 Not really. A modern browser is sufficient.
 
-## How to
-
-### How to add a new language to the system?
-
-Complete instructions on how to add a new language to the system are available at: [Translation guide](Translation_Guide.md).
-
 ### How to set up the development environment for ETERNA?
 
 Complete instructions on how to set up the development environment are available at: [Developers guide](Developers_Guide.md).

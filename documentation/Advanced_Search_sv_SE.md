@@ -51,14 +51,14 @@ Den resulterande XML-filen måste vara något i stil med:
 Regler:
 - Det finns några reserverade fältnamn; `titel`, `dateInitial` och `dateFinal`, som definierar vad som visas på listorna
 - Du kan lägga till nya specifika fält, men du måste alltid lägga till ett suffix för datatypen. De mest använda suffixen är "\_txt" (valfri sträng tokeniserad), "\_ss" (icke-tokeniserade strängar för identifierare), "\_dd" för ISO1601-datum.
-- Definitionen av de reserverade fältnamnen görs [here](https://github.com/ETERNA-earkiv/ETERNA/blob/main/roda-core/roda-core/src/main/java/org/roda/core/index/schema/collections/AIPCollection.java#L61) men du kan behöva komma åt [here](https://github.com/ETERNA-earkiv/ETERNA/blob/main/roda-common/roda-common-data/src/main/java/org/roda/core/data/common/RodaConstants.java#L604) för att ta reda på det slutliga namnet.
+- Definitionen av de reserverade fältnamnen görs [här](https://github.com/ETERNA-earkiv/ETERNA/blob/main/roda-core/roda-core/src/main/java/org/roda/core/index/schema/collections/AIPCollection.java#L61) men du kan behöva komma åt [här](https://github.com/ETERNA-earkiv/ETERNA/blob/main/roda-common/roda-common-data/src/main/java/org/roda/core/data/common/RodaConstants.java#L604) för att ta reda på det slutliga namnet.
 - En komplett lista över suffix och fälttyper finns på [SOLR base schema](https://github.com/ETERNA-earkiv/ETERNA/blob/main/roda-core/roda-core/src/main/resources/config/index/common/conf/managed-schema).
 
 För att tillämpa ändringarna på visningsmallen måste du leverera in nytt innehåll eller indexera om befintligt innehåll.
 
 ### 3. Konfigurera ETERNA för att visa fält i den avancerade sökmenyn
 
-Ändra dina `roda-wui.properties` till [add an new advanced search field item](https://github.com/ETERNA-earkiv/ETERNA/blob/main/roda-ui/roda-wui/src/main/resources/config/roda-wui.properties#L165):
+Ändra dina `roda-wui.properties` till [lägg till ett nytt avancerad sök fält](https://github.com/ETERNA-earkiv/ETERNA/blob/main/roda-ui/roda-wui/src/main/resources/config/roda-wui.properties#L165):
 
 ``` javaegenskaper
 ui.search.fields.IndexedAIP = destructiondate # lägg till nytt fält i listan över fält för objekt (dvs. AIP), andra alternativ är representationer eller filer
@@ -69,13 +69,13 @@ ui.search.fields.IndexedAIP.destructiondate.fixed = true # om det visas vid avan
 ```
 Du bör också lägga till de nödvändiga översättningarna till dina `$RODA_HOME/config/i18n/ServerMessages.properties`, och på alla språk du vill stödja.
 
-Lägg till [a translation for your new metadata type and version](https://github.com/ETERNA-earkiv/ETERNA/blob/main/roda-ui/roda-wui/src/main/resources/config/i18n/ServerMessages.properties#L121):
+Lägg till [en översättning av din nya metadata typ och version](https://github.com/ETERNA-earkiv/ETERNA/blob/main/roda-ui/roda-wui/src/main/resources/config/i18n/ServerMessages.properties#L121):
 
 ```javaproperties
 ui.browse.metadata.descriptive.type.golikswe_1=Golik SWE (version 1)
 ```
 
-Lägg till [translations for your fields](https://github.com/ETERNA-earkiv/ETERNA/blob/main/roda-ui/roda-wui/src/main/resources/config/i18n/ServerMessages.properties#L2):
+Lägg till [översättning för dina fält](https://github.com/ETERNA-earkiv/ETERNA/blob/main/roda-ui/roda-wui/src/main/resources/config/i18n/ServerMessages.properties#L2):
 
 ```javaproperties
 ui.search.fields.IndexedAIP.destructiondate= Destruction Date

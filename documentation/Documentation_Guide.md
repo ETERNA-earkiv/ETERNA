@@ -6,7 +6,7 @@ To update the existing content, you should copy the file you want to update from
 
 ## Adding new help pages
 
-To add new topics to the help menu, you need to copy the file `[RODA_HOME]/example-config/theme/README.md` (and all of its translation files, e.g. `README_pt_PT.md`) to `[RODA_HOME]/config/theme/documentation`.
+To add new topics to the help menu, you need to copy the file `[RODA_HOME]/example-config/theme/README.md` (and all of its translation files, e.g. `README_sv_SE.md`) to `[RODA_HOME]/config/theme/documentation`.
 
 Edit the new `README.md` file in order to include a link to the new help topic to be created:
 
