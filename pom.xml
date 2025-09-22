@@ -7,7 +7,7 @@
     <url>https://www.whitered.se/eterna</url>
     <groupId>org.roda-project</groupId>
     <artifactId>eterna</artifactId>
-    <version>0.3.1-dev</version>
+    <version>0.4.0</version>
     <packaging>pom</packaging>
     <description>ETERNA is a full-featured open-source digital preservation repository providing all the
         functionality
@@ -649,34 +649,34 @@
                 <groupId>org.roda-project</groupId>
                 <artifactId>roda-common-data</artifactId>
                 <classifier>sources</classifier>
-                <version>0.3.1-dev</version>
+                <version>0.4.0</version>
             </dependency>
             <dependency>
                 <groupId>org.roda-project</groupId>
                 <artifactId>roda-common-data</artifactId>
-                <version>0.3.1-dev</version>
+                <version>0.4.0</version>
             </dependency>
             <dependency>
                 <groupId>org.roda-project</groupId>
                 <artifactId>roda-common-utils</artifactId>
-                <version>0.3.1-dev</version>
+                <version>0.4.0</version>
             </dependency>
             <dependency>
                 <groupId>org.roda-project</groupId>
                 <artifactId>roda-core</artifactId>
-                <version>0.3.1-dev</version>
+                <version>0.4.0</version>
             </dependency>
             <dependency>
                 <groupId>org.roda-project</groupId>
                 <artifactId>roda-core-tests</artifactId>
-                <version>0.3.1-dev</version>
+                <version>0.4.0</version>
             </dependency>
             <dependency>
                 <groupId>org.roda-project</groupId>
                 <artifactId>roda-core-tests</artifactId>
                 <type>test-jar</type>
                 <scope>test</scope>
-                <version>0.3.1-dev</version>
+                <version>0.4.0</version>
             </dependency>
             <!-- RODA own modules dependencies - end -->
             <dependency>

@@ -43,8 +43,8 @@ services:
       - URL=http://localhost:8080/api/openapi.json
       - DOC_EXPANSION=none
       - VALIDATOR_URL=none
-  roda:
-    image: ghcr.io/eterna-earkiv/eterna:v0.3.0
+  eterna:
+    image: ghcr.io/eterna-earkiv/eterna:v0.4.0
     restart: unless-stopped
     ports:
       - "8080:8080"

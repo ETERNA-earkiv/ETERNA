@@ -1,4 +1,17 @@
 # ETERNA Changelog
+## v0.4.0 (2025-09-22)
+#### New features
+* Added missing functionality to set the preservation state of converted representations to `PRESERVATION` in AbstractConvertPlugin
+* Make indexing of preservation events optional, it is enabled by default
+* Separated Plugins Certificate Status from `VERIFIED` into `VERIFIED` and `LICENSED` where `LICENSED` is equivalent to the previous `VERIFIED`status, which represents a plugin commercially licensed to a customer and `VERIFIED` means that is code signed and trusted 
+
+#### Bug fixes
+* Allowed img-src 'self' blob: in the Content-Security-Policy to fix printing in the PDF renderer and PDF redactor
+* Updated paths to PDF redactor to point to version 1.0.1
+
+#### Improvements
+* Added White Red Plugin Certificate Authority Certificate to the plugin truststore
+
 ## v0.3.0 (2025-06-17)
 #### Security
 - Updated dependencies
@@ -14,7 +27,6 @@
 
 #### Bug fixes
 - Fixed NPE in MarketUtils.java
-
 
 ## v0.2.0 (2025-05-13)
 #### New features

@@ -7,7 +7,7 @@
 
     <groupId>org.roda-project</groupId>
     <artifactId>codeserver</artifactId>
-    <version>1.0.0</version>
+    <version>0.4.0</version>
 
     <name>codeserver</name>
 
