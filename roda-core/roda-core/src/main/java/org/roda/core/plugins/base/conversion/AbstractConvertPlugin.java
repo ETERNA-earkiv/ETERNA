@@ -759,9 +759,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
                     model.createRepresentation(file.getAipId(), newRepresentationID, original,
                         newRepresentationType,
-                        model.getStorage(), storagePath, true, job.getUsername()); // TODO: Undvik kopiering av
-                                                                                   // representation. Skapa ny tom och
-                                                                                   // återskapa mappstruktur
+                        model.getStorage(), storagePath, true, job.getUsername());
 
                     model.changeRepresentationStates(file.getAipId(), newRepresentationID, state, job.getUsername());
                     index.commit(IndexedRepresentation.class);
