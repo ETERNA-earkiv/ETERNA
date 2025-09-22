@@ -23,7 +23,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <rodaPath>..</rodaPath>
         <gwt.version>2.11.0</gwt.version>
-        <roda.version>0.3.1-dev</roda.version>
+        <roda.version>0.4.0</roda.version>
     </properties>
 
     <dependencies>
