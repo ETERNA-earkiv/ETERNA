@@ -10,10 +10,9 @@ If you have a question or an issue, please, follow these steps:
 
 ## Contributing with source code, translation assets or documentation
 
-In the [Documentation](/documentation/README.md) folder you may find various articles on how to contribute to this product, how to use it and how to develop it.
+In the [Documentation](/documentation/usage/README.md) folder you may find various articles on how to contribute to this product, how to use it and how to develop it.
 
 The articles that may interest you the most are:
 
-- [Developers guide](/documentation/Developers_Guide.md)
-- [Translation guide](/documentation/Translation_Guide.md)
-- [Documentation guide](/documentation/Documentation_Guide.md)
+- [Developers guide](/documentation/development/Developers_Guide.md)
+- [Documentation guide](/documentation/development/Documentation_Guide.md)
