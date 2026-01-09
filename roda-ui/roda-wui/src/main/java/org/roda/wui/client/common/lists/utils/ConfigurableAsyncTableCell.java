@@ -97,6 +97,47 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
     DEFAULT_COLUMNS_FIELDS.put("default_IndexedAIP_hasrepresentations",
       Arrays.asList(RodaConstants.AIP_HAS_REPRESENTATIONS));
 
+    // ADD PATH COLUMN FOR AIPs
+    DEFAULT_COLUMNS.put("default_IndexedAIP_path", new TextColumn<IndexedAIP>() {
+      @Override
+      public String getValue(IndexedAIP aip) {
+        if (aip == null) {
+          return null;
+        }
+        @SuppressWarnings("unchecked")
+        List<String> ancestors = (List<String>) aip.getFields().get(RodaConstants.AIP_ANCESTORS);
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> pathDocs = (List<Map<String, Object>>) aip.getFields().get("path_docs");
+        if (ancestors == null || ancestors.isEmpty()) {
+          return aip.getTitle() != null && !aip.getTitle().trim().isEmpty() ? "root/" + aip.getTitle() : "root/" + aip.getId();
+        }
+        List<String> pathParts = new ArrayList<>();
+        Map<String, String> ancestorTitles = new HashMap<>();
+        if (pathDocs != null) {
+          for (Map<String, Object> pathDoc : pathDocs) {
+            String id = (String) pathDoc.get("id");
+            String title = (String) pathDoc.get("title");
+            if (id != null) {
+              ancestorTitles.put(id, title != null && !title.trim().isEmpty() ? title : id);
+            }
+          }
+        }
+        List<String> reversedAncestors = new ArrayList<>(ancestors);
+        Collections.reverse(reversedAncestors);
+        pathParts.add("root");
+        for (String ancestorId : reversedAncestors) {
+          String ancestorName = ancestorTitles.get(ancestorId);
+          if (ancestorName == null) {
+            ancestorName = ancestorId; // Fallback to ID if title not available
+          }
+          pathParts.add(ancestorName);
+        }
+        String currentAipName = aip.getTitle() != null && !aip.getTitle().trim().isEmpty() ? aip.getTitle() : aip.getId();
+        pathParts.add(currentAipName);
+        return StringUtils.join(pathParts, " / ");
+      }
+    });
+    DEFAULT_COLUMNS_FIELDS.put("default_IndexedAIP_path", Arrays.asList("path", "path_docs", RodaConstants.AIP_ANCESTORS, RodaConstants.AIP_TITLE));
     /********************************************
      * Representations
      ********************************************/
@@ -277,6 +318,15 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
         fieldsToReturn.add(c.getField());
       }
     });
+
+    if (IndexedAIP.class.equals(options.getClassToReturn()) &&
+            "SelectAipDialog_AIPs".equals(options.getListId())) {
+      fieldsToReturn.add("path");
+      fieldsToReturn.add("path_docs");
+      fieldsToReturn.add(RodaConstants.AIP_ANCESTORS); // Needed for path calculation
+      fieldsToReturn.add(RodaConstants.AIP_ANCESTORS); // Needed for path calculation
+      fieldsToReturn.add(RodaConstants.AIP_TITLE); // Needed for current AIP title
+    }
 
     // if index object has permissions, add permissions fields
     if (HAS_PERMISSIONS.contains(options.getClassToReturn())) {

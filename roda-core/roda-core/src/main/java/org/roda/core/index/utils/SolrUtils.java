@@ -150,7 +150,6 @@ public class SolrUtils {
     RodaConstants.AIP_LEVEL, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL));
 
   private static Map<String, List<String>> liteFieldsForEachClass = new HashMap<>();
-
   public static final String COMMON = "common";
   public static final String CONF = "conf";
   public static final String SCHEMA = "managed-schema.xml";
@@ -260,7 +259,6 @@ public class SolrUtils {
     } catch (NotSupportedException e) {
       throw new GenericException("Could not query index", e);
     }
-
     return ret;
   }
 
@@ -280,7 +278,6 @@ public class SolrUtils {
   public static <T extends IsIndexed> Pair<IndexResult<T>, String> find(SolrClient index, Class<T> classToRetrieve,
     Filter filter, int pageSize, String cursorMark, User user, boolean justActive, List<String> fieldsToReturn)
     throws GenericException, RequestNotValidException {
-
     Pair<IndexResult<T>, String> ret;
     SolrQuery query = new SolrQuery();
     query.setParam("q.op", DEFAULT_QUERY_PARSER_OPERATOR);
@@ -334,19 +331,24 @@ public class SolrUtils {
     query.setSorts(parseSorter(sorter));
     query.setStart(sublist.getFirstElementIndex());
     query.setRows(sublist.getMaximumElementCount());
-    query.setFields(fieldsToReturn.toArray(new String[fieldsToReturn.size()]));
+    List<String> fl = new ArrayList<>(fieldsToReturn);
+    if (!fl.contains("ancestors")) {
+      fl.add("ancestors");
+    }
+    fl.add("path_docs:[subquery]");
+    query.setFields(fl.toArray(new String[0]));
+    query.set("path_docs.q", "{!terms f=id v=$row.ancestors}");
+    query.set("path_docs.fl", "id,title");
     parseAndConfigureFacets(facets, query);
     if (hasPermissionFilters(classToRetrieve)) {
       query.addFilterQuery(getFilterQueries(user, justActive, classToRetrieve));
     }
-
     try {
       QueryResponse response = query(index, classToRetrieve, query);
       ret = queryResponseToIndexResult(response, classToRetrieve, facets, fieldsToReturn);
     } catch (NotSupportedException e) {
       throw new GenericException("Could not query index", e);
     }
-
     return ret;
   }
 

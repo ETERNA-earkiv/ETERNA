@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
@@ -394,6 +395,17 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     ret.setOnHold(disposalHoldStatus);
     ret.setDisposalConfirmationId(disposalConfirmationId);
     ret.setDisposalScheduleAssociationType(aipDisposalScheduleAssociationType);
+    if (fieldsToReturn.contains("path_docs") && doc.get("path_docs") instanceof SolrDocumentList) {
+      SolrDocumentList pathDocsList = (SolrDocumentList) doc.get("path_docs");
+      List<Map<String, Object>> serializablePathDocs = new ArrayList<>();
+      for (SolrDocument pathDoc : pathDocsList) {
+        Map<String, Object> pathDocMap = new HashMap<>();
+        pathDocMap.put("id", pathDoc.get("id"));
+        pathDocMap.put("title", pathDoc.get("title"));
+        serializablePathDocs.add(pathDocMap);
+      }      
+      ret.getFields().put("path_docs", serializablePathDocs);
+    }
 
     return ret;
   }
