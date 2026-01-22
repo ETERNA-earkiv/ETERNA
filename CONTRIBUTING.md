@@ -14,6 +14,5 @@ In the [Documentation](/documentation/README.md) folder you may find various art
 
 The articles that may interest you the most are:
 
-- [Developers guide](/documentation/Developers_Guide.md)
-- [Translation guide](/documentation/Translation_Guide.md)
-- [Documentation guide](/documentation/Documentation_Guide.md)
+- [Developers guide](/documentation/development/Developers_Guide.md)
+- [Dev notes](/DEV_NOTES.md)
