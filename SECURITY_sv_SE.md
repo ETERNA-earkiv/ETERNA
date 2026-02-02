@@ -1,7 +1,3 @@
----
-title: Security Policy
----
-
 ## Rapportera en sårbarhet
 
 För att rapportera en sårbarhet, använd GitHub-formulären för rapportering av sårbarheter:

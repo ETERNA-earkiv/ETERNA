@@ -1,7 +1,3 @@
----
-title: Security Policy
----
-
 ## Reporting a Vulnerability
 
 To report on a vulnerability, please use the github forms for vulnerability reporting:
