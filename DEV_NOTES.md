@@ -1,9 +1,5 @@
 # Dev notes
-
-[![CI](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/CI.yml/badge.svg)](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/CI.yml)
-[![CodeQL](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/codeql-analysis.yml)
-[![Development](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/development.yml/badge.svg)](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/development.yml)
-[![Staging](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/staging.yml/badge.svg)](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/staging.yml)
+[![CodeQL](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/github-code-scanning/codeql)
 [![Release](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/release.yml/badge.svg)](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/release.yml)
 
 ## Setup

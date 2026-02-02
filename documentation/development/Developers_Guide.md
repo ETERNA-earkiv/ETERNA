@@ -2,6 +2,21 @@
 
 This is a quick and dirty guide on how to start coding on ETERNA.
 
+## Prerequisites
+
+* Linux
+  - ETERNA dev-environment requires Linux filesystem (we recommend Ubuntu LTS). If you dont have access to a linux-environment, you can use a virtual machine or a cloud instance.
+* Docker
+  - Container runtime (we recommend Docker with Docker Compose).
+* Git client
+* Java SDK
+  - We recommend OpenJDK 21.
+* Maven
+* IDE
+  - We recommend IntelliJ IDEA.
+* GitHub account
+  - [configure Maven to use your Github account](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry#authenticating-with-a-personal-access-token).
+
 ## Get the source code
 
 You can easily get the source code by cloning the project into your machine (just need git installed):
@@ -23,15 +38,6 @@ ETERNA uses [Apache Maven](http://maven.apache.org/) build system. Being a multi
 * Dependency management (version numbers are declared here and inherited by the sub-modules)
 * Plugin management (version numbers are declared here and inherited by the sub-modules)
 * Profiles available (There are a lot of usable profiles. One that only includes the core projects (**core**), other that includes user interface projects (**wui**), other that build ETERNA wui docker image (**wui,roda-wui-docker**), and some other ones that, for example, can include external plugins projects that can be integrated in ETERNA (**all**)).
-
-### Dependencies
-
-The pre-requisites to build ETERNA are:
-
-* Git client
-* Apache Maven 3.8+
-* GitHub account, [configure Maven to use your Github account](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry#authenticating-with-a-personal-access-token).
-* Oracle Java 21
 
 
 ### Compilation

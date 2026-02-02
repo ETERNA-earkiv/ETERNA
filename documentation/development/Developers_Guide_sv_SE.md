@@ -1,6 +1,21 @@
 # Utvecklarguide
 
-Detta är en snabb och smutsig guide om hur man börjar koda på ETERNA.
+Detta är en snabb guide om hur man börjar utveckla ETERNA.
+
+## Nödvändig programvara
+
+* Linux
+  - ETERNA-utvecklingsmiljö kräver Linux-filsystem (vi rekommenderar Ubuntu LTS). Om du inte har tillgång till en Linux-miljö kan du använda en virtuell maskin eller en molninstans.
+* Docker
+  - Container runtime (vi rekommenderar Docker med Docker Compose).
+* Git klient
+* Java SDK
+  - Vi rekommenderar OpenJDK 21.
+* Maven
+* IDE
+  - Vi rekommenderar IntelliJ IDEA.
+* GitHub konto
+  - [Konfigurera Maven att använda ditt Github-konto](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry#authenticating-with-a-personal-access-token).
 
 ## Hämta källkoden
 
@@ -23,15 +38,6 @@ ETERNA använder byggsystemet [Apache Maven](http://maven.apache.org/). Som ett 
 * Beroendehantering (versionsnummer deklareras här och ärvs av undermodulerna)
 * Plugin-hantering (versionsnummer deklareras här och ärvs av undermodulerna)
 * Tillgängliga profiler (Det finns många användbara profiler. En som endast inkluderar kärnprojekten (**core**), en annan som inkluderar användargränssnittsprojekt (**wui**), en annan som bygger ETERNA wui docker-bild (**wui,roda-wui-docker**), och några andra som till exempel kan inkludera externa plugin-projekt som kan integreras i ETERNA (**all**)).
-
-### Beroenden
-
-Förutsättningarna för att bygga ETERNA är:
-
-* Git-klient
-* Apache Maven 3.8+
-* GitHub-konto, [konfigurera Maven att använda ditt Github-konto](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry#authenticating-with-a-personal-access-token).
-* Oracle Java 21
 
 
 ### Kompilering

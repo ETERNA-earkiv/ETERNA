@@ -1,5 +1,5 @@
 ---
-title: Support Policy
+title: Security Policy
 ---
 
 ## Reporting a Vulnerability
