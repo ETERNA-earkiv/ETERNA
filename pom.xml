@@ -41,78 +41,13 @@
     </repositories>
     <developers>
         <developer>
-            <id>filiph-schaaf</id>
-            <name>Filiph Schaaf</name>
-            <email>filiph.schaaf@whitered.se</email>
+            <id>white-red</id>
+            <name>White Red Consulting AB</name>
+            <email>earkiv@whitered.se</email>
             <organization>White Red Consulting AB</organization>
             <organizationUrl>https://www.whitered.se/</organizationUrl>
             <timezone>0</timezone>
         </developer>
-        <!--<developer>
-            <id>lfaria</id>
-            <name>Luis Faria</name>
-            <email>lfaria@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>hsilva</id>
-            <name>Helder Silva</name>
-            <email>hsilva@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer
-        <developer>
-            <id>mguimaraes</id>
-            <name>Miguel Guimarães</name>
-            <email>mguimaraes@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>gbarros</id>
-            <name>Gabriel Barros</name>
-            <email>gbarros@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>jgomes</id>
-            <name>João Gomes</name>
-            <email>jgomes@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>syusupov</id>
-            <name>Shahzod Yusupov</name>
-            <email>syusupov@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>alindo</id>
-            <name>António Lindo</name>
-            <email>alindo@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>cafonso</id>
-            <name>Carlos Afonso</name>
-            <email>cafonso@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        -->
     </developers>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
