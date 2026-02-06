@@ -1,0 +1,33 @@
+name: Auto-label vid flytt i Project
+
+on:
+  projects_v2_item:
+    types: [edited]
+
+jobs:
+  add-label-when-moved:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Lägg till label om status är Prioritized
+        uses: leonsteinhaeuser/project-beta-automations@v3.0.0
+        with:
+          # Din token som vi skapade (Krävs för att läsa projektet)
+          gh_token: ${{ secrets.MY_PROJECT_TOKEN }}
+          
+          # Namnet på din organisation eller ditt användarnamn
+          organization: ETERNA-earkiv
+          
+          # Projektets ID-nummer (se URL:en till ditt projekt, t.ex. /projects/42)
+          project_id: 3
+          
+          # Vilket fält lyssnar vi på? (Kolumnerna styrs av "Status"-fältet)
+          resource_field: Status
+          
+          # Vilken kolumn ska trigga detta?
+          event_filter: Prioritized
+          
+          # Vad ska hända?
+          action: add_label
+          
+          # Vilken label ska läggas på?
+          label: Prioritized
