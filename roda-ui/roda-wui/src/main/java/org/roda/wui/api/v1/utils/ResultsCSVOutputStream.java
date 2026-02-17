@@ -10,6 +10,7 @@ package org.roda.wui.api.v1.utils;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import org.apache.commons.csv.CSVPrinter;
@@ -46,7 +47,10 @@ public class ResultsCSVOutputStream<T extends IsIndexed> extends CSVOutputStream
 
   @Override
   public void consumeOutputStream(final OutputStream out) throws IOException {
-    final OutputStreamWriter writer = new OutputStreamWriter(out);
+    out.write(0xEF);
+    out.write(0xBB);
+    out.write(0xBF);
+    final OutputStreamWriter writer = new OutputStreamWriter(out, StandardCharsets.UTF_8);
     CSVPrinter printer = null;
     boolean isFirst = true;
     for (final T result : this.results.getResults()) {
