@@ -42,6 +42,18 @@ services:
       - URL=http://eterna:8080/api/openapi.json
       - DOC_EXPANSION=none
       - VALIDATOR_URL=none
+
+  ffmpeg:
+    image: jrottenberg/ffmpeg:6.1-alpine
+    restart: unless-stopped
+    entrypoint: /bin/sh
+    command: /app/start.sh
+    environment:
+      - SHARED_VOLUME_PATH=/roda/data
+    volumes:
+      - roda_data:/roda/data/
+      - ./ffmpeg:/app
+
   unoserver:
     image: philiplehmann/unoserver:latest
     restart: unless-stopped
@@ -49,9 +61,10 @@ services:
     entrypoint: [ "unoserver", "--interface", "0.0.0.0", "--port", "2003" ]
     volumes:
       - roda_data:/roda/data/
-    mem_limit: 1g
+
+
   eterna:
-    image: eterna:v0.6.0-SNAPSHOT
+    image: eterna:v6.0.1-SNAPSHOT
     restart: unless-stopped
     ports:
       - "8080:8080"
@@ -60,9 +73,11 @@ services:
       - clamd
       - siegfried
       - unoserver
+      - ffmpeg
     volumes:
       - roda_data:/roda/data/
     environment:
+      - SHARED_VOLUME_PATH=/roda/data
       - RODA_CORE_SOLR_TYPE=CLOUD
       - RODA_CORE_SOLR_CLOUD_URLS=zoo:2181
       - SOLR_NUM_SHARDS=4
