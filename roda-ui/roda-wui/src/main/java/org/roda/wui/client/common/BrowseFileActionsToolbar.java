@@ -30,7 +30,7 @@ public class BrowseFileActionsToolbar extends BrowseObjectActionsToolbar<Indexed
   protected void buildActions() {
     this.actions.clear();
     FileToolbarActions fileActions = FileToolbarActions.get(object.getAipId(), object.getRepresentationId(), state,
-      object.isDirectory() ? object : null, actionPermissions);
+      object.isDirectory() ? object : null, actionPermissions, null);
     this.actions.add(new ActionableWidgetBuilder<IndexedFile>(fileActions)
       .buildGroupedListWithObjects(new ActionableObject<>(object)));
   }

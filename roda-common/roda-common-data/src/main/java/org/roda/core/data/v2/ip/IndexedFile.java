@@ -513,7 +513,7 @@ public class IndexedFile
   @Override
   public List<String> liteFields() {
     return Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.FILE_AIP_ID, RodaConstants.FILE_REPRESENTATION_ID,
-      RodaConstants.FILE_PATH, RodaConstants.INDEX_ID);
+      RodaConstants.FILE_REPRESENTATION_UUID, RodaConstants.FILE_PATH, RodaConstants.INDEX_ID);
   }
 
   @JsonIgnore
