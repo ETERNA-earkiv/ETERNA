@@ -35,11 +35,14 @@ import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectFileDialog;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.FileFormatSharedUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.client.redact.PDFRedactor;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -63,7 +66,7 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
 
   private static final Set<Action<IndexedFile>> POSSIBLE_ACTIONS_ON_SINGLE_FILE_BITSTREAM = new HashSet<>(
     Arrays.asList(FileSearchWrapperAction.MOVE, FileSearchWrapperAction.REMOVE, FileSearchWrapperAction.NEW_PROCESS,
-      FileSearchWrapperAction.IDENTIFY_FORMATS));
+      FileSearchWrapperAction.IDENTIFY_FORMATS,FileSearchWrapperAction.REDACT_PDF));
 
   private static final Set<Action<IndexedFile>> POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_THE_SAME_REPRESENTATION = new HashSet<>(
     Arrays.asList(FileSearchWrapperAction.MOVE, FileSearchWrapperAction.REMOVE, FileSearchWrapperAction.NEW_PROCESS,
@@ -78,32 +81,34 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
 
   private final String aipId;
   private final String representationId;
+  private final String representationUUID;
   private final AIPState state;
   private final IndexedFile parentFolder;
   private final Permissions permissions;
 
-  private FileSearchWrapperActions(String aipId, String representationId, AIPState state, IndexedFile parentFolder,
-    Permissions permissions) {
+  private FileSearchWrapperActions(String aipId, String representationId, String representationUUID, AIPState state,
+    IndexedFile parentFolder, Permissions permissions) {
     this.aipId = aipId;
     this.representationId = representationId;
+    this.representationUUID = representationUUID;
     this.state = state;
     this.permissions = permissions;
     this.parentFolder = parentFolder != null && parentFolder.isDirectory() ? parentFolder : null;
   }
 
-  public static FileSearchWrapperActions get(String aipId, String representationId, AIPState state,
-    Permissions permissions) {
-    return new FileSearchWrapperActions(aipId, representationId, state, null, permissions);
+  public static FileSearchWrapperActions get(String aipId, String representationId, String representationUUID,
+    AIPState state, Permissions permissions) {
+    return new FileSearchWrapperActions(aipId, representationId, representationUUID, state, null, permissions);
   }
 
-  public static FileSearchWrapperActions get(String aipId, String representationId, AIPState state,
-    IndexedFile parentFolder, Permissions permissions) {
-    return new FileSearchWrapperActions(aipId, representationId, state, parentFolder, permissions);
+  public static FileSearchWrapperActions get(String aipId, String representationId, String representationUUID,
+    AIPState state, IndexedFile parentFolder, Permissions permissions) {
+    return new FileSearchWrapperActions(aipId, representationId, representationUUID, state, parentFolder, permissions);
   }
 
-  public static FileSearchWrapperActions getWithoutNoFileActions(String aipId, String representationId, AIPState state,
-    IndexedFile parentFolder, Permissions permissions) {
-    return new FileSearchWrapperActions(aipId, representationId, state, parentFolder, permissions) {
+  public static FileSearchWrapperActions getWithoutNoFileActions(String aipId, String representationId,
+    String representationUUID, AIPState state, IndexedFile parentFolder, Permissions permissions) {
+    return new FileSearchWrapperActions(aipId, representationId, representationUUID, state, parentFolder, permissions) {
       @Override
       public CanActResult contextCanAct(Action<IndexedFile> action) {
         return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
@@ -207,6 +212,8 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
       newProcess(file, callback);
     } else if (FileSearchWrapperAction.IDENTIFY_FORMATS.equals(action)) {
       identifyFormats(file, callback);
+    } else if (FileSearchWrapperAction.REDACT_PDF.equals(action)) {
+      redactPdf(file, callback);
     } else {
       unsupportedAction(action, callback);
     }
@@ -232,6 +239,29 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
   }
 
   // ACTIONS
+    private void redactPdf(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
+    if (!FileFormatSharedUtils.hasFileFormat(file, "application/pdf", "pdf")) {
+      Dialogs.showInformationDialog("Error!", "Can only redact PDF-files.", "Ok", false);
+      callback.onSuccess(ActionImpact.NONE);
+      return;
+    }
+
+    String aipId = file.getAipId();
+    String repUUID = this.representationUUID != null ? this.representationUUID : file.getRepresentationUUID();
+    String fileId = file.getId();
+    List<String> path = file.getPath() != null ? file.getPath() : Collections.emptyList();
+
+    if (aipId == null || repUUID == null || fileId == null) {
+      Toast.showError("Cannot redact PDF: Missing required identifiers (AIP: " + aipId + ", Rep: " + repUUID + ", File: " + fileId + ")");
+      return;
+    }
+
+    List<String> historyItems = ListUtils.concat(
+            ListUtils.concat(Arrays.asList(aipId, repUUID), path), fileId);
+
+    callback.onSuccess(ActionImpact.NONE);
+    HistoryUtils.newHistory(PDFRedactor.RESOLVER, historyItems.toArray(new String[0]));
+  }
 
   private void move(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     move(file.getAipId(), file.getRepresentationId(),
@@ -544,6 +574,8 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
       ActionImpact.UPDATED, "btn-plus-circle", "fileCreateFolderButton");
     managementGroup.addButton(messages.removeButton(), FileSearchWrapperAction.REMOVE, ActionImpact.DESTROYED,
       "btn-ban", "fileRemoveButton");
+    managementGroup.addButton(messages.redactPdfButton(), FileSearchWrapperAction.REDACT_PDF,
+      ActionImpact.NONE, "btn-eraser", "fileRedactPdfButton");
 
     // PRESERVATION
     ActionableGroup<IndexedFile> preservationGroup = new ActionableGroup<>(messages.preservationTitle());
@@ -562,7 +594,8 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
     UPLOAD_FILES(RodaConstants.PERMISSION_METHOD_CREATE_FILE),
     CREATE_FOLDER(RodaConstants.PERMISSION_METHOD_CREATE_FOLDER),
     NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
-    IDENTIFY_FORMATS(RodaConstants.PERMISSION_METHOD_CREATE_JOB);
+    IDENTIFY_FORMATS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
+    REDACT_PDF(RodaConstants.PERMISSION_METHOD_CREATE_FILE);
 
     private final List<String> methods;
 

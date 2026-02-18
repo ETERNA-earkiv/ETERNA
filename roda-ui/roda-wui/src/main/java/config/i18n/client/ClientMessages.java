@@ -485,6 +485,13 @@ public interface ClientMessages extends Messages {
 
   String redactPdfButton();
 
+  String redactPdfToastTitle();
+
+  String redactPdfSaveSuccessDescription();
+
+  String redactPdfSaveErrorDescription();
+
+
   /*** Identify formats ***/
 
   String identifyFormatsButton();

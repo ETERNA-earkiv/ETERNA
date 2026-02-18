@@ -42,6 +42,8 @@ import org.roda.wui.client.main.Theme;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.RestUtils;
+import org.roda.wui.common.client.widgets.Toast;
+import config.i18n.client.ClientMessages;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,6 +61,7 @@ public class PDFRedactor extends Composite {
 
   public static final String JS_PATH = "webjars/pdf-redactor/1.0.1/pdf-redactor.js";
   public static final String CSS_PATH = "webjars/pdf-redactor/1.0.1/pdf-redactor.css";
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
   public static String[] requiredRoles = new String[]{"representation.view", "representation.read", "representation.create", "representation.update"};
   private static PDFRedactor instance = null;
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
@@ -177,13 +180,24 @@ public class PDFRedactor extends Composite {
         String uploadUrl = RestUtils.createFileUploadUri(aipId, representation.getId(), path, "Saved redacted version");
 
         FormData formData = new FormData();
-        formData.append("upl", pdfData, file.getId());
+        String fileName = file.getOriginalName() != null ? file.getOriginalName() : file.getId();
+        formData.append("resource", pdfData, fileName);
 
         RequestInit requestInit = RequestInit.create();
         requestInit.setMethod("POST");
         requestInit.setBody(formData);
 
-        fetch(uploadUrl, requestInit);
+        fetch(uploadUrl, requestInit).then(response -> {
+          if (response.ok) {
+            Toast.showInfo(messages.redactPdfToastTitle(), messages.redactPdfSaveSuccessDescription());
+          } else {
+            Toast.showError(messages.redactPdfToastTitle(), messages.redactPdfSaveErrorDescription());
+          }
+          return null;
+        }).catch_(error -> {
+          Toast.showError(messages.redactPdfToastTitle(), messages.redactPdfSaveErrorDescription());
+          return null;
+        });
 
         return null;
       });
@@ -304,27 +318,33 @@ public class PDFRedactor extends Composite {
       final String fileId = historyTokens.get(historyTokens.size() - 1);
 
       Services services = new Services("Retrieve file for PDF redactor", "get");
-      IndexedFileRequest request = new IndexedFileRequest();
-      request.setAipId(aipId);
-      request.setRepresentationId(representationId);
-      request.setDirectoryPaths(filePath);
-      request.setFileId(fileId);
-
-      CompletableFuture<IndexedFile> retrieveFileFuture = services.fileResource(s -> s.retrieveIndexedFileViaRequest(request));
-      CompletableFuture<IndexedAIP> retrieveAIPFuture = services.rodaEntityRestService(
-        s -> s.findByUuid(aipId, LocaleInfo.getCurrentLocale().getLocaleName()), IndexedAIP.class);
-      CompletableFuture<IndexedRepresentation> retrieveRepresentationFuture = services.rodaEntityRestService(
-        s -> s.findByUuid(representationId, LocaleInfo.getCurrentLocale().getLocaleName()), IndexedRepresentation.class);
-
-      CompletableFuture.allOf(retrieveFileFuture, retrieveAIPFuture, retrieveRepresentationFuture)
-        .whenComplete((unused, throwable) -> {
-          if (throwable != null) {
-            AsyncCallbackUtils.defaultFailureTreatment(throwable);
+      services.rodaEntityRestService(
+        s -> s.findByUuid(representationId, LocaleInfo.getCurrentLocale().getLocaleName()), IndexedRepresentation.class)
+        .whenComplete((indexedRepresentation, throwableRep) -> {
+          if (throwableRep != null) {
+            AsyncCallbackUtils.defaultFailureTreatment(throwableRep);
           } else {
-            PDFRedactor pdfRedactor = getInstance();
-            pdfRedactor.init(retrieveFileFuture.join());
-            pdfRedactor.setupNavigation(retrieveFileFuture.join(), retrieveAIPFuture.join(), retrieveRepresentationFuture.join());
-            callback.onSuccess(pdfRedactor);
+            IndexedFileRequest request = new IndexedFileRequest();
+            request.setAipId(aipId);
+            request.setRepresentationId(indexedRepresentation.getId());
+            request.setDirectoryPaths(filePath);
+            request.setFileId(fileId);
+
+            CompletableFuture<IndexedFile> retrieveFileFuture = services.fileResource(s -> s.retrieveIndexedFileViaRequest(request));
+            CompletableFuture<IndexedAIP> retrieveAIPFuture = services.rodaEntityRestService(
+              s -> s.findByUuid(aipId, LocaleInfo.getCurrentLocale().getLocaleName()), IndexedAIP.class);
+
+            CompletableFuture.allOf(retrieveFileFuture, retrieveAIPFuture)
+              .whenComplete((unused, throwable) -> {
+                if (throwable != null) {
+                  AsyncCallbackUtils.defaultFailureTreatment(throwable);
+                } else {
+                  PDFRedactor pdfRedactor = getInstance();
+                  pdfRedactor.init(retrieveFileFuture.join());
+                  pdfRedactor.setupNavigation(retrieveFileFuture.join(), retrieveAIPFuture.join(), indexedRepresentation);
+                  callback.onSuccess(pdfRedactor);
+                }
+              });
           }
         });
     } else {
