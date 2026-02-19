@@ -2,6 +2,21 @@
 
 This is a quick and dirty guide on how to start coding on ETERNA.
 
+## Prerequisites
+
+* Linux
+    - ETERNA dev-environment requires Linux filesystem (we recommend Ubuntu LTS). If you dont have access to a linux-environment, you can use a virtual machine or a cloud instance.
+* Docker
+    - Container runtime (we recommend Docker with Docker Compose).
+* Git client
+* Java SDK
+    - We recommend OpenJDK 21.
+* Maven
+* IDE
+    - We recommend IntelliJ IDEA.
+* GitHub account
+    - [configure Maven to use your Github account](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry#authenticating-with-a-personal-access-token).
+
 ## Get the source code
 
 You can easily get the source code by cloning the project into your machine (just need git installed):
@@ -23,15 +38,6 @@ ETERNA uses [Apache Maven](http://maven.apache.org/) build system. Being a multi
 * Dependency management (version numbers are declared here and inherited by the sub-modules)
 * Plugin management (version numbers are declared here and inherited by the sub-modules)
 * Profiles available (There are a lot of usable profiles. One that only includes the core projects (**core**), other that includes user interface projects (**wui**), other that build ETERNA wui docker image (**wui,roda-wui-docker**), and some other ones that, for example, can include external plugins projects that can be integrated in ETERNA (**all**)).
-
-### Dependencies
-
-The pre-requisites to build ETERNA are:
-
-* Git client
-* Apache Maven 3.8+
-* GitHub account, [configure Maven to use your Github account](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry#authenticating-with-a-personal-access-token).
-* Oracle Java 21
 
 
 ### Compilation
@@ -81,18 +87,18 @@ ETERNA is structured as follows:
 * **pom.xml** - root Maven Project Object Model
 * **code-style** - checkstyle & Eclipse code formatter files
 * **roda-common/** - this module contains common components used by other modules/projects
-  * **roda-common-data** - this module contains all ETERNA related model objects used in all other modules/projects
-  * **roda-common-utils** - this module contains base utilities to be used by other modules/projects
+    * **roda-common-data** - this module contains all ETERNA related model objects used in all other modules/projects
+    * **roda-common-utils** - this module contains base utilities to be used by other modules/projects
 
 ### /roda-core/
 
-  * **roda-core** - this module contains model, index and storage services, with special attention to the following packages:
+* **roda-core** - this module contains model, index and storage services, with special attention to the following packages:
     * **common** - this package contains roda-core related utilities
     * **storage** - this package contains both a storage abstraction (inspired on OpenStack Swift) and some implementations (ATM a filesystem & Fedora 4 based implementation)
     * **model** - this package contains all logic around ETERNA objects (e.g. CRUD operations, etc.), built on top of ETERNA storage abstraction
     * **index** - this package contains all indexing logic for ETERNA model objects, working together with ETERNA model through Observable pattern
     * **migration** - this package contains all migration logic (e.g. every time a change in a model object occurs a migration might be needed)
-  * **roda-core-tests** - this module contains tests and tests helpers for roda-core module. Besides that, this module can be added as dependency for other project that have, for example, plugins and ones wants to test them more easily
+* **roda-core-tests** - this module contains tests and tests helpers for roda-core module. Besides that, this module can be added as dependency for other project that have, for example, plugins and ones wants to test them more easily
 
 ### /roda-ui/
 

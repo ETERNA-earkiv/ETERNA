@@ -1,3 +1,8 @@
+[![CodeQL](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/github-code-scanning/codeql)
+[![Release](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/release.yml/badge.svg)](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/release.yml)
+
+Read this in: [English](README.md) | [Svenska](README_sv_SE.md)
+
 # ETERNA - E-Archive
 
 **ETERNA** is a fully open-source E-Archive system designed to meet the Open Archival Information System (OAIS) reference model requirements, providing institutions and organizations with a standardized solution for long-term digital preservation. ETERNA ensures flexibility, sustainability, and full control over archival processes and data.

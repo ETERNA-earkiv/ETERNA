@@ -1,3 +1,8 @@
+[![CodeQL](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/github-code-scanning/codeql)
+[![Release](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/release.yml/badge.svg)](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/release.yml)
+
+Läs detta på: [Engelska](README.md) | [Svenska](README_sv_SE.md)
+
 # ETERNA - E-Arkiv
 
 **ETERNA** är ett e-arkivsystem med helt öppen källkod som är utformat för att uppfylla kraven i OAIS-modellen, Open Archival Information System (OAIS) vilket ger myndigheter och organisationer en standardiserad lösning för långsiktigt digitalt bevarande. ETERNA säkerställer flexibilitet, hållbarhet och full kontroll över arkivprocesser och data.

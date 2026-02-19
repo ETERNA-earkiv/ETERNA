@@ -1,9 +1,5 @@
 # Dev notes
-
-[![CI](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/CI.yml/badge.svg)](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/CI.yml)
-[![CodeQL](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/codeql-analysis.yml)
-[![Development](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/development.yml/badge.svg)](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/development.yml)
-[![Staging](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/staging.yml/badge.svg)](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/staging.yml)
+[![CodeQL](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/github-code-scanning/codeql)
 [![Release](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/release.yml/badge.svg)](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/release.yml)
 
 ## Setup
@@ -73,9 +69,9 @@ Example release 2.2.0 and prepare for next version 2.3.0.
 1. Run `./scripts/release.sh 2.2.0`
 2. Wait for [GitHub action build](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/release.yml) to be finished and successful
 3. Review release and accept release:
-    1. Review issues
-    2. Update release notes
-    3. Publish release
+   1. Review issues
+   2. Update release notes
+   3. Publish release
 4. Run `./scripts/update_changelog.sh 2.2.0`
 5. Run `./scripts/prepare_next_version.sh 2.3.0`
 
