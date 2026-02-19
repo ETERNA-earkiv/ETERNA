@@ -1,4 +1,10 @@
 # ETERNA Changelog
+## v0.6.0-SNAPSHOT (2026-02-10)
+#### Bug fixes
+- Fixed compilation warnings regarding plural i18n by updating pluralization rule syntax from `[one]` to `[=1]` for single items
+- Added missing `[one]` pluralization keys in Swedish localization file and corrected a typo
+- Replaced Unicode escapes with literal HTML tags in Swedish client messages
+
 ## v0.5.0 (2025-12-16)
 #### Updates
 - Added Swedish and English SVG credentials images
