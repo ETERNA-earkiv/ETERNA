@@ -82,7 +82,7 @@ public class CreateUser extends Composite {
   Button buttonCancel;
 
   @UiField(provided = true)
-  CreateUserPanel userDataPanel;
+  UserDataPanel userDataPanel;
 
   /**
    * Create a new panel to create a user
@@ -93,7 +93,7 @@ public class CreateUser extends Composite {
   public CreateUser(User user) {
     this.user = user;
 
-    this.userDataPanel = new CreateUserPanel(true, false, true);
+    this.userDataPanel = new UserDataPanel(true, false, true);
     this.userDataPanel.setUser(user);
     initWidget(uiBinder.createAndBindUi(this));
   }
