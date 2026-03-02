@@ -35,7 +35,7 @@ RUN set -ex; \
     echo "core.plugins.internal.virus_check.clamav.get_version = clamdscan --version" >> config/roda-core.properties && \
     echo "core.tools.siegfried.mode = server" >> config/roda-core.properties && \
     zip -q /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/roda-core-*.jar config/roda-core.properties ; \
-    apt-get remove -y curl zip && apt-get clean && apt-get autoremove ; \
+    apt-get remove -y zip && apt-get clean && apt-get autoremove ; \
     rm -rf /var/lib/apt/lists/*
 
 ENV RODA_HOME=/roda \
@@ -60,5 +60,8 @@ RUN set -ex; \
 VOLUME "$RODA_HOME/data"
 
 USER "$RODA_UID"
+
+HEALTHCHECK --interval=30s --timeout=10s --retries=5 --start-period=60s \
+  CMD curl -f http://localhost:8080/api/openapi.json || exit 1
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
