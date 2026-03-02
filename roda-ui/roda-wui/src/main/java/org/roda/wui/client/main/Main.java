@@ -144,7 +144,7 @@ public class Main extends Composite implements EntryPoint {
 
     if (ConfigurationManager.getBoolean(true, RodaConstants.UI_EXPIRED_SESSION_DETECTOR_ACTIVE)) {
       ExpiredSessionDetector expiredSessionDetector = new ExpiredSessionDetector();
-      expiredSessionDetector.setScheduleTime(ConfigurationManager.getInt(RodaConstants.UI_EXPIRED_SESSION_DETECTOR_TIME));
+      expiredSessionDetector.setScheduleTime(ConfigurationManager.getInt(1800000, RodaConstants.UI_EXPIRED_SESSION_DETECTOR_TIME));
     }
 
   }
