@@ -1,4 +1,4 @@
-name: 'Dev Build'
+name: 'Dev Build (AMD64)'
 
 on:
   push:
@@ -48,9 +48,6 @@ jobs:
           VERSION=$(mvn -f pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)
           cp -r roda-ui/roda-wui/target/roda-wui-$VERSION/* docker/target/
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -66,7 +63,7 @@ jobs:
         with:
           push: true
           context: docker
-          platforms: linux/amd64,linux/arm64
-          tags: ghcr.io/ETERNA-earkiv/eterna:dev,ghcr.io/ETERNA-earkiv/eterna:dev-latest
+          platforms: linux/amd64
+          tags: ghcr.io/ETERNA-earkiv/eterna:dev-amd64,ghcr.io/ETERNA-earkiv/eterna:dev-latest-amd64
           sbom: true
           provenance: mode=max

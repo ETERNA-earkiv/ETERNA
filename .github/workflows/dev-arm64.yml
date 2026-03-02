@@ -1,0 +1,69 @@
+name: 'Dev Build (ARM64)'
+
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm64
+    env:
+      MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: "temurin"
+
+      - name: Set up Maven
+        uses: hb0730/maven-action@v1
+        with:
+          maven-version: 3.9.10
+
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+
+      - name: Build with Maven
+        run: mvn $MAVEN_CLI_OPTS -DskipTests clean package
+
+      - name: Copy target to docker context
+        run: |
+          mkdir -p docker/target
+          VERSION=$(mvn -f pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)
+          cp -r roda-ui/roda-wui/target/roda-wui-$VERSION/* docker/target/
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build docker image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          context: docker
+          platforms: linux/arm64
+          tags: ghcr.io/ETERNA-earkiv/eterna:dev-arm64,ghcr.io/ETERNA-earkiv/eterna:dev-latest-arm64
+          sbom: true
+          provenance: mode=max
