@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <name>ETERNA</name>
     <url>https://www.whitered.se/eterna</url>
@@ -56,11 +56,11 @@
         <maven.compiler.release>21</maven.compiler.release>
         <roda.temporary.repository>${user.dir}</roda.temporary.repository>
         <java_version>21</java_version>
-        <gwt.version>2.11.0</gwt.version>
+        <gwt.version>2.13.0</gwt.version>
         <cas.client.version>4.0.4</cas.client.version>
         <jersey.version>3.1.6</jersey.version>
         <swagger.version>2.2.21</swagger.version>
-        <jackson.version>2.17.0</jackson.version>
+        <jackson.version>2.18.6</jackson.version>
         <spring.version>7.0.5</spring.version>
         <pekko.version>1.1.4</pekko.version>
         <solr.version>9.8.1</solr.version>
@@ -390,7 +390,11 @@
                 <artifactId>jakarta.persistence-api</artifactId>
                 <version>3.1.0</version>
             </dependency>
-            <!-- https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-util -->
+            <!-- Pin Jetty 10.x client artifacts used transitively by SolrJ.
+                 These must stay at 10.x: Jetty 12 reorganised the client packages
+                 (removed the util sub-package) which breaks binary compatibility.
+                 GHSA-qh8g-58pp-2wxh only affects the Jetty 12.x branch and does
+                 not apply to these Jetty 10.x artifacts. -->
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-client</artifactId>
@@ -416,6 +420,12 @@
                 <artifactId>jetty-alpn-java-client</artifactId>
                 <version>10.0.19</version>
             </dependency>
+            <!-- Override protobuf-java to fix GHSA-wrvw-hg22-4m67, GHSA-h4h5-3hr4-j3g2, GHSA-735f-pc8j-v9w8 -->
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>3.25.5</version>
+            </dependency>
             <dependency>
                 <groupId>jakarta.xml.bind</groupId>
                 <artifactId>jakarta.xml.bind-api</artifactId>
@@ -426,18 +436,19 @@
                 <artifactId>jaxb-runtime</artifactId>
                 <version>4.0.5</version>
             </dependency>
-            <dependency>
-                <!-- Import dependency management from Spring Boot -->
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${springboot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
+            <!-- Override Jackson versions BEFORE Spring Boot BOM to ensure 2.x wins over any 3.x in the BOM.
+                 In Maven, for BOM imports the first occurrence wins; explicit entries here come BEFORE
+                 the imported BOM entries, guaranteeing ${jackson.version} is used. -->
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
                 <version>${jackson.version}</version>
+            </dependency>
+            <!-- Override tools.jackson.core (Jackson 3.x groupId) to fix GHSA-72hv-8253-57qq (jackson-core < 3.1.0) -->
+            <dependency>
+                <groupId>tools.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>3.1.0</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
@@ -458,6 +469,14 @@
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
                 <artifactId>jackson-dataformat-yaml</artifactId>
                 <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <!-- Import dependency management from Spring Boot -->
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${springboot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.gwtproject</groupId>
@@ -491,9 +510,9 @@
                 <version>3.2.2</version>
             </dependency>
             <dependency>
-                <groupId>commons-configuration</groupId>
-                <artifactId>commons-configuration</artifactId>
-                <version>1.10</version>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-configuration2</artifactId>
+                <version>2.12.0</version>
             </dependency>
             <dependency>
                 <groupId>commons-fileupload</groupId>
@@ -1106,11 +1125,6 @@
                 <groupId>org.eclipse.jetty.http2</groupId>
                 <artifactId>http2-common</artifactId>
                 <version>10.0.26</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.protobuf</groupId>
-                <artifactId>protobuf-java</artifactId>
-                <version>3.16.1</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.zookeeper</groupId>
