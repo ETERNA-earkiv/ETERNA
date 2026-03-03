@@ -9,7 +9,7 @@ package org.roda.wui.servlets;
 
 import java.io.Serial;
 
-import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.roda.core.RodaCoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

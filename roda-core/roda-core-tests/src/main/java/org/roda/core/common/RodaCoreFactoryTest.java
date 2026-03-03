@@ -21,7 +21,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
@@ -150,6 +150,7 @@ public class RodaCoreFactoryTest {
     final Map<String, List<String>> baseProperties = ImmutableMap.<String, List<String>> builder()
       .put("testing.prefix.string", Collections.singletonList("string"))
       .put("testing.prefix.array", Arrays.asList("first", "second"))
+      .put("testing.second.prefix.value", Collections.singletonList("second"))
       .put("testing.property.thisOne", Collections.singletonList("value"))
       .put(RodaConstants.RODA_NODE_TYPE_KEY, Collections.singletonList(RodaCoreFactory.getNodeType().toString()))
       .put(RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY,
