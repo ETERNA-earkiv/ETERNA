@@ -69,6 +69,8 @@ jobs:
           push: true
           context: docker
           platforms: linux/amd64
-          tags: ghcr.io/ETERNA-earkiv/eterna:dev-amd64,ghcr.io/ETERNA-earkiv/eterna:dev-latest-amd64
+          tags: |
+            ghcr.io/eterna-earkiv/eterna:dev-amd64
+            ghcr.io/eterna-earkiv/eterna:dev-latest-amd64
           sbom: true
           provenance: mode=max

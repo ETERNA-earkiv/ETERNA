@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04-arm64
+    runs-on: ubuntu-24.04-arm
     env:
       MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
 
@@ -26,6 +26,9 @@ jobs:
         with:
           java-version: 21
           distribution: "temurin"
+          server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: GITHUB_TOKEN
 
       - name: Set up Maven
         uses: hb0730/maven-action@v1
@@ -41,6 +44,8 @@ jobs:
 
       - name: Build with Maven
         run: mvn $MAVEN_CLI_OPTS -DskipTests clean package
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Copy target to docker context
         run: |
@@ -64,6 +69,8 @@ jobs:
           push: true
           context: docker
           platforms: linux/arm64
-          tags: ghcr.io/ETERNA-earkiv/eterna:dev-arm64,ghcr.io/ETERNA-earkiv/eterna:dev-latest-arm64
+          tags: |
+            ghcr.io/eterna-earkiv/eterna:dev-arm64
+            ghcr.io/eterna-earkiv/eterna:dev-latest-arm64
           sbom: true
           provenance: mode=max
