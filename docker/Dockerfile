@@ -1,8 +1,8 @@
 # Stage 1: Pull Tomcat binaries from the official image
-FROM tomcat:10.1-jre21 AS tomcat
+FROM tomcat:10.1-jre21@sha256:b5d106b590e2e7ea790b084eff3b7d94eb5d08aa20f958f0305ba0ff4e0737a3 AS tomcat
 
 # Stage 2: SUSE BCI base with JRE 21
-FROM registry.suse.com/bci/bci-base:latest
+FROM registry.suse.com/bci/bci-base:15.7@sha256:c2d2aa0c6c38b15432ecfd211e2a7bcbb5dd470f1c1d7d6aa16600ef5c1a6cfc
 LABEL maintainer="info@whitered.se" vendor="WHITE RED CONSULTING AB"
 
 # Install JRE 21 and system dependencies
