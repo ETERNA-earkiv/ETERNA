@@ -8,15 +8,14 @@ on:
       - "**"
 
 permissions:
-  actions: write
-  attestations: write
-  checks: write
-  contents: write
-  deployments: write
-  packages: write
+  contents: read
 
 jobs:
   build:
+    permissions:
+      attestations: write  # SBOM and provenance (docker/build-push-action)
+      contents: write      # upload release artifact (svenstaro/upload-release-action)
+      packages: write      # deploy to GitHub Packages + push Docker image to ghcr.io
     runs-on: ubuntu-latest
     env:
       MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
