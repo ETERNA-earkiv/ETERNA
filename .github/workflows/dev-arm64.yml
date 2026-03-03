@@ -26,6 +26,9 @@ jobs:
         with:
           java-version: 21
           distribution: "temurin"
+          server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: GITHUB_TOKEN
 
       - name: Set up Maven
         uses: hb0730/maven-action@v1
@@ -41,6 +44,8 @@ jobs:
 
       - name: Build with Maven
         run: mvn $MAVEN_CLI_OPTS -DskipTests clean package
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Copy target to docker context
         run: |
