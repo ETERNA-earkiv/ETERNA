@@ -16,7 +16,23 @@ RUN set -ex; \
         unzip \
         rsync \
         jq && \
-    zypper clean -a
+    zypper clean -a && \
+    chmod u-s /usr/bin/su && \
+    chmod u-s /usr/bin/newgrp && \
+    chmod u-s /usr/bin/newuidmap && \
+    chmod u-s /usr/bin/newgidmap && \
+    chmod u-s /usr/bin/passwd && \
+    chmod u-s /usr/bin/gpasswd && \
+    chmod u-s /usr/bin/mount && \
+    chmod u-s /usr/bin/umount && \
+    chmod u-s /usr/bin/chfn && \
+    chmod u-s /usr/bin/chsh && \
+    chmod g-s /usr/bin/expiry && \
+    chmod g-s /usr/bin/chage && \
+    chmod g-s /sbin/unix_chkpwd && \
+    chmod g-s /sbin/unix2_chkpwd && \
+    chmod g-s /usr/lib/utempter/utempter
+
 
 # Copy Tomcat from the official image (maintains /usr/local/tomcat layout)
 ENV CATALINA_HOME=/usr/local/tomcat
