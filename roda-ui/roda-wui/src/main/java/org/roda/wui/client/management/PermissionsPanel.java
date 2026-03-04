@@ -12,11 +12,9 @@ package org.roda.wui.client.management;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.MissingResourceException;
 import java.util.Set;
 
 import org.roda.wui.common.client.ClientLogger;
@@ -25,8 +23,7 @@ import org.roda.wui.common.client.widgets.LoadingPopup;
 import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -36,7 +33,6 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
-
 import config.i18n.client.ClientMessages;
 
 /**
@@ -44,12 +40,16 @@ import config.i18n.client.ClientMessages;
  *
  */
 public class PermissionsPanel extends FlowPanel implements HasValueChangeHandlers<List<String>> {
+  public enum PermissionsMode {
+    EDIT,
+    READ_ONLY
+  }
+  private PermissionsMode mode = PermissionsMode.EDIT;
 
   private class Permission extends HorizontalPanel implements HasValueChangeHandlers<String> {
 
     private final String role;
     private boolean locked;
-    private boolean enabled;
     private final CheckBox checkbox;
     private final Label descriptionLabel;
 
@@ -60,40 +60,35 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
       this.add(checkbox);
       this.add(descriptionLabel);
       this.locked = false;
-      this.enabled = true;
-
-      this.descriptionLabel.addClickHandler(new ClickHandler() {
-
-        @Override
-        public void onClick(ClickEvent event) {
-          if (isEnabled() && !locked) {
-            checkbox.setValue(!checkbox.getValue());
-            onChange();
-          }
+      descriptionLabel.addClickHandler(event -> {
+        if (isEditable()) {
+          checkbox.setValue(!checkbox.getValue(), true);
         }
       });
 
-      this.checkbox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-
-        @Override
-        public void onValueChange(ValueChangeEvent<Boolean> event) {
+      checkbox.addValueChangeHandler(event -> {
+        if (isEditable()) {
           onChange();
         }
       });
 
       this.addStyleName("permission");
-      WCAGUtilities.addTitleToCheckbox(checkbox, description);
       checkbox.addStyleName("permission-checkbox");
       descriptionLabel.setStylePrimaryName("permission-description");
+      WCAGUtilities.addTitleToCheckbox(checkbox, description);
     }
 
-    public boolean isLocked() {
-      return locked;
+    private boolean isEditable() {
+      return mode == PermissionsMode.EDIT && !locked;
     }
 
     public void setLocked(boolean locked) {
       this.locked = locked;
-      checkbox.setEnabled(!locked);
+      updateEnabledState();
+    }
+
+    public boolean isLocked() {
+      return locked;
     }
 
     public boolean isChecked() {
@@ -101,29 +96,15 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
     }
 
     public void setChecked(boolean checked) {
-      checkbox.setValue(checked);
+      checkbox.setValue(checked, false);
+    }
+
+    public void updateEnabledState() {
+      checkbox.setEnabled(isEditable());
     }
 
     public String getRole() {
       return role;
-    }
-
-    public boolean isEnabled() {
-      return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-      this.enabled = enabled;
-      if (!locked) {
-        this.checkbox.setEnabled(enabled);
-        if (enabled) {
-          this.descriptionLabel.removeStyleDependentName("off");
-          this.descriptionLabel.addStyleDependentName("on");
-        } else {
-          this.descriptionLabel.removeStyleDependentName("on");
-          this.descriptionLabel.addStyleDependentName("off");
-        }
-      }
     }
 
     @Override
@@ -132,73 +113,69 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
     }
 
     protected void onChange() {
-      ValueChangeEvent.fire(this, getValue());
-    }
-
-    public String getValue() {
-      return getRole();
-    }
-
-    private PermissionsPanel getOuterType() {
-      return PermissionsPanel.this;
+      ValueChangeEvent.fire(this, getRole());
     }
   }
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  @SuppressWarnings("unused")
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private final List<Permission> permissions;
+  private final List<Permission> permissions = new ArrayList<>();
+  private final Map<String, List<Permission>> permissionGroups = new LinkedHashMap<>();
+  private final Map<String, CheckBox> selectAllCheckboxes = new LinkedHashMap<>();
 
-  private List<String> userSelections;
-
-  private boolean enabled;
-
+  private final List<String> userSelections = new ArrayList<>();
   private final LoadingPopup loading;
 
-  /**
-   *
-   */
   public PermissionsPanel() {
-    this.permissions = new ArrayList<>();
-    this.userSelections = new ArrayList<>();
-
     loading = new LoadingPopup(this);
     loading.show();
-
-    this.enabled = true;
-
     this.addStyleName("permissions");
+  }
+
+  public void setMode(PermissionsMode mode) {
+    this.mode = mode;
+
+    for (Permission p : permissions) {
+      p.updateEnabledState();
+    }
+
+    for (CheckBox cb : selectAllCheckboxes.values()) {
+      cb.setEnabled(mode == PermissionsMode.EDIT);
+    }
   }
 
   public void init(final AsyncCallback<Boolean> callback) {
     Map<String, FlowPanel> rolePanels = new LinkedHashMap<>();
-    Map<String, Label> roleLabels = new LinkedHashMap<>();
     List<String> roleTitleKeys = ConfigurationManager.getStringList("ui.roleTitle");
     List<String> roles = ConfigurationManager.getStringList("ui.role");
 
-    // Create panels for each group in the order defined by ui.roleTitle
     for (String roleKey : roleTitleKeys) {
-      String roleTitle = null;
-      try {
-        roleTitle = messages.roleTitle(roleKey);
-      } catch (MissingResourceException e) {
-        // If not found, roleTitle remains null. No fallback here.
-        System.err.println("Missing i18n key for role title: " + roleKey);
-      }
 
       FlowPanel rolePanel = new FlowPanel();
       rolePanel.addStyleName("permission-role-container");
 
-      // Only add the label if a title was found
-      if (roleTitle != null) {
-        Label roleLabel = new Label(roleTitle);
-        roleLabel.addStyleName("permission-role-container-title");
-        rolePanel.add(roleLabel);
-        roleLabels.put(roleKey, roleLabel);
+      String roleTitle;
+      try {
+        roleTitle = messages.roleTitle(roleKey);
+      } catch (Exception ignored) {
+        roleTitle = roleKey;
       }
 
+      FlowPanel headerPanel = new FlowPanel();
+      headerPanel.addStyleName("permission-role-container-title");
+      headerPanel.addStyleName("permission-header-flex");
+
+      CheckBox selectAllCheckbox = new CheckBox();
+      selectAllCheckbox.addStyleName("permission-select-all-checkbox");
+
+      Label roleLabel = new Label(roleTitle);
+
+      headerPanel.add(selectAllCheckbox);
+      headerPanel.add(roleLabel);
+      rolePanel.add(headerPanel);
+
+      selectAllCheckboxes.put(roleKey, selectAllCheckbox);
       rolePanels.put(roleKey, rolePanel);
     }
 
@@ -206,122 +183,139 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
       String description;
       try {
         description = messages.role(role);
-      } catch (MissingResourceException e) {
-        description = role + " (needs translation)";
+      } catch (Exception e) {
+        description = role;
       }
 
       Permission permission = new Permission(role, description);
       permissions.add(permission);
 
-      String roleKey = role.contains(".") ? role.substring(0, role.indexOf('.')) : "other";
+      String roleKey = role.contains(".")
+              ? role.substring(0, role.indexOf('.'))
+              : "other";
       FlowPanel rolePanel = rolePanels.get(roleKey);
-      if (rolePanel == null) {
-        // Fallback for unknown roles (not listed in ui.roleTitle)
-        // Create the panel but add NO title label.
-        rolePanel = new FlowPanel();
-        rolePanel.addStyleName("permission-role-container");
-
-        rolePanels.put(roleKey, rolePanel);
-        this.add(rolePanel);
+      if (rolePanel != null) {
+        rolePanel.add(permission);
       }
-      rolePanel.add(permission);
+      permissionGroups.computeIfAbsent(roleKey, k -> new ArrayList<>()).add(permission);
 
-      permission.addValueChangeHandler(new ValueChangeHandler<String>() {
+      permission.addValueChangeHandler(event -> {
 
-        @Override
-        public void onValueChange(ValueChangeEvent<String> event) {
-          if (userSelections.contains(event.getValue())) {
-            userSelections.remove(event.getValue());
-          } else {
-            userSelections.add(event.getValue());
+        if (permission.isChecked()) {
+          if (!userSelections.contains(permission.getRole())) {
+            userSelections.add(permission.getRole());
           }
-          onChange();
+        } else {
+          userSelections.remove(permission.getRole());
         }
+        updateSelectAllCheckboxState(roleKey);
+        onChange();
       });
     }
 
-    // Add all group panels to the main PermissionsPanel in order
     for (FlowPanel rolePanel : rolePanels.values()) {
       this.add(rolePanel);
+    }
+    for (Map.Entry<String, List<Permission>> entry : permissionGroups.entrySet()) {
+      String roleKey = entry.getKey();
+      List<Permission> groupPermissions = entry.getValue();
+      CheckBox headerCheckbox = selectAllCheckboxes.get(roleKey);
+
+      headerCheckbox.addValueChangeHandler(event -> {
+        if (mode != PermissionsMode.EDIT) return;
+        boolean newState = Boolean.TRUE.equals(event.getValue());
+        for (Permission p : groupPermissions) {
+          if (!p.isLocked()) {
+            p.setChecked(newState);
+            if (newState) {
+              if (!userSelections.contains(p.getRole())) {
+                userSelections.add(p.getRole());
+              }
+            } else {
+              userSelections.remove(p.getRole());
+            }
+          }
+        }
+        updateSelectAllCheckboxState(roleKey);
+        onChange();
+      });
     }
 
     loading.hide();
     callback.onSuccess(true);
   }
 
-  public List<String> getUserSelections() {
-    return userSelections;
-  }
+  private void updateSelectAllCheckboxState(String roleKey) {
 
-  /**
-   * Set all permissions defined by roles checked and set locked with parameters
-   *
-   * @param roles
-   *              roles of the permissions to check
-   * @param lock
-   *              if permissions should also be locked
-   */
-  public void checkPermissions(Set<String> roles, boolean lock) {
-    Iterator<String> it = roles.iterator();
+    List<Permission> group = permissionGroups.get(roleKey);
+    CheckBox headerCheckbox = selectAllCheckboxes.get(roleKey);
 
-    while (it.hasNext()) {
-      String role = it.next();
-      boolean foundit = false;
-      for (Iterator<Permission> j = permissions.iterator(); j.hasNext() && !foundit;) {
-        Permission p = j.next();
-        if (p.getRole().equals(role)) {
-          foundit = true;
-          p.setChecked(true);
-          p.setLocked(lock);
-        }
-      }
+    if (group == null || headerCheckbox == null) return;
+
+    long total = group.size();
+    long selected = group.stream().filter(Permission::isChecked).count();
+
+    boolean allLocked = group.stream().allMatch(Permission::isLocked);
+    boolean allChecked = selected == total && total > 0;
+
+    InputElement input = headerCheckbox.getElement().getFirstChild().cast();
+    input.setPropertyBoolean("indeterminate", false);
+
+    if (allChecked) {
+      headerCheckbox.setValue(true, false);
+    } else if (selected == 0) {
+      headerCheckbox.setValue(false, false);
+    } else {
+      headerCheckbox.setValue(false, false);
+      input.setPropertyBoolean("indeterminate", true);
+    }
+
+    if (allChecked && allLocked) {
+      headerCheckbox.setEnabled(false);
+    } else {
+      headerCheckbox.setEnabled(mode == PermissionsMode.EDIT);
     }
   }
 
-  @Override
+  public void checkPermissions(Set<String> roles) {
+    checkPermissions(roles, false);
+  }
+
+  public void checkPermissions(Set<String> roles, boolean lock) {
+    for (Permission p : permissions) {
+      if (roles.contains(p.getRole())) {
+        p.setChecked(true);
+        p.setLocked(lock);
+        if (!userSelections.contains(p.getRole())) {
+          userSelections.add(p.getRole());
+        }
+      }
+    }
+    for (String roleKey : permissionGroups.keySet()) {
+      updateSelectAllCheckboxState(roleKey);
+    }
+  }
+
   public void clear() {
     for (Permission p : permissions) {
       p.setChecked(false);
       p.setLocked(false);
     }
+    userSelections.clear();
   }
 
-  public boolean isEnabled() {
-    return enabled;
-  }
-
-  public void setEnabled(boolean enabled) {
-    for (Permission p : permissions) {
-      p.setEnabled(enabled);
-    }
-  }
-
-  public void updateLockedPermissions(Set<String> memberGroups) {
-    if (!memberGroups.isEmpty()) {
-      this.setEnabled(false);
-      loading.show();
-    }
-  }
-
-  /**
-   * Get roles that are directly defined, i.e. are not inherited
-   *
-   * @return
-   */
   public Set<String> getDirectRoles() {
-    List<Permission> checkedPermissions = new ArrayList<>();
+    Set<String> result = new HashSet<>();
     for (Permission p : permissions) {
       if (p.isChecked() && !p.isLocked()) {
-        checkedPermissions.add(p);
+        result.add(p.getRole());
       }
     }
+    return result;
+  }
 
-    Set<String> specialRoles = new HashSet<>();
-    for (Permission checkedPermission : checkedPermissions) {
-      specialRoles.add(checkedPermission.getRole());
-    }
-
-    return specialRoles;
+  public List<String> getUserSelections() {
+    return userSelections;
   }
 
   @Override
@@ -330,10 +324,6 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
   }
 
   protected void onChange() {
-    ValueChangeEvent.fire(this, getValue());
-  }
-
-  public List<String> getValue() {
-    return getUserSelections();
+    ValueChangeEvent.fire(this, userSelections);
   }
 }
