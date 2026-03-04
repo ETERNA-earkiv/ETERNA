@@ -9314,3 +9314,20 @@ wui-disposal-hold-data .form-textbox {
     display: block;
     margin-bottom: 0.5em;
 }
+.permission-header-flex {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.permission-select-all-checkbox {
+    cursor: pointer;
+    transform: scale(1.05);
+    appearance: auto !important;
+}
+
+.permission-select-all-checkbox input[type="checkbox"] {
+    appearance: auto !important;
+    -webkit-appearance: checkbox !important;
+    -moz-appearance: checkbox !important;
+}
