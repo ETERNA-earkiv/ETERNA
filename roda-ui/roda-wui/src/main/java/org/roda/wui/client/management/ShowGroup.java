@@ -143,24 +143,27 @@ public class ShowGroup extends Composite {
   }
 
   private void buildPermissionList() {
-    Set<String> allGroupRoles = group.getAllRoles();
 
-    if (allGroupRoles.isEmpty()) {
-      permissionList.add(new Label(messages.showGroupEmptyPermissions()));
-    } else {
-      List<String> roles = ConfigurationManager.getStringList("ui.role");
-      for (String role : roles) {
-        String description;
-        try {
-          description = messages.role(role);
-        } catch (MissingResourceException e) {
-          description = role + " (needs translation)";
-        }
-        if (allGroupRoles.contains(role)) {
-          permissionList.add(createListItem(description));
-        }
+    PermissionsPanel permissionsPanel = new PermissionsPanel();
+
+    permissionsPanel.init(new AsyncCallback<Boolean>() {
+      @Override
+      public void onFailure(Throwable caught) {
+        permissionList.add(new Label("Error loading permissions"));
       }
-    }
+
+      @Override
+      public void onSuccess(Boolean result) {
+
+        Set<String> groupRoles = group.getAllRoles();
+
+        permissionsPanel.checkPermissions(groupRoles, true);
+
+        permissionsPanel.setMode(PermissionsPanel.PermissionsMode.READ_ONLY);
+
+        permissionList.add(permissionsPanel);
+      }
+    });
   }
 
   private FlowPanel createListItem(String item) {
