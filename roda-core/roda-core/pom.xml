@@ -12,6 +12,21 @@
 	<properties>
 		<io.prometheus.version>0.16.0</io.prometheus.version>
 	</properties>
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>version.json</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+			</resource>
+		</resources>
+	</build>
 	<profiles>
 		<profile>
 			<id>default</id>
