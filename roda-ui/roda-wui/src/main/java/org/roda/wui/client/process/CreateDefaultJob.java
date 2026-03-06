@@ -289,6 +289,7 @@ public class CreateDefaultJob extends Composite {
                   @Override
                   public void onValueChange(ValueChangeEvent<Boolean> event) {
                     workflowList.clear();
+                    selectedPlugin = null;
                     boolean noChecks = true;
 
                     if (plugins != null) {
@@ -310,22 +311,26 @@ public class CreateDefaultJob extends Composite {
                                 if (categories.contains(checkbox.getName())
                                   && !categories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)
                                   && !pluginsAdded.contains(pluginInfo.getId())) {
-                                  Widget pluginItem = addPluginItemWidgetToWorkflowList(pluginInfo);
-                                  if (pluginsAdded.isEmpty()) {
-                                    CreateDefaultJob.this.selectedPlugin = lookupPlugin(pluginInfo.getId());
-                                    pluginItem.addStyleName("plugin-list-item-selected");
+                                  if (pluginInfo.isInstalled()) {
+                                    Widget pluginItem = addPluginItemWidgetToWorkflowList(pluginInfo);
+                                      if (pluginsAdded.isEmpty()) {
+                                      CreateDefaultJob.this.selectedPlugin = lookupPlugin(pluginInfo.getId());
+                                      pluginItem.addStyleName("plugin-list-item-selected");
+                                      }
+                                    pluginsAdded.add(pluginInfo.getId());
                                   }
-                                  pluginsAdded.add(pluginInfo.getId());
                                 }
                               }
                             }
 
                             if (noChecks) {
                               if (!pluginInfo.getCategories().contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)) {
-                                Widget pluginItem = addPluginItemWidgetToWorkflowList(pluginInfo);
-                                if (p == 0) {
-                                  CreateDefaultJob.this.selectedPlugin = lookupPlugin(pluginInfo.getId());
-                                  pluginItem.addStyleName("plugin-list-item-selected");
+                                if (pluginInfo.isInstalled()) {
+                                  Widget pluginItem = addPluginItemWidgetToWorkflowList(pluginInfo);
+                                    if (p == 0) {
+                                    CreateDefaultJob.this.selectedPlugin = lookupPlugin(pluginInfo.getId());
+                                    pluginItem.addStyleName("plugin-list-item-selected");
+                                    }
                                 }
                               }
                             }
@@ -344,10 +349,12 @@ public class CreateDefaultJob extends Composite {
             }
 
             if (!pluginCategories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)) {
+              if (pluginInfo.isInstalled()) {
               Widget pluginItem = addPluginItemWidgetToWorkflowList(pluginInfo);
-              if (p == 0) {
+                if (p == 0) {
                 CreateDefaultJob.this.selectedPlugin = lookupPlugin(pluginInfo.getId());
                 pluginItem.addStyleName("plugin-list-item-selected");
+                }
               }
             }
           }
@@ -425,12 +432,24 @@ public class CreateDefaultJob extends Composite {
   protected void updateWorkflowOptions() {
     isListEmpty = true;
     if (selectedPlugin == null) {
+      name.setText("");
+      name.setEnabled(false);
+      workflowListTitle.clear();
+      workflowListPluginStatus.clear();
       workflowListDescription.clear();
       workflowListDescriptionCategories.clear();
-      workflowListDescription.setVisible(false);
+      if (workflowList.getWidgetCount() == 0) {
+        workflowListDescription.add(new Label(messages.noPluginsAvailable()));
+      }
+      workflowListDescription.setVisible(true);
       workflowListDescriptionCategories.setVisible(false);
       workflowOptions.setPluginInfo(null);
+      workflowPanel.setVisible(false);
+      buttonCreate.setEnabled(false);
+      targetListPanel.clear();
+      targetListPanel.setVisible(false);
     } else {
+      name.setEnabled(true);
       buttonCreate.setEnabled(shouldEnableCreateButton());
       buildPluginHeader();
       buildPluginStatusPanel();
