@@ -281,6 +281,7 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
                   @Override
                   public void onValueChange(ValueChangeEvent<Boolean> event) {
                     workflowList.clear();
+                    selectedPlugin = null;
                     boolean noChecks = true;
 
                     if (plugins != null) {
@@ -303,14 +304,16 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
                                   && ((!isSelectedEmpty() && pluginInfo.hasObjectClass(selectedClass))
                                     || (isSelectedEmpty() && pluginInfo.hasObjectClass(listSelectedClass)))
                                   && !pluginsAdded.contains(pluginInfo.getId())) {
-                                  Widget pluginItem = addPluginItemWidgetToWorkflowList(pluginInfo);
+                                  if (pluginInfo.isInstalled()) {
+                                    Widget pluginItem = addPluginItemWidgetToWorkflowList(pluginInfo);
 
-                                  if (pluginsAdded.isEmpty()) {
-                                    CreateSelectedJob.this.selectedPlugin = lookupPlugin(pluginInfo.getId());
-                                    pluginItem.addStyleName("plugin-list-item-selected");
+                                    if (pluginsAdded.isEmpty()) {
+                                      CreateSelectedJob.this.selectedPlugin = pluginInfo;
+                                      pluginItem.addStyleName("plugin-list-item-selected");
+                                    }
+
+                                    pluginsAdded.add(pluginInfo.getId());
                                   }
-
-                                  pluginsAdded.add(pluginInfo.getId());
                                 }
 
                               }
@@ -320,13 +323,15 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
                               if (!pluginInfo.getCategories().contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)
                                 && ((!isSelectedEmpty() && pluginInfo.hasObjectClass(selectedClass))
                                   || (isSelectedEmpty() && pluginInfo.hasObjectClass(listSelectedClass)))) {
-                                Widget pluginItem = addPluginItemWidgetToWorkflowList(pluginInfo);
-                                if (pluginsAdded.isEmpty()) {
-                                  CreateSelectedJob.this.selectedPlugin = lookupPlugin(pluginInfo.getId());
-                                  pluginItem.addStyleName("plugin-list-item-selected");
-                                }
+                                if (pluginInfo.isInstalled()) {
+                                  Widget pluginItem = addPluginItemWidgetToWorkflowList(pluginInfo);
+                                  if (pluginsAdded.isEmpty()) {
+                                    CreateSelectedJob.this.selectedPlugin = pluginInfo;
+                                    pluginItem.addStyleName("plugin-list-item-selected");
+                                  }
 
-                                pluginsAdded.add(pluginInfo.getId());
+                                  pluginsAdded.add(pluginInfo.getId());
+                                }
                               }
                             }
                           }
@@ -347,11 +352,13 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
             if (!pluginCategories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)
               && ((!isSelectedEmpty() && pluginInfo.hasObjectClass(selectedClass))
                 || (isSelectedEmpty() && pluginInfo.hasObjectClass(listSelectedClass)))) {
-              Widget pluginItem = addPluginItemWidgetToWorkflowList(pluginInfo);
-              if (pluginAdded == 0) {
-                CreateSelectedJob.this.selectedPlugin = lookupPlugin(pluginInfo.getId());
-                pluginItem.addStyleName("plugin-list-item-selected");
-                pluginAdded++;
+              if (pluginInfo.isInstalled()) {
+                Widget pluginItem = addPluginItemWidgetToWorkflowList(pluginInfo);
+                if (pluginAdded == 0) {
+                  CreateSelectedJob.this.selectedPlugin = pluginInfo;
+                  pluginItem.addStyleName("plugin-list-item-selected");
+                  pluginAdded++;
+                }
               }
             }
           }
@@ -428,12 +435,23 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
 
   protected void updateWorkflowOptions() {
     if (selectedPlugin == null) {
+      name.setText("");
+      name.setEnabled(false);
+      workflowListTitle.clear();
+      workflowListPluginStatus.clear();
       workflowListDescription.clear();
       workflowListDescriptionCategories.clear();
-      workflowListDescription.setVisible(false);
+      if (workflowList.getWidgetCount() == 0) {
+        workflowListDescription.add(new Label(messages.noPluginsAvailable()));
+      }
+      workflowListDescription.setVisible(true);
       workflowListDescriptionCategories.setVisible(false);
       workflowOptions.setPluginInfo(null);
-    } else {
+      workflowPanel.setVisible(false);
+      buttonCreate.setEnabled(false);
+    }else {
+      buttonCreate.setEnabled(shouldEnableCreateButton());
+      name.setEnabled(true);
       buttonCreate.setEnabled(shouldEnableCreateButton());
       buildPluginHeader();
       buildPluginStatusPanel();
