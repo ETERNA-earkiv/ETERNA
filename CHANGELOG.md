@@ -4,6 +4,7 @@
 - Fixed compilation warnings regarding plural i18n by updating pluralization rule syntax from `[one]` to `[=1]` for single items
 - Added missing `[one]` pluralization keys in Swedish localization file and corrected a typo
 - Replaced Unicode escapes with literal HTML tags in Swedish client messages
+- Fixed incorrect process name display and improved UI handling when no plugin/action is available on the New Process screen
 
 ## v0.5.0 (2025-12-16)
 #### Updates
