@@ -138,4 +138,28 @@ public final class HTMLUtils {
       true);
   }
 
+
+  public static String representationFileToHtml(Binary binary, String xsltName, final Locale locale)
+    throws GenericException {
+    Map<String, String> translations = getTranslations(xsltName, null, locale);
+    Reader reader = RodaUtils.applyMetadataStylesheet(binary,
+      RodaConstants.CROSSWALKS_DISSEMINATION_HTML_REPRESENTATION_PATH, xsltName, null, translations);
+    try {
+      return CharStreams.toString(reader);
+    } catch (IOException e) {
+      throw new GenericException("Could not transform representation file to HTML", e);
+    }
+  }
+
+  public static String representationFileToHtmlWithCustomXslt(Binary binary, InputStream xsltInputStream,
+    final Locale locale) throws GenericException {
+    Map<String, String> translations = new HashMap<>();
+    Reader reader = RodaUtils.applyCustomStylesheet(binary, xsltInputStream, translations);
+    try {
+      return CharStreams.toString(reader);
+    } catch (IOException e) {
+      throw new GenericException("Could not transform representation file with custom XSLT", e);
+    }
+  }
+
 }

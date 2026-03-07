@@ -75,6 +75,15 @@ import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
+import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.storage.Resource;
+import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.common.iterables.CloseableIterable;
 
 @Service
 public class FilesService {
@@ -247,7 +256,7 @@ public class FilesService {
   public StreamResponse retrieveAIPRepresentationFile(RequestContext requestContext, IndexedFile indexedFile)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     ModelService model = requestContext.getModelService();
-    Optional<LiteRODAObject> liteFile = LiteRODAObjectFactory.get(File.class, indexedFile.getId());
+    Optional<LiteRODAObject> liteFile = LiteRODAObjectFactory.get(indexedFile);
     if (liteFile.isEmpty()) {
       throw new RequestNotValidException("Couldn't retrieve file with id: " + indexedFile.getId());
     }
@@ -439,6 +448,147 @@ public class FilesService {
     ret = new StreamResponse(stream);
 
     return ret;
+  }
+
+  public StreamResponse retrieveFileContentHTML(RequestContext requestContext, IndexedFile indexedFile,
+    String localeString) throws GenericException, RequestNotValidException, NotFoundException,
+    AuthorizationDeniedException {
+
+    ModelService model = requestContext.getModelService();
+    Optional<LiteRODAObject> liteFile = LiteRODAObjectFactory.get(indexedFile);
+    if (liteFile.isEmpty()) {
+      throw new RequestNotValidException("Couldn't retrieve file with id: " + indexedFile.getId());
+    }
+
+    Binary binary = model.getBinary(liteFile.get());
+
+    // Detect XML namespace from the file content
+    String namespace = detectXmlNamespace(binary);
+    if (namespace == null) {
+      throw new RequestNotValidException("File is not XML or has no namespace: " + indexedFile.getId());
+    }
+
+    Locale locale = ServerTools.parseLocale(localeString);
+    String html = null;
+
+    // Strategy 1: Check AIP documentation for bundled XSLT stylesheet
+    try {
+      Binary xsltBinary = findXsltInAipDocumentation(model, indexedFile.getAipId());
+      if (xsltBinary != null) {
+        LOGGER.info("Using AIP-bundled XSLT from documentation for AIP {}", indexedFile.getAipId());
+        html = HTMLUtils.representationFileToHtmlWithCustomXslt(binary,
+          xsltBinary.getContent().createInputStream(), locale);
+      }
+    } catch (Exception e) {
+      LOGGER.debug("No bundled XSLT found in AIP documentation, falling back to config", e);
+    }
+
+    // Strategy 2: Fall back to namespace-based config lookup
+    if (html == null) {
+      String xsltName = resolveXsltForNamespace(namespace);
+      if (xsltName == null) {
+        throw new NotFoundException("No XSLT stylesheet configured for namespace: " + namespace);
+      }
+      html = HTMLUtils.representationFileToHtml(binary, xsltName, locale);
+    }
+
+    String filename = indexedFile.getId() + HTML_EXT;
+    final String finalHtml = html;
+    ConsumesOutputStream stream = new DefaultConsumesOutputStream(filename, RodaConstants.MEDIA_TYPE_TEXT_HTML,
+      out -> {
+        PrintStream printStream = new PrintStream(out);
+        printStream.print(finalHtml);
+        printStream.close();
+      });
+
+    return new StreamResponse(stream);
+  }
+
+
+  public StreamResponse retrieveFileContentHTMLWithCustomXslt(RequestContext requestContext,
+    IndexedFile indexedFile, InputStream xsltInputStream, String localeString)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+
+    ModelService model = requestContext.getModelService();
+    Optional<LiteRODAObject> liteFile = LiteRODAObjectFactory.get(indexedFile);
+    if (liteFile.isEmpty()) {
+      throw new RequestNotValidException("Couldn't retrieve file with id: " + indexedFile.getId());
+    }
+
+    Binary binary = model.getBinary(liteFile.get());
+    Locale locale = ServerTools.parseLocale(localeString);
+    String html = HTMLUtils.representationFileToHtmlWithCustomXslt(binary, xsltInputStream, locale);
+
+    String filename = indexedFile.getId() + HTML_EXT;
+    ConsumesOutputStream stream = new DefaultConsumesOutputStream(filename, RodaConstants.MEDIA_TYPE_TEXT_HTML,
+      out -> {
+        PrintStream printStream = new PrintStream(out);
+        printStream.print(html);
+        printStream.close();
+      });
+
+    return new StreamResponse(stream);
+  }
+
+
+
+  private Binary findXsltInAipDocumentation(ModelService model, String aipId) {
+    try {
+      StoragePath docPath = ModelUtils.getDocumentationStoragePath(aipId);
+      CloseableIterable<Resource> resources = model.getStorage().listResourcesUnderDirectory(docPath, true);
+      try {
+        for (Resource resource : resources) {
+          String name = resource.getStoragePath().getName();
+          if (name != null && name.endsWith(".xslt")) {
+            return model.getStorage().getBinary(resource.getStoragePath());
+          }
+        }
+      } finally {
+        resources.close();
+      }
+    } catch (Exception e) {
+      LOGGER.debug("Could not list AIP documentation for {}: {}", aipId, e.getMessage());
+    }
+    return null;
+  }
+
+  private String resolveXsltForNamespace(String namespace) {
+    List<String> rules = RodaCoreFactory.getRodaConfigurationAsList("ui", "viewer", "xslt", "representation",
+      "rules");
+    for (String rule : rules) {
+      String ruleNamespace = RodaCoreFactory.getRodaConfigurationAsString("ui", "viewer", "xslt", "representation",
+        "rule", rule, "namespace");
+      if (namespace.equals(ruleNamespace)) {
+        return RodaCoreFactory.getRodaConfigurationAsString("ui", "viewer", "xslt", "representation", "rule", rule,
+          "xslt");
+      }
+    }
+    return null;
+  }
+
+  private String detectXmlNamespace(Binary binary) {
+    try (InputStream is = binary.getContent().createInputStream()) {
+      byte[] header = new byte[4096];
+      int read = is.read(header);
+      if (read <= 0) return null;
+
+      XMLInputFactory factory = XMLInputFactory.newInstance();
+      factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+      factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+      XMLStreamReader reader = factory.createXMLStreamReader(new ByteArrayInputStream(header, 0, read));
+      while (reader.hasNext()) {
+        int event = reader.next();
+        if (event == XMLStreamReader.START_ELEMENT) {
+          String ns = reader.getNamespaceURI();
+          reader.close();
+          return ns;
+        }
+      }
+      reader.close();
+    } catch (Exception e) {
+      LOGGER.debug("Could not detect XML namespace", e);
+    }
+    return null;
   }
 
 }

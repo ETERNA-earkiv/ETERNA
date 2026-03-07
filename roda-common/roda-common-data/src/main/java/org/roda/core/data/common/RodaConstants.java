@@ -112,6 +112,7 @@ public final class RodaConstants {
   public static final String CROSSWALKS_DISSEMINATION_HTML_PATH = "crosswalks/dissemination/html/";
   public static final String CROSSWALKS_DISSEMINATION_HTML_EVENT_PATH = "crosswalks/dissemination/html/event.xslt";
   public static final String CROSSWALKS_DISSEMINATION_OTHER_PATH = "crosswalks/other/";
+  public static final String CROSSWALKS_DISSEMINATION_HTML_REPRESENTATION_PATH = "crosswalks/dissemination/html/representation/";
   public static final String UI_BROWSER_METADATA_DESCRIPTIVE_TYPES = "ui.browser.metadata.descriptive.types";
   public static final String I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX = "ui.browse.metadata.descriptive.type.";
   public static final String I18N_UI_BROWSE_METADATA_TECHNICAL_TYPE_PREFIX = "ui.browse.metadata.technical.type.";

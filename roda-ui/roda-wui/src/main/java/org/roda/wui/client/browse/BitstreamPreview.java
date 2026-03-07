@@ -58,6 +58,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   private static final String VIEWER_TYPE_HTML = "html";
   private static final String VIEWER_TYPE_PDF = "pdf";
   private static final String VIEWER_TYPE_IMAGE = "image";
+  private static final String VIEWER_TYPE_XML = "xml";
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -182,7 +183,11 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
       } else if (type.equals(VIEWER_TYPE_PDF)) {
         pdfPreview();
       } else if (type.equals(VIEWER_TYPE_TEXT)) {
-        textPreview();
+        if (isXmlFile()) {
+          xmlHtmlPreview();
+        } else {
+          textPreview();
+        }
       } else if (type.equals(VIEWER_TYPE_HTML)) {
         htmlPreview();
       } else if (type.equals(VIEWER_TYPE_AUDIO)) {
@@ -192,6 +197,8 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
       } else {
         notSupportedPreview();
       }
+    } else if (isXmlFile()) {
+      xmlHtmlPreview();
     } else if (object instanceof IndexedDIP) {
       IndexedDIP dip = (IndexedDIP) object;
       dipUrlPreview(dip);
@@ -503,6 +510,57 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     html.setHTML(b.toSafeHtml());
     html.setStyleName("viewRepresentationEmptyPreview");
     return html;
+  }
+
+
+  private boolean isXmlFile() {
+    if (format != null && format.getMimeType() != null) {
+      String mime = format.getMimeType().toLowerCase();
+      if (mime.equals("text/xml") || mime.equals("application/xml") || mime.endsWith("+xml")) {
+        return true;
+      }
+    }
+    if (filename != null && filename.toLowerCase().endsWith(".xml")) {
+      return true;
+    }
+    return false;
+  }
+
+  private void xmlHtmlPreview() {
+    if (object instanceof IndexedFile) {
+      IndexedFile indexedFile = (IndexedFile) object;
+      String htmlUrl = GWT.getHostPageBaseURL() + "api/v2/files/" + indexedFile.getUUID()
+        + "/preview/html?lang=" + LocaleInfo.getCurrentLocale().getLocaleName();
+
+      RequestBuilder request = new RequestBuilder(RequestBuilder.GET, htmlUrl);
+      try {
+        request.sendRequest(null, new RequestCallback() {
+          @Override
+          public void onResponseReceived(Request req, Response response) {
+            if (response.getStatusCode() == HttpStatus.SC_OK) {
+              // XSLT rendering available - show as HTML in iframe
+              Frame frame = new Frame();
+              String html = response.getText();
+              frame.getElement().setAttribute("srcdoc", html);
+              frame.setStyleName("viewRepresentationHtmlFilePreview");
+              panel.add(frame);
+            } else {
+              // No stylesheet match - fall back to text preview
+              textPreview();
+            }
+          }
+
+          @Override
+          public void onError(Request req, Throwable exception) {
+            textPreview();
+          }
+        });
+      } catch (RequestException e) {
+        textPreview();
+      }
+    } else {
+      textPreview();
+    }
   }
 
   private void downloadFile() {
