@@ -171,6 +171,22 @@ public class RestUtils {
     return UriUtils.fromSafeConstant(b.toString());
   }
 
+  public static String createDescriptiveMetadataTransformUri(String aipId, String metadataId) {
+    // api/v2/aips/{id}/metadata/descriptive/{metadataId}/transform?lang={lang}
+    StringBuilder b = new StringBuilder();
+    b.append(RodaConstants.API_REST_V2_AIPS).append(URL.encodeQueryString(aipId)).append(RodaConstants.API_SEP)
+      .append("metadata").append(RodaConstants.API_SEP).append("descriptive").append(RodaConstants.API_SEP)
+      .append(URL.encodeQueryString(metadataId)).append(RodaConstants.API_SEP).append("transform");
+
+    // locale
+    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_LANG)
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(LocaleInfo.getCurrentLocale().getLocaleName());
+
+    return b.toString();
+  }
+
+
+
   public static SafeUri createTechnicalMetadataHTMLUri(String fileId, String typeId) {
     return createTechnicalMetadataHTMLUri(fileId, typeId, null);
   }

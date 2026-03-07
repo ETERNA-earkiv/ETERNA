@@ -2649,4 +2649,10 @@ public interface ClientMessages extends Messages {
   String reasonCantActOnUser();
 
   String reasonCantActOnGroup();
+
+  /*** XSLT Transform ***/
+  String applyXsltButton();
+
+  String xsltTransformError();
+
 }

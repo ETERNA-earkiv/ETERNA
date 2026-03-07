@@ -244,6 +244,46 @@ public class RodaUtils {
     }
   }
 
+  public static Reader applyCustomStylesheet(Binary binary, InputStream xsltInputStream,
+    Map<String, String> parameters) throws GenericException {
+    try (
+      Reader descMetadataReader = new InputStreamReader(new BOMInputStream(binary.getContent().createInputStream()))) {
+
+      XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+      xmlReader.setEntityResolver(new RodaEntityResolver());
+      InputSource source = new InputSource(descMetadataReader);
+      Source text = new SAXSource(xmlReader, source);
+
+      XsltCompiler compiler = PROCESSOR.newXsltCompiler();
+      compiler.setURIResolver(new RodaURIFileResolver());
+      XsltExecutable xsltExecutable = compiler.compile(new StreamSource(xsltInputStream));
+
+      XsltTransformer transformer = xsltExecutable.load();
+      CharArrayWriter transformerResult = new CharArrayWriter();
+
+      transformer.setSource(text);
+      transformer.setDestination(PROCESSOR.newSerializer(transformerResult));
+
+      for (Entry<String, String> parameter : parameters.entrySet()) {
+        QName qName = new QName(parameter.getKey());
+        XdmValue xdmValue = new XdmAtomicValue(parameter.getValue());
+        transformer.setParameter(qName, xdmValue);
+      }
+
+      QName qNameMap = new QName("i18n");
+      XdmMap xdmMap = XdmMap.makeMap(parameters);
+      transformer.setParameter(qNameMap, xdmMap);
+
+      transformer.transform();
+
+      return new CharArrayReader(transformerResult.toCharArray());
+
+    } catch (IOException | SAXException | SaxonApiException e) {
+      throw new GenericException("Could not apply custom XSLT stylesheet to binary " + binary.getStoragePath(), e);
+    }
+  }
+
+
   public static Reader applyEventStylesheet(Binary binary, boolean onlyDetails, Map<String, String> translations,
     String path) throws GenericException {
     try (

@@ -8,6 +8,7 @@
 package org.roda.wui.common;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.Locale;
@@ -47,6 +48,18 @@ public final class HTMLUtils {
       throw new GenericException("Could not transform PREMIS to HTML", e);
     }
   }
+
+  public static String descriptiveMetadataToHtmlWithCustomXslt(Binary binary, InputStream xsltInputStream,
+    String metadataType, String metadataVersion, final Locale locale) throws GenericException {
+    Map<String, String> translations = getTranslations(metadataType, metadataVersion, locale);
+    Reader reader = RodaUtils.applyCustomStylesheet(binary, xsltInputStream, translations);
+    try {
+      return CharStreams.toString(reader);
+    } catch (IOException e) {
+      throw new GenericException("Could not transform metadata with custom XSLT", e);
+    }
+  }
+
 
   public static String technicalMetadataToHtml(Binary binary, String metadataType, String metadataVersion,
     final Locale locale) throws GenericException {

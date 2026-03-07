@@ -79,22 +79,18 @@ services:
       - "8025:8025" # web ui
 
   openldap:
-    image: docker.io/bitnami/openldap:2.6
+    image: osixia/openldap:1.5.0
     container_name: openldap
     restart: unless-stopped
-    user: 1001:root
     ports:
-      - "1389:1389"
-      - "1636:1636"
+      - "1389:389"
+      - "1636:636"
     environment:
-      - BITNAMI_DEBUG=true
-      - LDAP_ROOT=dc=roda,dc=org
-      - LDAP_SKIP_DEFAULT_TREE=yes
-      - LDAP_ADMIN_USERNAME=admin
+      - LDAP_ORGANISATION=RODA
+      - LDAP_DOMAIN=roda.org
       - LDAP_ADMIN_PASSWORD=eterna
-      - LDAP_EXTRA_SCHEMAS=cosine,inetorgperson,nis,pbkdf2
-    volumes:
-      - ./ldap/ldif/pbkdf2.ldif:/opt/bitnami/openldap/etc/schema/pbkdf2.ldif
+      - LDAP_TLS=false
+    command: --copy-service
 
   postgres:
     image: postgres:17
