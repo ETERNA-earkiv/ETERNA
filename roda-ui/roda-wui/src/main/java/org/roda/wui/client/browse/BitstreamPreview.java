@@ -542,7 +542,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
       String transformUrl = GWT.getHostPageBaseURL() + "api/v2/files/" + indexedFile.getUUID()
         + "/preview/html/transform?lang=" + locale;
 
-      // Toolbar with XSLT upload - only visible if user has representation.read role
+      // Toolbar with XSLT upload - only visible if user has representation.apply_xslt role
       FlowPanel toolbar = new FlowPanel();
       toolbar.setStyleName("xmlPreviewToolbar");
       toolbar.setVisible(false);
@@ -562,7 +562,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
       toolbar.add(applyButton);
       panel.add(toolbar);
 
-      UserLogin.getInstance().checkRole(Arrays.asList("representation.read"), new AsyncCallback<Boolean>() {
+      UserLogin.getInstance().checkRole(Arrays.asList("representation.apply_xslt"), new AsyncCallback<Boolean>() {
         @Override
         public void onSuccess(Boolean hasRole) {
           toolbar.setVisible(Boolean.TRUE.equals(hasRole));
