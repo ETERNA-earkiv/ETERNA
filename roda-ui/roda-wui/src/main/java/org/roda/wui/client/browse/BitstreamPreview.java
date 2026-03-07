@@ -17,15 +17,21 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.common.utils.IndexedDIPUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.StringUtils;
 
+import java.util.Arrays;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.event.logical.shared.AttachEvent.Handler;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -43,6 +49,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -529,23 +536,65 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   private void xmlHtmlPreview() {
     if (object instanceof IndexedFile) {
       IndexedFile indexedFile = (IndexedFile) object;
+      String locale = LocaleInfo.getCurrentLocale().getLocaleName();
       String htmlUrl = GWT.getHostPageBaseURL() + "api/v2/files/" + indexedFile.getUUID()
-        + "/preview/html?lang=" + LocaleInfo.getCurrentLocale().getLocaleName();
+        + "/preview/html?lang=" + locale;
+      String transformUrl = GWT.getHostPageBaseURL() + "api/v2/files/" + indexedFile.getUUID()
+        + "/preview/html/transform?lang=" + locale;
 
+      // Toolbar with XSLT upload - only visible if user has representation.read role
+      FlowPanel toolbar = new FlowPanel();
+      toolbar.setStyleName("xmlPreviewToolbar");
+      toolbar.setVisible(false);
+
+      FileUpload xsltUpload = new FileUpload();
+      xsltUpload.setName("xslt");
+      xsltUpload.getElement().setAttribute("accept", ".xslt,.xsl");
+      xsltUpload.setStyleName("xmlPreviewFileInput");
+
+      Button applyButton = new Button("Applicera XSLT");
+      applyButton.setStyleName("btn btn-play xmlPreviewApplyButton");
+      applyButton.setEnabled(false);
+
+      xsltUpload.addChangeHandler(event -> applyButton.setEnabled(true));
+
+      toolbar.add(xsltUpload);
+      toolbar.add(applyButton);
+      panel.add(toolbar);
+
+      UserLogin.getInstance().checkRole(Arrays.asList("representation.read"), new AsyncCallback<Boolean>() {
+        @Override
+        public void onSuccess(Boolean hasRole) {
+          toolbar.setVisible(Boolean.TRUE.equals(hasRole));
+        }
+
+        @Override
+        public void onFailure(Throwable caught) {
+          toolbar.setVisible(false);
+        }
+      });
+
+      // Iframe for rendered HTML
+      Frame frame = new Frame();
+      frame.setStyleName("viewRepresentationHtmlFilePreview");
+
+      applyButton.addClickHandler(event -> {
+        applyButton.setEnabled(false);
+        applyButton.setText("Laddar...");
+        applyCustomXslt(xsltUpload.getElement(), transformUrl, frame.getElement(), applyButton.getElement());
+      });
+
+      // Load default XSLT rendering
       RequestBuilder request = new RequestBuilder(RequestBuilder.GET, htmlUrl);
       try {
         request.sendRequest(null, new RequestCallback() {
           @Override
           public void onResponseReceived(Request req, Response response) {
             if (response.getStatusCode() == HttpStatus.SC_OK) {
-              // XSLT rendering available - show as HTML in iframe
-              Frame frame = new Frame();
-              String html = response.getText();
-              frame.getElement().setAttribute("srcdoc", html);
-              frame.setStyleName("viewRepresentationHtmlFilePreview");
+              frame.getElement().setAttribute("srcdoc", response.getText());
               panel.add(frame);
             } else {
-              // No stylesheet match - fall back to text preview
+              panel.add(frame);
               textPreview();
             }
           }
@@ -562,6 +611,36 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
       textPreview();
     }
   }
+
+  private native void applyCustomXslt(
+    com.google.gwt.dom.client.Element fileInput, String url,
+    com.google.gwt.dom.client.Element iframe, com.google.gwt.dom.client.Element button) /*-{
+    var files = fileInput.files;
+    if (!files || files.length === 0) {
+      button.innerText = "Applicera XSLT";
+      button.disabled = false;
+      return;
+    }
+    var formData = new FormData();
+    formData.append("xslt", files[0]);
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", url, true);
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        iframe.setAttribute("srcdoc", xhr.responseText);
+      } else {
+        $wnd.alert("XSLT-transformering misslyckades: " + xhr.statusText);
+      }
+      button.innerText = "Applicera XSLT";
+      button.disabled = false;
+    };
+    xhr.onerror = function() {
+      $wnd.alert("Fel vid uppladdning av XSLT");
+      button.innerText = "Applicera XSLT";
+      button.disabled = false;
+    };
+    xhr.send(formData);
+  }-*/;
 
   private void downloadFile() {
     if (bitstreamDownloadUri != null) {
