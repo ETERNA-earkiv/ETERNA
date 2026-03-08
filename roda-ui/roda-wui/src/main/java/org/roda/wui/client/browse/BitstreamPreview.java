@@ -542,6 +542,15 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
       String transformUrl = GWT.getHostPageBaseURL() + "api/v2/files/" + indexedFile.getUUID()
         + "/preview/html/transform?lang=" + locale;
 
+      // Print button - always visible
+      FlowPanel printToolbar = new FlowPanel();
+      printToolbar.setStyleName("xmlPreviewToolbar");
+
+      Button printButton = new Button("Skriv ut");
+      printButton.setStyleName("btn btn-play xmlPreviewPrintButton");
+      printToolbar.add(printButton);
+      panel.add(printToolbar);
+
       // Toolbar with XSLT upload - only visible if user has representation.apply_xslt role
       FlowPanel toolbar = new FlowPanel();
       toolbar.setStyleName("xmlPreviewToolbar");
@@ -584,6 +593,8 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
         applyCustomXslt(xsltUpload.getElement(), transformUrl, frame.getElement(), applyButton.getElement());
       });
 
+      printButton.addClickHandler(event -> printIframeContent(frame.getElement()));
+
       // Load default XSLT rendering
       RequestBuilder request = new RequestBuilder(RequestBuilder.GET, htmlUrl);
       try {
@@ -611,6 +622,28 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
       textPreview();
     }
   }
+
+  private native void printIframeContent(com.google.gwt.dom.client.Element iframe) /*-{
+    try {
+      var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+      var html = iframeDoc.documentElement.outerHTML;
+      var printWin = $wnd.open('', '_blank');
+      printWin.document.write(html);
+      // Inject print styles to suppress headers/footers
+      var style = printWin.document.createElement('style');
+      style.textContent = '@page { margin: 15mm; size: auto; } @media print { body { margin: 0; } }';
+      printWin.document.head.appendChild(style);
+      printWin.document.close();
+      printWin.focus();
+      // Delay to let content render before printing
+      setTimeout(function() {
+        printWin.print();
+        printWin.close();
+      }, 500);
+    } catch (e) {
+      $wnd.alert("Kunde inte skriva ut: " + e.message);
+    }
+  }-*/;
 
   private native void applyCustomXslt(
     com.google.gwt.dom.client.Element fileInput, String url,
