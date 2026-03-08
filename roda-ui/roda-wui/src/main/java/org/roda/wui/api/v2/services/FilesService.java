@@ -476,8 +476,9 @@ public class FilesService {
       Binary xsltBinary = findXsltInAipDocumentation(model, indexedFile.getAipId(), indexedFile.getRepresentationId(), indexedFile.getId());
       if (xsltBinary != null) {
         LOGGER.info("Using AIP-bundled XSLT from documentation for AIP {}", indexedFile.getAipId());
-        html = HTMLUtils.representationFileToHtmlWithCustomXslt(binary,
-          xsltBinary.getContent().createInputStream(), locale);
+        try (InputStream xsltStream = xsltBinary.getContent().createInputStream()) {
+          html = HTMLUtils.representationFileToHtmlWithCustomXslt(binary, xsltStream, locale);
+        }
       }
     } catch (Exception e) {
       LOGGER.debug("No bundled XSLT found in AIP documentation, falling back to config", e);
@@ -589,7 +590,7 @@ public class FilesService {
     for (String rule : rules) {
       String ruleNamespace = RodaCoreFactory.getRodaConfigurationAsString("ui", "viewer", "xslt", "representation",
         "rule", rule, "namespace");
-      if (namespace.equals(ruleNamespace)) {
+      if (ruleNamespace != null && namespace.equals(ruleNamespace)) {
         return RodaCoreFactory.getRodaConfigurationAsString("ui", "viewer", "xslt", "representation", "rule", rule,
           "xslt");
       }

@@ -26,7 +26,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -60,6 +64,8 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
+import net.sf.saxon.Configuration;
+import net.sf.saxon.lib.Feature;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
@@ -73,7 +79,16 @@ import net.sf.saxon.s9api.XsltTransformer;
 public class RodaUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(RodaUtils.class);
 
-  private static final Processor PROCESSOR = new Processor(false);
+  private static final long XSLT_TIMEOUT_SECONDS = 30;
+  private static final int MAX_OUTPUT_SIZE = 10 * 1024 * 1024; // 10 MB
+
+  private static final Processor PROCESSOR = createSecuredProcessor();
+
+  private static Processor createSecuredProcessor() {
+    Configuration config = new Configuration();
+    config.setBooleanProperty(Feature.ALLOW_EXTERNAL_FUNCTIONS, false);
+    return new Processor(config);
+  }
 
   private static final LoadingCache<Triple<String, String, String>, XsltExecutable> CACHE = CacheBuilder.newBuilder()
     .expireAfterWrite(1, TimeUnit.MINUTES).build(new CacheLoader<Triple<String, String, String>, XsltExecutable>() {
@@ -95,6 +110,71 @@ public class RodaUtils {
         return createEventTransformer(path);
       }
     });
+
+  /**
+   * CharArrayWriter with a size limit to prevent output-based resource exhaustion.
+   */
+  private static class LimitedCharArrayWriter extends CharArrayWriter {
+    private final int limit;
+
+    LimitedCharArrayWriter(int limit) {
+      this.limit = limit;
+    }
+
+    @Override
+    public void write(int c) {
+      checkLimit(1);
+      super.write(c);
+    }
+
+    @Override
+    public void write(char[] c, int off, int len) {
+      checkLimit(len);
+      super.write(c, off, len);
+    }
+
+    @Override
+    public void write(String str, int off, int len) {
+      checkLimit(len);
+      super.write(str, off, len);
+    }
+
+    private void checkLimit(int additional) {
+      if (size() + additional > limit) {
+        throw new RuntimeException("XSLT output exceeded maximum size of " + limit + " bytes");
+      }
+    }
+  }
+
+  /**
+   * Executes an XSLT transformation with a timeout to prevent infinite loops.
+   */
+  private static void transformWithTimeout(XsltTransformer transformer) throws GenericException {
+    ExecutorService executor = Executors.newSingleThreadExecutor();
+    try {
+      Future<?> future = executor.submit(() -> {
+        try {
+          transformer.transform();
+        } catch (SaxonApiException e) {
+          throw new RuntimeException(e);
+        }
+      });
+      future.get(XSLT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+    } catch (TimeoutException e) {
+      throw new GenericException("XSLT transformation timed out after " + XSLT_TIMEOUT_SECONDS + " seconds");
+    } catch (java.util.concurrent.ExecutionException e) {
+      Throwable cause = e.getCause();
+      if (cause instanceof RuntimeException && cause.getCause() instanceof SaxonApiException) {
+        throw new GenericException("XSLT transformation failed", cause.getCause());
+      }
+      throw new GenericException("XSLT transformation failed", e);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new GenericException("XSLT transformation interrupted", e);
+    } finally {
+      executor.shutdownNow();
+    }
+  }
 
   /** Private empty constructor */
   private RodaUtils() {
@@ -219,7 +299,7 @@ public class RodaUtils {
       XsltExecutable xsltExecutable = CACHE.get(Triple.of(basePath, metadataType, metadataVersion));
 
       XsltTransformer transformer = xsltExecutable.load();
-      CharArrayWriter transformerResult = new CharArrayWriter();
+      LimitedCharArrayWriter transformerResult = new LimitedCharArrayWriter(MAX_OUTPUT_SIZE);
 
       transformer.setSource(text);
       transformer.setDestination(PROCESSOR.newSerializer(transformerResult));
@@ -234,11 +314,11 @@ public class RodaUtils {
       XdmMap xdmMap = XdmMap.makeMap(parameters);
       transformer.setParameter(qNameMap, xdmMap);
 
-      transformer.transform();
+      transformWithTimeout(transformer);
 
       return new CharArrayReader(transformerResult.toCharArray());
 
-    } catch (IOException | SAXException | ExecutionException | SaxonApiException e) {
+    } catch (IOException | SAXException | ExecutionException e) {
       throw new GenericException("Could not process descriptive metadata binary " + binary.getStoragePath()
         + " metadata type " + metadataType + " and version " + metadataVersion, e);
     }
@@ -259,7 +339,7 @@ public class RodaUtils {
       XsltExecutable xsltExecutable = compiler.compile(new StreamSource(xsltInputStream));
 
       XsltTransformer transformer = xsltExecutable.load();
-      CharArrayWriter transformerResult = new CharArrayWriter();
+      LimitedCharArrayWriter transformerResult = new LimitedCharArrayWriter(MAX_OUTPUT_SIZE);
 
       transformer.setSource(text);
       transformer.setDestination(PROCESSOR.newSerializer(transformerResult));
@@ -274,7 +354,7 @@ public class RodaUtils {
       XdmMap xdmMap = XdmMap.makeMap(parameters);
       transformer.setParameter(qNameMap, xdmMap);
 
-      transformer.transform();
+      transformWithTimeout(transformer);
 
       return new CharArrayReader(transformerResult.toCharArray());
 
@@ -297,7 +377,7 @@ public class RodaUtils {
       XsltExecutable xsltExecutable = EVENT_CACHE.get(path);
 
       XsltTransformer transformer = xsltExecutable.load();
-      CharArrayWriter transformerResult = new CharArrayWriter();
+      LimitedCharArrayWriter transformerResult = new LimitedCharArrayWriter(MAX_OUTPUT_SIZE);
 
       transformer.setSource(text);
       transformer.setDestination(PROCESSOR.newSerializer(transformerResult));
@@ -311,9 +391,9 @@ public class RodaUtils {
         transformer.setParameter(qName, xdmValue);
       }
 
-      transformer.transform();
+      transformWithTimeout(transformer);
       return new CharArrayReader(transformerResult.toCharArray());
-    } catch (IOException | SAXException | ExecutionException | SaxonApiException e) {
+    } catch (IOException | SAXException | ExecutionException e) {
       LOGGER.error(e.getMessage(), e);
       throw new GenericException("Could not process event binary " + binary.getStoragePath(), e);
     }

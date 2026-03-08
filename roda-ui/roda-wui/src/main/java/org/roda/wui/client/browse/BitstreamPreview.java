@@ -654,10 +654,19 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
       button.disabled = false;
       return;
     }
+    var file = files[0];
+    var maxSize = 1024 * 1024;
+    if (file.size > maxSize) {
+      $wnd.alert("XSLT-filen är för stor (max 1 MB)");
+      button.innerText = "Applicera XSLT";
+      button.disabled = false;
+      return;
+    }
     var formData = new FormData();
-    formData.append("xslt", files[0]);
+    formData.append("xslt", file);
     var xhr = new XMLHttpRequest();
     xhr.open("POST", url, true);
+    xhr.timeout = 30000;
     xhr.onload = function() {
       if (xhr.status === 200) {
         iframe.setAttribute("srcdoc", xhr.responseText);
@@ -669,6 +678,11 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     };
     xhr.onerror = function() {
       $wnd.alert("Fel vid uppladdning av XSLT");
+      button.innerText = "Applicera XSLT";
+      button.disabled = false;
+    };
+    xhr.ontimeout = function() {
+      $wnd.alert("XSLT-transformeringen tog för lång tid (timeout 30s)");
       button.innerText = "Applicera XSLT";
       button.disabled = false;
     };

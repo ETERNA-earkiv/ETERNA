@@ -11,11 +11,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.io.InputStream;
 import java.util.ArrayList;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
 import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.file.CreateFolderRequest;
@@ -526,6 +530,25 @@ public class FilesController implements FileRestService, Exportable {
         fileFields.add(RodaConstants.FILE_ISDIRECTORY);
         IndexedFile file = indexService.retrieve(IndexedFile.class, fileUUID, fileFields);
         controllerAssistant.checkObjectPermissions(requestContext.getUser(), file);
+
+        // Validate XSLT file size (max 1 MB)
+        long maxXsltSize = 1024 * 1024;
+        if (xsltFile.getSize() > maxXsltSize) {
+          throw new RequestNotValidException("XSLT file exceeds maximum size of 1 MB");
+        }
+
+        // Validate XSLT is well-formed XML
+        try (InputStream validationStream = xsltFile.getInputStream()) {
+          XMLInputFactory xmlFactory = XMLInputFactory.newInstance();
+          xmlFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+          xmlFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+          XMLStreamReader xmlReader = xmlFactory.createXMLStreamReader(validationStream);
+          while (xmlReader.hasNext()) { xmlReader.next(); }
+          xmlReader.close();
+        } catch (Exception e) {
+          throw new RequestNotValidException("Uploaded file is not valid XML: " + e.getMessage());
+        }
+
         try {
           StreamResponse streamResponse = filesService.retrieveFileContentHTMLWithCustomXslt(
             requestContext, file, xsltFile.getInputStream(), localeString);

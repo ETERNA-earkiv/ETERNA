@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import org.owasp.html.HtmlPolicyBuilder;
+import org.owasp.html.PolicyFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
@@ -32,6 +34,23 @@ import com.google.common.io.CharStreams;
  */
 public final class HTMLUtils {
 
+  private static final PolicyFactory HTML_SANITIZER = new HtmlPolicyBuilder()
+    .allowCommonBlockElements()
+    .allowCommonInlineFormattingElements()
+    .allowElements("table", "thead", "tbody", "tfoot", "tr", "th", "td", "caption", "col", "colgroup")
+    .allowElements("dl", "dt", "dd", "pre", "code", "hr", "a", "img", "section", "header", "footer", "nav", "main")
+    .allowAttributes("class", "id", "style", "title", "lang").globally()
+    .allowAttributes("href").onElements("a")
+    .allowAttributes("src", "alt", "width", "height").onElements("img")
+    .allowAttributes("colspan", "rowspan", "scope", "align", "valign").onElements("th", "td")
+    .allowUrlProtocols("http", "https", "data")
+    .allowStyling()
+    .toFactory();
+
+  private static String sanitizeHtml(String html) {
+    return HTML_SANITIZER.sanitize(html);
+  }
+
   /** Private empty constructor */
   private HTMLUtils() {
     // do nothing
@@ -43,7 +62,7 @@ public final class HTMLUtils {
     Reader reader = RodaUtils.applyMetadataStylesheet(binary, RodaConstants.CROSSWALKS_DISSEMINATION_HTML_PATH,
       metadataType, metadataVersion, translations);
     try {
-      return CharStreams.toString(reader);
+      return sanitizeHtml(CharStreams.toString(reader));
     } catch (IOException e) {
       throw new GenericException("Could not transform PREMIS to HTML", e);
     }
@@ -54,7 +73,7 @@ public final class HTMLUtils {
     Map<String, String> translations = getTranslations(metadataType, metadataVersion, locale);
     Reader reader = RodaUtils.applyCustomStylesheet(binary, xsltInputStream, translations);
     try {
-      return CharStreams.toString(reader);
+      return sanitizeHtml(CharStreams.toString(reader));
     } catch (IOException e) {
       throw new GenericException("Could not transform metadata with custom XSLT", e);
     }
@@ -85,7 +104,7 @@ public final class HTMLUtils {
         metadataVersion, translations);
     }
     try {
-      return CharStreams.toString(reader);
+      return sanitizeHtml(CharStreams.toString(reader));
     } catch (IOException e) {
       throw new GenericException("Could not transform PREMIS to HTML", e);
     }
@@ -100,7 +119,7 @@ public final class HTMLUtils {
       RodaConstants.CROSSWALKS_DISSEMINATION_HTML_EVENT_PATH);
 
     try {
-      return CharStreams.toString(reader);
+      return sanitizeHtml(CharStreams.toString(reader));
     } catch (IOException e) {
       throw new GenericException("Could not transform PREMIS to HTML", e);
     }
@@ -145,7 +164,7 @@ public final class HTMLUtils {
     Reader reader = RodaUtils.applyMetadataStylesheet(binary,
       RodaConstants.CROSSWALKS_DISSEMINATION_HTML_REPRESENTATION_PATH, xsltName, null, translations);
     try {
-      return CharStreams.toString(reader);
+      return sanitizeHtml(CharStreams.toString(reader));
     } catch (IOException e) {
       throw new GenericException("Could not transform representation file to HTML", e);
     }
@@ -156,7 +175,7 @@ public final class HTMLUtils {
     Map<String, String> translations = new HashMap<>();
     Reader reader = RodaUtils.applyCustomStylesheet(binary, xsltInputStream, translations);
     try {
-      return CharStreams.toString(reader);
+      return sanitizeHtml(CharStreams.toString(reader));
     } catch (IOException e) {
       throw new GenericException("Could not transform representation file with custom XSLT", e);
     }
