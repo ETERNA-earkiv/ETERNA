@@ -473,7 +473,7 @@ public class FilesService {
 
     // Strategy 1: Check AIP documentation for bundled XSLT stylesheet
     try {
-      Binary xsltBinary = findXsltInAipDocumentation(model, indexedFile.getAipId());
+      Binary xsltBinary = findXsltInAipDocumentation(model, indexedFile.getAipId(), indexedFile.getId());
       if (xsltBinary != null) {
         LOGGER.info("Using AIP-bundled XSLT from documentation for AIP {}", indexedFile.getAipId());
         html = HTMLUtils.representationFileToHtmlWithCustomXslt(binary,
@@ -532,17 +532,37 @@ public class FilesService {
 
 
 
-  private Binary findXsltInAipDocumentation(ModelService model, String aipId) {
+  private Binary findXsltInAipDocumentation(ModelService model, String aipId, String xmlFileName) {
     try {
       StoragePath docPath = ModelUtils.getDocumentationStoragePath(aipId);
       CloseableIterable<Resource> resources = model.getStorage().listResourcesUnderDirectory(docPath, true);
       try {
+        // Derive expected XSLT name from XML filename (e.g. "Jrnl1.xml" -> "Jrnl1.xslt")
+        String expectedXsltName = null;
+        if (xmlFileName != null && xmlFileName.endsWith(".xml")) {
+          expectedXsltName = xmlFileName.substring(0, xmlFileName.length() - 4) + ".xslt";
+        }
+
+        // First pass: look for filename-matched XSLT
+        Binary fallback = null;
         for (Resource resource : resources) {
           String name = resource.getStoragePath().getName();
           if (name != null && name.endsWith(".xslt")) {
-            return model.getStorage().getBinary(resource.getStoragePath());
+            if (expectedXsltName != null && name.equals(expectedXsltName)) {
+              LOGGER.info("Found filename-matched XSLT '{}' for XML '{}'", name, xmlFileName);
+              return model.getStorage().getBinary(resource.getStoragePath());
+            }
+            if (fallback == null) {
+              fallback = model.getStorage().getBinary(resource.getStoragePath());
+            }
           }
         }
+
+        // Fallback: return first XSLT found (if any)
+        if (fallback != null) {
+          LOGGER.info("No filename-matched XSLT for '{}', using fallback XSLT in AIP documentation", xmlFileName);
+        }
+        return fallback;
       } finally {
         resources.close();
       }
