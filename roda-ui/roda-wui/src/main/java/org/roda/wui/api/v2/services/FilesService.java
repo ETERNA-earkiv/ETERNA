@@ -473,7 +473,7 @@ public class FilesService {
 
     // Strategy 1: Check AIP documentation for bundled XSLT stylesheet
     try {
-      Binary xsltBinary = findXsltInAipDocumentation(model, indexedFile.getAipId(), indexedFile.getId());
+      Binary xsltBinary = findXsltInAipDocumentation(model, indexedFile.getAipId(), indexedFile.getRepresentationId(), indexedFile.getId());
       if (xsltBinary != null) {
         LOGGER.info("Using AIP-bundled XSLT from documentation for AIP {}", indexedFile.getAipId());
         html = HTMLUtils.representationFileToHtmlWithCustomXslt(binary,
@@ -532,24 +532,35 @@ public class FilesService {
 
 
 
-  private Binary findXsltInAipDocumentation(ModelService model, String aipId, String xmlFileName) {
+  private Binary findXsltInAipDocumentation(ModelService model, String aipId, String representationId, String xmlFileName) {
+    // Try representation-level documentation first, then package-level as fallback
+    Binary result = searchXsltInDocumentation(model, aipId, representationId, xmlFileName);
+    if (result == null && representationId != null) {
+      result = searchXsltInDocumentation(model, aipId, null, xmlFileName);
+    }
+    return result;
+  }
+
+  private Binary searchXsltInDocumentation(ModelService model, String aipId, String representationId,
+    String xmlFileName) {
     try {
-      StoragePath docPath = ModelUtils.getDocumentationStoragePath(aipId);
+      StoragePath docPath = representationId != null
+        ? ModelUtils.getDocumentationStoragePath(aipId, representationId)
+        : ModelUtils.getDocumentationStoragePath(aipId);
       CloseableIterable<Resource> resources = model.getStorage().listResourcesUnderDirectory(docPath, true);
       try {
-        // Derive expected XSLT name from XML filename (e.g. "Jrnl1.xml" -> "Jrnl1.xslt")
         String expectedXsltName = null;
         if (xmlFileName != null && xmlFileName.endsWith(".xml")) {
           expectedXsltName = xmlFileName.substring(0, xmlFileName.length() - 4) + ".xslt";
         }
 
-        // First pass: look for filename-matched XSLT
         Binary fallback = null;
         for (Resource resource : resources) {
           String name = resource.getStoragePath().getName();
           if (name != null && name.endsWith(".xslt")) {
             if (expectedXsltName != null && name.equals(expectedXsltName)) {
-              LOGGER.info("Found filename-matched XSLT '{}' for XML '{}'", name, xmlFileName);
+              String level = representationId != null ? "representation" : "package";
+              LOGGER.info("Found filename-matched XSLT '{}' for XML '{}' at {} level", name, xmlFileName, level);
               return model.getStorage().getBinary(resource.getStoragePath());
             }
             if (fallback == null) {
@@ -558,16 +569,16 @@ public class FilesService {
           }
         }
 
-        // Fallback: return first XSLT found (if any)
         if (fallback != null) {
-          LOGGER.info("No filename-matched XSLT for '{}', using fallback XSLT in AIP documentation", xmlFileName);
+          String level = representationId != null ? "representation" : "package";
+          LOGGER.info("No filename-matched XSLT for '{}', using fallback XSLT at {} level", xmlFileName, level);
         }
         return fallback;
       } finally {
         resources.close();
       }
     } catch (Exception e) {
-      LOGGER.debug("Could not list AIP documentation for {}: {}", aipId, e.getMessage());
+      LOGGER.debug("Could not list documentation for aip={}, rep={}: {}", aipId, representationId, e.getMessage());
     }
     return null;
   }
