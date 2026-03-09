@@ -71,7 +71,7 @@ services:
       - VALIDATOR_URL=none
 
   mailpit:
-    image: axllent/mailpit:v1.24
+    image: axllent/mailpit:v1.29.2
     container_name: mailpit
     restart: unless-stopped
     ports:
