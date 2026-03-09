@@ -494,7 +494,7 @@ public class FilesController implements FileRestService, Exportable {
     @ApiResponse(responseCode = "404", description = "No stylesheet found for this file type", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   ResponseEntity<StreamingResponseBody> previewFileAsHTML(
     @Parameter(description = "The file UUID", required = true) @PathVariable(name = "uuid") String fileUUID,
-    @Parameter(description = "The language for internationalization") @RequestParam(name = "lang", defaultValue = "sv", required = false) String localeString) {
+    @Parameter(description = "The language for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString) {
     return requestHandler.processRequest(new RequestHandler.RequestProcessor<ResponseEntity<StreamingResponseBody>>() {
       @Override
       public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
@@ -518,7 +518,7 @@ public class FilesController implements FileRestService, Exportable {
     @ApiResponse(responseCode = "404", description = "File not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   ResponseEntity<StreamingResponseBody> previewFileWithCustomXSLT(
     @Parameter(description = "The file UUID", required = true) @PathVariable(name = "uuid") String fileUUID,
-    @Parameter(description = "The language for internationalization") @RequestParam(name = "lang", defaultValue = "sv", required = false) String localeString,
+    @Parameter(description = "The language for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString,
     @Parameter(content = @Content(mediaType = "multipart/form-data", schema = @Schema(implementation = MultipartFile.class)), description = "XSLT stylesheet file") @RequestPart(value = "xslt") MultipartFile xsltFile) {
     return requestHandler.processRequest(new RequestHandler.RequestProcessor<ResponseEntity<StreamingResponseBody>>() {
       @Override

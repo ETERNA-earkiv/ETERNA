@@ -2655,4 +2655,18 @@ public interface ClientMessages extends Messages {
 
   String xsltTransformError();
 
+  String xsltLoading();
+
+  String xsltPrintButton();
+
+  String xsltFileTooLarge();
+
+  String xsltTransformFailed();
+
+  String xsltUploadError();
+
+  String xsltTransformTimeout();
+
+  String xsltPrintError();
+
 }

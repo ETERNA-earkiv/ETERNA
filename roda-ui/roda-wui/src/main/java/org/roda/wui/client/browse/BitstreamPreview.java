@@ -546,7 +546,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
       FlowPanel printToolbar = new FlowPanel();
       printToolbar.setStyleName("xmlPreviewToolbar");
 
-      Button printButton = new Button("Skriv ut");
+      Button printButton = new Button(messages.xsltPrintButton());
       printButton.setStyleName("btn btn-play xmlPreviewPrintButton");
       printToolbar.add(printButton);
       panel.add(printToolbar);
@@ -561,7 +561,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
       xsltUpload.getElement().setAttribute("accept", ".xslt,.xsl");
       xsltUpload.setStyleName("xmlPreviewFileInput");
 
-      Button applyButton = new Button("Applicera XSLT");
+      Button applyButton = new Button(messages.applyXsltButton());
       applyButton.setStyleName("btn btn-play xmlPreviewApplyButton");
       applyButton.setEnabled(false);
 
@@ -589,11 +589,13 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
 
       applyButton.addClickHandler(event -> {
         applyButton.setEnabled(false);
-        applyButton.setText("Laddar...");
-        applyCustomXslt(xsltUpload.getElement(), transformUrl, frame.getElement(), applyButton.getElement());
+        applyButton.setText(messages.xsltLoading());
+        applyCustomXslt(xsltUpload.getElement(), transformUrl, frame.getElement(), applyButton.getElement(),
+          messages.applyXsltButton(), messages.xsltFileTooLarge(), messages.xsltTransformFailed(),
+          messages.xsltUploadError(), messages.xsltTransformTimeout());
       });
 
-      printButton.addClickHandler(event -> printIframeContent(frame.getElement()));
+      printButton.addClickHandler(event -> printIframeContent(frame.getElement(), messages.xsltPrintError()));
 
       // Load default XSLT rendering
       RequestBuilder request = new RequestBuilder(RequestBuilder.GET, htmlUrl);
@@ -623,7 +625,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     }
   }
 
-  private native void printIframeContent(com.google.gwt.dom.client.Element iframe) /*-{
+  private native void printIframeContent(com.google.gwt.dom.client.Element iframe, String errorMsg) /*-{
     try {
       var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
       var html = iframeDoc.documentElement.outerHTML;
@@ -641,16 +643,18 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
         printWin.close();
       }, 500);
     } catch (e) {
-      $wnd.alert("Kunde inte skriva ut: " + e.message);
+      $wnd.alert(errorMsg + e.message);
     }
   }-*/;
 
   private native void applyCustomXslt(
     com.google.gwt.dom.client.Element fileInput, String url,
-    com.google.gwt.dom.client.Element iframe, com.google.gwt.dom.client.Element button) /*-{
+    com.google.gwt.dom.client.Element iframe, com.google.gwt.dom.client.Element button,
+    String buttonLabel, String fileTooLargeMsg, String transformFailedMsg,
+    String uploadErrorMsg, String timeoutMsg) /*-{
     var files = fileInput.files;
     if (!files || files.length === 0) {
-      button.innerText = "Applicera XSLT";
+      button.innerText = buttonLabel;
       button.disabled = false;
       return;
     }
@@ -658,7 +662,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     var maxSize = 1024 * 1024;
     if (file.size > maxSize) {
       $wnd.alert("XSLT-filen är för stor (max 1 MB)");
-      button.innerText = "Applicera XSLT";
+      button.innerText = buttonLabel;
       button.disabled = false;
       return;
     }
@@ -671,19 +675,19 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
       if (xhr.status === 200) {
         iframe.setAttribute("srcdoc", xhr.responseText);
       } else {
-        $wnd.alert("XSLT-transformering misslyckades: " + xhr.statusText);
+        $wnd.alert(transformFailedMsg + xhr.statusText);
       }
-      button.innerText = "Applicera XSLT";
+      button.innerText = buttonLabel;
       button.disabled = false;
     };
     xhr.onerror = function() {
-      $wnd.alert("Fel vid uppladdning av XSLT");
-      button.innerText = "Applicera XSLT";
+      $wnd.alert(uploadErrorMsg);
+      button.innerText = buttonLabel;
       button.disabled = false;
     };
     xhr.ontimeout = function() {
       $wnd.alert("XSLT-transformeringen tog för lång tid (timeout 30s)");
-      button.innerText = "Applicera XSLT";
+      button.innerText = buttonLabel;
       button.disabled = false;
     };
     xhr.send(formData);

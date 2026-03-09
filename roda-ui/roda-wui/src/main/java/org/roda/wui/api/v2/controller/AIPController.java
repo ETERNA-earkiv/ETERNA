@@ -18,6 +18,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.LockingException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.aip.AssessmentRequest;
@@ -390,8 +391,26 @@ public class AIPController implements AIPRestService, Exportable {
             RodaConstants.CONTROLLER_METADATA_ID_PARAM, descriptiveMetadataId);
 
           IndexedAIP indexedAIP = requestContext.getIndexService().retrieve(IndexedAIP.class, aipId,
-            RodaConstants.REPRESENTATION_FIELDS_TO_RETURN);
+            RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
           controllerAssistant.checkObjectPermissions(requestContext.getUser(), indexedAIP);
+
+          // Validate XSLT file size (max 1 MB)
+          long maxXsltSize = 1024 * 1024;
+          if (xsltFile.getSize() > maxXsltSize) {
+            throw new RequestNotValidException("XSLT file exceeds maximum size of 1 MB");
+          }
+
+          // Validate XSLT is well-formed XML
+          try (java.io.InputStream validationStream = xsltFile.getInputStream()) {
+            javax.xml.stream.XMLInputFactory xmlFactory = javax.xml.stream.XMLInputFactory.newInstance();
+            xmlFactory.setProperty(javax.xml.stream.XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+            xmlFactory.setProperty(javax.xml.stream.XMLInputFactory.SUPPORT_DTD, false);
+            javax.xml.stream.XMLStreamReader xmlReader = xmlFactory.createXMLStreamReader(validationStream);
+            while (xmlReader.hasNext()) { xmlReader.next(); }
+            xmlReader.close();
+          } catch (Exception e) {
+            throw new RequestNotValidException("Uploaded file is not valid XML: " + e.getMessage());
+          }
 
           StreamResponse streamResponse = aipService.transformDescriptiveMetadataWithCustomXslt(requestContext,
             aipId, descriptiveMetadataId, xsltFile.getInputStream(), localeString);

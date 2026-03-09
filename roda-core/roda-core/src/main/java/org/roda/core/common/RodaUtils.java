@@ -149,18 +149,22 @@ public class RodaUtils {
   /**
    * Executes an XSLT transformation with a timeout to prevent infinite loops.
    */
+  private static final ExecutorService XSLT_EXECUTOR = Executors.newFixedThreadPool(
+    Math.max(2, Runtime.getRuntime().availableProcessors()),
+    r -> { Thread t = new Thread(r, "xslt-transform"); t.setDaemon(true); return t; });
+
   private static void transformWithTimeout(XsltTransformer transformer) throws GenericException {
-    ExecutorService executor = Executors.newSingleThreadExecutor();
+    Future<?> future = XSLT_EXECUTOR.submit(() -> {
+      try {
+        transformer.transform();
+      } catch (SaxonApiException e) {
+        throw new RuntimeException(e);
+      }
+    });
     try {
-      Future<?> future = executor.submit(() -> {
-        try {
-          transformer.transform();
-        } catch (SaxonApiException e) {
-          throw new RuntimeException(e);
-        }
-      });
       future.get(XSLT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     } catch (TimeoutException e) {
+      future.cancel(true);
       throw new GenericException("XSLT transformation timed out after " + XSLT_TIMEOUT_SECONDS + " seconds");
     } catch (java.util.concurrent.ExecutionException e) {
       Throwable cause = e.getCause();
@@ -171,8 +175,6 @@ public class RodaUtils {
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       throw new GenericException("XSLT transformation interrupted", e);
-    } finally {
-      executor.shutdownNow();
     }
   }
 
