@@ -211,8 +211,9 @@ public class AIPDescriptiveMetadataTabs extends Tabs {
               '<div class="descriptiveMetadataHTML">' + xhr.responseText + '</div>');
           } else {
             var errorMsg = xhr.responseText || 'Error transforming metadata';
+            var escaped = errorMsg.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
             metadataHTML.@com.google.gwt.user.client.ui.HTML::setHTML(Ljava/lang/String;)(
-              '<div class="error"><pre>' + errorMsg + '</pre></div>');
+              '<div class="error"><pre>' + escaped + '</pre></div>');
           }
         };
         xhr.onerror = function() {

@@ -586,6 +586,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
       // Iframe for rendered HTML
       Frame frame = new Frame();
       frame.setStyleName("viewRepresentationHtmlFilePreview");
+      frame.getElement().setAttribute("sandbox", "allow-same-origin");
 
       applyButton.addClickHandler(event -> {
         applyButton.setEnabled(false);
