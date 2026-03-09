@@ -79,18 +79,22 @@ services:
       - "8025:8025" # web ui
 
   openldap:
-    image: osixia/openldap:1.5.0
+    image: vegardit/openldap:latest
     container_name: openldap
     restart: unless-stopped
     ports:
       - "1389:389"
       - "1636:636"
     environment:
-      - LDAP_ORGANISATION=RODA
-      - LDAP_DOMAIN=roda.org
-      - LDAP_ADMIN_PASSWORD=eterna
-      - LDAP_TLS=false
-    command: --copy-service
+      - LDAP_INIT_ORG_DN=DC=roda,DC=org
+      - LDAP_INIT_ORG_NAME=RODA
+      - LDAP_INIT_ROOT_USER_DN=cn=admin,dc=roda,dc=org
+      - LDAP_INIT_ROOT_USER_PW=eterna
+      - LDAP_TLS_ENABLED=false
+    volumes:
+      - ./ldap/ldifs/init_org_tree.ldif:/opt/ldifs/init_org_tree.ldif:ro
+      - ./ldap/ldifs/init_org_entries.ldif:/opt/ldifs/init_org_entries.ldif:ro
+      - ./ldap/ldifs/init_org_ppolicy.ldif:/opt/ldifs/init_org_ppolicy.ldif:ro
 
   postgres:
     image: postgres:17
