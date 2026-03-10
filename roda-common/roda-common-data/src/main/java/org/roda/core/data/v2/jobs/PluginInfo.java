@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * This class contains information about a plugin.
@@ -249,6 +250,7 @@ public class PluginInfo implements Serializable {
     isInstalled = installed;
   }
 
+  @JsonProperty("hasLicenseFile")
   public Boolean hasLicenseFile() {
     return hasLicenseFile;
   }
@@ -265,6 +267,7 @@ public class PluginInfo implements Serializable {
     this.licenseFilePath = licenseFilePath;
   }
 
+  @JsonProperty("hasDocumentationFile")
   public Boolean hasDocumentationFile() {
     return hasDocumentationFile;
   }
@@ -288,4 +291,7 @@ public class PluginInfo implements Serializable {
   public void setMarketInfo(MarketInfo marketInfo) {
     this.marketInfo = marketInfo;
   }
+
+
+
 }
