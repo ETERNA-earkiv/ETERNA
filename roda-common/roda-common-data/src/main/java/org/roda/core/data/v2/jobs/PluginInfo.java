@@ -291,7 +291,4 @@ public class PluginInfo implements Serializable {
   public void setMarketInfo(MarketInfo marketInfo) {
     this.marketInfo = marketInfo;
   }
-
-
-
 }
