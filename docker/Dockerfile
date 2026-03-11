@@ -31,7 +31,7 @@ RUN set -ex; \
     chmod g-s /usr/bin/chage && \
     chmod g-s /sbin/unix_chkpwd && \
     chmod g-s /sbin/unix2_chkpwd && \
-    chmod g-s /usr/lib/utempter/utempter
+    chmod g-s /usr/lib/utempter/utempter 
 
 
 # Copy Tomcat from the official image (maintains /usr/local/tomcat layout)
@@ -66,7 +66,8 @@ RUN set -ex; \
     echo "core.plugins.internal.virus_check.clamav.get_version = clamdscan --version" >> config/roda-core.properties && \
     echo "core.tools.siegfried.mode = server" >> config/roda-core.properties && \
     zip -q /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/roda-core-*.jar config/roda-core.properties && \
-    zypper clean -a
+    zypper clean -a && \
+    rm -f /usr/bin/container-suseconnect
 
 ENV RODA_HOME=/roda \
     SIEGFRIED_MODE=server \
