@@ -5,6 +5,9 @@ on:
     - cron: '*/15 * * * *'   # Kör var 15:e minut
   workflow_dispatch:          # Kan också triggas manuellt
 
+permissions:
+  contents: read
+
 jobs:
   sync:
     runs-on: ubuntu-latest
