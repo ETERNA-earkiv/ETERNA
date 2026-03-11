@@ -92,4 +92,7 @@ WORKDIR $RODA_HOME
 
 USER "$RODA_UID"
 
+HEALTHCHECK --interval=30s --timeout=10s --retries=5 --start-period=60s \
+  CMD curl -f http://localhost:8080/api/openapi.json || exit 1
+
 ENTRYPOINT ["/docker-entrypoint.sh"]
