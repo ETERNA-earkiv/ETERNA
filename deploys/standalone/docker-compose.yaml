@@ -1,6 +1,6 @@
 services:
   zoo:
-    image: docker.io/zookeeper:3.9.2-jre-17
+    image: docker.io/zookeeper:3.9.4-jre-17
     restart: unless-stopped
     environment:
       - ZOO_4LW_COMMANDS_WHITELIST=mntr,conf,ruok
@@ -35,7 +35,7 @@ services:
       - siegfried_data:/root/siegfried/
       - roda_data:/roda/data/
   swagger:
-    image: docker.io/swaggerapi/swagger-ui:latest
+    image: docker.io/swaggerapi/swagger-ui:v5.32.0
     restart: on-failure
     ports:
       - "8081:8080"
@@ -44,7 +44,7 @@ services:
       - DOC_EXPANSION=none
       - VALIDATOR_URL=none
   eterna:
-    image: ghcr.io/eterna-earkiv/eterna:0.6.0-SNAPSHOT
+    image: ghcr.io/eterna-earkiv/eterna:v0.5.0
     restart: unless-stopped
     ports:
       - "8080:8080"

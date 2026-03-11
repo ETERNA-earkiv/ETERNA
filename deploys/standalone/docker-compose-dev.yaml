@@ -1,6 +1,6 @@
 services:
   zoo:
-    image: docker.io/zookeeper:3.9.2-jre-17
+    image: docker.io/zookeeper:3.9.4-jre-17
     restart: unless-stopped
     ports:
       - "2181:2181"
@@ -52,7 +52,7 @@ services:
       # Mapping /tmp to enable usage with local testing via mvn test
       - /tmp:/tmp:ro
   swagger:
-    image: docker.io/swaggerapi/swagger-ui:latest
+    image: docker.io/swaggerapi/swagger-ui:v5.32.0
     restart: on-failure
     ports:
       - "8081:8080"
