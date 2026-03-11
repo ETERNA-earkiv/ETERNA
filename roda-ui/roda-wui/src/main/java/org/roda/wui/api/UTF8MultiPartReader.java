@@ -25,7 +25,7 @@ import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.MultiPart;
 import org.glassfish.jersey.media.multipart.MultiPartProperties;
-import org.glassfish.jersey.media.multipart.internal.LocalizationMessages;
+import org.glassfish.jersey.media.multipart.internal.l10n.LocalizationMessages;
 import org.glassfish.jersey.message.internal.MediaTypes;
 import org.jvnet.mimepull.Header;
 import org.jvnet.mimepull.MIMEConfig;

@@ -443,10 +443,6 @@
 			<groupId>org.eclipse.angus</groupId>
 			<artifactId>angus-mail</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.glassfish.jersey.bundles</groupId>
-			<artifactId>jaxrs-ri</artifactId>
-		</dependency>
 
 		<dependency>
 			<groupId>io.dropwizard.metrics</groupId>
