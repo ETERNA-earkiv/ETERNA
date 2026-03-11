@@ -1,4 +1,4 @@
-name: Sync GitHub Projects order → Linear
+name: 'Sync GitHub Projects order to Linear'
 
 on:
   schedule:
