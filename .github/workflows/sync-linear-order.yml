@@ -1,0 +1,27 @@
+name: 'Sync GitHub Projects order to Linear'
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'   # Kör var 15:e minut
+  workflow_dispatch:          # Kan också triggas manuellt
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Sync order
+        run: node .github/scripts/sync-linear-order.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PROJECT_TOKEN }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          GITHUB_PROJECT_NUMBER: ${{ vars.GH_PROJECT_NUMBER }}
+          GITHUB_ORG: ${{ vars.GH_ORG }}
