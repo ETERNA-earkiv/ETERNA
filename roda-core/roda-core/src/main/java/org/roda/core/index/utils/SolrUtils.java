@@ -144,6 +144,13 @@ public class SolrUtils {
   public static final String COMMON = "common";
   public static final String CONF = "conf";
   public static final String SCHEMA = "managed-schema.xml";
+  // This is a workaround to get the ancestors of an AIP in the same query, without having to do a separate query for each result
+  private static final String ANCESTOR_SUBQUERY_ALIAS = "allAncestorList";
+  private static final String ANCESTOR_SUBQUERY_FIELD = ANCESTOR_SUBQUERY_ALIAS + ":[subquery]";
+  private static final String ANCESTOR_SUBQUERY_PARAM = ANCESTOR_SUBQUERY_ALIAS + ".q";
+  private static final String ANCESTOR_SUBQUERY_FIELDS_PARAM = ANCESTOR_SUBQUERY_ALIAS + ".fl";
+  private static final String ANCESTOR_SUBQUERY = "{!terms f=id v=$row." + RodaConstants.AIP_ANCESTORS + "}";
+  private static final String ANCESTOR_SUBQUERY_RETURN_FIELDS = "id,title";
 
   private SolrUtils() {
     // do nothing
@@ -352,13 +359,14 @@ public class SolrUtils {
     query.setStart(sublist.getFirstElementIndex());
     query.setRows(sublist.getMaximumElementCount());
     List<String> fl = new ArrayList<>(fieldsToReturn);
-    if (!fl.contains("ancestors")) {
-      fl.add("ancestors");
+    if (!fl.contains(RodaConstants.AIP_ANCESTORS)) {
+      fl.add(RodaConstants.AIP_ANCESTORS);
     }
-    fl.add("allAncestorList:[subquery]");
+    fl.add(ANCESTOR_SUBQUERY_FIELD);
+
     query.setFields(fl.toArray(new String[0]));
-    query.set("allAncestorList.q", "{!terms f=id v=$row.ancestors}");
-    query.set("allAncestorList.fl", "id,title");
+    query.set(ANCESTOR_SUBQUERY_PARAM, ANCESTOR_SUBQUERY);
+    query.set(ANCESTOR_SUBQUERY_FIELDS_PARAM, ANCESTOR_SUBQUERY_RETURN_FIELDS);
     parseAndConfigureFacets(facets, query);
     if (hasPermissionFilters(classToRetrieve)) {
       query.addFilterQuery(getFilterQueries(user, justActive, classToRetrieve));
