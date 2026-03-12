@@ -5,6 +5,9 @@
 - Added missing `[one]` pluralization keys in Swedish localization file and corrected a typo
 - Replaced Unicode escapes with literal HTML tags in Swedish client messages
 
+### Improvements
+- Added a Path column to the Move/Search AIP popup to display the full hierarchy of each AIP. This helps users clearly distinguish between AIPs with identical Level and Title, reducing confusion when selecting a target AIP for move operations.
+
 ## v0.5.0 (2025-12-16)
 #### Updates
 - Added Swedish and English SVG credentials images
