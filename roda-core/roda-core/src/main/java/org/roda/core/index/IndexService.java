@@ -173,8 +173,12 @@ public class IndexService {
   public <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter, Sublist sublist,
     Facets facets, User user, boolean justActive, final List<String> fieldsToReturn)
     throws GenericException, RequestNotValidException {
+    boolean includeAipFullPath = IndexedAIP.class.equals(returnClass)
+            && fieldsToReturn != null
+            && fieldsToReturn.contains(RodaConstants.AIP_ANCESTORS_LIST);
+
     return SolrUtils.find(getSolrClient(), returnClass, filter, sorter, sublist, facets, user, justActive,
-      fieldsToReturn);
+            fieldsToReturn, includeAipFullPath);
   }
 
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,

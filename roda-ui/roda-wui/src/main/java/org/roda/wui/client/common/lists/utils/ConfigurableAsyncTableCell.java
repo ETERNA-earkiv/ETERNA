@@ -19,15 +19,7 @@ import java.util.stream.Collectors;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.sort.Sorter;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.DIP;
-import org.roda.core.data.v2.ip.HasDisposal;
-import org.roda.core.data.v2.ip.HasPermissions;
-import org.roda.core.data.v2.ip.HasState;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.*;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.common.lists.utils.ColumnOptions.RenderingHint;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -105,39 +97,44 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
           return null;
         }
         @SuppressWarnings("unchecked")
-        List<String> ancestors = (List<String>) aip.getFields().get(RodaConstants.AIP_ANCESTORS);
-        @SuppressWarnings("unchecked")
-        List<Map<String, Object>> pathDocs = (List<Map<String, Object>>) aip.getFields().get("path_docs");
+        List<String> ancestors = aip.getAncestors();
+        String currentAipName = getDisplayName(aip.getTitle(), aip.getId());
+
         if (ancestors == null || ancestors.isEmpty()) {
-          return aip.getTitle() != null && !aip.getTitle().trim().isEmpty() ? "root/" + aip.getTitle() : "root/" + aip.getId();
+          return "root/" + currentAipName;
         }
-        List<String> pathParts = new ArrayList<>();
+
         Map<String, String> ancestorTitles = new HashMap<>();
+        List<ParentAncestorMap> pathDocs = aip.getParentAncestorsList();
+
         if (pathDocs != null) {
-          for (Map<String, Object> pathDoc : pathDocs) {
-            String id = (String) pathDoc.get("id");
-            String title = (String) pathDoc.get("title");
+          for (ParentAncestorMap pathDoc : pathDocs) {
+            String id = pathDoc.getAncestorId();
             if (id != null) {
-              ancestorTitles.put(id, title != null && !title.trim().isEmpty() ? title : id);
+              ancestorTitles.put(id, getDisplayName(pathDoc.getTitle(), id));
             }
           }
         }
-        List<String> reversedAncestors = new ArrayList<>(ancestors);
-        Collections.reverse(reversedAncestors);
+
+        List<String> pathParts = new ArrayList<>(ancestors.size() + 2);
         pathParts.add("root");
-        for (String ancestorId : reversedAncestors) {
-          String ancestorName = ancestorTitles.get(ancestorId);
-          if (ancestorName == null) {
-            ancestorName = ancestorId; // Fallback to ID if title not available
-          }
-          pathParts.add(ancestorName);
+
+        for (int i = ancestors.size() - 1; i >= 0; i--) {
+          String ancestorId = ancestors.get(i);
+          pathParts.add(ancestorTitles.getOrDefault(ancestorId, ancestorId));
         }
-        String currentAipName = aip.getTitle() != null && !aip.getTitle().trim().isEmpty() ? aip.getTitle() : aip.getId();
+
         pathParts.add(currentAipName);
         return StringUtils.join(pathParts, " / ");
       }
+
+      private String getDisplayName(String title, String fallback) {
+        return title != null && !title.trim().isEmpty() ? title : fallback;
+      }
     });
-    DEFAULT_COLUMNS_FIELDS.put("default_IndexedAIP_path", Arrays.asList("path", "path_docs", RodaConstants.AIP_ANCESTORS, RodaConstants.AIP_TITLE));
+
+    DEFAULT_COLUMNS_FIELDS.put("default_IndexedAIP_path",
+            Arrays.asList("path", RodaConstants.AIP_ANCESTORS_LIST, RodaConstants.AIP_ANCESTORS, RodaConstants.AIP_TITLE));
     /********************************************
      * Representations
      ********************************************/
@@ -322,10 +319,9 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
     if (IndexedAIP.class.equals(options.getClassToReturn()) &&
             "SelectAipDialog_AIPs".equals(options.getListId())) {
       fieldsToReturn.add("path");
-      fieldsToReturn.add("path_docs");
-      fieldsToReturn.add(RodaConstants.AIP_ANCESTORS); // Needed for path calculation
-      fieldsToReturn.add(RodaConstants.AIP_ANCESTORS); // Needed for path calculation
-      fieldsToReturn.add(RodaConstants.AIP_TITLE); // Needed for current AIP title
+      fieldsToReturn.add(RodaConstants.AIP_ANCESTORS_LIST);
+      fieldsToReturn.add(RodaConstants.AIP_ANCESTORS);
+      fieldsToReturn.add(RodaConstants.AIP_TITLE);
     }
 
     // if index object has permissions, add permissions fields

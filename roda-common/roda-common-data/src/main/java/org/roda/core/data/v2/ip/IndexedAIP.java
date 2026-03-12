@@ -96,6 +96,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
 
   private String disposalConfirmationId = null;
 
+  private List<ParentAncestorMap> parentAncestorsList = null;
   /**
    * Constructs an empty (<strong>invalid</strong>) {@link IndexedAIP}.
    */
@@ -118,7 +119,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
       other.getRetentionPeriodDuration(), other.getRetentionPeriodInterval(), other.getRetentionPeriodStartDate(),
       other.getRetentionPeriodDetails(), other.getRetentionPeriodState(), other.getDisposalHoldsId(),
       other.getTransitiveDisposalHoldsId(), other.getDestroyedOn(), other.getDestroyedBy(),
-      other.getDisposalConfirmationId(), other.getScheduleAssociationType());
+      other.getDisposalConfirmationId(), other.getScheduleAssociationType(), other.getParentAncestorsList());
   }
 
   /**
@@ -140,7 +141,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
     String disposalScheduleName, Integer retentionPeriodDuration, RetentionPeriodIntervalCode retentionPeriodInterval,
     Date retentionPeriodStartDate, String retentionPeriodDetails, RetentionPeriodCalculation retentionPeriodCalculation,
     List<String> disposalHoldsId, List<String> transitiveDisposalHoldsId, Date destroyedOn, String destroyedBy,
-    String disposalConfirmationId, AIPDisposalScheduleAssociationType scheduleAssociationType) {
+    String disposalConfirmationId, AIPDisposalScheduleAssociationType scheduleAssociationType, List<ParentAncestorMap> parentAncestorsList) {
     super();
     this.id = id;
     this.state = state;
@@ -174,6 +175,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
     this.destroyedBy = destroyedBy;
     this.disposalConfirmationId = disposalConfirmationId;
     this.scheduleAssociationType = scheduleAssociationType;
+    this.parentAncestorsList = parentAncestorsList;
   }
 
   public Long getNumberOfSubmissionFiles() {
@@ -570,6 +572,14 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
 
   public void setFields(Map<String, Object> fields) {
     this.fields = fields;
+  }
+
+  public List<ParentAncestorMap> getParentAncestorsList() {
+    return parentAncestorsList;
+  }
+
+  public void setParentAncestorsList(List<ParentAncestorMap> parentAncestorsList) {
+    this.parentAncestorsList = parentAncestorsList;
   }
 
   @Override

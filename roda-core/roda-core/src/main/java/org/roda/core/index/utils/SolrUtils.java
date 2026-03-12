@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -100,18 +101,8 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.AIPState;
-import org.roda.core.data.v2.ip.DIP;
-import org.roda.core.data.v2.ip.DIPFile;
-import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.HasPermissionFilters;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.*;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
-import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.RetentionPeriodCalculation;
@@ -322,8 +313,37 @@ public class SolrUtils {
   }
 
   public static <T extends IsIndexed> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve, Filter filter,
-    Sorter sorter, Sublist sublist, Facets facets, User user, boolean justActive, List<String> fieldsToReturn)
+                                                          Sorter sorter, Sublist sublist, Facets facets, User user, boolean justActive, List<String> fieldsToReturn)
+          throws GenericException, RequestNotValidException {
+    IndexResult<T> ret;
+    SolrQuery query = new SolrQuery();
+    query.setParam("q.op", DEFAULT_QUERY_PARSER_OPERATOR);
+    query.setQuery(parseFilter(filter));
+    query.setSorts(parseSorter(sorter));
+    query.setStart(sublist.getFirstElementIndex());
+    query.setRows(sublist.getMaximumElementCount());
+    query.setFields(fieldsToReturn.toArray(new String[fieldsToReturn.size()]));
+    parseAndConfigureFacets(facets, query);
+    if (hasPermissionFilters(classToRetrieve)) {
+      query.addFilterQuery(getFilterQueries(user, justActive, classToRetrieve));
+    }
+
+    try {
+      QueryResponse response = query(index, classToRetrieve, query);
+      ret = queryResponseToIndexResult(response, classToRetrieve, facets, fieldsToReturn);
+    } catch (NotSupportedException e) {
+      throw new GenericException("Could not query index", e);
+    }
+    return ret;
+  }
+
+  public static <T extends IsIndexed> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve, Filter filter,
+    Sorter sorter, Sublist sublist, Facets facets, User user, boolean justActive, List<String> fieldsToReturn, boolean includeAipFullPath)
     throws GenericException, RequestNotValidException {
+
+    if (!includeAipFullPath) {
+      return find(index, classToRetrieve, filter, sorter, sublist, facets, user, justActive, fieldsToReturn);
+    }
     IndexResult<T> ret;
     SolrQuery query = new SolrQuery();
     query.setParam("q.op", DEFAULT_QUERY_PARSER_OPERATOR);
@@ -335,10 +355,10 @@ public class SolrUtils {
     if (!fl.contains("ancestors")) {
       fl.add("ancestors");
     }
-    fl.add("path_docs:[subquery]");
+    fl.add("allAncestorList:[subquery]");
     query.setFields(fl.toArray(new String[0]));
-    query.set("path_docs.q", "{!terms f=id v=$row.ancestors}");
-    query.set("path_docs.fl", "id,title");
+    query.set("allAncestorList.q", "{!terms f=id v=$row.ancestors}");
+    query.set("allAncestorList.fl", "id,title");
     parseAndConfigureFacets(facets, query);
     if (hasPermissionFilters(classToRetrieve)) {
       query.addFilterQuery(getFilterQueries(user, justActive, classToRetrieve));
@@ -1773,5 +1793,18 @@ public class SolrUtils {
     }
 
     return disposalSchedule;
+  }
+
+  public static List<ParentAncestorMap> objectToParentAncestorList(SolrDocumentList solrDocumentList){
+    List<ParentAncestorMap> parentAncestorMapList = null;
+    if(!solrDocumentList.isEmpty()){
+      parentAncestorMapList =  solrDocumentList.stream().map(c -> {
+        ParentAncestorMap map = new ParentAncestorMap();
+        map.setAncestorId((String) c.get("id"));
+        map.setTitle((String) c.get("title"));
+        return map;
+      }).collect(Collectors.toList());
+    }
+    return parentAncestorMapList;
   }
 }

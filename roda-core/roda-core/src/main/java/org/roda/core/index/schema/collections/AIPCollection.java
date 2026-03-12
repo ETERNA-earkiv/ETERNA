@@ -24,10 +24,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.AIPDisposalScheduleAssociationType;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.*;
 import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.RetentionPeriodCalculation;
@@ -354,7 +351,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
       .objectToString(doc.get(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_DETAILS), null);
     final RetentionPeriodCalculation retentionPeriodCalculation = SolrUtils.objectToEnum(
       doc.get(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_CALCULATION), RetentionPeriodCalculation.class, null);
-
+    final List<ParentAncestorMap> parentAncestorsList;
     String level;
     if (ghost) {
       level = RodaConstants.AIP_GHOST;
@@ -395,16 +392,10 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     ret.setOnHold(disposalHoldStatus);
     ret.setDisposalConfirmationId(disposalConfirmationId);
     ret.setDisposalScheduleAssociationType(aipDisposalScheduleAssociationType);
-    if (fieldsToReturn.contains("path_docs") && doc.get("path_docs") instanceof SolrDocumentList) {
-      SolrDocumentList pathDocsList = (SolrDocumentList) doc.get("path_docs");
-      List<Map<String, Object>> serializablePathDocs = new ArrayList<>();
-      for (SolrDocument pathDoc : pathDocsList) {
-        Map<String, Object> pathDocMap = new HashMap<>();
-        pathDocMap.put("id", pathDoc.get("id"));
-        pathDocMap.put("title", pathDoc.get("title"));
-        serializablePathDocs.add(pathDocMap);
-      }      
-      ret.getFields().put("path_docs", serializablePathDocs);
+    if (fieldsToReturn.contains(RodaConstants.AIP_ANCESTORS_LIST) && doc.get(RodaConstants.AIP_ANCESTORS_LIST) instanceof SolrDocumentList) {
+      parentAncestorsList = SolrUtils.objectToParentAncestorList((SolrDocumentList) doc.get(RodaConstants.AIP_ANCESTORS_LIST));
+      ret.setParentAncestorsList(parentAncestorsList);
+      ret.getFields().remove(RodaConstants.AIP_ANCESTORS_LIST);
     }
 
     return ret;

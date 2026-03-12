@@ -1001,7 +1001,7 @@ public final class RodaConstants {
   public static final String AIP_DISPOSAL_RETENTION_PERIOD_INTERVAL = "retentionPeriodInterval";
   public static final String AIP_DISPOSAL_RETENTION_PERIOD_DETAILS = "retentionPeriodDetails";
   public static final String AIP_DISPOSAL_RETENTION_PERIOD_CALCULATION = "retentionPeriodCalculation";
-
+  public static final String AIP_ANCESTORS_LIST = "allAncestorList";
   // AIP types
   public static final String AIP_TYPE_MIXED = "MIXED";
 
