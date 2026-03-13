@@ -33,7 +33,15 @@
   <script>
     var source = new URLSearchParams(window.location.search).get('source');
     if (source) {
-      document.getElementById('viewer').setAttribute('source', source);
+      // Validate that source is a safe relative path on the same origin
+      try {
+        var resolved = new URL(source, window.location.origin);
+        if (resolved.origin === window.location.origin && /\.(warc|warc\.gz|wacz)$/i.test(resolved.pathname)) {
+          document.getElementById('viewer').setAttribute('source', resolved.pathname + resolved.search);
+        }
+      } catch (e) {
+        // Invalid URL — ignore
+      }
     }
   </script>
 </body>
