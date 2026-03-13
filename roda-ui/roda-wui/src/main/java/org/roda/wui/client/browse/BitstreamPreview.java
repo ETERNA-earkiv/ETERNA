@@ -59,6 +59,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   private static final String VIEWER_TYPE_PDF = "pdf";
   private static final String VIEWER_TYPE_IMAGE = "image";
   private static final String VIEWER_TYPE_TIFF = "tiff";
+  private static final String VIEWER_TYPE_WEBARCHIVE = "webarchive";
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -184,6 +185,8 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
         tiffCanvasPreview();
       } else if (type.equals(VIEWER_TYPE_PDF)) {
         pdfPreview();
+      } else if (type.equals(VIEWER_TYPE_WEBARCHIVE)) {
+        webarchivePreview();
       } else if (type.equals(VIEWER_TYPE_TEXT)) {
         textPreview();
       } else if (type.equals(VIEWER_TYPE_HTML)) {
@@ -280,6 +283,18 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
 
     panel.add(frame);
     frame.setStyleName("viewRepresentationPDFFilePreview");
+  }
+
+  private void webarchivePreview() {
+    String sourceUrl = GWT.getHostPageBaseURL() + bitstreamDownloadUri.asString();
+
+    String viewerUrl = GWT.getHostPageBaseURL() + "replay-viewer.html?source=" + encode(sourceUrl);
+
+    final Frame frame = new Frame(viewerUrl);
+    frame.addLoadHandler(ev -> JavascriptUtils.runIframeResizer(frame.getElement()));
+
+    panel.add(frame);
+    frame.setStyleName("viewRepresentationWebArchiveFilePreview");
   }
 
   private void textPreview() {
