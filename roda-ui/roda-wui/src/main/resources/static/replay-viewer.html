@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <title>Web Archive Viewer</title>
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+    replay-web-page { display: block; width: 100%; height: 100vh; }
+  </style>
+  <script>
+    // Derive base path from this page's location (works with any context path)
+    var basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+    var replayBase = basePath + 'replay/';
+
+    // Clean up stale replay service workers only (not other SWs on same origin)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        registrations.forEach(function(reg) {
+          if (reg.scope.includes('/replay') && reg.scope !== new URL(replayBase, window.location.origin).href) {
+            reg.unregister();
+          }
+        });
+      });
+    }
+  </script>
+</head>
+<body>
+  <script src="replay/ui.js"></script>
+  <replay-web-page id="viewer"></replay-web-page>
+  <script>
+    document.getElementById('viewer').setAttribute('replayBase', replayBase);
+  </script>
+  <script>
+    var source = new URLSearchParams(window.location.search).get('source');
+    if (source) {
+      document.getElementById('viewer').setAttribute('source', source);
+    }
+  </script>
+</body>
+</html>
