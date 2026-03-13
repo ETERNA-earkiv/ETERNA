@@ -85,30 +85,28 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
   private final AIPState state;
   private final IndexedFile parentFolder;
   private final Permissions permissions;
-  private final String representationUUID;
 
   private FileToolbarActions(String aipId, String representationId, AIPState state, IndexedFile parentFolder,
-    Permissions permissions, String representationUUID) {
+    Permissions permissions) {
     this.aipId = aipId;
     this.representationId = representationId;
     this.state = state;
     this.permissions = permissions;
     this.parentFolder = parentFolder != null && parentFolder.isDirectory() ? parentFolder : null;
-    this.representationUUID = representationUUID;
   }
 
-  public static FileToolbarActions get(String aipId, String representationId, Permissions permissions, String representationUUID) {
-    return new FileToolbarActions(aipId, representationId, null, null, permissions, representationUUID);
+  public static FileToolbarActions get(String aipId, String representationId, Permissions permissions) {
+    return new FileToolbarActions(aipId, representationId, null, null, permissions);
   }
 
   public static FileToolbarActions get(String aipId, String representationId, AIPState state, IndexedFile parentFolder,
-    Permissions permissions, String representationUUID) {
-    return new FileToolbarActions(aipId, representationId, state, parentFolder, permissions, representationUUID);
+    Permissions permissions) {
+    return new FileToolbarActions(aipId, representationId, state, parentFolder, permissions);
   }
 
   public static FileToolbarActions getWithoutNoFileActions(String aipId, String representationId,
-    IndexedFile parentFolder, Permissions permissions, String representationUUID) {
-    return new FileToolbarActions(aipId, representationId, null, parentFolder, permissions, representationUUID) {
+    IndexedFile parentFolder, Permissions permissions) {
+    return new FileToolbarActions(aipId, representationId, null, parentFolder, permissions) {
       @Override
       public CanActResult contextCanAct(Action<IndexedFile> action) {
         return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
@@ -249,7 +247,7 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
   }
 
   // ACTIONS
-  private void redactPdf(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
+    private void redactPdf(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     if (!FileFormatSharedUtils.hasFileFormat(file, "application/pdf", "pdf")) {
       Dialogs.showInformationDialog("Error!", "Can only redact PDF-files.", "Ok", false);
       callback.onSuccess(ActionImpact.NONE);
@@ -257,17 +255,17 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
     }
 
     String aipId = file.getAipId();
-    String repUUID = file.getRepresentationUUID() != null ? file.getRepresentationUUID() : this.representationUUID;
+    String representatioId = file.getRepresentationId();
     String fileId = file.getId();
     List<String> path = file.getPath() != null ? file.getPath() : Collections.emptyList();
 
-    if (aipId == null || repUUID == null || fileId == null) {
-      Toast.showError("Cannot redact PDF: Missing required identifiers (AIP: " + aipId + ", Rep: " + repUUID + ", File: " + fileId + ")");
+    if (aipId == null || representatioId == null || fileId == null) {
+      Toast.showError("Cannot redact PDF: Missing required identifiers (AIP: " + aipId + ", Rep: " + representatioId + ", File: " + fileId + ")");
       return;
     }
 
     List<String> historyItems = ListUtils.concat(
-            ListUtils.concat(Arrays.asList(aipId, repUUID), path), fileId);
+            ListUtils.concat(Arrays.asList(aipId, representatioId), path), fileId);
 
     callback.onSuccess(ActionImpact.NONE);
     HistoryUtils.newHistory(PDFRedactor.RESOLVER, historyItems.toArray(new String[0]));

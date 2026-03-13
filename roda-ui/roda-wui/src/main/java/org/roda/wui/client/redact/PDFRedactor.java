@@ -10,7 +10,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
+import config.i18n.client.ClientMessages;
+import org.roda.core.data.v2.index.IndexedRepresentationRequest;
 import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.common.client.widgets.Toast;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 import elemental2.dom.Blob;
 import elemental2.dom.FormData;
@@ -42,8 +45,6 @@ import org.roda.wui.client.main.Theme;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.RestUtils;
-import org.roda.wui.common.client.widgets.Toast;
-import config.i18n.client.ClientMessages;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -180,8 +181,7 @@ public class PDFRedactor extends Composite {
         String uploadUrl = RestUtils.createFileUploadUri(aipId, representation.getId(), path, "Saved redacted version");
 
         FormData formData = new FormData();
-        String fileName = file.getOriginalName() != null ? file.getOriginalName() : file.getId();
-        formData.append("resource", pdfData, fileName);
+        formData.append("resource", pdfData, file.getId());
 
         RequestInit requestInit = RequestInit.create();
         requestInit.setMethod("POST");
@@ -190,6 +190,8 @@ public class PDFRedactor extends Composite {
         fetch(uploadUrl, requestInit).then(response -> {
           if (response.ok) {
             Toast.showInfo(messages.redactPdfToastTitle(), messages.redactPdfSaveSuccessDescription());
+          } else if (response.status == RodaConstants.HTTP_RESPONSE_CODE_REQUEST_CONFLICT) {
+            Toast.showError(messages.redactPdfToastTitle(), messages.fileAlreadyExists());
           } else {
             Toast.showError(messages.redactPdfToastTitle(), messages.redactPdfSaveErrorDescription());
           }
@@ -198,7 +200,6 @@ public class PDFRedactor extends Composite {
           Toast.showError(messages.redactPdfToastTitle(), messages.redactPdfSaveErrorDescription());
           return null;
         });
-
         return null;
       });
 
@@ -318,8 +319,9 @@ public class PDFRedactor extends Composite {
       final String fileId = historyTokens.get(historyTokens.size() - 1);
 
       Services services = new Services("Retrieve file for PDF redactor", "get");
-      services.rodaEntityRestService(
-        s -> s.findByUuid(representationId, LocaleInfo.getCurrentLocale().getLocaleName()), IndexedRepresentation.class)
+      IndexedRepresentationRequest repFindRequest = new IndexedRepresentationRequest(aipId, representationId);
+      services.representationResource(
+        s -> s.retrieveIndexedRepresentationViaRequest(repFindRequest))
         .whenComplete((indexedRepresentation, throwableRep) -> {
           if (throwableRep != null) {
             AsyncCallbackUtils.defaultFailureTreatment(throwableRep);

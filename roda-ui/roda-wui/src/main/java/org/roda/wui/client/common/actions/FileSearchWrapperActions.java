@@ -81,34 +81,32 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
 
   private final String aipId;
   private final String representationId;
-  private final String representationUUID;
   private final AIPState state;
   private final IndexedFile parentFolder;
   private final Permissions permissions;
 
-  private FileSearchWrapperActions(String aipId, String representationId, String representationUUID, AIPState state,
+  private FileSearchWrapperActions(String aipId, String representationId, AIPState state,
     IndexedFile parentFolder, Permissions permissions) {
     this.aipId = aipId;
     this.representationId = representationId;
-    this.representationUUID = representationUUID;
     this.state = state;
     this.permissions = permissions;
     this.parentFolder = parentFolder != null && parentFolder.isDirectory() ? parentFolder : null;
   }
 
-  public static FileSearchWrapperActions get(String aipId, String representationId, String representationUUID,
+  public static FileSearchWrapperActions get(String aipId, String representationId,
     AIPState state, Permissions permissions) {
-    return new FileSearchWrapperActions(aipId, representationId, representationUUID, state, null, permissions);
+    return new FileSearchWrapperActions(aipId, representationId, state, null, permissions);
   }
 
-  public static FileSearchWrapperActions get(String aipId, String representationId, String representationUUID,
+  public static FileSearchWrapperActions get(String aipId, String representationId,
     AIPState state, IndexedFile parentFolder, Permissions permissions) {
-    return new FileSearchWrapperActions(aipId, representationId, representationUUID, state, parentFolder, permissions);
+    return new FileSearchWrapperActions(aipId, representationId, state, parentFolder, permissions);
   }
 
   public static FileSearchWrapperActions getWithoutNoFileActions(String aipId, String representationId,
-    String representationUUID, AIPState state, IndexedFile parentFolder, Permissions permissions) {
-    return new FileSearchWrapperActions(aipId, representationId, representationUUID, state, parentFolder, permissions) {
+    AIPState state, IndexedFile parentFolder, Permissions permissions) {
+    return new FileSearchWrapperActions(aipId, representationId, state, parentFolder, permissions) {
       @Override
       public CanActResult contextCanAct(Action<IndexedFile> action) {
         return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
@@ -247,17 +245,17 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
     }
 
     String aipId = file.getAipId();
-    String repUUID = this.representationUUID != null ? this.representationUUID : file.getRepresentationUUID();
+    String representationId = file.getRepresentationId();
     String fileId = file.getId();
     List<String> path = file.getPath() != null ? file.getPath() : Collections.emptyList();
 
-    if (aipId == null || repUUID == null || fileId == null) {
-      Toast.showError("Cannot redact PDF: Missing required identifiers (AIP: " + aipId + ", Rep: " + repUUID + ", File: " + fileId + ")");
+    if (aipId == null || representationId == null || fileId == null) {
+      Toast.showError("Cannot redact PDF: Missing required identifiers (AIP: " + aipId + ", Rep: " + representationId + ", File: " + fileId + ")");
       return;
     }
 
     List<String> historyItems = ListUtils.concat(
-            ListUtils.concat(Arrays.asList(aipId, repUUID), path), fileId);
+            ListUtils.concat(Arrays.asList(aipId, representationId), path), fileId);
 
     callback.onSuccess(ActionImpact.NONE);
     HistoryUtils.newHistory(PDFRedactor.RESOLVER, historyItems.toArray(new String[0]));
