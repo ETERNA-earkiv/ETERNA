@@ -58,7 +58,7 @@
         <java_version>21</java_version>
         <gwt.version>2.13.0</gwt.version>
         <cas.client.version>4.0.4</cas.client.version>
-        <jersey.version>3.1.6</jersey.version>
+        <jersey.version>4.0.2</jersey.version>
         <swagger.version>2.2.21</swagger.version>
         <jackson.version>2.18.6</jackson.version>
         <spring.version>7.0.5</spring.version>
@@ -891,14 +891,9 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>org.glassfish.jersey.bundles</groupId>
-                <artifactId>jaxrs-ri</artifactId>
-                <version>${jersey.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.glassfish.jersey.ext</groupId>
                 <artifactId>jersey-spring6</artifactId>
-                <version>3.1.9</version>
+                <version>${jersey.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.springframework</groupId>
@@ -910,16 +905,11 @@
             <dependency>
                 <groupId>jakarta.ws.rs</groupId>
                 <artifactId>jakarta.ws.rs-api</artifactId>
-                <version>3.1.0</version>
+                <version>4.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.glassfish.jersey.core</groupId>
                 <artifactId>jersey-server</artifactId>
-                <version>${jersey.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.glassfish.jersey.containers</groupId>
-                <artifactId>jersey-container-servlet-core</artifactId>
                 <version>${jersey.version}</version>
             </dependency>
             <dependency>
