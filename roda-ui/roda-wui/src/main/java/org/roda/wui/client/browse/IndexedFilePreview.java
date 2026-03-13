@@ -53,7 +53,7 @@ public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
       new AsyncTableCellOptions<>(IndexedFile.class, "IndexedFilePreview_files").withFilter(filter)
         .withSummary(messages.representationListOfFiles()).withJustActive(getJustActive()).bindOpener()
         .withActionable(FileSearchWrapperActions.get(getObject().getAipId(), getObject().getRepresentationId(),
-          getObject().getRepresentationUUID(), getState(), getObject(), getPermissions())));
+          getState(), getObject(), getPermissions())));
 
     LastSelectedItemsSingleton.getInstance().setSelectedJustActive(getJustActive());
 
