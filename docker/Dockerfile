@@ -10,12 +10,16 @@ RUN set -ex; \
     zypper -n refresh && \
     zypper -n update && \
     zypper -n install --no-recommends \
-        java-21-openjdk-headless \
-        clamav \
-        zip \
-        unzip \
-        rsync \
-        jq && \
+            java-21-openjdk-headless \
+            clamav \
+            zip \
+            unzip \
+            rsync \
+            jq \
+            curl \
+            python311 \
+            python311-pip && \
+    pip3.11 install --no-cache-dir "unoserver==2.0.2" && \
     zypper clean -a && \
     chmod u-s /usr/bin/su && \
     chmod u-s /usr/bin/newgrp && \
@@ -31,7 +35,7 @@ RUN set -ex; \
     chmod g-s /usr/bin/chage && \
     chmod g-s /sbin/unix_chkpwd && \
     chmod g-s /sbin/unix2_chkpwd && \
-    chmod g-s /usr/lib/utempter/utempter 
+    chmod g-s /usr/lib/utempter/utempter
 
 
 # Copy Tomcat from the official image (maintains /usr/local/tomcat layout)
@@ -65,6 +69,8 @@ RUN set -ex; \
     echo "core.plugins.internal.virus_check.clamav.params = -m --fdpass" >> config/roda-core.properties && \
     echo "core.plugins.internal.virus_check.clamav.get_version = clamdscan --version" >> config/roda-core.properties && \
     echo "core.tools.siegfried.mode = server" >> config/roda-core.properties && \
+    echo "core.tools.unoserver.bin = /usr/local/bin/unoconvert" >> config/roda-core.properties && \
+    echo "core.tools.unoserver.params = --host unoserver --port 2003" >> config/roda-core.properties && \
     zip -q /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/roda-core-*.jar config/roda-core.properties && \
     zypper clean -a && \
     rm -f /usr/bin/container-suseconnect
@@ -86,6 +92,9 @@ RUN set -ex; \
     mkdir -p -m0770 "$RODA_HOME/data" && \
     mkdir -p -m0770 "$RODA_HOME/config" && \
     chown -R "$RODA_USER:0" "$RODA_HOME"
+
+COPY docker-files/ffmpeg-service /roda/data/ffmpeg-service
+RUN chmod +x /roda/data/ffmpeg-service/start.sh
 
 VOLUME "$RODA_HOME/data"
 
