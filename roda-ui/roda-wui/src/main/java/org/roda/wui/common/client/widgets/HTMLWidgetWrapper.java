@@ -155,6 +155,11 @@ public class HTMLWidgetWrapper extends HTML {
                   RodaConstants.CORE_MARKDOWN_FOLDER + "/$1");
 
               html = imgRegExp.replace(html, imgReplacement);
+
+              // open external links in a new tab
+              RegExp extLinkRegExp = RegExp.compile("<a href=\"(https?://[^\"]*)\">", "g");
+              String extLinkReplacement = "<a href=\"$1\" target=\"_blank\" rel=\"noopener noreferrer\">";
+              html = extLinkRegExp.replace(html, extLinkReplacement);
             } else {
               html = response.getText();
             }
