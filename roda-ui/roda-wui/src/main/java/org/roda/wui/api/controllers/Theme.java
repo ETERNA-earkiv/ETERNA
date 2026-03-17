@@ -113,6 +113,10 @@ public class Theme extends RodaWuiController {
       file = RodaCoreFactory.getConfigurationFile(RodaConstants.CORE_THEME_FOLDER + "/" + resourceId);
     }
 
+    if (file == null) {
+      return INITIAL_DATE;
+    }
+
     if ("file".equalsIgnoreCase(file.getProtocol())) {
       try {
         Path filePath = Paths.get(file.toURI());
