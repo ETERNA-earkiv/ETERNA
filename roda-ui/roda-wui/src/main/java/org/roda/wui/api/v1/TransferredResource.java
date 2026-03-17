@@ -154,7 +154,11 @@ public class TransferredResource {
     // delegate action to controller
     try {
       org.roda.core.data.v2.ip.TransferredResource transferredResource;
-      String fileName = fileDetail.getFileName();
+      String fileName = fileDetail != null ? fileDetail.getFileName() : null;
+      if (name == null && StringUtils.isBlank(fileName)) {
+        return Response.status(Status.BAD_REQUEST)
+          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Missing or empty filename")).build();
+      }
       boolean forceCommit = false;
       if (StringUtils.isNotBlank(commitString)) {
         forceCommit = Boolean.parseBoolean(commitString);
