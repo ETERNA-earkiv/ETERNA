@@ -96,9 +96,7 @@ public class Ingest {
       init();
       callback.onSuccess(layout);
     } else {
-      if (historyTokens.get(0).equals(PreIngest.RESOLVER.getHistoryToken())) {
-        PreIngest.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
-      } else if (historyTokens.get(0).equals(IngestTransfer.RESOLVER.getHistoryToken())) {
+      if (historyTokens.get(0).equals(IngestTransfer.RESOLVER.getHistoryToken())) {
         IngestTransfer.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(IngestProcess.RESOLVER.getHistoryToken())) {
         IngestProcess.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
