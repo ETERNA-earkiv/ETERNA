@@ -2,6 +2,8 @@
 
 ## v1.0.0-SNAPSHOT
 #### WIP
+- Restored PDF redactor compatibility by realigning the integration with [`eterna-pdf-redactor@v1.0.1`](https://github.com/ETERNA-earkiv/eterna-pdf-redactor). [#142](https://github.com/ETERNA-earkiv/ETERNA/issues/142)
+
 
 ## v0.5.0 (2025-12-16)
 #### Updates
