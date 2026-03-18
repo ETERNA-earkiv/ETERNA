@@ -38,7 +38,6 @@ import org.roda.wui.client.disposal.confirmations.CreateDisposalConfirmation;
 import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
-import org.roda.wui.client.ingest.preingest.PreIngest;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.management.Management;
 import org.roda.wui.client.management.MemberManagement;
@@ -95,7 +94,6 @@ public class Menu extends Composite {
   private MenuItem disseminationSearchBasic;
 
   private AcessibleMenuBar ingestMenu;
-  private MenuItem ingestPre;
   private MenuItem ingestTransfer;
   private MenuItem ingestList;
   private MenuItem ingestAppraisal;
@@ -149,9 +147,6 @@ public class Menu extends Composite {
     disseminationSearchBasic.addStyleName("search_menu_item");
 
     ingestMenu = new AcessibleMenuBar(true);
-    ingestPre = ingestMenu.addItem(messages.title("ingest_preIngest"),
-      createCommand(PreIngest.RESOLVER.getHistoryPath()));
-    ingestPre.addStyleName("ingest_pre_item");
     ingestTransfer = ingestMenu.addItem(messages.title("ingest_transfer"),
       createCommand(IngestTransfer.RESOLVER.getHistoryPath()));
     ingestTransfer.addStyleName("ingest_transfer_item");
@@ -293,7 +288,6 @@ public class Menu extends Composite {
     updateResolverTopItemVisibility(Search.RESOLVER, disseminationSearchBasic, 2);
 
     // Ingest
-    updateResolverSubItemVisibility(PreIngest.RESOLVER, ingestPre);
     updateResolverSubItemVisibility(IngestTransfer.RESOLVER, ingestTransfer);
     updateResolverSubItemVisibility(IngestProcess.RESOLVER, ingestList);
     updateResolverSubItemVisibility(IngestAppraisal.RESOLVER, ingestAppraisal);
