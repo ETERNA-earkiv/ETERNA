@@ -1,9 +1,8 @@
 # Signed Plugins
 
 The introduction of the digital signature verification feature for plugins in ETERNA represents an advanced approach to
-ensuring the security, integrity, and authenticity of the plugins installed in the repository. All plugins published on
-the [https://market.roda-community.org/](https://market.roda-community.org) are certified with a digital signature, and
-the authenticity validation is performed by ETERNA through its internal truststore.
+ensuring the security, integrity, and authenticity of the plugins installed in the repository. All plugins published are
+certified with a digital signature, and the authenticity validation is performed by ETERNA through its internal truststore.
 
 ## Trusting External Sources
 
