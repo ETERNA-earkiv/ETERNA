@@ -96,7 +96,6 @@ public class Header extends Composite {
   private MenuItem disseminationSearchBasic;
 
   private AcessibleMenuBar ingestMenu;
-  private MenuItem ingestPre;
   private MenuItem ingestTransfer;
   private MenuItem ingestList;
   private MenuItem ingestAppraisal;
@@ -149,9 +148,6 @@ public class Header extends Composite {
 
     ingestMenu = new AcessibleMenuBar(true);
     ingestMenu.addStyleName("bannerHeaderColors");
-    ingestPre = ingestMenu.addItem(messages.title("ingest_preIngest"),
-      createCommand(PreIngest.RESOLVER.getHistoryPath()));
-    ingestPre.addStyleName("ingest_pre_item");
     ingestTransfer = ingestMenu.addItem(messages.title("ingest_transfer"),
       createCommand(IngestTransfer.RESOLVER.getHistoryPath()));
     ingestTransfer.addStyleName("ingest_transfer_item");
@@ -280,7 +276,6 @@ public class Header extends Composite {
     updateResolverTopItemVisibility(Search.RESOLVER, disseminationSearchBasic, 2);
 
     // Ingest
-    updateResolverSubItemVisibility(PreIngest.RESOLVER, ingestPre);
     updateResolverSubItemVisibility(IngestTransfer.RESOLVER, ingestTransfer);
     updateResolverSubItemVisibility(IngestProcess.RESOLVER, ingestList);
     updateResolverSubItemVisibility(IngestAppraisal.RESOLVER, ingestAppraisal);
