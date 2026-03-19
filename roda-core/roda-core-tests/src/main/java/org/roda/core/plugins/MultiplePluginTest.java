@@ -27,7 +27,9 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.ModelService;
+import org.roda.core.plugins.base.antivirus.AntivirusPlugin;
 import org.roda.core.plugins.base.multiple.MultiplePlugin;
+import org.roda.core.plugins.base.antivirus.TestAntiVirus;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -65,6 +67,10 @@ public class MultiplePluginTest {
     boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
       deployPluginManager, deployDefaultResources, false);
+    RodaCoreFactory.getRodaConfiguration().setProperty("core.plugins.internal.virus_check.antiVirusClassname",
+      TestAntiVirus.class.getName());
+    RodaCoreFactory.getRodaConfiguration().setProperty("core.plugins.internal.take_precedence_over_external", false);
+    RodaCoreFactory.getPluginManager().registerPlugin(new AntivirusPlugin());
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
 
