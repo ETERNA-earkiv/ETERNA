@@ -33,10 +33,11 @@
   <script>
     var source = new URLSearchParams(window.location.search).get('source');
     if (source) {
-      // Validate that source is a safe relative path on the same origin
+      // Validate that source is a safe path on the same origin
       try {
         var resolved = new URL(source, window.location.origin);
-        if (resolved.origin === window.location.origin && /\.(warc|warc\.gz|wacz)$/i.test(resolved.pathname)) {
+        if (resolved.origin === window.location.origin
+            && /^\/api\/v2\/files\//.test(resolved.pathname)) {
           document.getElementById('viewer').setAttribute('source', resolved.pathname + resolved.search);
         }
       } catch (e) {
