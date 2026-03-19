@@ -1,5 +1,5 @@
 # ETERNA Changelog
-## v0.6.0 (2026-03-19)
+## v0.6.0 (2026-03-20)
 #### Bug fixes
 - Fixed null URL handling in Theme controller to return INITIAL_DATE when file is not found
 - Fixed malformed UTF-8 encoding in file uploads and improved filename validation in TransferredResource
@@ -22,6 +22,25 @@
 - Added GitHub Action to sync project board order to Linear
 - Added OpenSSF Best Practices badge to README
 - Refactored GitHub Actions workflows for issue labeling
+
+#### Security
+- Upgraded Spring Framework 6.1.12 → 7.0.5
+- Upgraded Spring Boot 3.4.0 → 4.0.3
+- Upgraded Jersey (JAX-RS) 3.1.6 → 4.0.2
+- Upgraded Jackson 2.17.0 → 2.18.6
+- Upgraded Apache Pekko 1.0.2 → 1.1.4
+- Upgraded Apache Solr client 9.7.0 → 9.8.1
+- Upgraded GWT 2.11.0 → 2.13.0
+- Upgraded Logback 1.5.13 → 1.5.25
+- Upgraded commons-lang3 3.14.0 → 3.18.0
+- Upgraded commons-fileupload 1.5 → 1.6.0
+- Upgraded angus-mail 2.0.3 → 2.0.4
+- Upgraded BouncyCastle (bcprov/bcpkix/bcutil) 1.70 (jdk15on) → 1.79 (jdk18on)
+- Upgraded ZooKeeper 3.9.3 → 3.9.5
+- Pinned nimbus-jose-jwt transitive dependency to 9.37.4
+- Pinned protobuf-java transitive dependency to 3.25.5
+- Pinned mina-core transitive dependency to 2.2.5
+- Pinned Jetty http2-common transitive dependency to 10.0.26
 
 ## v0.5.0 (2025-12-16)
 #### Updates
