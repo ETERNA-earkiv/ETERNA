@@ -52,7 +52,7 @@ services:
       # Mapping /tmp to enable usage with local testing via mvn test
       - /tmp:/tmp:ro
   swagger:
-    image: docker.io/swaggerapi/swagger-ui:v5.32.0
+    image: docker.io/swaggerapi/swagger-ui:stable
     restart: on-failure
     ports:
       - "8081:8080"

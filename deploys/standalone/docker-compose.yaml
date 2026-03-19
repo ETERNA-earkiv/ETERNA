@@ -35,7 +35,7 @@ services:
       - siegfried_data:/root/siegfried/
       - roda_data:/roda/data/
   swagger:
-    image: docker.io/swaggerapi/swagger-ui:v5.32.0
+    image: docker.io/swaggerapi/swagger-ui:stable
     restart: on-failure
     ports:
       - "8081:8080"
