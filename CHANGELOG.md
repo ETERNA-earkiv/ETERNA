@@ -1,9 +1,27 @@
 # ETERNA Changelog
-## v0.6.0-SNAPSHOT (2026-02-10)
+## v0.6.0 (2026-03-19)
 #### Bug fixes
+- Fixed null URL handling in Theme controller to return INITIAL_DATE when file is not found
+- Fixed malformed UTF-8 encoding in file uploads and improved filename validation in TransferredResource
+- Fixed Jersey classpath conflict between versions 3.1.6 and 4.0.2
+- Fixed infinite loop when navigating back from User Details page
 - Fixed compilation warnings regarding plural i18n by updating pluralization rule syntax from `[one]` to `[=1]` for single items
 - Added missing `[one]` pluralization keys in Swedish localization file and corrected a typo
 - Replaced Unicode escapes with literal HTML tags in Swedish client messages
+
+#### Improvements
+- Added healthcheck to Dockerfile and docker-compose for improved service reliability
+- Hardened Docker image security: pinned base images to specific digest hashes and adjusted permissions on critical binaries
+- Migrated from `commons-configuration` to `commons-configuration2`
+- Bumped container image versions and updated ZooKeeper dependency
+- Fixed version display by adding `version.json` resource files and updating build configurations
+- Fixed dependency scope for `jakarta.servlet-api` and excluded conflicting Jackson dependencies
+
+#### Infrastructure
+- Added GitHub Actions workflows for development builds on AMD64 and ARM64 architectures
+- Added GitHub Action to sync project board order to Linear
+- Added OpenSSF Best Practices badge to README
+- Refactored GitHub Actions workflows for issue labeling
 
 ## v0.5.0 (2025-12-16)
 #### Updates
