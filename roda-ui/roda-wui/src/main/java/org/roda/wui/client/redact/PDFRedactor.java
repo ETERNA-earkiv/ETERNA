@@ -60,8 +60,8 @@ public class PDFRedactor extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  public static final String JS_PATH = "webjars/pdf-redactor/1.0.1/pdf-redactor.js";
-  public static final String CSS_PATH = "webjars/pdf-redactor/1.0.1/pdf-redactor.css";
+  public static final String JS_PATH = "webjars/pdf-redactor/pdf-redactor.js";
+  public static final String CSS_PATH = "webjars/pdf-redactor/pdf-redactor.css";
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   public static String[] requiredRoles = new String[]{"representation.view", "representation.read", "representation.create", "representation.update"};
   private static PDFRedactor instance = null;
@@ -174,7 +174,7 @@ public class PDFRedactor extends Composite {
   private void initPdfRedactorPanel(final String aipId, final IndexedFile file, final String downloadUrl) {
     pdfRedactorPanel.setUrl(downloadUrl);
     pdfRedactorPanel.mount();
-    pdfRedactorPanel.setSaveCallback((Blob pdfData) -> {
+    pdfRedactorPanel.setSaveCallback((Blob pdfData) ->
       getOrCreateRedactedRepresentation(aipId).then((representation) -> {
         List<String> path = new ArrayList<>(file.getPath());
 
@@ -187,24 +187,23 @@ public class PDFRedactor extends Composite {
         requestInit.setMethod("POST");
         requestInit.setBody(formData);
 
-        fetch(uploadUrl, requestInit).then(response -> {
+        return fetch(uploadUrl, requestInit).then(response -> {
           if (response.ok) {
             Toast.showInfo(messages.redactPdfToastTitle(), messages.redactPdfSaveSuccessDescription());
+            return Promise.resolve(response);
           } else if (response.status == RodaConstants.HTTP_RESPONSE_CODE_REQUEST_CONFLICT) {
             Toast.showError(messages.redactPdfToastTitle(), messages.fileAlreadyExists());
+            return Promise.resolve(response);
           } else {
             Toast.showError(messages.redactPdfToastTitle(), messages.redactPdfSaveErrorDescription());
-          }
-          return null;
+                  return Promise.resolve(response);
+                }
+              });
         }).catch_(error -> {
           Toast.showError(messages.redactPdfToastTitle(), messages.redactPdfSaveErrorDescription());
-          return null;
-        });
-        return null;
-      });
-
-      return true;
-    });
+          return Promise.reject(error);
+        })
+    );
   }
 
   private static Promise<IndexedRepresentation> getOrCreateRedactedRepresentation(String aipId) {
