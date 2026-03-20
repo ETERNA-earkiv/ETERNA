@@ -4,7 +4,6 @@
 - Fixed null URL handling in Theme controller to return INITIAL_DATE when file is not found
 - Fixed malformed UTF-8 encoding in file uploads and improved filename validation in TransferredResource
 - Fixed Jersey classpath conflict between versions 3.1.6 and 4.0.2
-- Fixed infinite loop when navigating back from User Details page
 - Fixed compilation warnings regarding plural i18n by updating pluralization rule syntax from `[one]` to `[=1]` for single items
 - Added missing `[one]` pluralization keys in Swedish localization file and corrected a typo
 - Replaced Unicode escapes with literal HTML tags in Swedish client messages
