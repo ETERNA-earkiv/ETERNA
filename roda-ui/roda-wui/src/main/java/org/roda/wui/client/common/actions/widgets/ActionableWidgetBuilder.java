@@ -175,8 +175,8 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
     if (includeBackButton) {
       ActionButton<T> backButton = new ActionButton<>(
         new ActionableButton<>(messages.backButton(), null, ActionImpact.NONE, "fas fa-arrow-circle-left"));
-      backButton.addClickHandler(event -> {
-        HistoryUtils.newHistory(MemberManagement.RESOLVER);});
+      backButton.addClickHandler(event ->
+        History.back());
       backButton.addStyleName("actionable-button-back");
       panel.add(backButton);
       addedButtonCount++;
