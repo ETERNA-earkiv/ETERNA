@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import com.google.gwt.user.client.History;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.AllFilterParameter;
@@ -752,7 +753,7 @@ public class CreateDefaultJob extends Composite {
 
   @UiHandler("buttonCancel")
   public void cancel(ClickEvent e) {
-    HistoryUtils.newHistory(ActionProcess.RESOLVER);
+    History.back();
   }
 
   public PluginInfo getSelectedPlugin() {

@@ -10,6 +10,7 @@ package org.roda.wui.client.planning;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.gwt.user.client.History;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.risks.IncidenceStatus;
@@ -231,7 +232,7 @@ public class EditRiskIncidence extends Composite {
 
       @Override
       public void onSuccess(Void result) {
-        HistoryUtils.newHistory(ShowRiskIncidence.RESOLVER, incidence.getId());
+        History.back();
       }
 
     });
@@ -243,7 +244,7 @@ public class EditRiskIncidence extends Composite {
   }
 
   private void cancel() {
-    HistoryUtils.newHistory(ShowRiskIncidence.RESOLVER, incidence.getId());
+    History.back();
   }
 
   private void errorMessage(Throwable caught) {
