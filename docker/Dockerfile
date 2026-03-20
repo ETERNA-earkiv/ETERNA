@@ -5,15 +5,17 @@ LABEL maintainer="admin@keep.pt" vendor="KEEP SOLUTIONS"
 RUN set -ex; \
     apt-get -qq update && \
     apt-get -qq -y install software-properties-common && \
-    apt-get -qq -y --no-install-recommends install clamdscan jq rsync && \
+    apt-get -qq -y --no-install-recommends install \
+        clamdscan jq rsync \
+        python3 python3-pip && \
+    pip3 install --no-cache-dir unoserver==2.0.2 && \
     apt-get clean && rm -rf /var/lib/apt/lists/* && \
-	DEBIAN_FRONTEND=noninteractive \
-	apt-get autoremove -y --purge "*python*"
+	DEBIAN_FRONTEND=noninteractive
 
-COPY ./docker/docker-files/clamd.conf /etc/clamav/clamd.conf
+COPY ./docker-files/clamd.conf /etc/clamav/clamd.conf
 
 # Copy the Roda WUI WAR file
-COPY roda-ui/roda-wui/target/roda-wui-*.jar  /KEEPS/bin/
+COPY ./target/roda-wui-1.0.0-alpha-SNAPSHOT.jar  /KEEPS/bin/
 
 ENV RODA_HOME=/roda \
     LDAP_SERVER_URL=ldap://openldap \
@@ -26,8 +28,8 @@ ENV RODA_HOME=/roda \
     RODA_GROUP="roda" \
     RODA_GID="1000"
 
-COPY ./docker/docker-files/docker-entrypoint.sh /
-COPY ./docker/docker-files/docker-entrypoint.d/* /docker-entrypoint.d/
+COPY ./docker-files/docker-entrypoint.sh /
+COPY ./docker-files/docker-entrypoint.d/* /docker-entrypoint.d/
 
 RUN set -ex; \
   groupadd -r --gid "$RODA_GID" "$RODA_GROUP"; \
@@ -35,6 +37,9 @@ RUN set -ex; \
   mkdir -p -m0770 "$RODA_HOME/data"; \
   mkdir -p -m0770 "$RODA_HOME/config"; \
   chown -R "$RODA_USER:0" "$RODA_HOME"
+
+COPY docker-files/ffmpeg-service /roda/data/ffmpeg-service
+RUN chmod +x /roda/data/ffmpeg-service/start.sh
 
 VOLUME "$RODA_HOME/data"
 
