@@ -1,0 +1,14 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="E2E Tests" verbose="1">
+    <test name="e2e" preserve-order="true">
+        <groups>
+            <run>
+                <include name="e2e"/>
+            </run>
+        </groups>
+        <packages>
+            <package name="org.roda.wui.e2e.tests"/>
+        </packages>
+    </test>
+</suite>
