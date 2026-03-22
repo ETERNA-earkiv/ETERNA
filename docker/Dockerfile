@@ -57,17 +57,7 @@ COPY ./target/  /usr/local/tomcat/webapps/ROOT
 RUN mkdir -p /usr/local/tomcat/conf/Catalina/localhost
 RUN chmod -R a+rwx /usr/local/tomcat/conf/Catalina
 
-RUN set -ex; \
-    unzip -q /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/roda-core-*.jar config/roda-core.properties && \
-    sed -i -e 's/^core.plugins.internal.virus_check.clamav/#&/' -e 's/^core.tools.siegfried.mode/#&/' config/roda-core.properties && \
-    printf '\n' >> config/roda-core.properties && \
-    echo "core.plugins.internal.virus_check.clamav.bin = /usr/bin/clamdscan" >> config/roda-core.properties && \
-    echo "core.plugins.internal.virus_check.clamav.params = -m --fdpass" >> config/roda-core.properties && \
-    echo "core.plugins.internal.virus_check.clamav.get_version = clamdscan --version" >> config/roda-core.properties && \
-    echo "core.tools.siegfried.mode = server" >> config/roda-core.properties && \
-    zip -q /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/roda-core-*.jar config/roda-core.properties && \
-    zypper clean -a && \
-    rm -f /usr/bin/container-suseconnect
+RUN rm -f /usr/bin/container-suseconnect
 
 ENV RODA_HOME=/roda \
     SIEGFRIED_MODE=server \
@@ -86,6 +76,10 @@ RUN set -ex; \
     mkdir -p -m0770 "$RODA_HOME/data" && \
     mkdir -p -m0770 "$RODA_HOME/config" && \
     chown -R "$RODA_USER:0" "$RODA_HOME"
+
+# Drop Docker-specific config overrides into $RODA_HOME/config so they take
+# precedence over the defaults bundled inside roda-core-*.jar — no JAR patching needed.
+COPY --chown=1000:0 ./docker-files/roda-core.properties /roda/config/roda-core.properties
 
 VOLUME "$RODA_HOME/data"
 
