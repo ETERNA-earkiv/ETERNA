@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.slider;
 
@@ -210,7 +210,6 @@ public class InfoSliderHelper {
       values.put(messages.sipId(), sipIds);
     }
 
-
     if (response.getIndexedAIP().getIngestJobId() != null && !response.getIndexedAIP().getIngestJobId().isEmpty()) {
       FlowPanel jobIdsList = new FlowPanel();
       jobIdsList.addStyleName("slider-info-entry-value-aip-ingest-jobs");
@@ -257,8 +256,7 @@ public class InfoSliderHelper {
 
         if (throwable != null) {
           Toast.showError("Error fetching AIP jobs information");
-        }
-        else {
+        } else {
           jobIdsList.clear();
           jobIdsList.add(value);
         }

@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common;
 
@@ -99,8 +99,7 @@ public class IncrementalRelationList extends Composite implements HasHandlers {
 
       @Override
       public void onClick(ClickEvent event) {
-        relations.get(relationType)
-          .remove(relation);
+        relations.get(relationType).remove(relation);
         listRelations();
         DomEvent.fireNativeEvent(Document.get().createChangeEvent(), IncrementalRelationList.this);
       }

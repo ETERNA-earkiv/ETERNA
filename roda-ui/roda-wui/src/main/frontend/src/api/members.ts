@@ -9,7 +9,7 @@ export interface RODAMember {
   active: boolean
   isUser: boolean
   isGroup: boolean
-  roles: string[]
+  allRoles: string[]
   groups: string[]
 }
 
@@ -20,11 +20,15 @@ export function searchMembers(
 ): Promise<IndexResult<RODAMember>> {
   const body: FindRequest = {
     sublist: { firstElementIndex: offset, maximumElementCount: limit },
+    facets: { parameters: {} },
+    onlyActive: false,
   }
   if (query) {
     body.filter = {
-      parameters: [{ name: 'fulltext', value: query }],
+      filterParameters: [{ type: 'SimpleFilterParameter', name: 'fulltext', value: query }],
     }
+  } else {
+    body.filter = { filterParameters: [] }
   }
-  return api.post<IndexResult<RODAMember>>('/members', body)
+  return api.post<IndexResult<RODAMember>>('/members/find', body)
 }

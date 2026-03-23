@@ -1,8 +1,11 @@
-import { useState, type FormEvent } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { login } from '../api/auth'
-import { getCurrentUser } from '../api/auth'
 import { useAuth } from '../components/AuthProvider'
+import { DigiFormInput, DigiButton, DigiNotificationAlert } from '@designsystem-se/af-react'
+import { FormInputType } from '@designsystem-se/af'
+
+type InputEl = HTMLElement & { afValue: string }
 
 export function Login() {
   const [username, setUsername] = useState('')
@@ -12,13 +15,11 @@ export function Login() {
   const navigate = useNavigate()
   const { setUser } = useAuth()
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault()
+  async function handleLogin() {
     setError('')
     setLoading(true)
     try {
-      await login({ username, password })
-      const user = await getCurrentUser()
+      const user = await login(username, password)
       setUser(user)
       navigate('/browse')
     } catch {
@@ -51,55 +52,53 @@ export function Login() {
         }}
       >
         <h1 style={{ marginBottom: '0.25rem', fontSize: '1.5rem' }}>ETERNA</h1>
-        <p style={{ marginBottom: '2rem', color: '#555' }}>
-          Digitalt bevaringsarkiv
-        </p>
+        <p style={{ marginBottom: '2rem', color: '#555' }}>Digitalt bevaringsarkiv</p>
 
-        <form onSubmit={handleSubmit} noValidate>
-          <div style={{ marginBottom: '1.25rem' }}>
-            <digi-form-input
-              af-label="Användarnamn"
-              af-id="username"
-              af-type="text"
-              af-required={true}
-              af-value={username}
-              onAfOnInputChange={(e: CustomEvent) =>
-                setUsername((e.detail as { value: string }).value)
-              }
-            ></digi-form-input>
-          </div>
+        <div style={{ marginBottom: '1.25rem' }}>
+          <DigiFormInput
+            afLabel="Användarnamn"
+            afId="username"
+            afType={FormInputType.TEXT}
+            afRequired={true}
+            afValue={username}
+            onAfOnInput={(e) => setUsername((e.target as InputEl).afValue)}
+            onAfOnKeyup={(e) => {
+              if ((e.detail as KeyboardEvent).key === 'Enter') handleLogin()
+            }}
+          />
+        </div>
 
-          <div style={{ marginBottom: '1.5rem' }}>
-            <digi-form-input
-              af-label="Lösenord"
-              af-id="password"
-              af-type="password"
-              af-required={true}
-              af-value={password}
-              onAfOnInputChange={(e: CustomEvent) =>
-                setPassword((e.detail as { value: string }).value)
-              }
-            ></digi-form-input>
-          </div>
+        <div style={{ marginBottom: '1.5rem' }}>
+          <DigiFormInput
+            afLabel="Lösenord"
+            afId="password"
+            afType={FormInputType.PASSWORD}
+            afRequired={true}
+            afValue={password}
+            onAfOnInput={(e) => setPassword((e.target as InputEl).afValue)}
+            onAfOnKeyup={(e) => {
+              if ((e.detail as KeyboardEvent).key === 'Enter') handleLogin()
+            }}
+          />
+        </div>
 
-          {error && (
-            <digi-message
-              af-type="error"
-              style={{ marginBottom: '1rem', display: 'block' }}
-            >
-              {error}
-            </digi-message>
-          )}
-
-          <digi-button
-            af-variation="primary"
-            af-type="submit"
-            af-disabled={loading}
-            style={{ width: '100%' }}
+        {error && (
+          <DigiNotificationAlert
+            afVariation="danger"
+            afHeading="Inloggningen misslyckades"
+            style={{ marginBottom: '1rem', display: 'block' }}
           >
-            {loading ? 'Loggar in…' : 'Logga in'}
-          </digi-button>
-        </form>
+            {error}
+          </DigiNotificationAlert>
+        )}
+
+        <DigiButton
+          afVariation="primary"
+          onAfOnClick={handleLogin}
+          style={{ width: '100%' }}
+        >
+          {loading ? 'Loggar in…' : 'Logga in'}
+        </DigiButton>
       </div>
     </div>
   )

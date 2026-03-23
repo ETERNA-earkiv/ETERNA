@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 /**
  *
@@ -40,8 +40,8 @@ public class Theme extends Composite {
         boolean first = true;
         for (String token : historyTokens) {
           if (token.equals(RodaConstants.ResourcesTypes.PLUGINS.toString())) {
-             resourceType = RodaConstants.ResourcesTypes.PLUGINS;
-             continue;
+            resourceType = RodaConstants.ResourcesTypes.PLUGINS;
+            continue;
           }
           if (first) {
             first = false;

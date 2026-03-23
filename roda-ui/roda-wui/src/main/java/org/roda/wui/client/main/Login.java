@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 /**
  *
@@ -127,7 +127,6 @@ public class Login extends Composite {
   @UiField
   FlowPanel loggedInPanel;
 
-
   @UiField
   FlowPanel mmaPanel;
 
@@ -143,7 +142,6 @@ public class Login extends Composite {
 
   private Login() {
     initWidget(uiBinder.createAndBindUi(this));
-
 
     if (multiMethodAuthenticationActive) {
       mmaPanel.setVisible(true);
@@ -238,8 +236,7 @@ public class Login extends Composite {
   void handleResendEmail(final ClickEvent e) {
     Services services = new Services("Resend email", "resend");
     services
-      .membersResource(
-        s -> s.sendEmailVerification(username.getText(), LocaleInfo.getCurrentLocale().getLocaleName()))
+      .membersResource(s -> s.sendEmailVerification(username.getText(), LocaleInfo.getCurrentLocale().getLocaleName()))
       .whenComplete((result, error) -> {
         if (result != null) {
           if (result.getState() == NotificationState.COMPLETED) {

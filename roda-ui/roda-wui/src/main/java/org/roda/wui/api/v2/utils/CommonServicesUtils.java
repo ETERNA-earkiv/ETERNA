@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.api.v2.utils;
 
@@ -130,7 +130,7 @@ public class CommonServicesUtils {
   }
 
   public static void getMetadataValueI18nPrefix(MetadataValue metadataValue, Locale locale, Messages messages)
-      throws GenericException {
+    throws GenericException {
     String i18nPrefix = metadataValue.get("optionsLabelI18nKeyPrefix");
     if (i18nPrefix != null) {
       Map<String, String> terms = messages.getTranslations(i18nPrefix, String.class, false);

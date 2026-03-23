@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.config;
 
@@ -190,7 +190,7 @@ public class RodaConfig {
 
   @Bean
   public ServletContextInitializer servletContextInitializer(
-      @Value("${server.servlet.session.cookie.secure:false}") boolean secureCookies) {
+    @Value("${server.servlet.session.cookie.secure:false}") boolean secureCookies) {
     return new ServletContextInitializer() {
 
       @Override

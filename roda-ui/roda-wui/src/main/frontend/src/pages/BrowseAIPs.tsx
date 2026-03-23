@@ -1,8 +1,17 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { searchAIPs, type IndexedAIP } from '../api/aips'
+import {
+  DigiFormInputSearch,
+  DigiTable,
+  DigiNavigationPagination,
+  DigiLoaderSpinner,
+  DigiNotificationAlert,
+} from '@designsystem-se/af-react'
 
 const PAGE_SIZE = 20
+
+type InputSearchEl = HTMLElement & { afValue: string }
 
 export function BrowseAIPs() {
   const [aips, setAips] = useState<IndexedAIP[]>([])
@@ -19,17 +28,17 @@ export function BrowseAIPs() {
     setError('')
     searchAIPs(search, page * PAGE_SIZE, PAGE_SIZE)
       .then((result) => {
-        setAips(result.results)
+        setAips(result.results ?? [])
         setTotal(result.totalCount)
       })
       .catch(() => setError('Kunde inte hämta arkivobjekt.'))
       .finally(() => setLoading(false))
   }, [search, page])
 
-  function handleSearch(e: React.FormEvent) {
-    e.preventDefault()
+  function submitSearch(value: string) {
     setPage(0)
-    setSearch(query)
+    setSearch(value)
+    setQuery(value)
   }
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
@@ -38,29 +47,28 @@ export function BrowseAIPs() {
     <div>
       <h1 style={{ marginBottom: '1.5rem' }}>Arkivobjekt</h1>
 
-      <form onSubmit={handleSearch} style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem' }}>
-        <digi-input
-          af-label="Sök arkivobjekt"
-          af-placeholder="Sök på titel, ID…"
-          af-value={query}
-          onAfOnInputChange={(e: CustomEvent) =>
-            setQuery((e.detail as { value: string }).value)
-          }
-          style={{ flex: 1 }}
-        ></digi-input>
-        <digi-button af-variation="primary" af-type="submit">
-          Sök
-        </digi-button>
-      </form>
+      <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem', alignItems: 'flex-end' }}>
+        <div style={{ flex: 1 }}>
+          <DigiFormInputSearch
+            afLabel="Sök arkivobjekt"
+            afId="search-aips"
+            afValue={query}
+            onAfOnInput={(e) => setQuery((e.target as InputSearchEl).afValue)}
+            onAfOnSubmitSearch={(e) => submitSearch(e.detail as string || query)}
+          />
+        </div>
+      </div>
 
       {loading && (
         <div style={{ textAlign: 'center', padding: '2rem' }}>
-          <digi-loader></digi-loader>
+          <DigiLoaderSpinner />
         </div>
       )}
 
       {error && (
-        <digi-message af-type="error">{error}</digi-message>
+        <DigiNotificationAlert afVariation="danger" afHeading="Fel">
+          {error}
+        </DigiNotificationAlert>
       )}
 
       {!loading && !error && (
@@ -69,7 +77,7 @@ export function BrowseAIPs() {
             Visar {aips.length} av {total} arkivobjekt
           </p>
 
-          <digi-table>
+          <DigiTable>
             <table>
               <thead>
                 <tr>
@@ -122,19 +130,19 @@ export function BrowseAIPs() {
                 )}
               </tbody>
             </table>
-          </digi-table>
+          </DigiTable>
 
           {totalPages > 1 && (
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem' }}>
-              <digi-pagination
-                af-current-page={page + 1}
-                af-total-pages={totalPages}
-                onAfOnPageChange={(e: CustomEvent) => {
-                  const newPage = (e.detail as { page: number }).page - 1
-                  setPage(newPage)
+              <DigiNavigationPagination
+                key={`pagination-${search}`}
+                afInitActivePage={1}
+                afTotalPages={totalPages}
+                onAfOnPageChange={(e) => {
+                  setPage((e.detail as number) - 1)
                   window.scrollTo(0, 0)
                 }}
-              ></digi-pagination>
+              />
             </div>
           )}
         </>

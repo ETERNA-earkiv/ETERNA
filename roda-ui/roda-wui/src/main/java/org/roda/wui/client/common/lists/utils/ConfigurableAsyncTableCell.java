@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.lists.utils;
 
@@ -365,7 +365,8 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
               case DATE_FORMAT_SIMPLE:
                 return Humanize.formatDate((String) value, false);
               case LIST:
-                List<String> renderedList = ((List<?>) value).stream().map(v -> renderValue(v, hint)).collect(Collectors.toList());
+                List<String> renderedList = ((List<?>) value).stream().map(v -> renderValue(v, hint))
+                  .collect(Collectors.toList());
                 return StringUtils.prettyPrint(renderedList);
               default:
                 return value.toString();

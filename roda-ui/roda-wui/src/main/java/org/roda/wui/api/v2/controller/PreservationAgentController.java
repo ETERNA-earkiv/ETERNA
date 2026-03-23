@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.api.v2.controller;
 
@@ -110,7 +110,8 @@ public class PreservationAgentController implements PreservationAgentRestService
       public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
         controllerAssistant.setRelatedObjectId(id);
-        StreamResponse response = preservationAgentService.retrievePreservationAgentFile(requestContext.getModelService(), id);
+        StreamResponse response = preservationAgentService
+          .retrievePreservationAgentFile(requestContext.getModelService(), id);
 
         return ApiUtils.okResponse(response);
       }
@@ -120,7 +121,6 @@ public class PreservationAgentController implements PreservationAgentRestService
   @Override
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
     // delegate
-    return ApiUtils.okResponse(
-      indexService.exportToCSV(findRequestString, IndexedPreservationAgent.class));
+    return ApiUtils.okResponse(indexService.exportToCSV(findRequestString, IndexedPreservationAgent.class));
   }
 }

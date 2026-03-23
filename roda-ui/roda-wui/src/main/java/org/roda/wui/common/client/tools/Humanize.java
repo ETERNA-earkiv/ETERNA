@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.common.client.tools;
 
@@ -237,7 +237,7 @@ public class Humanize {
     Date parsed = DATE_TIME_FORMAT_JSON.parse(date);
 
     return applyDateTimeFormat(parsed, ConfigurationManager.getString(RodaConstants.UI_DATE_TIME_FORMAT_SIMPLE),
-        DATE_TIME_FORMAT);
+      DATE_TIME_FORMAT);
   }
 
   public enum DHMSFormat {

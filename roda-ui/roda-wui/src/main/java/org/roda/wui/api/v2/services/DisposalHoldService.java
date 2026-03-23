@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.api.v2.services;
 
@@ -49,8 +49,8 @@ public class DisposalHoldService {
   }
 
   public DisposalHold updateDisposalHold(DisposalHold hold, String details, RequestContext context)
-    throws AuthorizationDeniedException,
-    RequestNotValidException, NotFoundException, IllegalOperationException, GenericException {
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, IllegalOperationException,
+    GenericException {
     return context.getModelService().updateDisposalHold(hold, context.getUser().getName(), details);
   }
 
@@ -64,7 +64,8 @@ public class DisposalHoldService {
     return model.retrieveDisposalHold(id);
   }
 
-  public DisposalTransitiveHoldsAIPMetadata listTransitiveDisposalHolds(String aipId, ModelService model) throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+  public DisposalTransitiveHoldsAIPMetadata listTransitiveDisposalHolds(String aipId, ModelService model)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     return model.listTransitiveDisposalHolds(aipId);
   }
 
@@ -90,8 +91,8 @@ public class DisposalHoldService {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, disposalHoldId);
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
 
-    return CommonServicesUtils.createAndExecuteInternalJob("Lift disposal hold", SelectedItemsNone.create(), LiftDisposalHoldPlugin.class,
-      user, pluginParameters, "Could not execute lift disposal hold action");
+    return CommonServicesUtils.createAndExecuteInternalJob("Lift disposal hold", SelectedItemsNone.create(),
+      LiftDisposalHoldPlugin.class, user, pluginParameters, "Could not execute lift disposal hold action");
   }
 
   public Job disassociateDisposalHold(User user, DisassociateDisposalHoldRequest request, String disposalHoldId)

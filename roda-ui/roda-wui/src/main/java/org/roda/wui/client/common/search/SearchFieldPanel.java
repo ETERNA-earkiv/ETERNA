@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.search;
 
@@ -128,7 +128,8 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     inputDateBox.getDatePicker().setYearAndMonthDropdownVisible(true);
     inputDateBox.getDatePicker().setYearArrowsVisible(true);
     inputDateBox.setFireNullValues(true);
-    // inputDateBox.getElement().setPropertyString("placeholder", messages.searchFieldDatePlaceHolder());
+    // inputDateBox.getElement().setPropertyString("placeholder",
+    // messages.searchFieldDatePlaceHolder());
     inputDateBox.getTextBox().addKeyDownHandler(keyDownHandler);
 
     inputDateBoxFromLabel = new Label(messages.genericRangeFieldFrom());
@@ -137,7 +138,8 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     inputDateBoxFrom.getDatePicker().setYearAndMonthDropdownVisible(true);
     inputDateBoxFrom.getDatePicker().setYearArrowsVisible(true);
     inputDateBoxFrom.setFireNullValues(true);
-    // inputDateBoxFrom.getElement().setPropertyString("placeholder", messages.searchFieldDateFromPlaceHolder());
+    // inputDateBoxFrom.getElement().setPropertyString("placeholder",
+    // messages.searchFieldDateFromPlaceHolder());
     inputDateBoxFrom.getTextBox().addKeyDownHandler(keyDownHandler);
 
     inputDateBoxToLabel = new Label(messages.genericRangeFieldTo());
@@ -146,32 +148,38 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     inputDateBoxTo.getDatePicker().setYearAndMonthDropdownVisible(true);
     inputDateBoxTo.getDatePicker().setYearArrowsVisible(true);
     inputDateBoxTo.setFireNullValues(true);
-    // inputDateBoxTo.getElement().setPropertyString("placeholder", messages.searchFieldDateToPlaceHolder());
+    // inputDateBoxTo.getElement().setPropertyString("placeholder",
+    // messages.searchFieldDateToPlaceHolder());
     inputDateBoxTo.getTextBox().addKeyDownHandler(keyDownHandler);
 
     inputNumeric = new TextBox();
-    // inputNumeric.getElement().setPropertyString("placeholder", messages.searchFieldNumericPlaceHolder());
+    // inputNumeric.getElement().setPropertyString("placeholder",
+    // messages.searchFieldNumericPlaceHolder());
     inputNumeric.getElement().setAttribute("type", "number");
     inputNumeric.addKeyDownHandler(keyDownHandler);
     inputNumericFromLabel = new Label(messages.genericRangeFieldFrom());
     inputNumericFrom = new TextBox();
-    // inputNumericFrom.getElement().setPropertyString("placeholder", messages.searchFieldNumericFromPlaceHolder());
+    // inputNumericFrom.getElement().setPropertyString("placeholder",
+    // messages.searchFieldNumericFromPlaceHolder());
     inputNumericFrom.getElement().setAttribute("type", "number");
     inputNumericFrom.addKeyDownHandler(keyDownHandler);
     inputNumericToLabel = new Label(messages.genericRangeFieldTo());
     inputNumericTo = new TextBox();
-    // inputNumericTo.getElement().setPropertyString("placeholder", messages.searchFieldNumericToPlaceHolder());
+    // inputNumericTo.getElement().setPropertyString("placeholder",
+    // messages.searchFieldNumericToPlaceHolder());
     inputNumericTo.getElement().setAttribute("type", "number");
     inputNumericTo.addKeyDownHandler(keyDownHandler);
 
     inputStorageSizeFromLabel = new Label(messages.genericRangeFieldFrom());
     inputStorageSizeFrom = new TextBox();
-    // inputStorageSizeFrom.getElement().setPropertyString("placeholder", messages.searchFieldNumericFromPlaceHolder());
+    // inputStorageSizeFrom.getElement().setPropertyString("placeholder",
+    // messages.searchFieldNumericFromPlaceHolder());
     inputStorageSizeFrom.getElement().setAttribute("type", "number");
     inputStorageSizeFrom.addKeyDownHandler(keyDownHandler);
     inputStorageSizeToLabel = new Label(messages.genericRangeFieldTo());
     inputStorageSizeTo = new TextBox();
-    // inputStorageSizeTo.getElement().setPropertyString("placeholder", messages.searchFieldNumericToPlaceHolder());
+    // inputStorageSizeTo.getElement().setPropertyString("placeholder",
+    // messages.searchFieldNumericToPlaceHolder());
     inputStorageSizeTo.getElement().setAttribute("type", "number");
     inputStorageSizeTo.addKeyDownHandler(keyDownHandler);
     inputStorageSizeList = new ListBox();

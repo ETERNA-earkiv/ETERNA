@@ -1,26 +1,33 @@
 import { api } from './client'
 
-export interface LoginRequest {
-  username: string
-  password: string
-}
-
 export interface UserInfo {
   id: string
   name: string
   fullName: string
   email: string
-  roles: string[]
+  allRoles: string[]
+  groups: string[]
+  guest: boolean
+  active: boolean
 }
 
-export async function login(credentials: LoginRequest): Promise<void> {
-  await api.post('/members/login', credentials)
+export async function login(username: string, password: string): Promise<UserInfo> {
+  // RODA API expects password as {chars: char[]}
+  return api.post<UserInfo>('/members/users/login', {
+    username,
+    password: { chars: password.split('') },
+  })
 }
 
 export async function logout(): Promise<void> {
-  await api.post('/members/logout', {})
+  // Spring Security logout via GET /logout (returns redirect)
+  try {
+    await fetch('/logout', { method: 'GET', credentials: 'include', redirect: 'manual' })
+  } catch {
+    // ignore redirect errors
+  }
 }
 
 export async function getCurrentUser(): Promise<UserInfo> {
-  return api.get<UserInfo>('/members/me')
+  return api.get<UserInfo>('/members/users/authenticated')
 }

@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.api.v2.exceptions.model;
 
@@ -37,7 +37,8 @@ public class ErrorResponseMessage implements Serializable {
     this.instance = instance;
   }
 
-  public ErrorResponseMessage(int status, String errorId, String message, String details, String instance, Object objectDetails) {
+  public ErrorResponseMessage(int status, String errorId, String message, String details, String instance,
+    Object objectDetails) {
     this.status = status;
     this.errorId = errorId;
     this.message = message;

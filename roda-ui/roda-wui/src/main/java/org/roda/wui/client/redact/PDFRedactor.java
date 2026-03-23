@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/ETERNA-earkiv/ETERNA
+ */
 package org.roda.wui.client.redact;
 
 import com.google.gwt.core.client.Callback;
@@ -59,7 +66,8 @@ public class PDFRedactor extends Composite {
 
   public static final String JS_PATH = "webjars/pdf-redactor/1.0.1/pdf-redactor.js";
   public static final String CSS_PATH = "webjars/pdf-redactor/1.0.1/pdf-redactor.css";
-  public static String[] requiredRoles = new String[]{"representation.view", "representation.read", "representation.create", "representation.update"};
+  public static String[] requiredRoles = new String[] {"representation.view", "representation.read",
+    "representation.create", "representation.update"};
   private static PDFRedactor instance = null;
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -88,10 +96,12 @@ public class PDFRedactor extends Composite {
   private static final List<String> findRedactedRepresentationFieldsToReturn = new ArrayList<>();
 
   static {
-    findRedactedRepresentationFieldsToReturn.addAll(Arrays.asList(RodaConstants.INDEX_ID, RodaConstants.INDEX_UUID, RodaConstants.REPRESENTATION_TITLE, RodaConstants.REPRESENTATION_TYPE));
+    findRedactedRepresentationFieldsToReturn.addAll(Arrays.asList(RodaConstants.INDEX_ID, RodaConstants.INDEX_UUID,
+      RodaConstants.REPRESENTATION_TITLE, RodaConstants.REPRESENTATION_TYPE));
   }
 
-  private static final Sorter findRedactedRepresentationSorter = new Sorter(new SortParameter(RodaConstants.REPRESENTATION_ID, false));
+  private static final Sorter findRedactedRepresentationSorter = new Sorter(
+    new SortParameter(RodaConstants.REPRESENTATION_ID, false));
 
   private boolean initialized;
 
@@ -193,22 +203,20 @@ public class PDFRedactor extends Composite {
   }
 
   private static Promise<IndexedRepresentation> getOrCreateRedactedRepresentation(String aipId) {
-    Filter findRedactedRepresentationFilter = new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aipId),
+    Filter findRedactedRepresentationFilter = new Filter(
+      new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aipId),
 
-            // Make type configurable
-            new SimpleFilterParameter(RodaConstants.REPRESENTATION_TYPE, "Redacted"));
+      // Make type configurable
+      new SimpleFilterParameter(RodaConstants.REPRESENTATION_TYPE, "Redacted"));
 
     final PromiseWrapper<IndexedRepresentation> repPromise = new PromiseWrapper<>();
     Services services = new Services("Find redacted representation", "get");
     FindRequest findRequest = new FindRequest.FindRequestBuilder(findRedactedRepresentationFilter, true)
-      .withSorter(findRedactedRepresentationSorter)
-      .withSublist(new Sublist(0, 1))
-      .withFacets(Facets.NONE)
-      .withFieldsToReturn(findRedactedRepresentationFieldsToReturn)
-      .build();
+      .withSorter(findRedactedRepresentationSorter).withSublist(new Sublist(0, 1)).withFacets(Facets.NONE)
+      .withFieldsToReturn(findRedactedRepresentationFieldsToReturn).build();
 
-    services.rodaEntityRestService(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()), IndexedRepresentation.class)
-      .whenComplete((result, throwable) -> {
+    services.rodaEntityRestService(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
+      IndexedRepresentation.class).whenComplete((result, throwable) -> {
         if (throwable != null) {
           repPromise.reject(throwable);
         } else if (result.getTotalCount() > 0) {
@@ -222,19 +230,18 @@ public class PDFRedactor extends Composite {
   }
 
   private static Promise<IndexedRepresentation> getRepresentationById(String aipId, String representationId) {
-    final Filter findRedactedRepresentationFilter = new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aipId), new SimpleFilterParameter(RodaConstants.REPRESENTATION_ID, representationId));
+    final Filter findRedactedRepresentationFilter = new Filter(
+      new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aipId),
+      new SimpleFilterParameter(RodaConstants.REPRESENTATION_ID, representationId));
 
     final PromiseWrapper<IndexedRepresentation> repPromise = new PromiseWrapper<>();
     Services services = new Services("Find representation by ID", "get");
     FindRequest findRequest = new FindRequest.FindRequestBuilder(findRedactedRepresentationFilter, true)
-      .withSorter(findRedactedRepresentationSorter)
-      .withSublist(new Sublist(0, 1))
-      .withFacets(Facets.NONE)
-      .withFieldsToReturn(findRedactedRepresentationFieldsToReturn)
-      .build();
+      .withSorter(findRedactedRepresentationSorter).withSublist(new Sublist(0, 1)).withFacets(Facets.NONE)
+      .withFieldsToReturn(findRedactedRepresentationFieldsToReturn).build();
 
-    services.rodaEntityRestService(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()), IndexedRepresentation.class)
-      .whenComplete((result, throwable) -> {
+    services.rodaEntityRestService(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
+      IndexedRepresentation.class).whenComplete((result, throwable) -> {
         if (throwable != null) {
           repPromise.reject(throwable);
         } else if (result.getTotalCount() > 0) {
@@ -251,12 +258,14 @@ public class PDFRedactor extends Composite {
     final PromiseWrapper<IndexedRepresentation> repPromise = new PromiseWrapper<>();
     Services services = new Services("Create redacted representation", "post");
 
-    services.representationResource(s -> s.createRepresentation(aipId, "MIXED", "Creating representation for redacted files"))
+    services
+      .representationResource(s -> s.createRepresentation(aipId, "MIXED", "Creating representation for redacted files"))
       .whenComplete((representation, throwable) -> {
         if (throwable != null) {
           repPromise.reject(throwable);
         } else {
-          // After creating the representation, get it as IndexedRepresentation, then set its type
+          // After creating the representation, get it as IndexedRepresentation, then set
+          // its type
           getRepresentationById(aipId, representation.getId()).then((indexedRepresentation) -> {
             setRepresentationType(indexedRepresentation).then((job) -> {
               repPromise.resolve(indexedRepresentation);
@@ -273,8 +282,10 @@ public class PDFRedactor extends Composite {
   private static Promise<Job> setRepresentationType(IndexedRepresentation representation) {
     final PromiseAsyncCallback<Job> changeRepTypeJobCallback = new PromiseAsyncCallback<>();
     Services services = new Services("Change representation type", "put");
-    SelectedItemsListRequest selectedItemsRequest = new SelectedItemsListRequest(Collections.singletonList(representation.getUUID()));
-    ChangeTypeRequest changeTypeRequest = new ChangeTypeRequest(selectedItemsRequest, "Redacted", "Setting representation type to \"Redacted\"");
+    SelectedItemsListRequest selectedItemsRequest = new SelectedItemsListRequest(
+      Collections.singletonList(representation.getUUID()));
+    ChangeTypeRequest changeTypeRequest = new ChangeTypeRequest(selectedItemsRequest, "Redacted",
+      "Setting representation type to \"Redacted\"");
 
     services.representationResource(s -> s.changeRepresentationType(changeTypeRequest))
       .whenComplete((job, throwable) -> {
@@ -288,10 +299,9 @@ public class PDFRedactor extends Composite {
     return changeRepTypeJobCallback.getPromise();
   }
 
-  private void setupNavigation(IndexedFile indexedFile, IndexedAIP indexedAIP, IndexedRepresentation indexedRepresentation) {
-    navigationToolbar.withObject(indexedFile)
-      .withPermissions(indexedAIP.getPermissions())
-      .build();
+  private void setupNavigation(IndexedFile indexedFile, IndexedAIP indexedAIP,
+    IndexedRepresentation indexedRepresentation) {
+    navigationToolbar.withObject(indexedFile).withPermissions(indexedAIP.getPermissions()).build();
     navigationToolbar.updateBreadcrumb(indexedAIP, indexedRepresentation, indexedFile);
     keyboardFocus.setFocus(true);
   }
@@ -310,11 +320,13 @@ public class PDFRedactor extends Composite {
       request.setDirectoryPaths(filePath);
       request.setFileId(fileId);
 
-      CompletableFuture<IndexedFile> retrieveFileFuture = services.fileResource(s -> s.retrieveIndexedFileViaRequest(request));
+      CompletableFuture<IndexedFile> retrieveFileFuture = services
+        .fileResource(s -> s.retrieveIndexedFileViaRequest(request));
       CompletableFuture<IndexedAIP> retrieveAIPFuture = services.rodaEntityRestService(
         s -> s.findByUuid(aipId, LocaleInfo.getCurrentLocale().getLocaleName()), IndexedAIP.class);
       CompletableFuture<IndexedRepresentation> retrieveRepresentationFuture = services.rodaEntityRestService(
-        s -> s.findByUuid(representationId, LocaleInfo.getCurrentLocale().getLocaleName()), IndexedRepresentation.class);
+        s -> s.findByUuid(representationId, LocaleInfo.getCurrentLocale().getLocaleName()),
+        IndexedRepresentation.class);
 
       CompletableFuture.allOf(retrieveFileFuture, retrieveAIPFuture, retrieveRepresentationFuture)
         .whenComplete((unused, throwable) -> {
@@ -323,7 +335,8 @@ public class PDFRedactor extends Composite {
           } else {
             PDFRedactor pdfRedactor = getInstance();
             pdfRedactor.init(retrieveFileFuture.join());
-            pdfRedactor.setupNavigation(retrieveFileFuture.join(), retrieveAIPFuture.join(), retrieveRepresentationFuture.join());
+            pdfRedactor.setupNavigation(retrieveFileFuture.join(), retrieveAIPFuture.join(),
+              retrieveRepresentationFuture.join());
             callback.onSuccess(pdfRedactor);
           }
         });

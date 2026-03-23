@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.api.v2.controller;
 
@@ -53,8 +53,8 @@ public class ClassificationPlanController {
       public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
         // delegate
-        ConsumesOutputStream consumesOutputStream = classificationPlanService
-          .retrieveClassificationPlan(requestContext, filename);
+        ConsumesOutputStream consumesOutputStream = classificationPlanService.retrieveClassificationPlan(requestContext,
+          filename);
         return ApiUtils.okResponse(new StreamResponse(consumesOutputStream), null);
       }
     });

@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.api.v2.services;
 
@@ -55,8 +55,7 @@ public class RiskIncidenceService {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_DESCRIPTION, mitigatedDescription);
 
     return CommonServicesUtils.createAndExecuteInternalJob("Update risk incidences", selected,
-      UpdateIncidencesPlugin.class, user,
-      pluginParameters, "Could not execute risk incidence update action");
+      UpdateIncidencesPlugin.class, user, pluginParameters, "Could not execute risk incidence update action");
   }
 
   public RiskIncidence updateRiskIncidence(ModelService modelService, RiskIncidence incidence)

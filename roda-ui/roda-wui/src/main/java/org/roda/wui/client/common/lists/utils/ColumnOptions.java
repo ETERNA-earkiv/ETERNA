@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.lists.utils;
 
@@ -25,9 +25,7 @@ public class ColumnOptions {
   private RenderingHint renderingHint;
 
   public enum RenderingHint {
-    FILE_SIZE,
-    DATE_FORMAT_TITLE, DATE_FORMAT_SIMPLE, DATETIME_FORMAT_SIMPLE,
-    LIST;
+    FILE_SIZE, DATE_FORMAT_TITLE, DATE_FORMAT_SIMPLE, DATETIME_FORMAT_SIMPLE, LIST;
   }
 
   /**

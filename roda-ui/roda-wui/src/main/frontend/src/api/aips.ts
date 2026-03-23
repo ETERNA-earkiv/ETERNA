@@ -17,7 +17,7 @@ export interface IndexedAIP {
 }
 
 export interface IndexResult<T> {
-  results: T[]
+  results: T[] | null
   totalCount: number
   offset: number
   limit: number
@@ -25,7 +25,8 @@ export interface IndexResult<T> {
 
 export interface FindRequest {
   filter?: {
-    parameters: Array<{
+    filterParameters: Array<{
+      type: string
       name: string
       value: string
     }>
@@ -41,10 +42,7 @@ export interface FindRequest {
     maximumElementCount: number
   }
   facets?: {
-    parameters: Array<{
-      name: string
-      limit: number
-    }>
+    parameters: Record<string, unknown>
   }
   onlyActive?: boolean
 }
@@ -57,17 +55,21 @@ export function searchAIPs(
   const body: FindRequest = {
     sublist: { firstElementIndex: offset, maximumElementCount: limit },
     sorter: { parameters: [{ name: 'dateModified', descending: true }] },
+    facets: { parameters: {} },
+    onlyActive: true,
   }
   if (query) {
     body.filter = {
-      parameters: [{ name: 'fulltext', value: query }],
+      filterParameters: [{ type: 'SimpleFilterParameter', name: 'fulltext', value: query }],
     }
+  } else {
+    body.filter = { filterParameters: [] }
   }
-  return api.post<IndexResult<IndexedAIP>>('/aips', body)
+  return api.post<IndexResult<IndexedAIP>>('/aips/find', body)
 }
 
 export function getAIP(id: string): Promise<IndexedAIP> {
-  return api.get<IndexedAIP>(`/aips/${id}`)
+  return api.get<IndexedAIP>(`/aips/find/${id}`)
 }
 
 export interface Representation {
@@ -79,10 +81,12 @@ export interface Representation {
 }
 
 export function getRepresentations(aipId: string): Promise<IndexResult<Representation>> {
-  return api.post<IndexResult<Representation>>('/representations', {
+  return api.post<IndexResult<Representation>>('/representations/find', {
     filter: {
-      parameters: [{ name: 'aipId', value: aipId }],
+      filterParameters: [{ type: 'SimpleFilterParameter', name: 'aipId', value: aipId }],
     },
     sublist: { firstElementIndex: 0, maximumElementCount: 100 },
+    facets: { parameters: {} },
+    onlyActive: true,
   })
 }

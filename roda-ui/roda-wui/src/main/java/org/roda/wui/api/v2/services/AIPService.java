@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.api.v2.services;
 
@@ -333,7 +333,7 @@ public class AIPService {
     AlreadyExistsException {
     User user = requestContext.getUser();
     ModelService model = requestContext.getModelService();
-    //return model.createAIP(parentAipId, type, permissions, user.getName(), null);
+    // return model.createAIP(parentAipId, type, permissions, user.getName(), null);
     AIP aip = model.createAIP(parentAipId, type, permissions, user.getName(), null);
     CreateLogicalMETS.create(aip, model);
     return aip;

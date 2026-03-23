@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.actions;
 
@@ -50,12 +50,13 @@ public class RepresentationSearchWrapperActions extends AbstractActionable<Index
     Arrays.asList(RepresentationSearchWrapperAction.NEW));
 
   private static final Set<RepresentationSearchWrapperAction> POSSIBLE_ACTIONS_ON_SINGLE_REPRESENTATION = new HashSet<>(
-    Arrays.asList(RepresentationSearchWrapperAction.CHANGE_TYPE, RepresentationSearchWrapperAction.REMOVE, RepresentationSearchWrapperAction.NEW_PROCESS,
-      RepresentationSearchWrapperAction.IDENTIFY_FORMATS, RepresentationSearchWrapperAction.CHANGE_STATE));
+    Arrays.asList(RepresentationSearchWrapperAction.CHANGE_TYPE, RepresentationSearchWrapperAction.REMOVE,
+      RepresentationSearchWrapperAction.NEW_PROCESS, RepresentationSearchWrapperAction.IDENTIFY_FORMATS,
+      RepresentationSearchWrapperAction.CHANGE_STATE));
 
   private static final Set<RepresentationSearchWrapperAction> POSSIBLE_ACTIONS_ON_MULTIPLE_REPRESENTATIONS = new HashSet<>(
-    Arrays.asList(RepresentationSearchWrapperAction.CHANGE_TYPE, RepresentationSearchWrapperAction.REMOVE, RepresentationSearchWrapperAction.NEW_PROCESS,
-      RepresentationSearchWrapperAction.IDENTIFY_FORMATS));
+    Arrays.asList(RepresentationSearchWrapperAction.CHANGE_TYPE, RepresentationSearchWrapperAction.REMOVE,
+      RepresentationSearchWrapperAction.NEW_PROCESS, RepresentationSearchWrapperAction.IDENTIFY_FORMATS));
 
   private final String parentAipId;
   private final Permissions permissions;
@@ -392,13 +393,14 @@ public class RepresentationSearchWrapperActions extends AbstractActionable<Index
 
     // MANAGEMENT
     ActionableGroup<IndexedRepresentation> managementGroup = new ActionableGroup<>(messages.representation());
-    managementGroup.addButton(messages.newRepresentationButton(), RepresentationSearchWrapperAction.NEW, ActionImpact.UPDATED,
-      "btn-plus");
-    managementGroup.addButton(messages.changeTypeButton(), RepresentationSearchWrapperAction.CHANGE_TYPE, ActionImpact.UPDATED,
-      "btn-edit");
-    managementGroup.addButton(messages.changeStatusButton(), RepresentationSearchWrapperAction.CHANGE_STATE, ActionImpact.UPDATED,
-      "btn-edit");
-    managementGroup.addButton(messages.removeButton(), RepresentationSearchWrapperAction.REMOVE, ActionImpact.DESTROYED, "btn-ban");
+    managementGroup.addButton(messages.newRepresentationButton(), RepresentationSearchWrapperAction.NEW,
+      ActionImpact.UPDATED, "btn-plus");
+    managementGroup.addButton(messages.changeTypeButton(), RepresentationSearchWrapperAction.CHANGE_TYPE,
+      ActionImpact.UPDATED, "btn-edit");
+    managementGroup.addButton(messages.changeStatusButton(), RepresentationSearchWrapperAction.CHANGE_STATE,
+      ActionImpact.UPDATED, "btn-edit");
+    managementGroup.addButton(messages.removeButton(), RepresentationSearchWrapperAction.REMOVE, ActionImpact.DESTROYED,
+      "btn-ban");
 
     // PRESERVATION
     ActionableGroup<IndexedRepresentation> preservationGroup = new ActionableGroup<>(messages.preservationTitle());

@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.api.v2.controller;
 
@@ -770,8 +770,7 @@ public class AIPController implements AIPRestService, Exportable {
         controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
         // delegate
-        return aipService.retrieveSupportedMetadata(requestContext, aip, representation, metadataType,
-          locale);
+        return aipService.retrieveSupportedMetadata(requestContext, aip, representation, metadataType, locale);
       }
     });
   }
@@ -1396,7 +1395,7 @@ public class AIPController implements AIPRestService, Exportable {
         IndexedAIP aip = requestContext.getIndexService().retrieve(IndexedAIP.class, aipId,
           RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
         controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
-        
+
         // delegate
         return requestContext.getModelService().retrieveAIP(aipId);
       }

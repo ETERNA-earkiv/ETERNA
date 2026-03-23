@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.search;
 
@@ -14,26 +14,27 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class RODASavedSearch {
 
-    private final String searchClassName;
-    private final String title;
-    private final Filter filter;
+  private final String searchClassName;
+  private final String title;
+  private final Filter filter;
 
-    @JsonCreator
-    public RODASavedSearch(@JsonProperty("searchClassName") String searchClassName, @JsonProperty("title") String title, @JsonProperty("filter") Filter filter) {
-        this.searchClassName = searchClassName;
-        this.title = title;
-        this.filter = filter;
-    }
+  @JsonCreator
+  public RODASavedSearch(@JsonProperty("searchClassName") String searchClassName, @JsonProperty("title") String title,
+    @JsonProperty("filter") Filter filter) {
+    this.searchClassName = searchClassName;
+    this.title = title;
+    this.filter = filter;
+  }
 
-    public String getSearchClassName() {
-        return searchClassName;
-    }
+  public String getSearchClassName() {
+    return searchClassName;
+  }
 
-    public Filter getFilter() {
-        return filter;
-    }
+  public Filter getFilter() {
+    return filter;
+  }
 
-    public String getTitle() {
-        return title;
-    }
+  public String getTitle() {
+    return title;
+  }
 }

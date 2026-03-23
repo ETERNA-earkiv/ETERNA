@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/ETERNA-earkiv/ETERNA
+ */
 package org.roda.wui.client.redact;
 
 import com.google.gwt.core.client.GWT;
@@ -32,5 +39,7 @@ public class PDFRedactorPanel extends Composite {
     PDFRedactorObject.unmount();
   }
 
-  public void setSaveCallback(PDFRedactorObject.SaveCallback callback) { PDFRedactorObject.setSaveCallback(callback); }
+  public void setSaveCallback(PDFRedactorObject.SaveCallback callback) {
+    PDFRedactorObject.setSaveCallback(callback);
+  }
 }

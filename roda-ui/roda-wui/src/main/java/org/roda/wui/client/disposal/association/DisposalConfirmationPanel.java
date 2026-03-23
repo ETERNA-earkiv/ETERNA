@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.disposal.association;
 
@@ -61,7 +61,9 @@ public class DisposalConfirmationPanel extends Composite {
     } else {
 
       Services services = new Services("Retrieve disposal confirmation", "get");
-      services.rodaEntityRestService(s -> s.findByUuid(disposalConfirmationId, LocaleInfo.getCurrentLocale().getLocaleName()), DisposalConfirmation.class)
+      services
+        .rodaEntityRestService(s -> s.findByUuid(disposalConfirmationId, LocaleInfo.getCurrentLocale().getLocaleName()),
+          DisposalConfirmation.class)
         .whenComplete((result, throwable) -> {
           if (throwable != null) {
             AsyncCallbackUtils.defaultFailureTreatment(throwable);

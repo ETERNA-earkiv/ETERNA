@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.utils;
 
@@ -485,7 +485,6 @@ public class JavascriptUtils {
    return decodeURIComponent(escape(o.join("")));
   }-*/;
 
-
   public static native Boolean accessLocalStorage(String key) /*-{
     var result=localStorage.getItem(key);
 
@@ -507,7 +506,6 @@ public class JavascriptUtils {
       localStorage.setItem(key, false);
     })
   }-*/;
-
 
   public static native void handleClickLeanMore(Element panelStatisticsButton, String url) /*-{
     panelStatisticsButton.addEventListener("click", function() {

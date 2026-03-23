@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 /**
  *
@@ -112,8 +112,8 @@ public class HTMLWidgetWrapper extends HTML {
       defaultResourceId = id + ".html";
     }
 
-    RequestBuilder request = new RequestBuilder(RequestBuilder.GET,
-      RestUtils.createThemeResourceUri(localizedResourceId, defaultResourceId, resourceType.toString(), false).asString());
+    RequestBuilder request = new RequestBuilder(RequestBuilder.GET, RestUtils
+      .createThemeResourceUri(localizedResourceId, defaultResourceId, resourceType.toString(), false).asString());
 
     final boolean transformMarkdownIntoHTML = isMarkdown;
     try {
@@ -142,8 +142,8 @@ public class HTMLWidgetWrapper extends HTML {
               RegExp imgDocRegExp = RegExp
                 .compile("<img src=\"(" + RodaConstants.CORE_MARKDOWN_FOLDER + "/images/.*?)\"", "g");
               String imgDocReplacement = ("<img src=\""
-                + RestUtils.createThemeResourceUri(filenameToken, null, false).asString() + "\"").replace(filenameToken,
-                  "$1");
+                + RestUtils.createThemeResourceUri(filenameToken, null, false).asString() + "\"")
+                .replace(filenameToken, "$1");
 
               html = imgDocRegExp.replace(html, imgDocReplacement);
 
@@ -151,8 +151,8 @@ public class HTMLWidgetWrapper extends HTML {
               // them with proper "#theme/images/..." links
               RegExp imgRegExp = RegExp.compile("<img src=\"(images/.*?)\"", "g");
               String imgReplacement = ("<img src=\""
-                + RestUtils.createThemeResourceUri(filenameToken, null, false).asString() + "\"").replace(filenameToken,
-                  RodaConstants.CORE_MARKDOWN_FOLDER + "/$1");
+                + RestUtils.createThemeResourceUri(filenameToken, null, false).asString() + "\"")
+                .replace(filenameToken, RodaConstants.CORE_MARKDOWN_FOLDER + "/$1");
 
               html = imgRegExp.replace(html, imgReplacement);
             } else {

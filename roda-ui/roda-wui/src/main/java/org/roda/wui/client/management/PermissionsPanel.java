@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 /**
  *
@@ -257,9 +257,9 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
    * Set all permissions defined by roles checked and set locked with parameters
    *
    * @param roles
-   *              roles of the permissions to check
+   *          roles of the permissions to check
    * @param lock
-   *              if permissions should also be locked
+   *          if permissions should also be locked
    */
   public void checkPermissions(Set<String> roles, boolean lock) {
     Iterator<String> it = roles.iterator();

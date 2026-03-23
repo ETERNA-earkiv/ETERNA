@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.disposal;
 
@@ -33,9 +33,8 @@ public class Disposal {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance()
-          .checkRoles(new HistoryResolver[] { DisposalPolicy.RESOLVER, DisposalConfirmations.RESOLVER,
-              DisposalDestroyedRecords.RESOLVER }, false, callback);
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {DisposalPolicy.RESOLVER, DisposalConfirmations.RESOLVER,
+        DisposalDestroyedRecords.RESOLVER}, false, callback);
 
     }
 

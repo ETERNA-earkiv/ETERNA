@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.management;
 
@@ -74,8 +74,7 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
     Sorter sorter = new Sorter(new SortParameter(RodaConstants.MEMBERS_FULLNAME, false));
 
     Services services = new Services("Find RODA members", "get");
-    FindRequest request = FindRequest.getBuilder(filter, justActive).withSorter(sorter)
-      .build();
+    FindRequest request = FindRequest.getBuilder(filter, justActive).withSorter(sorter).build();
     services.membersResource(s -> s.find(request, LocaleInfo.getCurrentLocale().getLocaleName()))
       .whenComplete((indexedResult, throwable) -> {
         if (throwable != null) {

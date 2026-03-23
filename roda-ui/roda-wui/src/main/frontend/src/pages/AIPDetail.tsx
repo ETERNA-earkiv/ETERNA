@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { getAIP, getRepresentations, type IndexedAIP, type Representation } from '../api/aips'
+import { DigiTable, DigiLoaderSpinner, DigiNotificationAlert, DigiButton } from '@designsystem-se/af-react'
 
 export function AIPDetail() {
   const { id } = useParams<{ id: string }>()
@@ -16,7 +17,7 @@ export function AIPDetail() {
     Promise.all([getAIP(id), getRepresentations(id)])
       .then(([aipData, repsResult]) => {
         setAip(aipData)
-        setRepresentations(repsResult.results)
+        setRepresentations(repsResult.results ?? [])
       })
       .catch(() => setError('Kunde inte hämta arkivobjektet.'))
       .finally(() => setLoading(false))
@@ -25,13 +26,17 @@ export function AIPDetail() {
   if (loading) {
     return (
       <div style={{ textAlign: 'center', padding: '4rem' }}>
-        <digi-loader></digi-loader>
+        <DigiLoaderSpinner />
       </div>
     )
   }
 
   if (error || !aip) {
-    return <digi-message af-type="error">{error || 'Arkivobjektet hittades inte.'}</digi-message>
+    return (
+      <DigiNotificationAlert afVariation="danger" afHeading="Fel">
+        {error || 'Arkivobjektet hittades inte.'}
+      </DigiNotificationAlert>
+    )
   }
 
   const fields: Array<{ label: string; value: string | number | boolean | undefined | null }> = [
@@ -51,24 +56,25 @@ export function AIPDetail() {
     <div>
       {/* Brödsmulor */}
       <nav style={{ marginBottom: '1rem', fontSize: '0.875rem' }}>
-        <button
-          onClick={() => navigate('/browse')}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: 'var(--digi-color-primary, #006991)',
-            cursor: 'pointer',
-            padding: 0,
-            textDecoration: 'underline',
-          }}
+        <DigiButton
+          afVariation="tertiary"
+          onAfOnClick={() => navigate('/browse')}
+          style={{ padding: 0 }}
         >
           Arkivobjekt
-        </button>
+        </DigiButton>
         <span style={{ margin: '0 0.5rem', color: '#555' }}>›</span>
         <span>{aip.title || aip.id}</span>
       </nav>
 
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          marginBottom: '1.5rem',
+        }}
+      >
         <h1>{aip.title || aip.id}</h1>
         <span
           style={{
@@ -86,7 +92,7 @@ export function AIPDetail() {
       {/* Metadata */}
       <section style={{ marginBottom: '2rem' }}>
         <h2 style={{ fontSize: '1.125rem', marginBottom: '0.75rem' }}>Metadata</h2>
-        <digi-table>
+        <DigiTable>
           <table>
             <tbody>
               {fields.map(({ label, value }) =>
@@ -99,7 +105,7 @@ export function AIPDetail() {
               )}
             </tbody>
           </table>
-        </digi-table>
+        </DigiTable>
       </section>
 
       {/* Representationer */}
@@ -108,7 +114,7 @@ export function AIPDetail() {
           <h2 style={{ fontSize: '1.125rem', marginBottom: '0.75rem' }}>
             Representationer ({representations.length})
           </h2>
-          <digi-table>
+          <DigiTable>
             <table>
               <thead>
                 <tr>
@@ -129,7 +135,7 @@ export function AIPDetail() {
                 ))}
               </tbody>
             </table>
-          </digi-table>
+          </DigiTable>
         </section>
       )}
     </div>

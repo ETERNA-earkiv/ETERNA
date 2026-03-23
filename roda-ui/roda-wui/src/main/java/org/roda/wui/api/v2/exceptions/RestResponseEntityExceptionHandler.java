@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.api.v2.exceptions;
 
@@ -79,8 +79,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     } else if (ex.getCause() instanceof GenericException || ex.getCause() instanceof RequestNotValidException
       || ex.getCause() instanceof JobStateNotPendingException
       || ex.getCause() instanceof DisposalScheduleNotValidException
-      || ex.getCause() instanceof DisposalHoldNotValidException
-      || ex.getCause() instanceof InvalidTokenException
+      || ex.getCause() instanceof DisposalHoldNotValidException || ex.getCause() instanceof InvalidTokenException
       || ex.getCause() instanceof JwtException) {
       message = "Request was not valid";
       details = ex.getCause().getMessage();

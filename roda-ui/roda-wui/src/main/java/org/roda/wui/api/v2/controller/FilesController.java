@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.api.v2.controller;
 
@@ -413,8 +413,7 @@ public class FilesController implements FileRestService, Exportable {
   @Override
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
     // delegate
-    return ApiUtils
-      .okResponse(indexService.exportToCSV(findRequestString, IndexedFile.class));
+    return ApiUtils.okResponse(indexService.exportToCSV(findRequestString, IndexedFile.class));
   }
 
   @GetMapping(path = "/{uuid}/metadata/technical/{typeId}/html", produces = MediaType.TEXT_HTML_VALUE)

@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.disposal.rule;
 
@@ -66,6 +66,7 @@ public class MetadataFieldsPanel extends Composite implements HasValueChangeHand
   private int selectedConditionIndex;
   private boolean changed = false;
   private boolean checked = false;
+
   public MetadataFieldsPanel(String conditionKey, String conditionValue, boolean editMode, DisposalRule disposalRule) {
     initWidget(uiBinder.createAndBindUi(this));
 

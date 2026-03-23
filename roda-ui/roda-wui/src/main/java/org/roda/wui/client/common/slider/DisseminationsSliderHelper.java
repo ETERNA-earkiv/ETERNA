@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.slider;
 
@@ -91,8 +91,8 @@ public class DisseminationsSliderHelper {
     dipFields.addAll(Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID, RodaConstants.DIP_TITLE,
       RodaConstants.DIP_DESCRIPTION, RodaConstants.DIP_DELETE_EXTERNAL_URL, RodaConstants.DIP_OPEN_EXTERNAL_URL));
 
-    FindRequest findRequest = FindRequest.getBuilder(filter, true).withSorter(sorter)
-      .withSublist(sublist).withFacets(facets).build();
+    FindRequest findRequest = FindRequest.getBuilder(filter, true).withSorter(sorter).withSublist(sublist)
+      .withFacets(facets).build();
 
     services.rodaEntityRestService(s -> s.find(findRequest, localeString), IndexedDIP.class)
       .whenComplete((indexedDIPIndexResult, throwable) -> {
@@ -114,7 +114,8 @@ public class DisseminationsSliderHelper {
     dipFields.addAll(Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID, RodaConstants.DIP_TITLE,
       RodaConstants.DIP_DESCRIPTION, RodaConstants.DIP_DELETE_EXTERNAL_URL, RodaConstants.DIP_OPEN_EXTERNAL_URL));
 
-    FindRequest request = FindRequest.getBuilder(filter, true).withFieldsToReturn(dipFields).withSublist(sublist).withSorter(sorter).withFacets(facets).build();
+    FindRequest request = FindRequest.getBuilder(filter, true).withFieldsToReturn(dipFields).withSublist(sublist)
+      .withSorter(sorter).withFacets(facets).build();
 
     Services services = new Services("Find Indexed DIP", "get");
     services.dipResource(s -> s.find(request, localeString)).whenComplete((indexedDIPIndexResult, throwable) -> {

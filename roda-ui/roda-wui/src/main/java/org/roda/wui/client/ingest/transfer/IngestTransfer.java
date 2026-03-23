@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 /**
  *
@@ -201,7 +201,8 @@ public class IngestTransfer extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    // navigationToolbar.setHeader(messages.oneOfAObject(TransferredResource.class.getName())); //TODO: Add header
+    // navigationToolbar.setHeader(messages.oneOfAObject(TransferredResource.class.getName()));
+    // //TODO: Add header
 
     ingestTransferDescription.add(new HTMLWidgetWrapper("IngestTransferDescription.html"));
 
@@ -218,7 +219,7 @@ public class IngestTransfer extends Composite {
       navigationToolbar.setVisible(false);
       objectToolbar.setVisible(false);
       // if (!dropFolderActive) {
-      //   ingestTransferPanel.setVisible(JavascriptUtils.accessLocalStorage(CARD_IDENTIFIER));
+      // ingestTransferPanel.setVisible(JavascriptUtils.accessLocalStorage(CARD_IDENTIFIER));
       // }
       lastScanned.setText("");
     } else {

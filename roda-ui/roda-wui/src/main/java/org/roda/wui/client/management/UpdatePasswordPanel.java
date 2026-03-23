@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.management;
 
@@ -86,6 +86,7 @@ public class UpdatePasswordPanel extends Composite {
   Button reset;
 
   public boolean checked = false;
+
   @UiConstructor
   public UpdatePasswordPanel(boolean isReset) {
     initWidget(uiBinder.createAndBindUi(this));
@@ -237,25 +238,25 @@ public class UpdatePasswordPanel extends Composite {
         resetPasswordRequest.setToken(token.getValue());
         services.membersResource(s -> s.resetUserPassword(username.getValue(), resetPasswordRequest))
           .whenComplete((res, error) -> {
-          if (error == null) {
-            Dialogs.showInformationDialog(messages.resetPasswordSuccessDialogTitle(),
-              messages.resetPasswordSuccessDialogMessage(), messages.resetPasswordSuccessDialogButton(), false,
-              new AsyncCallback<Void>() {
+            if (error == null) {
+              Dialogs.showInformationDialog(messages.resetPasswordSuccessDialogTitle(),
+                messages.resetPasswordSuccessDialogMessage(), messages.resetPasswordSuccessDialogButton(), false,
+                new AsyncCallback<Void>() {
 
-                @Override
-                public void onSuccess(Void result) {
-                  HistoryUtils.newHistory(Login.RESOLVER);
-                }
+                  @Override
+                  public void onSuccess(Void result) {
+                    HistoryUtils.newHistory(Login.RESOLVER);
+                  }
 
-                @Override
-                public void onFailure(Throwable caught) {
-                  HistoryUtils.newHistory(Login.RESOLVER);
-                }
-              });
-          } else {
-            errorMessage(error);
-          }
-        });
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    HistoryUtils.newHistory(Login.RESOLVER);
+                  }
+                });
+            } else {
+              errorMessage(error);
+            }
+          });
       }
     }
   }

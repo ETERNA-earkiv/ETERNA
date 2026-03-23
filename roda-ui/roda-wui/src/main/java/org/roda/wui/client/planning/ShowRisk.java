@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 /**
  *
@@ -129,22 +129,22 @@ public class ShowRisk extends Composite {
         .rodaEntityRestService(s -> s.findByUuid(historyTokens.get(0), LocaleInfo.getCurrentLocale().getLocaleName()),
           IndexedRisk.class)
         .thenCompose(indexedRisk -> services.riskResource(s -> s.retrieveRiskVersions(historyTokens.get(0)))
-        .whenComplete((result, throwable) -> {
-          if (throwable == null) {
-            indexedRisk.setHasVersions(!result.getVersions().isEmpty());
-            instance = new ShowRisk(indexedRisk);
-            RiskActions riskActions = RiskActions.get();
-            if (indexedRisk.hasVersions()) {
-              riskActions = RiskActions.getWithHistory();
+          .whenComplete((result, throwable) -> {
+            if (throwable == null) {
+              indexedRisk.setHasVersions(!result.getVersions().isEmpty());
+              instance = new ShowRisk(indexedRisk);
+              RiskActions riskActions = RiskActions.get();
+              if (indexedRisk.hasVersions()) {
+                riskActions = RiskActions.getWithHistory();
+              }
+              SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, riskActions.hasAnyRoles());
+              instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(riskActions).withBackButton()
+                .withActionCallback(actionCallback).buildListWithObjects(new ActionableObject<>(indexedRisk)));
+              callback.onSuccess(instance);
+            } else {
+              callback.onFailure(throwable);
             }
-            SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, riskActions.hasAnyRoles());
-            instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(riskActions).withBackButton()
-              .withActionCallback(actionCallback).buildListWithObjects(new ActionableObject<>(indexedRisk)));
-            callback.onSuccess(instance);
-          } else {
-            callback.onFailure(throwable);
-          }
-        }));
+          }));
     } else {
       HistoryUtils.newHistory(RiskRegister.RESOLVER);
       callback.onSuccess(null);

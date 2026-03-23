@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.common.client.tools;
 
@@ -60,8 +60,8 @@ public class RestUtils {
     // api/v2/{aip_id}/representations/{representation_id}/binary
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V2_AIPS).append(URL.encodeQueryString(aipId))
-      .append(RodaConstants.API_SEP).append(RodaConstants.AIP_REPRESENTATIONS).append(RodaConstants.API_SEP)
+    b.append(RodaConstants.API_REST_V2_AIPS).append(URL.encodeQueryString(aipId)).append(RodaConstants.API_SEP)
+      .append(RodaConstants.AIP_REPRESENTATIONS).append(RodaConstants.API_SEP)
       .append(URL.encodeQueryString(representationId)).append(RodaConstants.API_REST_V2_DOWNLOAD_HANDLER);
 
     return UriUtils.fromSafeConstant(b.toString());
@@ -72,8 +72,8 @@ public class RestUtils {
     // api/v2/aip/{aip_id}/representations/{representation_id}/other-metadata/binary
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V2_AIPS).append(URL.encodeQueryString(aipId))
-      .append(RodaConstants.API_SEP).append(RodaConstants.AIP_REPRESENTATIONS).append(RodaConstants.API_SEP)
+    b.append(RodaConstants.API_REST_V2_AIPS).append(URL.encodeQueryString(aipId)).append(RodaConstants.API_SEP)
+      .append(RodaConstants.AIP_REPRESENTATIONS).append(RodaConstants.API_SEP)
       .append(URL.encodeQueryString(representationId)).append(RodaConstants.API_REST_V2_REPRESENTATION_OTHER_METADATA)
       .append(RodaConstants.API_REST_V2_REPRESENTATION_BINARY);
 

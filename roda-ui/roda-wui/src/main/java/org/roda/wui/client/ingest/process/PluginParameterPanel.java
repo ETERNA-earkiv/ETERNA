@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.ingest.process;
 
@@ -184,7 +184,7 @@ public class PluginParameterPanel extends Composite {
 
         innerPanel.add(createRepresentationType(messages.representationTypeTitle(),
           messages.representationTypeDescription(), typeChanged));
-          ValueChangeHandler<Boolean> preservationStatusChanged = preservationStatusChangedEvent -> representationParameter
+        ValueChangeHandler<Boolean> preservationStatusChanged = preservationStatusChangedEvent -> representationParameter
           .setMarkAsPreservation(preservationStatusChangedEvent.getValue());
 
         innerPanel
@@ -638,48 +638,49 @@ public class PluginParameterPanel extends Composite {
   private void createPluginSipToAipLayout() {
     List<PluginType> plugins = Arrays.asList(PluginType.SIP_TO_AIP);
     Services services = new Services("Retrieve plugin information", "get");
-    services.configurationsResource(s -> s.retrievePluginsInfo(plugins, false)).whenComplete((pluginInfoList, throwable) -> {
-      if (throwable == null) {
-        Label parameterName = new Label(parameter.getName());
-        layout.add(parameterName);
-        addHelp();
+    services.configurationsResource(s -> s.retrievePluginsInfo(plugins, false))
+      .whenComplete((pluginInfoList, throwable) -> {
+        if (throwable == null) {
+          Label parameterName = new Label(parameter.getName());
+          layout.add(parameterName);
+          addHelp();
 
-        FlowPanel radioGroup = new FlowPanel();
-        PluginUtils.sortByName(pluginInfoList.getPluginInfoList());
+          FlowPanel radioGroup = new FlowPanel();
+          PluginUtils.sortByName(pluginInfoList.getPluginInfoList());
 
-        for (final PluginInfo pluginInfo : pluginInfoList.getPluginInfoList()) {
-          if (pluginInfo != null) {
-            RadioButton pRadio = new RadioButton(parameter.getName(),
-              messages.pluginLabelWithVersion(pluginInfo.getName(), pluginInfo.getVersion()));
+          for (final PluginInfo pluginInfo : pluginInfoList.getPluginInfoList()) {
+            if (pluginInfo != null) {
+              RadioButton pRadio = new RadioButton(parameter.getName(),
+                messages.pluginLabelWithVersion(pluginInfo.getName(), pluginInfo.getVersion()));
 
-            if (pluginInfo.getId().equals(parameter.getDefaultValue())) {
-              pRadio.setValue(true);
-              value = pluginInfo.getId();
-            }
-
-            Label pHelp = new Label(pluginInfo.getDescription());
-            pRadio.setTitle("radio button");
-
-            radioGroup.add(pRadio);
-            radioGroup.add(pHelp);
-
-            pRadio.addStyleName(FORM_RADIOBUTTON);
-            pHelp.addStyleName(FORM_HELP);
-
-            pRadio.addValueChangeHandler(event -> {
-              if (Boolean.TRUE.equals(event.getValue())) {
+              if (pluginInfo.getId().equals(parameter.getDefaultValue())) {
+                pRadio.setValue(true);
                 value = pluginInfo.getId();
               }
-            });
+
+              Label pHelp = new Label(pluginInfo.getDescription());
+              pRadio.setTitle("radio button");
+
+              radioGroup.add(pRadio);
+              radioGroup.add(pHelp);
+
+              pRadio.addStyleName(FORM_RADIOBUTTON);
+              pHelp.addStyleName(FORM_HELP);
+
+              pRadio.addValueChangeHandler(event -> {
+                if (Boolean.TRUE.equals(event.getValue())) {
+                  value = pluginInfo.getId();
+                }
+              });
+            }
           }
+
+          layout.add(radioGroup);
+
+          radioGroup.addStyleName(FORM_RADIOGROUP);
+          parameterName.addStyleName(FORM_LABEL);
         }
-
-        layout.add(radioGroup);
-
-        radioGroup.addStyleName(FORM_RADIOGROUP);
-        parameterName.addStyleName(FORM_LABEL);
-      }
-    });
+      });
   }
 
   private void createIntegerLayout() {

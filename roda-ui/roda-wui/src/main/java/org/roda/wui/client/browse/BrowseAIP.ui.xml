@@ -10,7 +10,7 @@
 		<g:FocusPanel ui:field="keyboardFocus">
 			<g:FlowPanel styleName="browse" addStyleNames="wrapper skip_padding">
 				<common:NavigationToolbar ui:field="navigationToolbar" />
-				<common:BrowseAIPActionsToolbar ui:field="objectToolbar" label="{messages.catalogueItemTitle}"/>
+				<common:BrowseAIPActionsToolbar ui:field="objectToolbar" label="{messages.catalogueItemTitle}" />
 				<g:FlowPanel addStyleNames="row full_width skip_padding">
 					<g:FlowPanel addStyleNames="content">
 						<g:FlowPanel addStyleNames="upperContent">
@@ -31,10 +31,10 @@
 		</g:FocusPanel>
 		<g:FlowPanel styleName="browseSidePanel" ui:field="sidePanel">
 			<g:FlowPanel>
-				<g:FlowPanel ui:field="representationCards"  addStyleNames="verticalThumbnailCardContainer"/>
+				<g:FlowPanel ui:field="representationCards" addStyleNames="verticalThumbnailCardContainer" />
 			</g:FlowPanel>
 			<g:FlowPanel>
-				<g:FlowPanel ui:field="disseminationCards" addStyleNames="verticalThumbnailCardContainer"/>
+				<g:FlowPanel ui:field="disseminationCards" addStyleNames="verticalThumbnailCardContainer" />
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

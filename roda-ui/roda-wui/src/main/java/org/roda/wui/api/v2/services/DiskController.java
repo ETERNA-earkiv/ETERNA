@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/ETERNA-earkiv/ETERNA
+ */
 package org.roda.wui.api.v2.services;
 
 import java.util.Map;
@@ -20,7 +27,7 @@ public class DiskController {
 
   @GetMapping("/diskstats")
   public Map<String, Object> getDiskStats(HttpServletRequest request)
-      throws GenericException, AuthorizationDeniedException {
+    throws GenericException, AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     User user = UserUtility.getUser(request);

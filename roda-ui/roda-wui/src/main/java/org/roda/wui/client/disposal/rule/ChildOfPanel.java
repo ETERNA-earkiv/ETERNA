@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.disposal.rule;
 
@@ -105,10 +105,11 @@ public class ChildOfPanel extends Composite implements HasValueChangeHandlers<Pa
   }
 
   private void initPluginParameterPanel() {
-    pluginParameterPanel = new PluginParameterPanel(
-      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_PARENT_ID, messages.selectParentTitle(),
-        PluginParameter.PluginParameterType.AIP_ID).withDescription("").isMandatory(false).isReadOnly(false)
-        .withDescription("Use the provided parent node if the SIPs does not provide one.").build());
+    pluginParameterPanel = new PluginParameterPanel(PluginParameter
+      .getBuilder(RodaConstants.PLUGIN_PARAMS_PARENT_ID, messages.selectParentTitle(),
+        PluginParameter.PluginParameterType.AIP_ID)
+      .withDescription("").isMandatory(false).isReadOnly(false)
+      .withDescription("Use the provided parent node if the SIPs does not provide one.").build());
     pluginParameterPanel.getLayout().removeStyleName("plugin-options-parameter");
   }
 

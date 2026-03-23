@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.search;
 
@@ -87,9 +87,8 @@ public class Relation {
       Filter filter = new Filter(params);
 
       Services services = new Services("Find AIPs", "get");
-      FindRequest request = FindRequest.getBuilder(filter, false).withSorter(Sorter.NONE)
-        .withSublist(new Sublist(0, 1)).withFacets(Facets.NONE)
-        .withFieldsToReturn(Arrays.asList(RodaConstants.INDEX_UUID)).build();
+      FindRequest request = FindRequest.getBuilder(filter, false).withSorter(Sorter.NONE).withSublist(new Sublist(0, 1))
+        .withFacets(Facets.NONE).withFieldsToReturn(Arrays.asList(RodaConstants.INDEX_UUID)).build();
       services.aipResource(s -> s.find(request, LocaleInfo.getCurrentLocale().getLocaleName()))
         .whenComplete((result, throwable) -> {
           if (throwable != null) {

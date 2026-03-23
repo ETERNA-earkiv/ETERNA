@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.browse;
 
@@ -390,8 +390,8 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     frame.setTitle(dip.getTitle());
     frame.getElement().setAttribute("scrolling", "auto");
 
-    if(isSameOrigin(url)){
-        frame.addLoadHandler(ev -> JavascriptUtils.runIframeResizer(frame.getElement()));
+    if (isSameOrigin(url)) {
+      frame.addLoadHandler(ev -> JavascriptUtils.runIframeResizer(frame.getElement()));
     }
     panel.add(frame);
   }
@@ -540,8 +540,8 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     return false;
   }
 
-  public boolean isSameOrigin(String url){
-      String base = GWT.getHostPageBaseURL();
-      return url !=null && base != null && url.startsWith(base);
+  public boolean isSameOrigin(String url) {
+    String base = GWT.getHostPageBaseURL();
+    return url != null && base != null && url.startsWith(base);
   }
 }

@@ -2,16 +2,16 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
 
-    <ui:with field='messages' type='config.i18n.client.ClientMessages' />
+	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
-    <g:FlowPanel styleName="thumbnailCard">
-        <g:Label ui:field="title" styleName="thumbnailCardTitle"/>
-        <g:FocusPanel styleName="clickable" ui:field="clickable">
-            <g:FlowPanel styleName="thumbnailCardDetails">
-                <g:FlowPanel ui:field="thumbnail" />
-                <g:FlowPanel ui:field="tags" styleName="thumbnailCardTags"/>
-                <g:FlowPanel ui:field="attributes" styleName="thumbnailCardAttributes"/>
-            </g:FlowPanel>
-        </g:FocusPanel>
-    </g:FlowPanel>
+	<g:FlowPanel styleName="thumbnailCard">
+		<g:Label ui:field="title" styleName="thumbnailCardTitle" />
+		<g:FocusPanel styleName="clickable" ui:field="clickable">
+			<g:FlowPanel styleName="thumbnailCardDetails">
+				<g:FlowPanel ui:field="thumbnail" />
+				<g:FlowPanel ui:field="tags" styleName="thumbnailCardTags" />
+				<g:FlowPanel ui:field="attributes" styleName="thumbnailCardAttributes" />
+			</g:FlowPanel>
+		</g:FocusPanel>
+	</g:FlowPanel>
 </ui:UiBinder>

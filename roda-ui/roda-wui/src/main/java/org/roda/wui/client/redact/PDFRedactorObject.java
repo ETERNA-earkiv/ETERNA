@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/ETERNA-earkiv/ETERNA
+ */
 package org.roda.wui.client.redact;
 
 import com.google.gwt.dom.client.Element;
@@ -7,7 +14,7 @@ import jsinterop.annotations.JsMethod;
 import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
 
-@JsType(name="PDFRedactor", namespace=JsPackage.GLOBAL)
+@JsType(name = "PDFRedactor", namespace = JsPackage.GLOBAL)
 public class PDFRedactorObject {
   @JsFunction
   public interface SaveCallback {
@@ -26,4 +33,3 @@ public class PDFRedactorObject {
   @JsMethod
   public static native void setSaveCallback(SaveCallback callback);
 }
-

@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.actions;
 
@@ -143,8 +143,8 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
   @Override
   public CanActResult contextCanAct(Action<IndexedFile> action, IndexedFile file) {
     if (AIPState.UNDER_APPRAISAL.equals(state)) {
-      return new CanActResult(POSSIBLE_ACTIONS_ON_FILE_UNDER_APPRAISAL.contains(action),
-              CanActResult.Reason.CONTEXT, messages.reasonAIPUnderAppraisal());
+      return new CanActResult(POSSIBLE_ACTIONS_ON_FILE_UNDER_APPRAISAL.contains(action), CanActResult.Reason.CONTEXT,
+        messages.reasonAIPUnderAppraisal());
     }
 
     if (file.isDirectory()) {
@@ -165,8 +165,8 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
   @Override
   public CanActResult contextCanAct(Action<IndexedFile> action, SelectedItems<IndexedFile> selectedItems) {
     if (AIPState.UNDER_APPRAISAL.equals(state)) {
-      return new CanActResult(POSSIBLE_ACTIONS_ON_FILE_UNDER_APPRAISAL.contains(action),
-              CanActResult.Reason.CONTEXT, messages.reasonAIPUnderAppraisal());
+      return new CanActResult(POSSIBLE_ACTIONS_ON_FILE_UNDER_APPRAISAL.contains(action), CanActResult.Reason.CONTEXT,
+        messages.reasonAIPUnderAppraisal());
     }
 
     if (aipId != null && representationId != null) {

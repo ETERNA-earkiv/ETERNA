@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.management;
 
@@ -260,7 +260,6 @@ public class CreateUserPanel extends Composite implements HasValueChangeHandlers
     });
   }
 
-
   private void setPermissions(final Set<String> directRoles, final Set<String> allRoles) {
     permissionsPanel.init(new AsyncCallback<Boolean>() {
 
@@ -358,7 +357,6 @@ public class CreateUserPanel extends Composite implements HasValueChangeHandlers
   public Set<String> getMemberGroups() {
     return enableGroupSelect ? groupSelect.getMemberGroups() : null;
   }
-
 
   /**
    * Is user data panel valid
@@ -507,4 +505,3 @@ public class CreateUserPanel extends Composite implements HasValueChangeHandlers
     createForm(userExtra);
   }
 }
-

@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.common;
 
@@ -66,8 +66,7 @@ public final class HTMLUtils {
       RodaConstants.CROSSWALKS_DISSEMINATION_HTML_PATH + lowerCaseMetadataTypeWithVersion + ".xslt")) == null) {
       reader = RodaUtils.applyMetadataStylesheet(binary, RodaConstants.CROSSWALKS_DISSEMINATION_HTML_PATH, "plain",
         null, translations);
-    }
-    else {
+    } else {
       reader = RodaUtils.applyMetadataStylesheet(binary, RodaConstants.CROSSWALKS_DISSEMINATION_HTML_PATH, metadataType,
         metadataVersion, translations);
     }
@@ -93,7 +92,7 @@ public final class HTMLUtils {
     }
   }
 
-  public static Map<String, String>   getTranslations(String descriptiveMetadataType, String descriptiveMetadataVersion,
+  public static Map<String, String> getTranslations(String descriptiveMetadataType, String descriptiveMetadataVersion,
     final Locale locale) {
     Map<String, String> translations = null;
     Messages messages = RodaCoreFactory.getI18NMessages(locale);

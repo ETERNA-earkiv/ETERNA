@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 /**
  *
@@ -222,26 +222,27 @@ public class VerifyEmail extends Composite {
   private void doVerifyEmail() {
     if (isValid()) {
       Services services = new Services("Confirm email", "confirm");
-      services.membersResource(s -> s.confirmUserEmail(username.getValue(), token.getValue())).whenComplete((res, error) -> {
-        if (error == null) {
-          Dialogs.showInformationDialog(messages.verifyEmailSuccessDialogTitle(),
-            messages.verifyEmailSuccessDialogMessage(), messages.verifyEmailSuccessDialogButton(), false,
-            new AsyncCallback<Void>() {
+      services.membersResource(s -> s.confirmUserEmail(username.getValue(), token.getValue()))
+        .whenComplete((res, error) -> {
+          if (error == null) {
+            Dialogs.showInformationDialog(messages.verifyEmailSuccessDialogTitle(),
+              messages.verifyEmailSuccessDialogMessage(), messages.verifyEmailSuccessDialogButton(), false,
+              new AsyncCallback<Void>() {
 
-              @Override
-              public void onSuccess(Void result) {
-                HistoryUtils.newHistory(Login.RESOLVER);
-              }
+                @Override
+                public void onSuccess(Void result) {
+                  HistoryUtils.newHistory(Login.RESOLVER);
+                }
 
-              @Override
-              public void onFailure(Throwable caught) {
-                HistoryUtils.newHistory(Login.RESOLVER);
-              }
-            });
-        } else {
-          errorMessage(error);
-        }
-      });
+                @Override
+                public void onFailure(Throwable caught) {
+                  HistoryUtils.newHistory(Login.RESOLVER);
+                }
+              });
+          } else {
+            errorMessage(error);
+          }
+        });
     }
   }
 

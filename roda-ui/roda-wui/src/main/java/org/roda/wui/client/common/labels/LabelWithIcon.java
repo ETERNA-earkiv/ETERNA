@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.labels;
 
@@ -52,8 +52,7 @@ public class LabelWithIcon extends Composite {
     if (iconClasses != null && !iconClasses.isEmpty()) {
       icon.setVisible(true);
       icon.setHTML(SafeHtmlUtils.fromSafeConstant("<i class=\"" + iconClasses + "\"></i>"));
-    }
-    else {
+    } else {
       icon.setVisible(false);
     }
   }

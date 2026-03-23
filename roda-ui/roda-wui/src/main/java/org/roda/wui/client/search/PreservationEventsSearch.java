@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.search;
 
@@ -36,10 +36,9 @@ public class PreservationEventsSearch extends SimplePanel {
     if (fileUUID != null) {
       filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_FILE_UUID, fileUUID));
     }
-    SearchWrapper searchWrapper = new SearchWrapper(false)
-      .createListAndSearchPanel(new ListBuilder<>(() -> new PreservationEventList(),
-        new AsyncTableCellOptions<>(IndexedPreservationEvent.class, eventsListId).withFilter(filter)
-          .withSummary(messages.searchResults()).bindOpener()));
+    SearchWrapper searchWrapper = new SearchWrapper(false).createListAndSearchPanel(new ListBuilder<>(
+      () -> new PreservationEventList(), new AsyncTableCellOptions<>(IndexedPreservationEvent.class, eventsListId)
+        .withFilter(filter).withSummary(messages.searchResults()).bindOpener()));
 
     setWidget(searchWrapper);
   }
