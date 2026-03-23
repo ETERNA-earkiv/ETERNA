@@ -420,6 +420,12 @@
                 <artifactId>jetty-alpn-java-client</artifactId>
                 <version>10.0.19</version>
             </dependency>
+            <!-- Override commons-beanutils to fix GHSA-wxr5-93ph-8wr9 -->
+            <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>1.11.0</version>
+            </dependency>
             <!-- Override protobuf-java to fix GHSA-wrvw-hg22-4m67, GHSA-h4h5-3hr4-j3g2, GHSA-735f-pc8j-v9w8 -->
             <dependency>
                 <groupId>com.google.protobuf</groupId>
