@@ -10,10 +10,6 @@
         <version>1.0.0-alpha-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <properties>
-        <gwt.module.main>org.roda.wui.RodaWUI</gwt.module.main>
-        <gwt.module.portal>org.roda.wui.RodaWUIPortal</gwt.module.portal>
-    </properties>
     <packaging>jar</packaging>
     <profiles>
         <profile>
@@ -24,36 +20,41 @@
             <build>
                 <plugins>
 
-                    <!-- GWT Maven Plugin -->
+                    <!-- Frontend (React + Vite + Digi) Maven Plugin -->
                     <plugin>
-                        <groupId>net.ltgt.gwt.maven</groupId>
-                        <artifactId>gwt-maven-plugin</artifactId>
-                        <extensions>true</extensions>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <version>1.15.0</version>
                         <configuration>
-                            <skipCompilation>false</skipCompilation>
+                            <workingDirectory>src/main/frontend</workingDirectory>
+                            <nodeVersion>v22.12.0</nodeVersion>
+                            <npmVersion>10.9.0</npmVersion>
                         </configuration>
                         <executions>
                             <execution>
-                                <id>${gwt.module.main}</id>
-                                <configuration>
-                                    <moduleName>${gwt.module.main}</moduleName>
-                                    <webappDirectory>${project.build.directory}/classes/static</webappDirectory>
-                                </configuration>
+                                <id>install-node-and-npm</id>
                                 <goals>
-                                    <goal>compile</goal>
-                                    <goal>test</goal>
+                                    <goal>install-node-and-npm</goal>
                                 </goals>
                             </execution>
                             <execution>
-                                <id>${gwt.module.portal}</id>
-                                <configuration>
-                                    <moduleName>${gwt.module.portal}</moduleName>
-                                    <workingDirectory>${project.build.directory}/classes/static</workingDirectory>
-                                </configuration>
+                                <id>npm-install</id>
                                 <goals>
-                                    <goal>compile</goal>
-                                    <goal>test</goal>
+                                    <goal>npm</goal>
                                 </goals>
+                                <configuration>
+                                    <arguments>install</arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>npm-build</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <arguments>run build</arguments>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
@@ -123,35 +124,12 @@
                                 -Droda.distributed.mode.type=LOCAL
                                 -Droda.home=${env.HOME}/.roda_local
                                 -Droda.environment.collect.version=false
-                                -Dgwt.codeServerPort=9876 -Xdebug
-                                <!-- Remove after upgrade to spring-boot 3-->
                                 -Dorg.springframework.boot.logging.LoggingSystem=none
                                 -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5007
                                 --add-opens java.base/java.util=ALL-UNNAMED
                                 --add-opens java.base/java.lang=ALL-UNNAMED
                             </jvmArguments>
                         </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>net.ltgt.gwt.maven</groupId>
-                        <artifactId>gwt-maven-plugin</artifactId>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <moduleName>${gwt.module.main}</moduleName>
-                            <launcherDir>${project.build.directory}/${project.build.finalName}</launcherDir>
-
-                            <classpathScope>compile+runtime</classpathScope>
-                            <skipCompilation>false</skipCompilation>
-                            <draftCompile>true</draftCompile>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>compile</goal>
-                                    <goal>test</goal>
-                                </goals>
-                            </execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>
@@ -181,35 +159,12 @@
                                 -Droda.distributed.mode.type=CENTRAL
                                 -Droda.home=${env.HOME}/.roda_central
                                 -Droda.environment.collect.version=false
-                                -Dgwt.codeServerPort=9876 -Xdebug
-                                <!-- Remove after upgrade to spring-boot 3-->
                                 -Dorg.springframework.boot.logging.LoggingSystem=none
                                 -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5006
                                 --add-opens java.base/java.util=ALL-UNNAMED
                                 --add-opens java.base/java.lang=ALL-UNNAMED
                             </jvmArguments>
                         </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>net.ltgt.gwt.maven</groupId>
-                        <artifactId>gwt-maven-plugin</artifactId>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <moduleName>${gwt.module.main}</moduleName>
-                            <launcherDir>${project.build.directory}/${project.build.finalName}</launcherDir>
-
-                            <classpathScope>compile+runtime</classpathScope>
-                            <skipCompilation>false</skipCompilation>
-                            <draftCompile>true</draftCompile>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>compile</goal>
-                                    <goal>test</goal>
-                                </goals>
-                            </execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>
@@ -237,44 +192,13 @@
                                 </additionalClasspathElement>
                             </additionalClasspathElements>
                             <jvmArguments>
-                                -Dgwt.codeServerPort=9876 -Xdebug
-                                <!-- Remove after upgrade to spring-boot 3-->
                                 -Dorg.springframework.boot.logging.LoggingSystem=none
-                                <!-- Remove -->
                                 -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005
                                 -Droda.environment.collect.version=false
                                 --add-opens java.base/java.util=ALL-UNNAMED
                                 --add-opens java.base/java.lang=ALL-UNNAMED
                             </jvmArguments>
                         </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>net.ltgt.gwt.maven</groupId>
-                        <artifactId>gwt-maven-plugin</artifactId>
-                        <version>1.0.1</version>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <moduleName>${gwt.module.main}</moduleName>
-                            <launcherDir>${project.build.directory}/${project.build.finalName}</launcherDir>
-                            <classpathScope>test</classpathScope>
-                            <skipCompilation>false</skipCompilation>
-                            <draftCompile>true</draftCompile>
-                            <style>PRETTY</style>
-                            <forceCompilation>true</forceCompilation>
-                            <environmentVariables>
-                                <JDK_JAVA_OPTIONS>
-                                    --add-opens java.base/java.util=ALL-UNNAMED
-                                </JDK_JAVA_OPTIONS>
-                            </environmentVariables>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>compile</goal>
-                                    <goal>test</goal>
-                                </goals>
-                            </execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>
@@ -301,90 +225,12 @@
                             </additionalClasspathElements>
                             <jvmArguments>
                                 -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=*:5005
-                                <!-- Remove after upgrade to spring-boot 3-->
                                 -Dorg.springframework.boot.logging.LoggingSystem=none
-                                <!-- Remove -->
-
-                                -Djavax.net.ssl.trustStore=/Users/filiph.ps/projects/eterna-environments/solr-tls/solr/solr-tls-keystore.p12
-                                -Djavax.net.ssl.trustStorePassword=changeit
-
                                 -Droda.environment.collect.version=false
                                 --add-opens java.base/java.util=ALL-UNNAMED
                                 --add-opens java.base/java.lang=ALL-UNNAMED
                             </jvmArguments>
                         </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>net.ltgt.gwt.maven</groupId>
-                        <artifactId>gwt-maven-plugin</artifactId>
-                        <version>1.0.1</version>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <moduleName>${gwt.module.main}</moduleName>
-                            <launcherDir>${project.build.directory}/${project.build.finalName}</launcherDir>
-                            <classpathScope>test</classpathScope>
-                            <skipCompilation>false</skipCompilation>
-                            <draftCompile>true</draftCompile>
-                            <style>PRETTY</style>
-                            <forceCompilation>true</forceCompilation>
-                            <environmentVariables>
-                                <JDK_JAVA_OPTIONS>
-                                    --add-opens java.base/java.util=ALL-UNNAMED
-                                </JDK_JAVA_OPTIONS>
-                            </environmentVariables>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>compile</goal>
-                                    <goal>test</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>debug-portal</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-maven-plugin</artifactId>
-                        <version>${springboot.version}</version>
-                        <configuration>
-                            <skip>false</skip>
-                            <jvmArguments>
-                                -Dgwt.codeServerPort=9876 -Xdebug
-                                -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005
-                            </jvmArguments>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>net.ltgt.gwt.maven</groupId>
-                        <artifactId>gwt-maven-plugin</artifactId>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <moduleName>${gwt.module.portal}</moduleName>
-                            <launcherDir>${project.build.directory}/${project.build.finalName}</launcherDir>
-
-                            <skipCompilation>false</skipCompilation>
-                            <draftCompile>true</draftCompile>
-                            <style>PRETTY</style>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>compile</goal>
-                                    <goal>test</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>pl.project13.maven</groupId>
-                        <artifactId>git-commit-id-plugin</artifactId>
                     </plugin>
                 </plugins>
             </build>
@@ -416,28 +262,43 @@
             <groupId>org.gwtproject</groupId>
             <artifactId>gwt-servlet-jakarta</artifactId>
         </dependency>
+        <!-- GWT client-only deps kept as "provided" so the legacy client/ source
+             files still compile, but these JARs are not packaged in the WAR.
+             GWT compilation is disabled (gwt-maven-plugin removed from default profile). -->
+        <dependency>
+            <groupId>org.fusesource.restygwt</groupId>
+            <artifactId>restygwt</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.nmorel.gwtjackson</groupId>
+            <artifactId>gwt-jackson</artifactId>
+            <version>0.15.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.elemental2</groupId>
+            <artifactId>elemental2-core</artifactId>
+            <version>1.2.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.elemental2</groupId>
+            <artifactId>elemental2-dom</artifactId>
+            <version>1.2.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.elemental2</groupId>
+            <artifactId>elemental2-promise</artifactId>
+            <version>1.2.1</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>com.ekotrope</groupId>
             <artifactId>gwt-completablefuture</artifactId>
             <version>1.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.gwtproject</groupId>
-            <artifactId>gwt-dev</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.mortbay.jasper</groupId>
-                    <artifactId>apache-jsp</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>javax.servlet-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>apache-jsp</artifactId>
-                </exclusion>
-            </exclusions>
+            <scope>provided</scope>
         </dependency>
         <!-- /gwt -->
 
@@ -536,10 +397,6 @@
             <artifactId>jakarta.ws.rs-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.fusesource.restygwt</groupId>
-            <artifactId>restygwt</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
         </dependency>
@@ -568,26 +425,6 @@
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.nmorel.gwtjackson</groupId>
-            <artifactId>gwt-jackson</artifactId>
-            <version>0.15.4</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.elemental2</groupId>
-            <artifactId>elemental2-core</artifactId>
-            <version>1.2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.elemental2</groupId>
-            <artifactId>elemental2-dom</artifactId>
-            <version>1.2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.elemental2</groupId>
-            <artifactId>elemental2-promise</artifactId>
-            <version>1.2.1</version>
         </dependency>
         <!-- WebJars https://www.webjars.org -->
         <dependency>
@@ -732,6 +569,7 @@
     </dependencies>
     <dependencyManagement>
         <dependencies>
+            <!-- GWT BOM provides version management for gwt-user, gwt-servlet-jakarta etc. -->
             <dependency>
                 <groupId>org.gwtproject</groupId>
                 <artifactId>gwt</artifactId>
@@ -766,6 +604,12 @@
                 <configuration>
                     <release>21</release>
                     <encoding>UTF-8</encoding>
+                    <!-- Exclude GWT client-side code: these files are no longer
+                         compiled since GWT has been replaced by the React/Digi UI. -->
+                    <excludes>
+                        <exclude>org/roda/wui/client/**</exclude>
+                        <exclude>org/roda/wui/common/client/**</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
         </plugins>
