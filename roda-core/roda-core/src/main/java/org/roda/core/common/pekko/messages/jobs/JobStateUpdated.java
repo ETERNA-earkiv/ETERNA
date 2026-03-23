@@ -41,7 +41,6 @@ public class JobStateUpdated extends JobStateDetailsUpdated {
 
   @Override
   public String toString() {
-    return "JobStateUpdated [plugin=" + getPlugin() + ", state=" + state + ", stateDetails=" + getStateDetails()
-        + "]";
+    return "JobStateUpdated [plugin=" + getPlugin() + ", state=" + state + ", stateDetails=" + getStateDetails() + "]";
   }
 }

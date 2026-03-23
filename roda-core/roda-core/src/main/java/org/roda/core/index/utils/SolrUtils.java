@@ -725,9 +725,9 @@ public class SolrUtils {
         List counts = facet.getCounts();
         LOGGER.trace("facet:{} count:{}", facet.getName(), counts.size());
         facetResult = new FacetFieldResult(facet.getName(), counts.size(),
-                facets.getParameters().get(facet.getName()).getValues());
+          facets.getParameters().get(facet.getName()).getValues());
         for (Object countObj : counts) {
-          if(countObj instanceof RangeFacet.Count count) {
+          if (countObj instanceof RangeFacet.Count count) {
             LOGGER.trace("   value:{} value:{}", count.getValue(), count.getCount());
             facetResult.addFacetValue(count.getValue(), count.getValue(), count.getCount());
           }
@@ -775,9 +775,8 @@ public class SolrUtils {
     return doc == null ? new SolrInputDocument() : validateDescriptiveMetadataFields(doc);
   }
 
-
-  public static SolrInputDocument getTechnicalMetadataFields(Binary binary, String metadataType,
-                                                               String metadataVersion) throws GenericException {
+  public static SolrInputDocument getTechnicalMetadataFields(Binary binary, String metadataType, String metadataVersion)
+    throws GenericException {
     SolrInputDocument doc;
 
     Map<String, String> parameters = new HashMap<>();
@@ -823,7 +822,6 @@ public class SolrUtils {
 
     return doc == null ? new SolrInputDocument() : validateDescriptiveMetadataFields(doc);
   }
-
 
   private static SolrInputDocument validateDescriptiveMetadataFields(SolrInputDocument doc) {
     if (doc.get(RodaConstants.AIP_DATE_INITIAL) != null) {
@@ -900,9 +898,8 @@ public class SolrUtils {
         prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof OrFiltersParameters || parameter instanceof AndFiltersParameters) {
       FiltersParameters filters = (FiltersParameters) parameter;
-      appendFiltersWithOperator(ret, parameter instanceof OrFiltersParameters ? "OR" : "AND",
-          filters.getValues(),
-          prefixWithANDOperatorIfBuilderNotEmpty);
+      appendFiltersWithOperator(ret, parameter instanceof OrFiltersParameters ? "OR" : "AND", filters.getValues(),
+        prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof AllFilterParameter) {
       appendSelectAll(ret, prefixWithANDOperatorIfBuilderNotEmpty);
     } else {
@@ -1147,17 +1144,16 @@ public class SolrUtils {
 
         if (facetParameter instanceof SimpleFacetParameter) {
           setQueryFacetParameter(query, (SimpleFacetParameter) facetParameter);
-          appendValuesUsingOROperator(filterQuery, facetParameter.getName(),
-            facetParameter.getValues(), true);
+          appendValuesUsingOROperator(filterQuery, facetParameter.getName(), facetParameter.getValues(), true);
         } else if (facetParameter instanceof RangeFacetParameter) {
           query.add("facet", "true");
           query.add("facet.range", facetParameter.getName());
           query.add(String.format("f.%s.facet.range.start", facetParameter.getName()),
-                  ((RangeFacetParameter) facetParameter).getStart());
+            ((RangeFacetParameter) facetParameter).getStart());
           query.add(String.format("f.%s.facet.range.end", facetParameter.getName()),
-                  ((RangeFacetParameter) facetParameter).getEnd());
+            ((RangeFacetParameter) facetParameter).getEnd());
           query.add(String.format("f.%s.facet.range.gap", facetParameter.getName()),
-                  ((RangeFacetParameter) facetParameter).getGap());
+            ((RangeFacetParameter) facetParameter).getGap());
         } else {
           LOGGER.error("Unsupported facet parameter class: {}", facetParameter.getClass().getName());
         }
@@ -1247,7 +1243,8 @@ public class SolrUtils {
     boolean waitSearcher = true;
     boolean softCommit = true;
 
-    Fallback<Object> fallback = Fallback.of(e -> {});
+    Fallback<Object> fallback = Fallback.of(e -> {
+    });
 
     for (String collection : collections) {
       Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy()).onFailure(e -> {

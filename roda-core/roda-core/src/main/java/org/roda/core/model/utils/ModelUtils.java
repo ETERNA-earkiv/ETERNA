@@ -423,8 +423,8 @@ public final class ModelUtils {
     List<String> directoryPath = path.getDirectoryPath();
 
     if (container.equals(RodaConstants.STORAGE_CONTAINER_AIP) && directoryPath.size() == 3
-            && directoryPath.get(1).equals(RodaConstants.STORAGE_DIRECTORY_METADATA)
-            && directoryPath.get(2).equals(RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE)) {
+      && directoryPath.get(1).equals(RodaConstants.STORAGE_DIRECTORY_METADATA)
+      && directoryPath.get(2).equals(RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE)) {
 
       String fileName = path.getName();
       int lastIndexOfVersionSep = fileName.lastIndexOf("_");
@@ -432,7 +432,7 @@ public final class ModelUtils {
 
       if (lastIndexOfVersionSep > -1) {
         return Optional.of(fileName.substring(0, lastIndexOfVersionSep));
-      } else if(lastIndexOfDot > -1) {
+      } else if (lastIndexOfDot > -1) {
         return Optional.of(fileName.substring(0, lastIndexOfDot));
       }
     }
@@ -446,9 +446,9 @@ public final class ModelUtils {
     List<String> directoryPath = path.getDirectoryPath();
 
     if (container.equals(RodaConstants.STORAGE_CONTAINER_AIP) && directoryPath.size() == 5
-            && directoryPath.get(1).equals(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS)
-            && directoryPath.get(3).equals(RodaConstants.STORAGE_DIRECTORY_METADATA)
-            && directoryPath.get(4).equals(RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE)) {
+      && directoryPath.get(1).equals(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS)
+      && directoryPath.get(3).equals(RodaConstants.STORAGE_DIRECTORY_METADATA)
+      && directoryPath.get(4).equals(RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE)) {
 
       String fileName = path.getName();
       int lastIndexOfVersionSep = fileName.lastIndexOf("_");
@@ -456,7 +456,7 @@ public final class ModelUtils {
 
       if (lastIndexOfVersionSep > -1) {
         return Optional.of(fileName.substring(0, lastIndexOfVersionSep));
-      } else if(lastIndexOfDot > -1) {
+      } else if (lastIndexOfDot > -1) {
         return Optional.of(fileName.substring(0, lastIndexOfDot));
       }
     }
@@ -470,15 +470,15 @@ public final class ModelUtils {
     List<String> directoryPath = path.getDirectoryPath();
 
     if (container.equals(RodaConstants.STORAGE_CONTAINER_AIP) && directoryPath.size() == 3
-            && directoryPath.get(1).equals(RodaConstants.STORAGE_DIRECTORY_METADATA)
-            && directoryPath.get(2).equals(RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE)) {
+      && directoryPath.get(1).equals(RodaConstants.STORAGE_DIRECTORY_METADATA)
+      && directoryPath.get(2).equals(RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE)) {
 
       String fileName = path.getName();
       int lastIndexOfVersionSep = fileName.lastIndexOf("_");
       int lastIndexOfDot = fileName.lastIndexOf(".");
 
       if (lastIndexOfVersionSep > -1 && lastIndexOfVersionSep < fileName.length() - 1) {
-        if(lastIndexOfDot > -1) {
+        if (lastIndexOfDot > -1) {
           return Optional.of(fileName.substring(lastIndexOfVersionSep + 1, lastIndexOfDot));
         } else {
           return Optional.of(fileName.substring(lastIndexOfVersionSep + 1));
@@ -495,16 +495,16 @@ public final class ModelUtils {
     List<String> directoryPath = path.getDirectoryPath();
 
     if (container.equals(RodaConstants.STORAGE_CONTAINER_AIP) && directoryPath.size() == 5
-            && directoryPath.get(1).equals(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS)
-            && directoryPath.get(3).equals(RodaConstants.STORAGE_DIRECTORY_METADATA)
-            && directoryPath.get(4).equals(RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE)) {
+      && directoryPath.get(1).equals(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS)
+      && directoryPath.get(3).equals(RodaConstants.STORAGE_DIRECTORY_METADATA)
+      && directoryPath.get(4).equals(RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE)) {
 
       String fileName = path.getName();
       int lastIndexOfVersionSep = fileName.lastIndexOf("_");
       int lastIndexOfDot = fileName.lastIndexOf(".");
 
       if (lastIndexOfVersionSep > -1 && lastIndexOfVersionSep < fileName.length() - 1) {
-        if(lastIndexOfDot > -1) {
+        if (lastIndexOfDot > -1) {
           return Optional.of(fileName.substring(lastIndexOfVersionSep + 1, lastIndexOfDot));
         } else {
           return Optional.of(fileName.substring(lastIndexOfVersionSep + 1));

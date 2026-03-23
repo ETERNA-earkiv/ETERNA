@@ -52,6 +52,7 @@ public class InstanceIdentifierRepresentationInformationPlugin extends AbstractP
 
   private static final Logger LOGGER = LoggerFactory.getLogger(InstanceIdentifierRepresentationInformationPlugin.class);
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+
   @Override
   public String getVersionImpl() {
     return "1.0";

@@ -22,35 +22,36 @@ import java.util.Set;
 /**
  * @author António Lindo <alindo@keep.pt>
  */
-  @JsonRootName("vendor")
-  public class Vendor implements Serializable{
-    @Serial
-    private static final long serialVersionUID = 8062643455231089592L;
-    @JsonProperty("name")
-    private String name = null;
-    @JsonProperty("homepage")
-    private String homepage = null;
+@JsonRootName("vendor")
+public class Vendor implements Serializable {
+  @Serial
+  private static final long serialVersionUID = 8062643455231089592L;
+  @JsonProperty("name")
+  private String name = null;
+  @JsonProperty("homepage")
+  private String homepage = null;
 
-    public Vendor(){
-    }
-    public Vendor(String name, String homepage) {
-      this.name = name;
-      this.homepage = homepage;
-    }
-
-    public String getName() {
-      return name;
-    }
-
-    public void setName(String name) {
-      this.name = name;
-    }
-
-    public String getHomepage() {
-      return homepage;
-    }
-
-    public void setHomepage(String homepage) {
-      this.homepage = homepage;
-    }
+  public Vendor() {
   }
+
+  public Vendor(String name, String homepage) {
+    this.name = name;
+    this.homepage = homepage;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getHomepage() {
+    return homepage;
+  }
+
+  public void setHomepage(String homepage) {
+    this.homepage = homepage;
+  }
+}

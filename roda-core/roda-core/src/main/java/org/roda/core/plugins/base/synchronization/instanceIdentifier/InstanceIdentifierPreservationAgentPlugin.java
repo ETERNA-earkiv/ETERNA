@@ -166,7 +166,7 @@ public class InstanceIdentifierPreservationAgentPlugin extends AbstractPlugin<Vo
               if (!distributedInstanceIds.contains(instanceId)) {
                 PremisV3Utils.updatePremisUserAgentId(pm, model, index, RODAInstanceUtils.getLocalInstanceIdentifier());
               }
-            }else{
+            } else {
               PremisV3Utils.updatePremisUserAgentId(pm, model, index, RODAInstanceUtils.getLocalInstanceIdentifier());
             }
             countSuccess++;

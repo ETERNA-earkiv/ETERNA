@@ -29,7 +29,7 @@ public class JobsManagerJobEnded extends AbstractMessage {
   private final JobParallelism parallelism;
 
   public JobsManagerJobEnded(String jobId, String plugin, PluginType pluginType, long duration, JobStats jobStats,
-                             JobParallelism parallelism) {
+    JobParallelism parallelism) {
     super();
     this.jobId = jobId;
     this.plugin = plugin;
@@ -66,7 +66,7 @@ public class JobsManagerJobEnded extends AbstractMessage {
   @Override
   public String toString() {
     return "JobsManagerJobEnded [jobId=" + jobId + ", plugin=" + plugin + ", pluginType=" + pluginType
-        + ", jobParallelism=" + parallelism + "]";
+      + ", jobParallelism=" + parallelism + "]";
 
   }
 }

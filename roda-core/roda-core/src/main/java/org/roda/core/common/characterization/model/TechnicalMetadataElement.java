@@ -37,5 +37,4 @@ public class TechnicalMetadataElement {
     this.technicalMetadataFields = technicalMetadataFields;
   }
 
-
 }

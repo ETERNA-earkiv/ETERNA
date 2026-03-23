@@ -43,6 +43,6 @@ public final class EventUserUpdated extends AbstractEventMessage {
   @Override
   public String toString() {
     return "EventUserUpdated [user=" + user + ", password=" + password + ", myUser=" + myUser + ", getSenderId()="
-        + getSenderId() + "]";
+      + getSenderId() + "]";
   }
 }

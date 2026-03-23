@@ -26,14 +26,11 @@ public class ScatteredFSRegexConfig implements ScatteredFSConfig {
   private int folderDepth;
 
   public ScatteredFSRegexConfig(String fileSystemName) throws GenericException {
-    String regex = RodaCoreFactory.getRodaConfigurationAsString("core.storage.filesystem", fileSystemName,
-            "regex");
+    String regex = RodaCoreFactory.getRodaConfigurationAsString("core.storage.filesystem", fileSystemName, "regex");
 
-    String type = RodaCoreFactory.getRodaConfigurationAsString("core.storage.filesystem", fileSystemName,
-            "type");
+    String type = RodaCoreFactory.getRodaConfigurationAsString("core.storage.filesystem", fileSystemName, "type");
 
-    String rule = RodaCoreFactory.getRodaConfigurationAsString("core.storage.filesystem", fileSystemName,
-            "rule");
+    String rule = RodaCoreFactory.getRodaConfigurationAsString("core.storage.filesystem", fileSystemName, "rule");
 
     if (regex.isEmpty()) {
       throw new GenericException("Error! Missing regex.");
@@ -61,7 +58,7 @@ public class ScatteredFSRegexConfig implements ScatteredFSConfig {
       pathPartials.add(FSUtils.decodePathPartial(pathPartial));
     }
 
-    if(i > 1) {
+    if (i > 1) {
       int numPathPartialsToRemove = Math.min(pathPartials.size(), this.folderDepth);
       pathPartials.subList(1, numPathPartialsToRemove + 1).clear();
     }

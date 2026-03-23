@@ -162,7 +162,8 @@ public class ResourceParseUtils {
     return ret;
   }
 
-  private static DescriptiveMetadata convertResourceToDescriptiveMetadata(Resource resource) throws RequestNotValidException {
+  private static DescriptiveMetadata convertResourceToDescriptiveMetadata(Resource resource)
+    throws RequestNotValidException {
     if (resource == null) {
       throw new RequestNotValidException(RESOURCE_CANNOT_BE_NULL);
     }
@@ -173,11 +174,11 @@ public class ResourceParseUtils {
     String aipId = ModelUtils.extractAipId(resourcePath).orElse(null);
     String representationId = ModelUtils.extractRepresentationId(resourcePath).orElse(null);
     String type = representationId != null
-            ? ModelUtils.extractTypeFromRepresentationDescriptiveMetadata(resourcePath).orElse(null)
-            : ModelUtils.extractTypeFromAipDescriptiveMetadata(resourcePath).orElse(null);
+      ? ModelUtils.extractTypeFromRepresentationDescriptiveMetadata(resourcePath).orElse(null)
+      : ModelUtils.extractTypeFromAipDescriptiveMetadata(resourcePath).orElse(null);
     String version = representationId != null
-            ? ModelUtils.extractVersionFromRepresentationDescriptiveMetadata(resourcePath).orElse(null)
-            : ModelUtils.extractVersionFromAipDescriptiveMetadata(resourcePath).orElse(null);
+      ? ModelUtils.extractVersionFromRepresentationDescriptiveMetadata(resourcePath).orElse(null)
+      : ModelUtils.extractVersionFromAipDescriptiveMetadata(resourcePath).orElse(null);
 
     DescriptiveMetadata dm = new DescriptiveMetadata();
     dm.setAipId(aipId);

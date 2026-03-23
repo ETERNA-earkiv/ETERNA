@@ -13,8 +13,7 @@ import java.util.Objects;
 
 public interface ScatteredFSConfig {
   enum ScatterMethod {
-    RANGE("range"),
-    REGEX("regex");
+    RANGE("range"), REGEX("regex");
 
     private final String scatterMethod;
 
@@ -29,20 +28,17 @@ public interface ScatteredFSConfig {
 
   static ScatteredFSConfig getScatteredFSConfigFromRodaConfiguration(String fileSystemName) throws GenericException {
     String scatterMethod = RodaCoreFactory.getRodaConfigurationAsString("core.storage.filesystem", fileSystemName,
-            "scatter_method");
+      "scatter_method");
 
-    String regex = RodaCoreFactory.getRodaConfigurationAsString("core.storage.filesystem", fileSystemName,
-            "regex");
+    String regex = RodaCoreFactory.getRodaConfigurationAsString("core.storage.filesystem", fileSystemName, "regex");
 
-    String type = RodaCoreFactory.getRodaConfigurationAsString("core.storage.filesystem", fileSystemName,
-            "type");
+    String type = RodaCoreFactory.getRodaConfigurationAsString("core.storage.filesystem", fileSystemName, "type");
 
-    String rule = RodaCoreFactory.getRodaConfigurationAsString("core.storage.filesystem", fileSystemName,
-            "rule");
+    String rule = RodaCoreFactory.getRodaConfigurationAsString("core.storage.filesystem", fileSystemName, "rule");
 
-    if(scatterMethod == null || scatterMethod.isEmpty() || scatterMethod.equals("ranges")) {
+    if (scatterMethod == null || scatterMethod.isEmpty() || scatterMethod.equals("ranges")) {
       return new ScatteredFSRangeConfig(fileSystemName);
-    } else if(scatterMethod.equals("regex")) {
+    } else if (scatterMethod.equals("regex")) {
       return new ScatteredFSRegexConfig(fileSystemName);
     } else {
       throw new GenericException("Encountered unknown scatter method.");

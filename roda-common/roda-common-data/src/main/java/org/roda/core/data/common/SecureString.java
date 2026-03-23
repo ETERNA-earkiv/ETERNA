@@ -34,7 +34,7 @@ public class SecureString implements CharSequence, Closeable, Serializable {
   public SecureString(char[] chars) {
     this.chars = Objects.requireNonNull(chars);
   }
-  
+
   @Override
   public synchronized boolean equals(Object o) {
     ensureNotClosed();
@@ -78,8 +78,8 @@ public class SecureString implements CharSequence, Closeable, Serializable {
   }
 
   /**
-   * Converts chars to a {@link String}. Avoid using this method as it creates a string with
-   * the secure string content.
+   * Converts chars to a {@link String}. Avoid using this method as it creates a
+   * string with the secure string content.
    */
   @Override
   public synchronized String toString() {
@@ -106,8 +106,8 @@ public class SecureString implements CharSequence, Closeable, Serializable {
   }
 
   /**
-   * Throws an exception if the secure string has been closed, which means that something is
-   * trying to access the data after being closed.
+   * Throws an exception if the secure string has been closed, which means that
+   * something is trying to access the data after being closed.
    */
   private void ensureNotClosed() {
     if (chars == null) {

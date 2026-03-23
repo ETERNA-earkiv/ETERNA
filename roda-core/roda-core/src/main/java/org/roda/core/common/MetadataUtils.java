@@ -63,7 +63,8 @@ public final class MetadataUtils {
     try {
       StringWriter writer = new StringWriter();
 
-      final Map<String, String> props = Collections.singletonMap(JAXBRIContext.DEFAULT_NAMESPACE_REMAP, "http://www.loc.gov/premis/v3");
+      final Map<String, String> props = Collections.singletonMap(JAXBRIContext.DEFAULT_NAMESPACE_REMAP,
+        "http://www.loc.gov/premis/v3");
       final JAXBContext jaxbContext = JAXBContext.newInstance(tClass, props);
       Marshaller marshaller = jaxbContext.createMarshaller();
       marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);

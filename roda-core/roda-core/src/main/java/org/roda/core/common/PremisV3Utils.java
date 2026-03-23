@@ -1079,8 +1079,8 @@ public final class PremisV3Utils {
     ValidationEventCollector validationCollector = new ValidationEventCollector();
 
     try {
-      jaxbContext = JAXBContext.newInstance(gov.loc.premis.v3.PremisComplexType.class, gov.loc.premis.v3.AgentComplexType.class,
-              gov.loc.premis.v3.EventComplexType.class);
+      jaxbContext = JAXBContext.newInstance(gov.loc.premis.v3.PremisComplexType.class,
+        gov.loc.premis.v3.AgentComplexType.class, gov.loc.premis.v3.EventComplexType.class);
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
       if (validate) {

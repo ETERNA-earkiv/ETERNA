@@ -484,8 +484,8 @@ public class DeleteRodaObjectPluginUtils {
     if (object instanceof AIP aip) {
       dipFilter.add(new SimpleFilterParameter(RodaConstants.DIP_ALL_AIP_UUIDS, aip.getId()));
     } else if (object instanceof Representation representation) {
-      dipFilter.add(
-        new SimpleFilterParameter(RodaConstants.DIP_ALL_REPRESENTATION_UUIDS, IdUtils.getRepresentationId(representation)));
+      dipFilter.add(new SimpleFilterParameter(RodaConstants.DIP_ALL_REPRESENTATION_UUIDS,
+        IdUtils.getRepresentationId(representation)));
     } else if (object instanceof File file) {
       dipFilter.add(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, IdUtils.getFileId(file)));
     } else {
@@ -553,7 +553,7 @@ public class DeleteRodaObjectPluginUtils {
     Plugin<? extends IsRODAObject> plugin, DIP dip, boolean doReport, String deletePlugin) {
     try {
       String requestUuid = plugin.getParameterValues().getOrDefault(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID,
-          IdUtils.createUUID());
+        IdUtils.createUUID());
       Plugin<? extends IsRODAObject> externalDeletePlugin = RodaCoreFactory.getPluginManager().getPlugin(deletePlugin);
       Map<String, String> parameters = new HashMap<>(job.getPluginParameters());
       parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, job.getId());

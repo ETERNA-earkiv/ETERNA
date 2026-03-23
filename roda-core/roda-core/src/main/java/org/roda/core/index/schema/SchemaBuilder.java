@@ -89,7 +89,7 @@ public class SchemaBuilder {
     } catch (SolrServerException | IOException e) {
       LOGGER.error("Error bootstraping schemas", e);
       throw new GenericException("Error bootstraping schemas", e);
-    } 
+    }
   }
 
 }

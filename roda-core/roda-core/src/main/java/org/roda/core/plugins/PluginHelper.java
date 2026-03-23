@@ -794,8 +794,8 @@ public final class PluginHelper {
     Permissions permissions = new Permissions();
 
     boolean isGhost = true;
-    AIP ghostAIP = model.createAIP(parent.orElse(null), "", permissions, Arrays.asList(ancestor), jobId, true,
-      username, isGhost);
+    AIP ghostAIP = model.createAIP(parent.orElse(null), "", permissions, Arrays.asList(ancestor), jobId, true, username,
+      isGhost);
 
     return Optional.ofNullable(ghostAIP.getId());
   }

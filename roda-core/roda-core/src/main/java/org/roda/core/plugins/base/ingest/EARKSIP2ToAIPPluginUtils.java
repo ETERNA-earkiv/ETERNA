@@ -241,11 +241,12 @@ public class EARKSIP2ToAIPPluginUtils {
               file.getRelativeFolders(), file.getFileName(), fileContentPayload, username, notify);
           } else {
             model.createPreservationMetadata(PreservationMetadataType.EVENT, aipId, file.getRelativeFolders(),
-                    file.getFileName(), fileContentPayload, username, notify);
+              file.getFileName(), fileContentPayload, username, notify);
           }
         } else if (((JAXBElement<?>) object).getValue() instanceof ObjectComplexType objectComplexType) {
-          PreservationMetadataType preservationMetadataType = switch(objectComplexType) {
-            case gov.loc.premis.v3.IntellectualEntity premisIntellectualEntity -> PreservationMetadataType.INTELLECTUAL_ENTITY;
+          PreservationMetadataType preservationMetadataType = switch (objectComplexType) {
+            case gov.loc.premis.v3.IntellectualEntity premisIntellectualEntity ->
+              PreservationMetadataType.INTELLECTUAL_ENTITY;
             case gov.loc.premis.v3.Representation premisRepresentation -> PreservationMetadataType.REPRESENTATION;
             case gov.loc.premis.v3.File premisFile -> PreservationMetadataType.FILE;
             case gov.loc.premis.v3.Bitstream premisBitstream -> PreservationMetadataType.BITSTREAM;
@@ -256,12 +257,14 @@ public class EARKSIP2ToAIPPluginUtils {
           model.createPreservationMetadata(preservationMetadataType, aipId, representationId.orElse(null),
             file.getRelativeFolders(), file.getFileName(), fileContentPayload, username, notify);
         } else if (((JAXBElement<?>) object).getValue() instanceof RightsComplexType rightsComplexType) {
-          // RightComplexType actually contains a list of RightsStatementComplexType or ExtensionComplexType, here we handle it as a single thing
-          model.createPreservationMetadata(PreservationMetadataType.RIGHTS_STATEMENT, aipId, representationId.orElse(null),
-                  file.getRelativeFolders(), file.getFileName(), fileContentPayload, username, notify);
+          // RightComplexType actually contains a list of RightsStatementComplexType or
+          // ExtensionComplexType, here we handle it as a single thing
+          model.createPreservationMetadata(PreservationMetadataType.RIGHTS_STATEMENT, aipId,
+            representationId.orElse(null), file.getRelativeFolders(), file.getFileName(), fileContentPayload, username,
+            notify);
         } else {
           model.createPreservationMetadata(PreservationMetadataType.OTHER, aipId, representationId.orElse(null),
-                  file.getRelativeFolders(), file.getFileName(), fileContentPayload, username, notify);
+            file.getRelativeFolders(), file.getFileName(), fileContentPayload, username, notify);
         }
       } catch (ValidationException e) {
         model.createPreservationMetadata(PreservationMetadataType.OTHER, aipId, representationId.orElse(null),

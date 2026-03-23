@@ -35,10 +35,10 @@ public class RodaPropertiesReloadStrategy {
   });
 
   /**
-   * Starts watching {@code file} for modifications. When a change is detected
-   * the configuration is reloaded in-place and
-   * {@link RodaCoreFactory#clearRodaCachableObjectsAfterConfigurationChange()}
-   * is called.
+   * Starts watching {@code file} for modifications. When a change is detected the
+   * configuration is reloaded in-place and
+   * {@link RodaCoreFactory#clearRodaCachableObjectsAfterConfigurationChange()} is
+   * called.
    *
    * @param config
    *          the live {@link PropertiesConfiguration} instance to reload

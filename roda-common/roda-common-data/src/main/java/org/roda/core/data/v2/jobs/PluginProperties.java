@@ -23,51 +23,51 @@ import java.util.Set;
  * @author António Lindo <alindo@keep.pt>
  */
 
-  @JsonRootName("plugin")
-  public class PluginProperties implements Serializable {
-    @Serial
-    private static final long serialVersionUID = -2328914839866065966L;
-    @JsonProperty("objectClasses")
-    private Set<String> objectClasses = new HashSet<>();
-    @JsonProperty("categories")
-    private List<String> categories = null;
-    @JsonProperty("type")
-    private PluginType type = PluginType.MISC;
+@JsonRootName("plugin")
+public class PluginProperties implements Serializable {
+  @Serial
+  private static final long serialVersionUID = -2328914839866065966L;
+  @JsonProperty("objectClasses")
+  private Set<String> objectClasses = new HashSet<>();
+  @JsonProperty("categories")
+  private List<String> categories = null;
+  @JsonProperty("type")
+  private PluginType type = PluginType.MISC;
 
-    public PluginProperties() {
-    }
-
-    PluginProperties(Set<String> objectClasses, List<String> categories, PluginType type) {
-      this.objectClasses = objectClasses;
-      this.categories = categories;
-      this.type = type;
-    }
-
-    public List<String> getCategories() {
-      return categories;
-    }
-
-    public Set<String> getObjectClasses() {
-      return objectClasses;
-    }
-
-    public PluginType getType() {
-      return type;
-    }
-
-    public void setCategories(List<String> categories) {
-      this.categories = categories;
-    }
-
-    public void setObjectClasses(Set<String> objectClasses) {
-      this.objectClasses = objectClasses;
-    }
-
-    public void addObjectClass(String objectClass) {
-      this.objectClasses.add(objectClass);
-    }
-
-    public void setType(PluginType type) {
-      this.type = type;
-    }
+  public PluginProperties() {
   }
+
+  PluginProperties(Set<String> objectClasses, List<String> categories, PluginType type) {
+    this.objectClasses = objectClasses;
+    this.categories = categories;
+    this.type = type;
+  }
+
+  public List<String> getCategories() {
+    return categories;
+  }
+
+  public Set<String> getObjectClasses() {
+    return objectClasses;
+  }
+
+  public PluginType getType() {
+    return type;
+  }
+
+  public void setCategories(List<String> categories) {
+    this.categories = categories;
+  }
+
+  public void setObjectClasses(Set<String> objectClasses) {
+    this.objectClasses = objectClasses;
+  }
+
+  public void addObjectClass(String objectClass) {
+    this.objectClasses.add(objectClass);
+  }
+
+  public void setType(PluginType type) {
+    this.type = type;
+  }
+}

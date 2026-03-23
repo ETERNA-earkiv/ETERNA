@@ -50,7 +50,6 @@ public class PluginMethodIsDone extends AbstractMessage {
 
   @Override
   public String toString() {
-    return "PluginMethodIsDone [plugin=" + plugin + ", withError=" + withError + ", errorMessage=" + errorMessage
-        + "]";
+    return "PluginMethodIsDone [plugin=" + plugin + ", withError=" + withError + ", errorMessage=" + errorMessage + "]";
   }
 }

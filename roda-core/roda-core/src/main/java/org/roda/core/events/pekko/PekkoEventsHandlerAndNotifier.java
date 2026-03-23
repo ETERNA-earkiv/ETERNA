@@ -84,8 +84,7 @@ public class PekkoEventsHandlerAndNotifier extends AbstractEventsHandler impleme
   @Override
   public void notifyUserCreated(ModelService model, User user) {
     LOGGER.debug("notifyUserCreated '{}'", user);
-    eventsNotifierAndHandlerActor.tell(Messages.newEventUserCreated(user, instanceSenderId),
-      ActorRef.noSender());
+    eventsNotifierAndHandlerActor.tell(Messages.newEventUserCreated(user, instanceSenderId), ActorRef.noSender());
   }
 
   @Override
@@ -98,8 +97,7 @@ public class PekkoEventsHandlerAndNotifier extends AbstractEventsHandler impleme
   @Override
   public void notifyMyUserUpdated(ModelService model, User user, User updatedUser) {
     LOGGER.debug("notifyMyUserUpdated '{}'", user);
-    eventsNotifierAndHandlerActor.tell(Messages.newEventUserUpdated(user, true, instanceSenderId),
-      ActorRef.noSender());
+    eventsNotifierAndHandlerActor.tell(Messages.newEventUserUpdated(user, true, instanceSenderId), ActorRef.noSender());
   }
 
   @Override

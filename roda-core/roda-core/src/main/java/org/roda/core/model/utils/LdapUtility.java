@@ -518,7 +518,8 @@ public class LdapUtility {
       setMemberGroups(session, getUserDN(user.getName()), user.getGroups());
 
       if (!user.isActive()) {
-        try (SecureString randomPassword = new SecureString(RandomStringUtils.random(RANDOM_PASSWORD_LENGTH).toCharArray())){
+        try (SecureString randomPassword = new SecureString(
+          RandomStringUtils.random(RANDOM_PASSWORD_LENGTH).toCharArray())) {
           setUserPasswordUnchecked(user.getName(), randomPassword);
         } catch (final NotFoundException e) {
           LOGGER.error("Created user doesn't exist! Notify developers!!!", e);
@@ -972,7 +973,7 @@ public class LdapUtility {
    *           if something goes wrong with the operation.
    */
   public User requestPasswordReset(final String username, final String email)
-          throws NotFoundException, IllegalOperationException, GenericException {
+    throws NotFoundException, IllegalOperationException, GenericException {
     User user = null;
     try {
       user = getUserByNameOrEmail(username, email);
@@ -994,7 +995,6 @@ public class LdapUtility {
       }
     }
   }
-
 
   /**
    * Reset {@link User}'s password given a previously generated token.
@@ -2112,8 +2112,8 @@ public class LdapUtility {
   }
 
   public static String escapeLdapQuery(final String ldapQuery) {
-    final String[] reservedCharacters = new String[]{"*", "(", ")", "\\", "\0"};
-    final String[] replacements = new String[]{"\\2A", "\\28", "\\29", "\\5C", "\\00"};
+    final String[] reservedCharacters = new String[] {"*", "(", ")", "\\", "\0"};
+    final String[] replacements = new String[] {"\\2A", "\\28", "\\29", "\\5C", "\\00"};
     return StringUtils.replaceEach(ldapQuery, reservedCharacters, replacements);
   }
 

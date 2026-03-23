@@ -43,10 +43,11 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
 
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS,
-      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS,
-        "Delete older than X days", PluginParameterType.INTEGER).withDefaultValue("90").isMandatory(false)
-        .isReadOnly(false).withDescription("The plugin will delete all logs older than the specified number of days.")
-        .build());
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS, "Delete older than X days",
+          PluginParameterType.INTEGER)
+        .withDefaultValue("90").isMandatory(false).isReadOnly(false)
+        .withDescription("The plugin will delete all logs older than the specified number of days.").build());
   }
 
   private int deleteOlderThanXDays = 90;

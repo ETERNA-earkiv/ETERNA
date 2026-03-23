@@ -61,7 +61,6 @@ import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * Class that persists binary files and their containers in the File System.
  *
@@ -994,7 +993,5 @@ public class FileStorageService implements StorageService {
 
     return stats;
   }
-  
-
 
 }

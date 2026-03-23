@@ -358,7 +358,8 @@ public class PluginManager {
             // Get plugin class names from manifest
             final String eternaPluginClassNamesString = mainAttributes.getValue(ETERNA_PLUGIN_MANIFEST_KEY);
             final String rodaPluginClassNamesString = mainAttributes.getValue(RODA_PLUGIN_MANIFEST_KEY);
-            final String pluginClassNamesString = Optional.ofNullable(eternaPluginClassNamesString).orElse(rodaPluginClassNamesString);
+            final String pluginClassNamesString = Optional.ofNullable(eternaPluginClassNamesString)
+              .orElse(rodaPluginClassNamesString);
             if (pluginClassNamesString != null) {
               pluginClassNames.addAll(Arrays.asList(pluginClassNamesString.split("\\s+")));
             }
@@ -745,7 +746,8 @@ public class PluginManager {
         List<String> pluginClassNames = new ArrayList<>();
         String eternaPluginClassNamesString = mainAttributes.getValue(ETERNA_PLUGIN_MANIFEST_KEY);
         String rodaPluginClassNamesString = mainAttributes.getValue(RODA_PLUGIN_MANIFEST_KEY);
-        String pluginClassNamesString = Optional.ofNullable(eternaPluginClassNamesString).orElse(rodaPluginClassNamesString);
+        String pluginClassNamesString = Optional.ofNullable(eternaPluginClassNamesString)
+          .orElse(rodaPluginClassNamesString);
         if (pluginClassNamesString != null) {
           pluginClassNames.addAll(Arrays.asList(pluginClassNamesString.split("\\s+")));
         }
@@ -754,7 +756,8 @@ public class PluginManager {
         List<String> pluginDepends = new ArrayList<>();
         String eternaPluginClassNamesDependsString = mainAttributes.getValue(ETERNA_PLUGIN_MANIFEST_KEY_DEPENDS);
         String rodaPluginClassNamesDependsString = mainAttributes.getValue(RODA_PLUGIN_MANIFEST_KEY_DEPENDS);
-        String pluginClassNamesDependsString = Optional.ofNullable(eternaPluginClassNamesDependsString).orElse(rodaPluginClassNamesDependsString);
+        String pluginClassNamesDependsString = Optional.ofNullable(eternaPluginClassNamesDependsString)
+          .orElse(rodaPluginClassNamesDependsString);
         if (pluginClassNamesDependsString != null) {
           pluginDepends.addAll(Arrays.asList(pluginClassNamesDependsString.split("\\s+")));
         }
@@ -1005,8 +1008,8 @@ public class PluginManager {
           } else {
             LOGGER.error("{} is not a valid Plugin", pluginClassNames);
           }
-        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | RuntimeException |
-                 NoSuchMethodException | InvocationTargetException e) {
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | RuntimeException
+          | NoSuchMethodException | InvocationTargetException e) {
           LOGGER.error("Error loading plugin from {}", jarPath, e);
         }
       }

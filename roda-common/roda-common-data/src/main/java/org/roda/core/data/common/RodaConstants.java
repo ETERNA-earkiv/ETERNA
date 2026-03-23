@@ -94,7 +94,6 @@ public final class RodaConstants {
 
   public static final List<String> DEFAULT_ALGORITHMS = Arrays.asList(SHA256);
 
-
   public enum DateGranularity {
     YEAR, MONTH, DAY, HOUR, MINUTE, SECOND, MILLISECOND
   }

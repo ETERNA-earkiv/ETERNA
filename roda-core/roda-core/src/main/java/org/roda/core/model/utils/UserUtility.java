@@ -240,7 +240,7 @@ public class UserUtility {
   public static void checkUserApiBasicAuth(String username) throws AuthenticationDeniedException {
     if (RodaCoreFactory.getRodaConfiguration().getBoolean(RodaConstants.CORE_API_BASIC_AUTH_DISABLE, false)) {
       List<String> allowedUsers = RodaCoreFactory
-              .getRodaConfigurationAsList(RodaConstants.CORE_API_BASIC_AUTH_WHITELIST);
+        .getRodaConfigurationAsList(RodaConstants.CORE_API_BASIC_AUTH_WHITELIST);
       if (allowedUsers.isEmpty() || !allowedUsers.contains(username)) {
         throw new AuthenticationDeniedException("User is not authorized to use API");
       }

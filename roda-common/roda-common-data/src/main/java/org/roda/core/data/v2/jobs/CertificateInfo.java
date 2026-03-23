@@ -17,9 +17,11 @@ import java.util.Objects;
  */
 public class CertificateInfo implements Serializable {
   private static final long serialVersionUID = 5755199988566186742L;
+
   public enum CertificateStatus {
     INTERNAL, VERIFIED, LICENSED, NOT_VERIFIED
   }
+
   private CertificateStatus certificateStatus = CertificateStatus.INTERNAL;
   private HashSet<Certificate> certificates = new HashSet<>();
 
@@ -44,7 +46,7 @@ public class CertificateInfo implements Serializable {
     this.certificates.add(certificate);
   }
 
-  public boolean isNotVerified(){
+  public boolean isNotVerified() {
     return getCertificateStatus().equals(CertificateStatus.NOT_VERIFIED);
   }
 

@@ -43,7 +43,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class MarketUtils {
   private static String retrieveRodaVersion() throws MarketException {
     try (InputStream inputStream = MarketUtils.class.getClassLoader().getResourceAsStream("version.json");
-      BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream), StandardCharsets.UTF_8))) {
+      BufferedReader bufferedReader = new BufferedReader(
+        new InputStreamReader(Objects.requireNonNull(inputStream), StandardCharsets.UTF_8))) {
       StringBuilder builder = new StringBuilder();
       for (String line = null; (line = bufferedReader.readLine()) != null;) {
         builder.append(line).append("\n");
@@ -59,6 +60,7 @@ public class MarketUtils {
       throw new MarketException("Unable to retrieve ETERNA version", e);
     }
   }
+
   public static String getResultNodeFromJson(String jsonString) throws GenericException, JsonProcessingException {
     ObjectMapper mapper = new ObjectMapper();
     JsonNode rootNode = mapper.readTree(jsonString);
@@ -69,10 +71,11 @@ public class MarketUtils {
       throw new GenericException("Unable to find 'result' field in JSON");
     }
   }
+
   public static void retrievePluginsListFromAPI(LocalInstance instance) throws MarketException {
     try {
-      boolean collectVersion = Boolean.parseBoolean(RodaCoreFactory.getProperty(RodaConstants.ENVIRONMENT_COLLECT_VERSION,
-        RodaConstants.DEFAULT_ENVIRONMENT_COLLECT_VERSION));
+      boolean collectVersion = Boolean.parseBoolean(RodaCoreFactory
+        .getProperty(RodaConstants.ENVIRONMENT_COLLECT_VERSION, RodaConstants.DEFAULT_ENVIRONMENT_COLLECT_VERSION));
 
       String rodaVersion = collectVersion ? retrieveRodaVersion() : "development";
 
@@ -85,7 +88,7 @@ public class MarketUtils {
       HttpGet httpGet = new HttpGet(pluginUrl);
       httpGet.addHeader("Accept", "application/json");
       // TODO: RODA-LOCAL must have an instanceId at startup
-      if(instance != null){
+      if (instance != null) {
         httpGet.addHeader("X-RODA-INSTANCE-ID", instance.getId());
       }
       httpGet.addHeader("X-RODA-VERSION", rodaVersion);

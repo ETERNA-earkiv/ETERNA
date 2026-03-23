@@ -292,8 +292,7 @@ public class RodaCoreFactory {
             }
           }
 
-          List<String> properties = RodaCoreFactory
-            .getRodaConfigurationAsList("ui.display.properties.tika.fixed");
+          List<String> properties = RodaCoreFactory.getRodaConfigurationAsList("ui.display.properties.tika.fixed");
           for (String propertyKey : properties) {
             if (messages.containsTranslation(propertyKey)) {
               sharedProperties.put("i18n." + propertyKey,
@@ -680,7 +679,7 @@ public class RodaCoreFactory {
    * "RODA_" after replacements, it will be prepended); 3) RODA configuration
    * files (with original property value, ensuring that it does not start by
    * "roda."); 4) return default value
-   * 
+   *
    * <p>
    * Example 1: for property = 'roda.node.type' this method will try to find the
    * following:
@@ -1313,12 +1312,12 @@ public class RodaCoreFactory {
     String username = getRodaConfigurationAsString(RodaConstants.CORE_SOLR_AUTH_USERNAME);
     String password = getRodaConfigurationAsString(RodaConstants.CORE_SOLR_AUTH_PASSWORD);
 
-    if(username != null && !username.isBlank() && password != null && !password.isBlank() ) {
+    if (username != null && !username.isBlank() && password != null && !password.isBlank()) {
       http2ClientBuilder.withBasicAuthCredentials(username, password);
     }
 
-    CloudHttp2SolrClient cloudSolrClient = new CloudHttp2SolrClient.Builder(zkHosts, zkChroot).
-            withInternalClientBuilder(http2ClientBuilder).build();
+    CloudHttp2SolrClient cloudSolrClient = new CloudHttp2SolrClient.Builder(zkHosts, zkChroot)
+      .withInternalClientBuilder(http2ClientBuilder).build();
 
     waitForSolrCluster(cloudSolrClient);
 

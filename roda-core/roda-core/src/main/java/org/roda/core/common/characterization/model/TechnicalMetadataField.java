@@ -21,7 +21,7 @@ import jakarta.xml.bind.annotation.XmlValue;
 public class TechnicalMetadataField {
 
   public TechnicalMetadataField() {
-    //empty constructor
+    // empty constructor
   }
 
   @XmlAttribute(name = "name")

@@ -73,7 +73,7 @@ public class PekkoJobStateInfoActor extends PekkoBaseActor {
   private Histogram stateMessagesMetricsHistogram;
 
   public PekkoJobStateInfoActor(Plugin<?> plugin, ActorRef jobCreator, ActorRef jobsManager, String jobId,
-                                int numberOfJobsWorkers, int numberOfLimitedJobsWorkers) {
+    int numberOfJobsWorkers, int numberOfLimitedJobsWorkers) {
     super();
     jobInfo = new JobInfo();
     this.plugin = plugin;

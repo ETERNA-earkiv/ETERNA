@@ -60,7 +60,7 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
       Path path;
       if (folderRelativePath.isPresent()) {
         Path resolvedBasePath = basePath.resolve(Paths.get(FilenameUtils.normalize(folderRelativePath.get())));
-        boolean isWithin = RodaCoreFactory.checkPathIsWithin(resolvedBasePath,basePath);
+        boolean isWithin = RodaCoreFactory.checkPathIsWithin(resolvedBasePath, basePath);
         if (isWithin) {
           path = resolvedBasePath.normalize();
         } else {

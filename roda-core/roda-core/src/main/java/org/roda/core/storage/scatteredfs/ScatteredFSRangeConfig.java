@@ -24,14 +24,11 @@ public class ScatteredFSRangeConfig implements ScatteredFSConfig {
   private List<ScatteredFSRange> ranges;
 
   public ScatteredFSRangeConfig(String fileSystemName) throws GenericException {
-    String regex = RodaCoreFactory.getRodaConfigurationAsString("core.storage.filesystem", fileSystemName,
-            "regex");
+    String regex = RodaCoreFactory.getRodaConfigurationAsString("core.storage.filesystem", fileSystemName, "regex");
 
-    String type = RodaCoreFactory.getRodaConfigurationAsString("core.storage.filesystem", fileSystemName,
-            "type");
+    String type = RodaCoreFactory.getRodaConfigurationAsString("core.storage.filesystem", fileSystemName, "type");
 
-    String rule = RodaCoreFactory.getRodaConfigurationAsString("core.storage.filesystem", fileSystemName,
-            "rule");
+    String rule = RodaCoreFactory.getRodaConfigurationAsString("core.storage.filesystem", fileSystemName, "rule");
 
     if (!regex.isEmpty()) {
       this.pattern = Pattern.compile(regex);
@@ -43,28 +40,28 @@ public class ScatteredFSRangeConfig implements ScatteredFSConfig {
 
     List<ScatteredFSRange> ranges = new ArrayList<>();
 
-    for(String rangeString : rangeStrings) {
+    for (String rangeString : rangeStrings) {
       int dashIndex = rangeString.indexOf("-");
 
-      if(dashIndex == -1 || dashIndex == rangeString.length() - 1) {
+      if (dashIndex == -1 || dashIndex == rangeString.length() - 1) {
         throw new GenericException("Error! Invalid rule property.");
       }
 
       try {
         int beginIndex = Integer.parseInt(rangeString, 0, dashIndex, 10);
-        int endIndex = Integer.parseInt(rangeString, dashIndex+1, rangeString.length(), 10);
+        int endIndex = Integer.parseInt(rangeString, dashIndex + 1, rangeString.length(), 10);
 
-        if(endIndex <= beginIndex) {
+        if (endIndex <= beginIndex) {
           throw new GenericException("Error! Invalid rule property.");
         }
 
         ranges.add(new ScatteredFSRange(beginIndex, endIndex));
-      } catch(Exception ignored) {
+      } catch (Exception ignored) {
         throw new GenericException("Error! Invalid rule property.");
       }
     }
 
-    if(ranges.isEmpty()) {
+    if (ranges.isEmpty()) {
       throw new GenericException("Error! Invalid rule property.");
     }
 
@@ -80,7 +77,7 @@ public class ScatteredFSRangeConfig implements ScatteredFSConfig {
       pathPartials.add(FSUtils.decodePathPartial(pathPartial));
     }
 
-    if(i > 1) {
+    if (i > 1) {
       int numPathPartialsToRemove = Math.min(pathPartials.size(), this.ranges.size());
       pathPartials.subList(1, numPathPartialsToRemove + 1).clear();
     }
@@ -89,10 +86,8 @@ public class ScatteredFSRangeConfig implements ScatteredFSConfig {
   }
 
   public Path getScatteredPath(String id) {
-    Path scatteredPath = Paths.get(
-            ranges.stream().map(range -> id.substring(range.beginIndex(), range.endIndex()))
-                    .collect(Collectors.joining(File.separator))
-    );
+    Path scatteredPath = Paths.get(ranges.stream().map(range -> id.substring(range.beginIndex(), range.endIndex()))
+      .collect(Collectors.joining(File.separator)));
 
     scatteredPath = scatteredPath.resolve(id);
 

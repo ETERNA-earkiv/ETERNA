@@ -18,8 +18,6 @@ import org.roda.core.data.common.RodaConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-
-
 /**
  * This is a user of RODA.
  *

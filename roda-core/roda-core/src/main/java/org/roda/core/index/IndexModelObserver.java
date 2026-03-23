@@ -117,7 +117,8 @@ public class IndexModelObserver implements ModelObserver {
     super();
     this.index = index;
     this.model = model;
-    this.indexPreservationEvents = RodaCoreFactory.getRodaConfiguration().getBoolean("core.index.preservation_event.enable", true);
+    this.indexPreservationEvents = RodaCoreFactory.getRodaConfiguration()
+      .getBoolean("core.index.preservation_event.enable", true);
   }
 
   @Override

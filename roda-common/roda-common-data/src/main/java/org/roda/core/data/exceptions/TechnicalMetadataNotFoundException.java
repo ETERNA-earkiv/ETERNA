@@ -13,7 +13,7 @@ import java.io.Serial;
  * @author Carlos Afonso <cafonso@keep.pt>
  */
 
-public class TechnicalMetadataNotFoundException extends RODAException{
+public class TechnicalMetadataNotFoundException extends RODAException {
 
   @Serial
   private static final long serialVersionUID = 3820597384560474275L;

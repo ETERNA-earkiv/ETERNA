@@ -225,7 +225,7 @@ public class TransferredResourcesScanner {
     boolean isWithin;
     Path resolvedBasePath;
     Optional<String> normalizedRelativePath;
-    if(folderRelativePath.isPresent() && !folderRelativePath.get().isEmpty()) {
+    if (folderRelativePath.isPresent() && !folderRelativePath.get().isEmpty()) {
       resolvedBasePath = basePath.resolve(Paths.get(FilenameUtils.normalize(folderRelativePath.get()))).normalize();
       isWithin = RodaCoreFactory.checkPathIsWithin(resolvedBasePath, basePath);
       if (resolvedBasePath.equals(basePath)) {
@@ -272,7 +272,7 @@ public class TransferredResourcesScanner {
 
     if (folderRelativePath.isPresent()) {
       Path resolvedBasePath = basePath.resolve(Paths.get(FilenameUtils.normalize(folderRelativePath.get())));
-      boolean isWithin = RodaCoreFactory.checkPathIsWithin(resolvedBasePath,basePath);
+      boolean isWithin = RodaCoreFactory.checkPathIsWithin(resolvedBasePath, basePath);
 
       if (isWithin) {
         Path parent = resolvedBasePath.getParent();

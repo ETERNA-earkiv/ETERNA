@@ -137,15 +137,14 @@ public class IndexedPreservationEvent
   public String toString() {
     return "IndexedPreservationEvent [id=" + id + ", aipID=" + aipID + ", representationUUID=" + representationUUID
       + ", fileUUID=" + fileUUID + ", objectClass=" + objectClass + ", eventDateTime=" + eventDateTime
-      + ", eventDetail=" + eventDetail + ", eventType=" + eventType + ", eventOutcome=" + eventOutcome
-      + ", instanceId=" + instanceId + ", instanceName=" + instanceName + "]";
+      + ", eventDetail=" + eventDetail + ", eventType=" + eventType + ", eventOutcome=" + eventOutcome + ", instanceId="
+      + instanceId + ", instanceName=" + instanceName + "]";
   }
 
   @Override
   public List<String> toCsvHeaders() {
     return Arrays.asList("id", "aipID", "representationUUID", "fileUUID", "objectClass", "eventDateTime", "eventDetail",
-      "eventType", "eventOutcome", "instanceId",
-      "instanceName");
+      "eventType", "eventOutcome", "instanceId", "instanceName");
   }
 
   @Override

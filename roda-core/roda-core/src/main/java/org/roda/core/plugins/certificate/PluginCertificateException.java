@@ -12,7 +12,7 @@ import org.roda.core.data.exceptions.RODAException;
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-public class PluginCertificateException  extends RODAException {
+public class PluginCertificateException extends RODAException {
 
   public PluginCertificateException() {
     super();

@@ -61,7 +61,7 @@ public class PekkoEventsHandlerAndNotifierActor extends AbstractActor {
   private Set<ObjectKey> objectKeys = new HashSet<>();
 
   public PekkoEventsHandlerAndNotifierActor(final EventsHandler eventsHandler, final String writeConsistency,
-                                            final int writeConsistencyTimeoutInSeconds) {
+    final int writeConsistencyTimeoutInSeconds) {
     this.eventsHandler = eventsHandler;
     this.instanceSenderId = self().toString();
     this.writeConsistency = instantiateWriteConsistency(writeConsistency, writeConsistencyTimeoutInSeconds);

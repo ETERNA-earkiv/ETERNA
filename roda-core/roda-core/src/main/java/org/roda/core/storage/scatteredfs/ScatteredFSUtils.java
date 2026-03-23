@@ -47,7 +47,7 @@ public class ScatteredFSUtils extends FSUtils {
   public static void initialize() throws GenericException {
     List<String> scatteredFSFilesystems = RodaCoreFactory.getRodaConfigurationAsList(SCATTERED_FS_FILESYSTEM_PROPERTY);
 
-    for(String filesystem : scatteredFSFilesystems) {
+    for (String filesystem : scatteredFSFilesystems) {
       ScatteredFSConfig config = ScatteredFSConfig.getScatteredFSConfigFromRodaConfiguration(filesystem);
 
       containerNameScatteredFSConfigMap.put(filesystem, config);
@@ -69,7 +69,7 @@ public class ScatteredFSUtils extends FSUtils {
       List<String> directoryPathList = storagePath.getDirectoryPath();
       String directoryPath = "";
 
-      if(!directoryPathList.isEmpty()) {
+      if (!directoryPathList.isEmpty()) {
         id = directoryPathList.get(0);
         directoryPathList = directoryPathList.subList(1, directoryPathList.size());
         directoryPathList.add(storagePath.getName());
@@ -79,7 +79,7 @@ public class ScatteredFSUtils extends FSUtils {
       }
 
       ScatteredFSConfig fsConfig = containerNameScatteredFSConfigMap.get(containerName);
-      if(fsConfig.isValidName(Path.of(id))) {
+      if (fsConfig.isValidName(Path.of(id))) {
         Path scatteredPath = fsConfig.getScatteredPath(id);
         return basePath.resolve(containerName).resolve(scatteredPath).resolve(directoryPath);
       }
@@ -89,7 +89,7 @@ public class ScatteredFSUtils extends FSUtils {
   }
 
   public static Path getEntityPath(Path basePath, StoragePath storagePath, String version)
-          throws RequestNotValidException {
+    throws RequestNotValidException {
     if (version.indexOf(VERSION_SEP) >= 0) {
       throw new RequestNotValidException("Cannot use '" + VERSION_SEP + "' in version " + version);
     }
@@ -100,7 +100,7 @@ public class ScatteredFSUtils extends FSUtils {
       List<String> directoryPathList = storagePath.getDirectoryPath();
       String directoryPath = "";
 
-      if(directoryPathList.size() > 1) {
+      if (directoryPathList.size() > 1) {
         id = directoryPathList.get(0);
         directoryPathList = directoryPathList.subList(1, directoryPathList.size());
         directoryPathList.add(storagePath.getName() + VERSION_SEP + version);
@@ -110,7 +110,7 @@ public class ScatteredFSUtils extends FSUtils {
       }
 
       ScatteredFSConfig fsConfig = containerNameScatteredFSConfigMap.get(containerName);
-      if(fsConfig.isValidName(Path.of(id))) {
+      if (fsConfig.isValidName(Path.of(id))) {
         Path scatteredPath = fsConfig.getScatteredPath(id);
         return basePath.resolve(containerName).resolve(scatteredPath).resolve(directoryPath);
       }
@@ -137,7 +137,7 @@ public class ScatteredFSUtils extends FSUtils {
 
         String id = scatteredRoot.getFileName().toString();
         Path scatteredPath = fsConfig.getScatteredPath(id);
-        if(scatteredPath.equals(scatteredRoot) && fsConfig.isValidName(scatteredRoot)) {
+        if (scatteredPath.equals(scatteredRoot) && fsConfig.isValidName(scatteredRoot)) {
           return fsConfig.getStoragePath(relativePath);
         }
       }
@@ -157,7 +157,7 @@ public class ScatteredFSUtils extends FSUtils {
    * @throws GenericException
    */
   public static CloseableIterable<Resource> listPath(final Path basePath, final Path path)
-          throws NotFoundException, GenericException {
+    throws NotFoundException, GenericException {
     CloseableIterable<Resource> resourceIterable;
     try {
       final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(path);
@@ -206,7 +206,7 @@ public class ScatteredFSUtils extends FSUtils {
   }
 
   public static CloseableIterable<Resource> listPathUnderFile(final Path basePath, final Path path)
-          throws NotFoundException, GenericException {
+    throws NotFoundException, GenericException {
     CloseableIterable<Resource> resourceIterable;
     try {
       LineIterator lineIterator = FileUtils.lineIterator(path.toFile());
@@ -256,7 +256,7 @@ public class ScatteredFSUtils extends FSUtils {
   }
 
   public static CloseableIterable<Resource> recursivelyListPath(final Path basePath, final Path path)
-          throws NotFoundException, GenericException {
+    throws NotFoundException, GenericException {
     CloseableIterable<Resource> resourceIterable;
     try {
       final Stream<Path> walk = Files.walk(path, FileVisitOption.FOLLOW_LINKS);
@@ -375,7 +375,7 @@ public class ScatteredFSUtils extends FSUtils {
    * @throws GenericException
    */
   public static Resource convertPathToResource(Path basePath, Path path)
-          throws RequestNotValidException, NotFoundException, GenericException {
+    throws RequestNotValidException, NotFoundException, GenericException {
     Resource resource;
 
     // TODO support binary reference
@@ -415,7 +415,7 @@ public class ScatteredFSUtils extends FSUtils {
   }
 
   public static BinaryVersion convertPathToBinaryVersion(Path historyDataPath, Path historyMetadataPath, Path path)
-          throws RequestNotValidException, NotFoundException, GenericException {
+    throws RequestNotValidException, NotFoundException, GenericException {
     DefaultBinaryVersion ret;
 
     if (!FSUtils.exists(path)) {
@@ -473,7 +473,7 @@ public class ScatteredFSUtils extends FSUtils {
    * @throws RequestNotValidException
    */
   public static Container convertPathToContainer(Path basePath, Path path)
-          throws GenericException, RequestNotValidException {
+    throws GenericException, RequestNotValidException {
     Container resource;
 
     // storage path
@@ -491,7 +491,7 @@ public class ScatteredFSUtils extends FSUtils {
   public static Path createRandomDirectory(Path parent) throws IOException {
     String containerName = parent.getFileName().toString();
 
-    if(containerNameScatteredFSConfigMap.containsKey(containerName)) {
+    if (containerNameScatteredFSConfigMap.containsKey(containerName)) {
       String id = IdUtils.createUUID();
       Path scatteredPath = containerNameScatteredFSConfigMap.get(containerName).getScatteredPath(id);
 
@@ -502,7 +502,7 @@ public class ScatteredFSUtils extends FSUtils {
   }
 
   public static CloseableIterable<BinaryVersion> listBinaryVersions(final Path historyDataPath,
-                                                                    final Path historyMetadataPath, final StoragePath storagePath) throws GenericException, NotFoundException {
+    final Path historyMetadataPath, final StoragePath storagePath) throws GenericException, NotFoundException {
     Path fauxPath = getEntityPath(historyDataPath, storagePath);
     final Path parent = fauxPath.getParent();
     final String baseName = fauxPath.getFileName().toString();
@@ -511,16 +511,16 @@ public class ScatteredFSUtils extends FSUtils {
 
     try {
       final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(parent,
-              new DirectoryStream.Filter<Path>() {
+        new DirectoryStream.Filter<Path>() {
 
-                @Override
-                public boolean accept(Path entry) {
-                  String fileName = entry.getFileName().toString();
-                  int lastIndexOfDot = fileName.lastIndexOf(VERSION_SEP);
+          @Override
+          public boolean accept(Path entry) {
+            String fileName = entry.getFileName().toString();
+            int lastIndexOfDot = fileName.lastIndexOf(VERSION_SEP);
 
-                  return lastIndexOfDot > 0 ? fileName.substring(0, lastIndexOfDot).equals(baseName) : false;
-                }
-              });
+            return lastIndexOfDot > 0 ? fileName.substring(0, lastIndexOfDot).equals(baseName) : false;
+          }
+        });
 
       final Iterator<Path> pathIterator = directoryStream.iterator();
       iterable = new CloseableIterable<BinaryVersion>() {
@@ -563,42 +563,38 @@ public class ScatteredFSUtils extends FSUtils {
   }
 
   public static CloseableIterable<Resource> listResourcesUnderContainer(final Path storagePath, String containerName)
-          throws NotFoundException, GenericException {
+    throws NotFoundException, GenericException {
     CloseableIterable<Resource> resourceIterable;
 
     Path containerPath = storagePath.resolve(containerName);
 
-    if(containerNameScatteredFSConfigMap.containsKey(containerName)) {
+    if (containerNameScatteredFSConfigMap.containsKey(containerName)) {
       ScatteredFSConfig scatteredFSConfig = containerNameScatteredFSConfigMap.get(containerName);
 
       try {
-        final Stream<Path> directoryStream =
-                Files.walk(
-                        containerPath,
-                        scatteredFSConfig.getScatteredFolderDepth() + 1,
-                         FileVisitOption.FOLLOW_LINKS
-                        )
-                        .filter(p -> {
-                          Path relativePath = containerPath.relativize(p);
-                          int folderDepth = relativePath.getNameCount();
+        final Stream<Path> directoryStream = Files
+          .walk(containerPath, scatteredFSConfig.getScatteredFolderDepth() + 1, FileVisitOption.FOLLOW_LINKS)
+          .filter(p -> {
+            Path relativePath = containerPath.relativize(p);
+            int folderDepth = relativePath.getNameCount();
 
-                          if (scatteredFSConfig.getScatteredFolderDepth() + 1 != folderDepth) {
-                            return false;
-                          }
+            if (scatteredFSConfig.getScatteredFolderDepth() + 1 != folderDepth) {
+              return false;
+            }
 
-                          String id = p.getFileName().toString();
-                          Path scatteredPath = scatteredFSConfig.getScatteredPath(id);
+            String id = p.getFileName().toString();
+            Path scatteredPath = scatteredFSConfig.getScatteredPath(id);
 
-                          if (!relativePath.equals(scatteredPath)) {
-                            return false;
-                          }
+            if (!relativePath.equals(scatteredPath)) {
+              return false;
+            }
 
-                          if (!scatteredFSConfig.isValidName(relativePath)) {
-                            return false;
-                          }
+            if (!scatteredFSConfig.isValidName(relativePath)) {
+              return false;
+            }
 
-                          return Files.isDirectory(p) == scatteredFSConfig.isDirectory();
-                        });
+            return Files.isDirectory(p) == scatteredFSConfig.isDirectory();
+          });
 
         final Iterator<Path> pathIterator = directoryStream.iterator();
 
@@ -632,7 +628,6 @@ public class ScatteredFSUtils extends FSUtils {
             directoryStream.close();
           }
         };
-
 
       } catch (NoSuchFileException e) {
         throw new NotFoundException("Could not list contents of entity because it doesn't exist: " + containerPath, e);

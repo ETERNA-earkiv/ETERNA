@@ -60,8 +60,8 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
       LOGGER.debug("Loading antivirus class {}", antiVirusClassName);
       setAntiVirus((AntiVirus) Class.forName(antiVirusClassName).getDeclaredConstructor().newInstance());
       LOGGER.debug("Using antivirus {}", getAntiVirus().getClass().getName());
-    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
-             InvocationTargetException | NoSuchMethodException e) {
+    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException
+      | NoSuchMethodException e) {
       LOGGER.warn("Error loading antivirus", e);
     }
 

@@ -50,13 +50,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Class that persists binary files and their containers in scattered folders on the File System.
+ * Class that persists binary files and their containers in scattered folders on
+ * the File System.
  *
  * @author Luis Faria <lfaria@keep.pt>
  * @author Hélder Silva <hsilva@keep.pt>
  * @author Filiph Schaaf <filiph.schaaf@whitered.se>
  */
-public class ScatteredFileStorageService extends FileStorageService  {
+public class ScatteredFileStorageService extends FileStorageService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ScatteredFileStorageService.class);
 
@@ -71,7 +72,7 @@ public class ScatteredFileStorageService extends FileStorageService  {
   private final Path trashPath;
 
   public ScatteredFileStorageService(Path basePath, boolean createTrash, String trashDirName, boolean createHistory)
-          throws GenericException {
+    throws GenericException {
     super(basePath, createTrash, trashDirName, createHistory);
 
     this.basePath = basePath;
@@ -185,7 +186,7 @@ public class ScatteredFileStorageService extends FileStorageService  {
 
   @Override
   public CloseableIterable<Resource> listResourcesUnderContainer(StoragePath storagePath, boolean recursive)
-          throws NotFoundException, GenericException {
+    throws NotFoundException, GenericException {
     Path path = ScatteredFSUtils.getEntityPath(basePath, storagePath);
     if (recursive) {
       return ScatteredFSUtils.recursivelyListPath(basePath, path);
@@ -196,7 +197,7 @@ public class ScatteredFileStorageService extends FileStorageService  {
 
   @Override
   public Long countResourcesUnderContainer(StoragePath storagePath, boolean recursive)
-          throws NotFoundException, GenericException {
+    throws NotFoundException, GenericException {
     Path path = ScatteredFSUtils.getEntityPath(basePath, storagePath);
     if (recursive) {
       return FSUtils.recursivelyCountPath(path);
@@ -231,7 +232,7 @@ public class ScatteredFileStorageService extends FileStorageService  {
 
   @Override
   public Directory createRandomDirectory(StoragePath parentStoragePath)
-          throws RequestNotValidException, GenericException, NotFoundException, AlreadyExistsException {
+    throws RequestNotValidException, GenericException, NotFoundException, AlreadyExistsException {
     Path parentDirPath = ScatteredFSUtils.getEntityPath(basePath, parentStoragePath);
     Path directory = null;
 
@@ -254,7 +255,7 @@ public class ScatteredFileStorageService extends FileStorageService  {
 
   @Override
   public Directory getDirectory(StoragePath storagePath)
-          throws RequestNotValidException, NotFoundException, GenericException {
+    throws RequestNotValidException, NotFoundException, GenericException {
     if (storagePath.isFromAContainer()) {
       throw new RequestNotValidException("Invalid storage path for a directory: " + storagePath);
     }
@@ -271,7 +272,7 @@ public class ScatteredFileStorageService extends FileStorageService  {
 
   @Override
   public CloseableIterable<Resource> listResourcesUnderDirectory(StoragePath storagePath, boolean recursive)
-          throws NotFoundException, GenericException {
+    throws NotFoundException, GenericException {
     Path directoryPath = ScatteredFSUtils.getEntityPath(basePath, storagePath);
     if (recursive) {
       return ScatteredFSUtils.recursivelyListPath(basePath, directoryPath);
@@ -282,14 +283,14 @@ public class ScatteredFileStorageService extends FileStorageService  {
 
   @Override
   public CloseableIterable<Resource> listResourcesUnderFile(StoragePath storagePath, boolean recursive)
-          throws NotFoundException, GenericException {
+    throws NotFoundException, GenericException {
     Path directoryPath = ScatteredFSUtils.getEntityPath(basePath, storagePath);
     return ScatteredFSUtils.listPathUnderFile(basePath, directoryPath);
   }
 
   @Override
   public Long countResourcesUnderDirectory(StoragePath storagePath, boolean recursive)
-          throws NotFoundException, GenericException {
+    throws NotFoundException, GenericException {
     Path directoryPath = ScatteredFSUtils.getEntityPath(basePath, storagePath);
     if (recursive) {
       return FSUtils.recursivelyCountPath(directoryPath);
@@ -300,14 +301,14 @@ public class ScatteredFileStorageService extends FileStorageService  {
 
   @Override
   public Binary createBinary(StoragePath storagePath, ContentPayload payload, boolean asReference)
-          throws GenericException, AlreadyExistsException {
+    throws GenericException, AlreadyExistsException {
     if (asReference) {
       Path binPath = ScatteredFSUtils.getEntityPath(basePath, storagePath);
       try {
         if (FSUtils.exists(binPath)) {
           if (payload instanceof ExternalFileManifestContentPayload) {
             ShallowFile shallowFile = ((ExternalFileManifestContentPayload) payload).getShallowFiles().getObjects()
-                    .get(0);
+              .get(0);
             ShallowFiles manifestContent = FSUtils.retrieveManifestFileContent(binPath);
 
             for (ShallowFile manifestFileShallow : manifestContent.getObjects()) {
@@ -365,7 +366,7 @@ public class ScatteredFileStorageService extends FileStorageService  {
 
   @Override
   public Binary createRandomBinary(StoragePath parentStoragePath, ContentPayload payload, boolean asReference)
-          throws GenericException, RequestNotValidException {
+    throws GenericException, RequestNotValidException {
     if (asReference) {
       throw new GenericException("Method not yet implemented");
     } else {
@@ -396,7 +397,7 @@ public class ScatteredFileStorageService extends FileStorageService  {
 
   @Override
   public Binary updateBinaryContent(StoragePath storagePath, ContentPayload payload, boolean asReference,
-                                    boolean createIfNotExists) throws GenericException, NotFoundException, RequestNotValidException {
+    boolean createIfNotExists) throws GenericException, NotFoundException, RequestNotValidException {
     if (asReference) {
       Path binaryPath = ScatteredFSUtils.getEntityPath(basePath, storagePath);
       boolean fileExists = ScatteredFSUtils.exists(binaryPath);
@@ -405,17 +406,17 @@ public class ScatteredFileStorageService extends FileStorageService  {
       } else {
         try {
           ShallowFile shallowFile = ((ExternalFileManifestContentPayload) payload).getShallowFiles().getObjects()
-                  .get(0);
+            .get(0);
           ShallowFiles manifestFileContent = FSUtils.retrieveManifestFileContent(binaryPath);
           manifestFileContent.getObjects()
-                  .replaceAll(sf -> sf.getName().equals(shallowFile.getName()) ? shallowFile : sf);
+            .replaceAll(sf -> sf.getName().equals(shallowFile.getName()) ? shallowFile : sf);
           ExternalFileManifestContentPayload newPayload = new ExternalFileManifestContentPayload(manifestFileContent);
           newPayload.writeToPath(binaryPath);
 
           Path sfPath = binaryPath.getParent().resolve(shallowFile.getName());
           StoragePath sfStoragePath = ScatteredFSUtils.getStoragePath(basePath, sfPath);
           Resource resource = FSUtils.convertReferenceToResource(sfStoragePath, shallowFile.getLocation().toString(),
-                  false);
+            false);
           if (resource instanceof Binary) {
             return (DefaultBinary) resource;
           } else {
@@ -453,7 +454,7 @@ public class ScatteredFileStorageService extends FileStorageService  {
 
   @Override
   public Binary getBinary(StoragePath storagePath)
-          throws RequestNotValidException, NotFoundException, GenericException {
+    throws RequestNotValidException, NotFoundException, GenericException {
     Path binaryPath = ScatteredFSUtils.getEntityPath(basePath, storagePath);
     if (FSUtils.exists(binaryPath)) {
       Resource resource = ScatteredFSUtils.convertPathToResource(basePath, binaryPath);
@@ -466,7 +467,7 @@ public class ScatteredFileStorageService extends FileStorageService  {
       ShallowFile shallowFile = FSUtils.isResourcePresentOnManifestFile(binaryPath);
       if (shallowFile != null) {
         Resource resource = FSUtils.convertReferenceToResource(storagePath, shallowFile.getLocation().toString(),
-                false);
+          false);
         if (resource instanceof DefaultBinary) {
           ((DefaultBinary) resource).setSizeInBytes(shallowFile.getSize());
           return (Binary) resource;
@@ -500,8 +501,8 @@ public class ScatteredFileStorageService extends FileStorageService  {
 
   @Override
   public void copy(StorageService fromService, StoragePath fromStoragePath, StoragePath toStoragePath)
-          throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
-          AuthorizationDeniedException {
+    throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
+    AuthorizationDeniedException {
     if (fromService instanceof FileStorageService) {
       Path sourcePath = ((FileStorageService) fromService).resolve(fromStoragePath);
       Path targetPath = ScatteredFSUtils.getEntityPath(basePath, toStoragePath);
@@ -514,7 +515,7 @@ public class ScatteredFileStorageService extends FileStorageService  {
 
   @Override
   public void copy(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource)
-          throws AlreadyExistsException, GenericException {
+    throws AlreadyExistsException, GenericException {
     Path sourcePath = null;
     if (StringUtils.isNotBlank(resource)) {
       sourcePath = ScatteredFSUtils.getEntityPath(basePath, fromStoragePath).resolve(resource);
@@ -528,8 +529,8 @@ public class ScatteredFileStorageService extends FileStorageService  {
 
   @Override
   public void move(StorageService fromService, StoragePath fromStoragePath, StoragePath toStoragePath)
-          throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
-          AuthorizationDeniedException {
+    throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
+    AuthorizationDeniedException {
     if (fromService instanceof ScatteredFileStorageService) {
       Path sourcePath = ((ScatteredFileStorageService) fromService).resolve(fromStoragePath);
       Path targetPath = ScatteredFSUtils.getEntityPath(basePath, toStoragePath);
@@ -556,7 +557,7 @@ public class ScatteredFileStorageService extends FileStorageService  {
     List<String> path = ModelUtils.extractFilePathFromRepresentationData(storagePath);
     try {
       StoragePath externalFile = ModelUtils.getFileStoragePath(aipId.get(), representationId.get(), path,
-              RodaConstants.RODA_MANIFEST_EXTERNAL_FILES);
+        RodaConstants.RODA_MANIFEST_EXTERNAL_FILES);
       Path entity = ScatteredFSUtils.getEntityPath(basePath, externalFile);
       if (FSUtils.exists(entity)) {
         return getEntityClass(externalFile, entity);
@@ -595,7 +596,7 @@ public class ScatteredFileStorageService extends FileStorageService  {
 
   @Override
   public CloseableIterable<BinaryVersion> listBinaryVersions(StoragePath storagePath)
-          throws GenericException, NotFoundException {
+    throws GenericException, NotFoundException {
     if (historyDataPath == null) {
       LOGGER.warn("Skipping list binary versions because no history folder is defined, so returning empty list!");
       return new EmptyClosableIterable<>();
@@ -613,13 +614,13 @@ public class ScatteredFileStorageService extends FileStorageService  {
 
     try {
       final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(parent,
-              new DirectoryStream.Filter<Path>() {
+        new DirectoryStream.Filter<Path>() {
 
-                @Override
-                public boolean accept(Path entry) {
-                  return entry.getFileName().toString().startsWith(baseName);
-                }
-              });
+          @Override
+          public boolean accept(Path entry) {
+            return entry.getFileName().toString().startsWith(baseName);
+          }
+        });
 
       final Iterator<Path> pathIterator = directoryStream.iterator();
       iterable = new CloseableIterable<BinaryVersion>() {
@@ -667,7 +668,7 @@ public class ScatteredFileStorageService extends FileStorageService  {
 
   @Override
   public BinaryVersion getBinaryVersion(StoragePath storagePath, String version)
-          throws RequestNotValidException, NotFoundException, GenericException {
+    throws RequestNotValidException, NotFoundException, GenericException {
     if (historyDataPath == null) {
       throw new GenericException("Skipping get binary version because no history folder is defined!");
     }
@@ -677,7 +678,7 @@ public class ScatteredFileStorageService extends FileStorageService  {
 
   @Override
   public BinaryVersion createBinaryVersion(StoragePath storagePath, Map<String, String> properties)
-          throws RequestNotValidException, NotFoundException, GenericException {
+    throws RequestNotValidException, NotFoundException, GenericException {
     if (historyDataPath == null) {
       throw new GenericException("Skipping create binary version because no history folder is defined!");
     }
@@ -726,7 +727,7 @@ public class ScatteredFileStorageService extends FileStorageService  {
 
   @Override
   public void revertBinaryVersion(StoragePath storagePath, String version)
-          throws NotFoundException, RequestNotValidException, GenericException {
+    throws NotFoundException, RequestNotValidException, GenericException {
     if (historyDataPath == null) {
       LOGGER.warn("Skipping revert binary version because no history folder is defined!");
       return;
@@ -757,7 +758,7 @@ public class ScatteredFileStorageService extends FileStorageService  {
 
   @Override
   public void deleteBinaryVersion(StoragePath storagePath, String version)
-          throws NotFoundException, GenericException, RequestNotValidException {
+    throws NotFoundException, GenericException, RequestNotValidException {
     if (historyDataPath == null) {
       LOGGER.warn("Skipping delete binary version because no history folder is defined!");
       return;
@@ -788,7 +789,7 @@ public class ScatteredFileStorageService extends FileStorageService  {
     if (FSUtils.isDirectory(resourceHistoryDataPath)) {
       try {
         Path resourceHistoryMetadataPath = historyMetadataPath
-                .resolve(historyDataPath.relativize(resourceHistoryDataPath));
+          .resolve(historyDataPath.relativize(resourceHistoryDataPath));
 
         trash(resourceHistoryDataPath);
         trash(resourceHistoryMetadataPath);
@@ -863,67 +864,66 @@ public class ScatteredFileStorageService extends FileStorageService  {
     }
     return storagePaths;
   }
-    public Map<StoragePath, Path> listContainersWithPaths() throws GenericException {
-        Map<StoragePath, Path> containersWithPaths = new HashMap<>();
 
-        try (CloseableIterable<Container> containers = listContainers()) {
-            for (Container container : containers) {
-                if (container == null) {
-                    LOGGER.warn("Encountered null container while listing containers under {}", basePath);
-                    continue; // skip it
-                }
+  public Map<StoragePath, Path> listContainersWithPaths() throws GenericException {
+    Map<StoragePath, Path> containersWithPaths = new HashMap<>();
 
-                StoragePath storagePath = container.getStoragePath();
-                Path entityPath = ScatteredFSUtils.getEntityPath(basePath, storagePath);
-                containersWithPaths.put(storagePath, entityPath);
-            }
-        } catch (IOException e) {
-            throw new GenericException("Error closing containers iterable", e);
+    try (CloseableIterable<Container> containers = listContainers()) {
+      for (Container container : containers) {
+        if (container == null) {
+          LOGGER.warn("Encountered null container while listing containers under {}", basePath);
+          continue; // skip it
         }
 
-        return containersWithPaths;
+        StoragePath storagePath = container.getStoragePath();
+        Path entityPath = ScatteredFSUtils.getEntityPath(basePath, storagePath);
+        containersWithPaths.put(storagePath, entityPath);
+      }
+    } catch (IOException e) {
+      throw new GenericException("Error closing containers iterable", e);
     }
 
-    @Override
-    public Map<String, Object> getStorageStats() throws GenericException {
-        Map<StoragePath, Path> containersWithPaths = listContainersWithPaths();
+    return containersWithPaths;
+  }
 
-        // get distinct parent paths (leaving out container names)
-        Set<Path> distinctBasePaths = containersWithPaths.values().stream().map(Path::getParent)
-                .collect(Collectors.toSet());
+  @Override
+  public Map<String, Object> getStorageStats() throws GenericException {
+    Map<StoragePath, Path> containersWithPaths = listContainersWithPaths();
 
-        Set<FileStore> seenStores = new HashSet<>();
-        long totalAll = 0, usedAll = 0, availAll = 0;
+    // get distinct parent paths (leaving out container names)
+    Set<Path> distinctBasePaths = containersWithPaths.values().stream().map(Path::getParent)
+      .collect(Collectors.toSet());
 
-        for (Path basePath : distinctBasePaths) {
-            try {
-                FileStore store = Files.getFileStore(basePath);
-                if (seenStores.add(store)) { // avoid double counting
-                    long total = store.getTotalSpace();
-                    long unallocated = store.getUnallocatedSpace(); // matches "Free" in df
-                    long avail = store.getUsableSpace(); // matches "Avail" in df
-                    long used = total - unallocated; // matches "Used" in df
+    Set<FileStore> seenStores = new HashSet<>();
+    long totalAll = 0, usedAll = 0, availAll = 0;
 
-                    totalAll += total;
-                    usedAll += used;
-                    availAll += avail;
+    for (Path basePath : distinctBasePaths) {
+      try {
+        FileStore store = Files.getFileStore(basePath);
+        if (seenStores.add(store)) { // avoid double counting
+          long total = store.getTotalSpace();
+          long unallocated = store.getUnallocatedSpace(); // matches "Free" in df
+          long avail = store.getUsableSpace(); // matches "Avail" in df
+          long used = total - unallocated; // matches "Used" in df
 
-                }
-            } catch (IOException e) {
-                throw new GenericException("Could not retrieve storage statistics for " + basePath, e);
-            }
+          totalAll += total;
+          usedAll += used;
+          availAll += avail;
+
         }
-
-        Map<String, Object> stats = new HashMap<>();
-        stats.putAll(FSUtils.formatSize(totalAll, "total"));
-        stats.putAll(FSUtils.formatSize(usedAll, "used"));
-        stats.putAll(FSUtils.formatSize(availAll, "available"));
-
-        stats.put("solrIndexUsage", 0L);
-
-        return stats;
+      } catch (IOException e) {
+        throw new GenericException("Could not retrieve storage statistics for " + basePath, e);
+      }
     }
 
+    Map<String, Object> stats = new HashMap<>();
+    stats.putAll(FSUtils.formatSize(totalAll, "total"));
+    stats.putAll(FSUtils.formatSize(usedAll, "used"));
+    stats.putAll(FSUtils.formatSize(availAll, "available"));
 
+    stats.put("solrIndexUsage", 0L);
+
+    return stats;
+  }
 
 }

@@ -118,7 +118,8 @@ public class PekkoEmbeddedPluginOrchestrator implements PluginOrchestrator {
     // 20170105 hsilva: subscribe all dead letter so they are logged
     jobsSystem.eventStream().subscribe(jobsSystem.actorOf(Props.create(DeadLetterActor.class)), AllDeadLetters.class);
 
-    jobsManager = jobsSystem.actorOf(Props.create(PekkoJobsManager.class, maxNumberOfJobsInParallel, maxNumberOfLimitedJobsInParallel), "jobsManager");
+    jobsManager = jobsSystem.actorOf(
+      Props.create(PekkoJobsManager.class, maxNumberOfJobsInParallel, maxNumberOfLimitedJobsInParallel), "jobsManager");
 
   }
 

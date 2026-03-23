@@ -351,8 +351,14 @@ public class Report implements IsModelObject, HasId, HasInstanceID {
     return this;
   }
 
-  public String getIngestType() { return ingestType; }
-  public void setIngestType(String status) { this.ingestType = status; }
+  public String getIngestType() {
+    return ingestType;
+  }
+
+  public void setIngestType(String status) {
+    this.ingestType = status;
+  }
+
   public String getInstanceId() {
     return instanceId;
   }

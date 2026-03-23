@@ -28,7 +28,7 @@ import org.roda.core.storage.StorageService;
 /**
  * This interface should be implemented by any class that want to be a RODA
  * plugin.
- * 
+ *
  * @author Luis Faria<lfaria@keep.p>
  * @author Hélder Silva <hsilva@keep.pt>
  */
