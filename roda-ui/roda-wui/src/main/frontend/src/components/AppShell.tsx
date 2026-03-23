@@ -28,26 +28,25 @@ export function AppShell() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
           <strong style={{ fontSize: '1.125rem' }}>ETERNA</strong>
           <nav style={{ display: 'flex', gap: '1.5rem' }}>
-            <NavLink
-              to="/browse"
-              style={({ isActive }) => ({
-                color: 'white',
-                textDecoration: isActive ? 'underline' : 'none',
-                fontWeight: isActive ? 600 : 400,
-              })}
-            >
-              Arkivobjekt
-            </NavLink>
-            <NavLink
-              to="/management/users"
-              style={({ isActive }) => ({
-                color: 'white',
-                textDecoration: isActive ? 'underline' : 'none',
-                fontWeight: isActive ? 600 : 400,
-              })}
-            >
-              Användare
-            </NavLink>
+            {[
+              { to: '/browse', label: 'Arkivobjekt' },
+              { to: '/ingest', label: 'Ingest' },
+              { to: '/jobs', label: 'Jobb' },
+              { to: '/audit', label: 'Logg' },
+              { to: '/management/users', label: 'Användare' },
+            ].map(({ to, label }) => (
+              <NavLink
+                key={to}
+                to={to}
+                style={({ isActive }) => ({
+                  color: 'white',
+                  textDecoration: isActive ? 'underline' : 'none',
+                  fontWeight: isActive ? 600 : 400,
+                })}
+              >
+                {label}
+              </NavLink>
+            ))}
           </nav>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>

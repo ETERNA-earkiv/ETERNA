@@ -16,11 +16,22 @@ export interface IndexedAIP {
   onHold: boolean
 }
 
+export interface FacetValue {
+  value: string
+  count: number
+}
+
+export interface FacetResult {
+  field: string
+  values: FacetValue[]
+}
+
 export interface IndexResult<T> {
   results: T[] | null
   totalCount: number
   offset: number
   limit: number
+  facetResults?: FacetResult[] | null
 }
 
 export interface FindRequest {
@@ -47,25 +58,56 @@ export interface FindRequest {
   onlyActive?: boolean
 }
 
+export interface DescriptiveMetadataInfo {
+  id: string
+  type: string
+  version: string
+}
+
 export function searchAIPs(
   query: string,
   offset = 0,
-  limit = 20
+  limit = 20,
+  activeFilters: Record<string, string> = {}
 ): Promise<IndexResult<IndexedAIP>> {
+  const filterParameters: Array<{ type: string; name: string; value: string }> = []
+
+  if (query) {
+    filterParameters.push({ type: 'SimpleFilterParameter', name: 'fulltext', value: query })
+  }
+
+  for (const [field, value] of Object.entries(activeFilters)) {
+    if (value) {
+      filterParameters.push({ type: 'SimpleFilterParameter', name: field, value })
+    }
+  }
+
   const body: FindRequest = {
+    filter: { filterParameters },
     sublist: { firstElementIndex: offset, maximumElementCount: limit },
     sorter: { parameters: [{ name: 'dateModified', descending: true }] },
-    facets: { parameters: {} },
+    facets: {
+      parameters: {
+        state: { type: 'SimpleFacetParameter', name: 'state', limit: 10 },
+        level: { type: 'SimpleFacetParameter', name: 'level', limit: 20 },
+      },
+    },
     onlyActive: true,
   }
-  if (query) {
-    body.filter = {
-      filterParameters: [{ type: 'SimpleFilterParameter', name: 'fulltext', value: query }],
-    }
-  } else {
-    body.filter = { filterParameters: [] }
-  }
+
   return api.post<IndexResult<IndexedAIP>>('/aips/find', body)
+}
+
+export function getMetadataList(
+  aipId: string
+): Promise<{ metadataInfos: DescriptiveMetadataInfo[] }> {
+  return api.get<{ metadataInfos: DescriptiveMetadataInfo[] }>(
+    `/aips/${aipId}/metadata/descriptive`
+  )
+}
+
+export function getMetadataHtml(aipId: string, metadataId: string): Promise<string> {
+  return api.getText(`/aips/${aipId}/metadata/descriptive/${metadataId}/html`)
 }
 
 export function getAIP(id: string): Promise<IndexedAIP> {
