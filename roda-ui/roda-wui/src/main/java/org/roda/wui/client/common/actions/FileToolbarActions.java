@@ -261,6 +261,7 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
 
     if (aipId == null || representatioId == null || fileId == null) {
       Toast.showError("Cannot redact PDF: Missing required identifiers (AIP: " + aipId + ", Rep: " + representatioId + ", File: " + fileId + ")");
+      callback.onSuccess(ActionImpact.NONE);
       return;
     }
 

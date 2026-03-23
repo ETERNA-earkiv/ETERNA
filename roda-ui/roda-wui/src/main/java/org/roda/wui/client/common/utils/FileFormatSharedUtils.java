@@ -9,10 +9,18 @@ public class FileFormatSharedUtils {
   private FileFormatSharedUtils() {}
 
   public static boolean hasFileFormat(final IndexedFile file, final String mimeType, final String fileExtension) {
+    if (file == null) {
+      return false;
+    }
+
+    String fileIdExtension = getFileExtension(file.getId());
     FileFormat fileFormat = file.getFileFormat();
+    if (fileFormat == null) {
+      return fileIdExtension.equalsIgnoreCase(fileExtension);
+    }
+
     String mime = fileFormat.getMimeType();
     String extension = fileFormat.getExtension();
-    String fileIdExtension = getFileExtension(file.getId());
 
     if (Objects.equals(mime, mimeType)) {
       return true;
