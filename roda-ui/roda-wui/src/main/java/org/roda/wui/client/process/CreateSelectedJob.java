@@ -471,6 +471,7 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
         licenseButton.addClickHandler(e -> Dialogs.showLicenseModal(messages.pluginLicenseLabel(),
           new HTMLWidgetWrapper(selectedPlugin.getLicenseFilePath(), RodaConstants.ResourcesTypes.PLUGINS)));
       }
+      rightPanel.add(licenseButton);
     } else if (marketInfo != null && marketInfo.getLicense() != null) {
       LicenseInfo license = marketInfo.getLicense();
       licenseButton.setText(license.getName());
