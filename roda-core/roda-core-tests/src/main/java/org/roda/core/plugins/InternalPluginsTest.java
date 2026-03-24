@@ -99,7 +99,7 @@ import gov.loc.premis.v3.FormatRegistryComplexType;
 import gov.loc.premis.v3.LinkingAgentIdentifierComplexType;
 import gov.loc.premis.v3.ObjectCharacteristicsComplexType;
 import gov.loc.premis.v3.Representation;
-import jersey.repackaged.com.google.common.collect.Lists;
+import com.google.common.collect.Lists;
 
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
 public class InternalPluginsTest {
