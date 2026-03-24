@@ -11,6 +11,7 @@ import java.io.File;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -34,6 +35,8 @@ public class RodaPropertiesReloadStrategy {
     return t;
   });
 
+  private final Object reloadLock = new Object();
+
   /**
    * Starts watching {@code file} for modifications. When a change is detected
    * the configuration is reloaded in-place and
@@ -48,17 +51,21 @@ public class RodaPropertiesReloadStrategy {
    *          polling interval in milliseconds
    */
   public void watch(PropertiesConfiguration config, File file, long refreshDelayMs) {
-    final long[] lastModified = {file.lastModified()};
+    final AtomicLong lastModified = new AtomicLong(file.lastModified());
     scheduler.scheduleWithFixedDelay(() -> {
       long current = file.lastModified();
-      if (current != lastModified[0]) {
-        lastModified[0] = current;
+      if (current != lastModified.get()) {
+        lastModified.set(current);
         try {
-          config.clear();
-          FileHandler fh = new FileHandler(config);
+          PropertiesConfiguration tmp = new PropertiesConfiguration();
+          FileHandler fh = new FileHandler(tmp);
           fh.setEncoding(RodaConstants.DEFAULT_ENCODING);
           fh.load(file);
-          RodaCoreFactory.clearRodaCachableObjectsAfterConfigurationChange();
+          synchronized (reloadLock) {
+            config.clear();
+            tmp.getKeys().forEachRemaining(key -> config.setProperty(key, tmp.getProperty(key)));
+            RodaCoreFactory.clearRodaCachableObjectsAfterConfigurationChange();
+          }
         } catch (ConfigurationException e) {
           LOGGER.error("Error reloading configuration from {}", file, e);
         }
