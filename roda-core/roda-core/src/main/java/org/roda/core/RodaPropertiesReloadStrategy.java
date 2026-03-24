@@ -51,11 +51,14 @@ public class RodaPropertiesReloadStrategy {
    *          polling interval in milliseconds
    */
   public void watch(PropertiesConfiguration config, File file, long refreshDelayMs) {
-    final AtomicLong lastModified = new AtomicLong(file.lastModified());
+    // Prefer the timestamp from the config's own file handler (captured at load
+    // time) so a change between load and watch() is not silently dropped.
+    FileHandler configFh = new FileHandler(config);
+    long seed = configFh.getFile() != null ? configFh.getFile().lastModified() : file.lastModified();
+    final AtomicLong lastModified = new AtomicLong(seed);
     scheduler.scheduleWithFixedDelay(() -> {
       long current = file.lastModified();
       if (current != lastModified.get()) {
-        lastModified.set(current);
         try {
           PropertiesConfiguration tmp = new PropertiesConfiguration();
           FileHandler fh = new FileHandler(tmp);
@@ -66,6 +69,9 @@ public class RodaPropertiesReloadStrategy {
             tmp.getKeys().forEachRemaining(key -> config.setProperty(key, tmp.getProperty(key)));
             RodaCoreFactory.clearRodaCachableObjectsAfterConfigurationChange();
           }
+          // Only advance the baseline after a successful reload so transient
+          // load/parse errors do not permanently suppress future retries.
+          lastModified.set(current);
         } catch (ConfigurationException e) {
           LOGGER.error("Error reloading configuration from {}", file, e);
         }

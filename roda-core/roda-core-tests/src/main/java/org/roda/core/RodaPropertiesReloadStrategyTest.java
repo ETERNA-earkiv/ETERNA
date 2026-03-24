@@ -86,17 +86,20 @@ public class RodaPropertiesReloadStrategyTest {
     new RodaPropertiesReloadStrategy().watch(config, f, POLL_MS);
     Thread.sleep(POLL_MS * 3);
 
-    // Remove read permission so fh.load(file) throws ConfigurationException.
-    // config.clear() must NOT have been called before the failed load.
-    f.setReadable(false);
-    // Touch mtime so the watcher detects a "change".
+    // Replace the file with a directory so fh.load() reliably throws on all
+    // platforms (setReadable(false) is not guaranteed when running as root or
+    // on certain filesystems). config.clear() must NOT be called before the
+    // failed load attempt.
+    Files.delete(f.toPath());
+    Files.createDirectory(f.toPath());
+    // Advance mtime so the watcher detects a "change".
     f.setLastModified(System.currentTimeMillis() + 2000);
     Thread.sleep(WAIT_MS);
 
     assertEquals(config.getString("key1"), "original",
       "Config must be unchanged when file load fails");
 
-    f.setReadable(true); // restore so deleteOnExit can clean up
+    Files.delete(f.toPath()); // remove the directory; deleteOnExit registered the path
   }
 
   @Test
@@ -124,8 +127,14 @@ public class RodaPropertiesReloadStrategyTest {
   }
 
   private void rewriteFile(File f, String content) throws Exception {
+    long before = f.lastModified();
     try (FileWriter w = new FileWriter(f)) {
       w.write(content);
+    }
+    // Guarantee mtime is strictly greater than the previous value so the watcher
+    // detects a change on coarse-resolution filesystems (e.g. 1-second granularity).
+    if (f.lastModified() <= before) {
+      f.setLastModified(Math.max(System.currentTimeMillis(), before + 1000));
     }
   }
 }
