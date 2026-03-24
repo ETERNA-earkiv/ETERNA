@@ -52,7 +52,11 @@ jobs:
         run: |
           MVN_VERSION=3.9.10
           curl -fsSL "https://archive.apache.org/dist/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.tar.gz" \
-            | sudo tar -xz -C /opt
+            -o /tmp/apache-maven-${MVN_VERSION}-bin.tar.gz
+          curl -fsSL "https://archive.apache.org/dist/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.tar.gz.sha512" \
+            -o /tmp/apache-maven-${MVN_VERSION}-bin.tar.gz.sha512
+          (cd /tmp && sha512sum -c apache-maven-${MVN_VERSION}-bin.tar.gz.sha512)
+          sudo tar -xz -C /opt -f /tmp/apache-maven-${MVN_VERSION}-bin.tar.gz
           sudo ln -sf /opt/apache-maven-${MVN_VERSION}/bin/mvn /usr/local/bin/mvn
       - name: Cache
         uses: actions/cache@v4
@@ -75,7 +79,12 @@ jobs:
           sudo cp .github/workflows/bin/clamscan /usr/bin/clamdscan
           sudo chmod a+rx /usr/bin/clamscan /usr/bin/clamdscan
       - name: Get release version
-        run: echo "release_version=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+        run: |
+          if [[ "${GITHUB_REF_NAME}" == v* ]]; then
+            echo "release_version=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+          else
+            echo "release_version=$(mvn -f pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+          fi
       - name: Run tests & install
         run:
           mvn $MAVEN_CLI_OPTS -Dtestng.groups="travis" clean org.jacoco:jacoco-maven-plugin:prepare-agent install
