@@ -10,9 +10,11 @@ package org.roda.core;
 import static org.mockito.Mockito.mockStatic;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 
 import org.apache.commons.configuration2.PropertiesConfiguration;
@@ -93,7 +95,8 @@ public class RodaPropertiesReloadStrategyTest {
     Files.delete(f.toPath());
     Files.createDirectory(f.toPath());
     // Advance mtime so the watcher detects a "change".
-    f.setLastModified(System.currentTimeMillis() + 2000);
+    assertTrue(f.setLastModified(System.currentTimeMillis() + 2000),
+      "Failed to update lastModified on test directory; cannot trigger reload");
     Thread.sleep(WAIT_MS);
 
     assertEquals(config.getString("key1"), "original",
@@ -134,7 +137,11 @@ public class RodaPropertiesReloadStrategyTest {
     // Guarantee mtime is strictly greater than the previous value so the watcher
     // detects a change on coarse-resolution filesystems (e.g. 1-second granularity).
     if (f.lastModified() <= before) {
-      f.setLastModified(Math.max(System.currentTimeMillis(), before + 1000));
+      long advanced = Math.max(System.currentTimeMillis(), before + 1000);
+      if (!f.setLastModified(advanced)) {
+        throw new IOException("Failed to advance lastModified on " + f
+          + " (before=" + before + ", attempted=" + advanced + ")");
+      }
     }
   }
 }
