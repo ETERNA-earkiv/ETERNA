@@ -255,18 +255,18 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
     }
 
     String aipId = file.getAipId();
-    String representatioId = file.getRepresentationId();
+    String representationId = file.getRepresentationId();
     String fileId = file.getId();
     List<String> path = file.getPath() != null ? file.getPath() : Collections.emptyList();
 
-    if (aipId == null || representatioId == null || fileId == null) {
-      Toast.showError("Cannot redact PDF: Missing required identifiers (AIP: " + aipId + ", Rep: " + representatioId + ", File: " + fileId + ")");
+    if (aipId == null || representationId == null || fileId == null) {
+      Toast.showError("Cannot redact PDF: Missing required identifiers (AIP: " + aipId + ", Rep: " + representationId + ", File: " + fileId + ")");
       callback.onSuccess(ActionImpact.NONE);
       return;
     }
 
     List<String> historyItems = ListUtils.concat(
-            ListUtils.concat(Arrays.asList(aipId, representatioId), path), fileId);
+            ListUtils.concat(Arrays.asList(aipId, representationId), path), fileId);
 
     callback.onSuccess(ActionImpact.NONE);
     HistoryUtils.newHistory(PDFRedactor.RESOLVER, historyItems.toArray(new String[0]));
