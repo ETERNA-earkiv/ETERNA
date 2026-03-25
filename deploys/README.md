@@ -6,6 +6,11 @@ It also includes additional support services for file format identification (Sie
 
 If you wish to install this demonstration deployment of ETERNA please check [these instructions](standalone/README.md).
 
+## Full-service example
+A full-service deployment example with Traefik reverse proxy, TLS termination, proper networking, and optional services (CAS SSO, SFTP drop folder, Swagger UI).
+
+If you wish to use this as a starting point for your deployment, check [these instructions](full-service/README.md).
+
 ## Production
 Every production environment is tailored for the specific requirements of the repository to be made available.
 Consideration on data volume (size, number of object, heterogeneity of formats), infrastructure type, designated community, 
