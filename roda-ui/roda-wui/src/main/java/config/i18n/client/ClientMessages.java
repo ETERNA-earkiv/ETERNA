@@ -491,6 +491,8 @@ public interface ClientMessages extends Messages {
 
   String redactPdfSaveErrorDescription();
 
+  String redactPdfOnlyPdfDialogMessage();
+
 
   /*** Identify formats ***/
 

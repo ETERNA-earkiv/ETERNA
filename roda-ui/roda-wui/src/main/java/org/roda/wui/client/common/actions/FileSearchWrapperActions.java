@@ -239,7 +239,8 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
   // ACTIONS
     private void redactPdf(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     if (!FileFormatSharedUtils.hasFileFormat(file, "application/pdf", "pdf")) {
-      Dialogs.showInformationDialog("Error!", "Can only redact PDF-files.", "Ok", false);
+      Dialogs.showInformationDialog(messages.redactPdfToastTitle(),
+        messages.redactPdfOnlyPdfDialogMessage(), messages.dialogOk(), false);
       callback.onSuccess(ActionImpact.NONE);
       return;
     }

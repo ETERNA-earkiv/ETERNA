@@ -22,7 +22,7 @@ public class FileFormatSharedUtils {
     String mime = fileFormat.getMimeType();
     String extension = fileFormat.getExtension();
 
-    if (Objects.equals(mime, mimeType)) {
+    if (mimeType != null && Objects.equals(mime, mimeType)) {
       return true;
     } else if (mime == null && extension != null && (extension.equalsIgnoreCase("." + fileExtension) || extension.equalsIgnoreCase(fileExtension))) {
       return true;
