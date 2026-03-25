@@ -58,9 +58,9 @@ public class CopyOriginalMETS {
   private static final Logger LOG = LoggerFactory.getLogger(CopyOriginalMETS.class);
 
   public static void copy(String aipId, SIP sip, ModelService modelService) throws RequestNotValidException {
-	  System.out.println("====CopyOriginalMETS====");
+	
 	boolean keepOriginalMets = RodaCoreFactory.getProperty(RodaConstants.CORE_PLUGINS_BASE_KEEP_ORIGINAL_METS, false);
-	if (!keepOriginalMets) {System.out.println("UPPS");
+	if (!keepOriginalMets) {
 		return;
 	}
 	

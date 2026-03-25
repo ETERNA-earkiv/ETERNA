@@ -101,7 +101,6 @@ public class UpdateOriginalMETS {
 				Mets mets = METSUtils.instantiateMETSFromFile(metsPath);
 		    	MetsWrapper metsWrapper = new MetsWrapper(mets, metsPath);
 				
-		    	pm.getFileDirectoryPath().forEach(p -> System.out.println(p));
 		    	Path subFolders = Path.of(pm.getFileDirectoryPath().stream().map(p -> p).collect(Collectors.joining(java.io.File.separator)));
 		    	
 		    	String fileName = "";
@@ -342,6 +341,25 @@ public class UpdateOriginalMETS {
     			METSUtils.marshallMETS(mets, metsPath, true);
     		}
     	}
+	}
+	
+	// HANDLE PARENT WHEN REMOVED AIP
+	public static void handleParentWhenRemovedAIP(ModelService modelService, String removedAipId, String parentAipId)
+			throws AuthorizationDeniedException, 
+			GenericException, 
+			IOException, 
+			IPException, 
+			JAXBException, 
+			NotFoundException, 
+			RequestNotValidException, 
+			SAXException {
+
+		boolean keepOriginalMets = RodaCoreFactory.getProperty(RodaConstants.CORE_PLUGINS_BASE_KEEP_ORIGINAL_METS, false);
+		if (!keepOriginalMets) {
+			return;
+		}
+		
+		removeDescendentFromParent(modelService, removedAipId, parentAipId);
 	}
 	
 	private static DivType createDivType(String label) {

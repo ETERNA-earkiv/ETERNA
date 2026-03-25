@@ -7,6 +7,8 @@
  */
 package org.roda.core.index;
 
+import jakarta.xml.bind.JAXBException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -82,6 +84,7 @@ import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.plugins.base.originalmets.UpdateOriginalMETS;
 
+import org.roda_project.commons_ip.utils.IPException;
 
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
@@ -822,7 +825,18 @@ public class IndexModelObserver implements ModelObserver {
     if (deleteIncidences) {
       deleteDocumentsFromIndex(RiskIncidence.class, RodaConstants.RISK_INCIDENCE_AIP_ID, aipId).addTo(ret);
     }
-
+	
+    try {
+    	String parentAipId = model.retrieveAIP(aipId).getParentId();
+        if (ret.getExceptions().isEmpty() && parentAipId != null) {
+        	UpdateOriginalMETS.handleParentWhenRemovedAIP(model, aipId, parentAipId);
+        }  	
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException | IOException | IPException | JAXBException | SAXException e) {
+        LOGGER.error("Failed to updating parentAIP when removing AIP", e);
+        
+        ret.add(e);	
+    }
+    
     return ret;
   }
 
