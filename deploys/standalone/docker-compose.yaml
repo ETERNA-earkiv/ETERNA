@@ -1,6 +1,6 @@
 services:
   zoo:
-    image: docker.io/zookeeper:3.9.5-jre-17
+    image: ghcr.io/eterna-earkiv/zookeeper:3.9.5
     restart: unless-stopped
     environment:
       - ZOO_4LW_COMMANDS_WHITELIST=mntr,conf,ruok
@@ -8,7 +8,7 @@ services:
       - zookeeper_data:/data
       - zookeeper_datalog:/datalog
   solr:
-    image: docker.io/solr:9.10.1
+    image: ghcr.io/eterna-earkiv/solr:9.10.1
     restart: unless-stopped
     environment:
       SOLR_HEAP: 2g
