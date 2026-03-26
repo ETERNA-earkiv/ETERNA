@@ -80,17 +80,20 @@ public class UpdateOriginalMETS {
 			// ROOT METS
 			if (pm.getRepresentationId() == null) {
 				Path metsPath = OriginalMETSUtils.metsPath(modelService, aipPath);
-				Mets mets = METSUtils.instantiateMETSFromFile(metsPath);
-		    	MetsWrapper metsWrapper = new MetsWrapper(mets, metsPath); 
+		    	MetsWrapper metsWrapper = new MetsWrapper(METSUtils.instantiateMETSFromFile(metsPath), metsPath); 
 		    	
 		    	handleStructurMap(modelService, pm.getAipId(), metsWrapper);
 		    	
 		    	java.io.File file = modelService.getStorage().getDirectAccess(aipPath).getPath().resolve(Path.of(IPConstants.PRESERVATION_FOLDER)).resolve(pm.getId() + PREMIS_FILE_TYPE).toFile();
+		    	
 		    	if (file.exists()) {
 			    	String relativeFilePath = IPConstants.METADATA + java.io.File.separator + IPConstants.PRESERVATION + java.io.File.separator + file.getName();
+			    	
+			    	checkAmdSec(metsWrapper, metsPath);
+			    	
 			    	Optional<MdSecType> fileInMets = metsWrapper.getMets().getAmdSec().getFirst().getDigiprovMD().stream().filter(m -> m.getMdRef().getHref().equals(relativeFilePath)).findFirst();
 			    	if (!fileInMets.isPresent()) {
-			    		addToMETS(relativeFilePath, file, mets, metsPath, true);
+			    		addToMETS(relativeFilePath, file, metsWrapper.getMets(), metsPath, true);
 			    	}
 		    	}
 		    	
@@ -98,8 +101,7 @@ public class UpdateOriginalMETS {
 			} else {
 				Path representationPath = Path.of(IPConstants.REPRESENTATIONS_FOLDER).resolve(Path.of(pm.getRepresentationId()));
 				Path metsPath = OriginalMETSUtils.metsPath(modelService, aipPath, representationPath);
-				Mets mets = METSUtils.instantiateMETSFromFile(metsPath);
-		    	MetsWrapper metsWrapper = new MetsWrapper(mets, metsPath);
+		    	MetsWrapper metsWrapper = new MetsWrapper(METSUtils.instantiateMETSFromFile(metsPath), metsPath);
 				
 		    	Path subFolders = Path.of(pm.getFileDirectoryPath().stream().map(p -> p).collect(Collectors.joining(java.io.File.separator)));
 		    	
@@ -118,9 +120,12 @@ public class UpdateOriginalMETS {
 		    	
 		    	if (file.exists()) {
 			    	String relativeFilePath = IPConstants.METADATA + java.io.File.separator + IPConstants.PRESERVATION + java.io.File.separator + pm.getFileDirectoryPath().stream().map(p -> p).collect(Collectors.joining(java.io.File.separator)) + java.io.File.separator + file.getName();
+			    	
+			    	checkAmdSec(metsWrapper, metsPath);
+			    	
 			    	Optional<MdSecType> fileInMets = metsWrapper.getMets().getAmdSec().getFirst().getDigiprovMD().stream().filter(m -> m.getMdRef().getHref().equals(relativeFilePath)).findFirst();
 			    	if (!fileInMets.isPresent()) {
-			    		addToMETS(relativeFilePath, file, mets, metsPath, false);
+			    		addToMETS(relativeFilePath, file, metsWrapper.getMets(), metsPath, false);
 			    	} 		    	
 		    	}
 			}
@@ -151,8 +156,7 @@ public class UpdateOriginalMETS {
 			StoragePath aipPath = ModelUtils.getAIPStoragePath(aipId);
 			Path representationPath = Path.of(IPConstants.REPRESENTATIONS_FOLDER).resolve(Path.of(representationId));
 			Path metsPath = OriginalMETSUtils.metsPath(modelService, aipPath, representationPath);
-			Mets mets = METSUtils.instantiateMETSFromFile(metsPath);
-	    	MetsWrapper metsWrapper = new MetsWrapper(mets, metsPath);
+	    	MetsWrapper metsWrapper = new MetsWrapper(METSUtils.instantiateMETSFromFile(metsPath), metsPath);
 	    	
 	    	String fileName = REPRESENTATION_FILE_PREFIX + representationUUID + PREMIS_FILE_TYPE;
 	    	java.io.File file = modelService.getStorage().getDirectAccess(aipPath).getPath()
@@ -164,9 +168,11 @@ public class UpdateOriginalMETS {
 	    	if (file.exists()) {
 		    	String relativeFilePath = IPConstants.METADATA + java.io.File.separator + IPConstants.PRESERVATION + java.io.File.separator + file.getName();
 		    
+		    	checkAmdSec(metsWrapper, metsPath);
+		    	
 		    	Optional<MdSecType> fileInMets = metsWrapper.getMets().getAmdSec().getFirst().getDigiprovMD().stream().filter(m -> m.getMdRef().getHref().equals(relativeFilePath)).findFirst();
 		    	if (!fileInMets.isPresent()) {
-		    		addToMETS(relativeFilePath, file, mets, metsPath, false);
+		    		addToMETS(relativeFilePath, file, metsWrapper.getMets(), metsPath, false);
 		    	}
 	    	}		
 		
@@ -290,8 +296,7 @@ public class UpdateOriginalMETS {
 		
 		StoragePath parentAipPath = ModelUtils.getAIPStoragePath(parentAipId);	
 		Path metsPath = OriginalMETSUtils.metsPath(modelService, parentAipPath);
-		Mets mets = METSUtils.instantiateMETSFromFile(metsPath);
-    	MetsWrapper metsWrapper = new MetsWrapper(mets, metsPath);
+    	MetsWrapper metsWrapper = new MetsWrapper(METSUtils.instantiateMETSFromFile(metsPath), metsPath);
     	
     	StructMapType structMapType = getStructureMap(metsWrapper);	
     	
@@ -301,7 +306,7 @@ public class UpdateOriginalMETS {
 			DivType descendentsDivType = createDivType(DESCENDENTS);
     		structMapType.getDiv().getDiv().add(descendentsDivType);
     		descendentsDivType.getMptr().add(createMptrDivType(aipId));
-    		METSUtils.marshallMETS(mets, metsPath, true);
+    		METSUtils.marshallMETS(metsWrapper.getMets(), metsPath, true);
     		
     	} else {
     		Optional<DivType.Mptr> optionalDivTypeMptr = optionalDescendentsDivType.get().getMptr().stream()
@@ -311,7 +316,7 @@ public class UpdateOriginalMETS {
     		if (!optionalDivTypeMptr.isPresent()) {
     			optionalDescendentsDivType = structMapType.getDiv().getDiv().stream().filter(f -> f.getLABEL().equals(DESCENDENTS)).findFirst();
     			optionalDescendentsDivType.get().getMptr().add(createMptrDivType(aipId));
-    			METSUtils.marshallMETS(mets, metsPath, true);
+    			METSUtils.marshallMETS(metsWrapper.getMets(), metsPath, true);
     		}    		
     	}	
 	}
@@ -328,8 +333,7 @@ public class UpdateOriginalMETS {
 	
 		StoragePath parentAipPath = ModelUtils.getAIPStoragePath(parentAipId);	
 		Path metsPath = OriginalMETSUtils.metsPath(modelService, parentAipPath);
-		Mets mets = METSUtils.instantiateMETSFromFile(metsPath);
-    	MetsWrapper metsWrapper = new MetsWrapper(mets, metsPath);
+    	MetsWrapper metsWrapper = new MetsWrapper(METSUtils.instantiateMETSFromFile(metsPath), metsPath);
     	
     	StructMapType structMapType = getStructureMap(metsWrapper);		
     	Optional<DivType> optionalDescendentsDivType = structMapType.getDiv().getDiv().stream().filter(f -> f.getLABEL().equals(DESCENDENTS)).findFirst();
@@ -338,7 +342,7 @@ public class UpdateOriginalMETS {
     		Optional<DivType.Mptr> optionalDivTypeMptr = optionalDescendentsDivType.get().getMptr().stream().filter(m -> m.getHref().equals(aipId)).findFirst();
     		if (optionalDivTypeMptr.isPresent()) {
     			optionalDescendentsDivType.get().getMptr().remove(optionalDivTypeMptr.get()); 
-    			METSUtils.marshallMETS(mets, metsPath, true);
+    			METSUtils.marshallMETS(metsWrapper.getMets(), metsPath, true);
     		}
     	}
 	}
@@ -405,5 +409,18 @@ public class UpdateOriginalMETS {
     	mets.getMetsHdr().setLASTMODDATE(OriginalMETSUtils.currentDateAndTime());
     		
     	METSUtils.marshallMETS(mets, metsPath, isRoot);
+	}
+	
+	// Check if AMDSEC element is available
+	private static void checkAmdSec(MetsWrapper metsWrapper, Path metsPath) throws IOException, IPException, JAXBException {
+		try {
+    		metsWrapper.getMets().getAmdSec().getFirst();
+    		
+    	} catch (java.util.NoSuchElementException e) {
+    		AmdSecType amdSec = new AmdSecType();
+			amdSec.setID("uuid-" + UUID.randomUUID().toString());
+			metsWrapper.getMets().getAmdSec().add(amdSec);
+    		METSUtils.marshallMETS(metsWrapper.getMets(), metsPath, true);
+    	}
 	}
 }
