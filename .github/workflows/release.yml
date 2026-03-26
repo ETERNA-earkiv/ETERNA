@@ -55,7 +55,7 @@ jobs:
             -o /tmp/apache-maven-${MVN_VERSION}-bin.tar.gz
           curl -fsSL "https://archive.apache.org/dist/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.tar.gz.sha512" \
             -o /tmp/apache-maven-${MVN_VERSION}-bin.tar.gz.sha512
-          (cd /tmp && sha512sum -c apache-maven-${MVN_VERSION}-bin.tar.gz.sha512)
+          (cd /tmp && echo "$(cat apache-maven-${MVN_VERSION}-bin.tar.gz.sha512)  apache-maven-${MVN_VERSION}-bin.tar.gz" | sha512sum -c -)
           sudo tar -xz -C /opt -f /tmp/apache-maven-${MVN_VERSION}-bin.tar.gz
           sudo ln -sf /opt/apache-maven-${MVN_VERSION}/bin/mvn /usr/local/bin/mvn
       - name: Cache
