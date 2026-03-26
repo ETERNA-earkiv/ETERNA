@@ -10,9 +10,12 @@ package org.roda.wui.api;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.ByteBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +28,7 @@ import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.MultiPart;
 import org.glassfish.jersey.media.multipart.MultiPartProperties;
-import org.glassfish.jersey.media.multipart.internal.LocalizationMessages;
+import org.glassfish.jersey.media.multipart.internal.l10n.LocalizationMessages;
 import org.glassfish.jersey.message.internal.MediaTypes;
 import org.jvnet.mimepull.Header;
 import org.jvnet.mimepull.MIMEConfig;
@@ -180,11 +183,18 @@ public class UTF8MultiPartReader implements MessageBodyReader<MultiPart> {
     return multiPart;
   }
 
-  private String getFixedHeaderValue(Header h) throws UnsupportedEncodingException {
+  private String getFixedHeaderValue(Header h) {
     String result = h.getValue();
 
-    if ("Content-Disposition".equals(h.getName()) && (result.contains("filename="))) {
-        result = new String(result.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+    if ("Content-Disposition".equals(h.getName()) && result.contains("filename=")) {
+      try {
+        byte[] bytes = result.getBytes(StandardCharsets.ISO_8859_1);
+        CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT)
+          .onUnmappableCharacter(CodingErrorAction.REPORT);
+        result = decoder.decode(ByteBuffer.wrap(bytes)).toString();
+      } catch (CharacterCodingException e) {
+        // Bytes are not valid UTF-8 — string was already correctly decoded, keep as-is
+      }
     }
 
     return result;

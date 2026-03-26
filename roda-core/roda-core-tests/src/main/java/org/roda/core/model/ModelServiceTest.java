@@ -85,7 +85,7 @@ import gov.loc.premis.v3.AgentComplexType;
 import gov.loc.premis.v3.EventComplexType;
 import gov.loc.premis.v3.ObjectCharacteristicsComplexType;
 import gov.loc.premis.v3.ObjectIdentifierComplexType;
-import jersey.repackaged.com.google.common.collect.Lists;
+import com.google.common.collect.Lists;
 
 /**
  * Unit tests for ModelService

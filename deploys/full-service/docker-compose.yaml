@@ -1,0 +1,300 @@
+# ETERNA Full-Service Deployment Example
+#
+# This is a full-service example that includes:
+#   - Traefik reverse proxy with TLS termination
+#   - ZooKeeper + Solr (cloud mode)
+#   - ClamAV virus scanning
+#   - Siegfried file format identification
+#   - ETERNA application
+#
+# Optional services are included but commented out:
+#   - CAS SSO (uncomment the `cas` service block and set RODA_SERVICES_CAS_ACTIVE=true)
+#   - Swagger UI / API docs (uncomment the `docs-api` block)
+#   - SFTP drop folder (uncomment the `sftp` block)
+#
+# Prerequisites:
+#   1. Copy .env.example to .env and fill in all values
+#   2. Create a ./config/ directory with your site-specific configuration files
+#      (see README.md for the expected directory layout)
+#   3. Point your DNS hostname to this server
+#
+# Quick start:
+#   cp .env.example .env && $EDITOR .env
+#   docker compose up -d
+
+# ---------------------------------------------------------------------------
+# Shared configuration applied to every service via YAML anchors
+# ---------------------------------------------------------------------------
+x-config: &config
+  restart: unless-stopped
+  networks:
+    - eterna_net
+  logging:
+    driver: "json-file"
+    options:
+      max-size: "256m"
+      max-file: "3"
+      compress: "true"
+
+# ---------------------------------------------------------------------------
+# Services
+# ---------------------------------------------------------------------------
+services:
+
+  # ---- Reverse proxy --------------------------------------------------------
+  traefik:
+    image: docker.io/traefik:v3.2
+    container_name: traefik
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "${CONFIG_PATH:-./config}/traefik/config.yaml:/etc/traefik/config.yaml:ro"
+      # Uncomment to supply your own TLS certificates instead of using ACME:
+      # - "${CONFIG_PATH:-./config}/traefik/certs:/etc/traefik/certs:ro"
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.network=${NETWORK_NAME:-eterna_net}"
+      - "--providers.docker.exposedByDefault=false"
+      - "--providers.file.filename=/etc/traefik/config.yaml"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web-secure.address=:443"
+      # Uncomment to enable ACME / Let's Encrypt:
+      # - "--certificatesresolvers.myresolver.acme.email=${ACME_EMAIL}"
+      # - "--certificatesresolvers.myresolver.acme.storage=/etc/traefik/acme.json"
+      # - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+    labels:
+      traefik.enable: "true"
+      # Redirect all HTTP traffic to HTTPS
+      traefik.http.routers.http-catchall.rule: "hostregexp(`{host:[a-z-.]+}`)"
+      traefik.http.routers.http-catchall.entrypoints: web
+      traefik.http.routers.http-catchall.middlewares: redirect-to-https
+      traefik.http.middlewares.redirect-to-https.redirectscheme.scheme: https
+      traefik.http.services.traefik.loadbalancer.server.port: "80"
+    <<: *config
+
+  # ---- Search index ---------------------------------------------------------
+  zoo:
+    image: ghcr.io/eterna-earkiv/zookeeper:3.9.5
+    container_name: zookeeper
+    environment:
+      - ZOO_4LW_COMMANDS_WHITELIST=mntr,conf,ruok
+    volumes:
+      - zookeeper_data:/data
+      - zookeeper_datalog:/datalog
+    <<: *config
+
+  solr:
+    image: ghcr.io/eterna-earkiv/solr:9.10.1
+    container_name: solr
+    user: "8983"
+    environment:
+      SOLR_HEAP: "${SOLR_HEAP:-2g}"
+      ZK_HOST: zoo:2181
+      SOLR_OPTS: "-Dsolr.environment=prod,label=PROD+ENV"
+    command: -c
+    depends_on:
+      - zoo
+    volumes:
+      - solr_data:/var/solr
+    # Solr admin UI is exposed via Traefik behind basic-auth middleware defined
+    # in your traefik/config.yaml. Remove the labels block to keep Solr internal.
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.solr.rule: "Host(`${ETERNA_HOST}`) && PathPrefix(`/solr/`)"
+      traefik.http.routers.solr.middlewares: auth@file
+      traefik.http.routers.solr.entrypoints: web-secure
+      traefik.http.routers.solr.tls: "true"
+      traefik.http.services.solr.loadbalancer.server.port: "8983"
+    <<: *config
+
+  # ---- Support services -----------------------------------------------------
+  clamd:
+    image: docker.io/clamav/clamav:stable
+    container_name: clamd
+    volumes:
+      - clam_data:/var/lib/clamav
+      - "${DATA_PATH:-./data}/storage:/roda/data/storage:ro"
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/clamdcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    <<: *config
+
+  siegfried:
+    image: ghcr.io/eterna-earkiv/siegfried:v1.11.4
+    container_name: siegfried
+    environment:
+      SIEGFRIED_HOST: 0.0.0.0
+      SIEGFRIED_PORT: "5138"
+    volumes:
+      - siegfried_data:/root/siegfried/
+      - "${DATA_PATH:-./data}/storage:/roda/data/storage:ro"
+    <<: *config
+
+  # ---- ETERNA application ---------------------------------------------------
+  eterna:
+    image: ghcr.io/eterna-earkiv/eterna:v0.6.0
+    container_name: eterna
+    depends_on:
+      solr:
+        condition: service_started
+      clamd:
+        condition: service_healthy
+      siegfried:
+        condition: service_started
+    volumes:
+      # Bind-mount data directories so backups are operator-controlled
+      - "${DATA_PATH:-./data}/storage:/roda/data/storage"
+      - "${DATA_PATH:-./data}/ldap:/roda/data/ldap"
+      - "${DATA_PATH:-./data}/log:/roda/log"
+      # Drop/transfer integration paths
+      - "${INTEGRATION_PATH:-./integration}/drop:/volumes/integration/drop"
+      - "${INTEGRATION_PATH:-./integration}/transfer:/volumes/integration/transfer"
+      - "${INTEGRATION_PATH:-./integration}/reports:/volumes/integration/reports"
+      # Site-specific configuration files
+      - "${CONFIG_PATH:-./config}/theme:/roda/config/theme"
+      - "${CONFIG_PATH:-./config}/ldap/groups.ldif:/roda/config/ldap/groups.ldif"
+      - "${CONFIG_PATH:-./config}/ldap/users.ldif:/roda/config/ldap/users.ldif"
+      - "${CONFIG_PATH:-./config}/roda-core.properties:/roda/config/roda-core.properties"
+      - "${CONFIG_PATH:-./config}/roda-wui.properties:/roda/config/roda-wui.properties"
+      - "${CONFIG_PATH:-./config}/clamd.conf:/roda/config/clamd.conf:ro"
+      - "${CONFIG_PATH:-./config}/plugins:/roda/config/plugins"
+    environment:
+      - LANG=C.UTF-8
+      - LC_ALL=C.UTF-8
+
+      # Distributed API secret (shared across ETERNA nodes if clustering)
+      - RODA_DISTRIBUTED_API_SECRET=${RODA_DISTRIBUTED_API_SECRET}
+
+      # Solr Cloud configuration
+      - RODA_CORE_SOLR_TYPE=CLOUD
+      - RODA_CORE_SOLR_CLOUD_URLS=zoo:2181
+      - SOLR_NUM_SHARDS=${SOLR_NUM_SHARDS:-4}
+      - SOLR_REPLICATION_FACTOR=${SOLR_REPLICATION_FACTOR:-1}
+
+      # Support service endpoints
+      - SIEGFRIED_SERVER_URL=http://siegfried:5138
+      - CLAMD_TCPADDR=clamd
+      - CLAMD_TCPSOCKET=3310
+
+      # Public hostname (used for self-referencing links)
+      - RODA_ACK_URL=${ETERNA_HOST}
+
+      # LDAP (internal directory — disable if using CAS with external LDAP)
+      - RODA_CORE_LDAP_STARTSERVER=true
+
+      # SMTP configuration
+      - RODA_EMAIL_FROM=${EMAIL_FROM}
+      - RODA_EMAIL_USER=${SMTP_USERNAME}
+      - RODA_EMAIL_PASSWORD=${SMTP_PASSWORD}
+      - RODA_EMAIL_PROTOCOL=smtp
+      - RODA_EMAIL_HOST=${SMTP_HOST}
+      - RODA_EMAIL_PORT=${SMTP_PORT:-587}
+      - RODA_EMAIL_AUTH=true
+      - RODA_EMAIL_STARTTLS=true
+
+      # Integration paths (must match the volume mounts above)
+      - RODA_TRANSFERREDRESOURCES_FOLDER=/volumes/integration/transfer
+
+      # Feature flags
+      - INCLUDE_REPRESENTATION_INFORMATION=true
+      - RODA_SERVICES_REPORTING_ACTIVE=false
+      - RODA_SERVICES_DROPFOLDER_ACTIVE=false
+
+      # --- CAS SSO (uncomment when enabling the `cas` service below) ---
+      # - RODA_SERVICES_CAS_ACTIVE=true
+      # - CAS_EXTERNAL_SERVICE=https://${ETERNA_HOST}
+      # - RODA_EXTERNAL_SERVICE=https://${ETERNA_HOST}
+      # - CAS_INTERNAL_SERVICE=http://cas:8080
+
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.eterna.rule: "Host(`${ETERNA_HOST}`)"
+      traefik.http.routers.eterna.entrypoints: web-secure
+      traefik.http.routers.eterna.tls: "true"
+      # traefik.http.routers.eterna.tls.certresolver: myresolver
+      traefik.http.services.eterna.loadbalancer.server.port: "8080"
+    <<: *config
+
+  # ---------------------------------------------------------------------------
+  # Optional services — uncomment the blocks you need
+  # ---------------------------------------------------------------------------
+
+  # ---- CAS SSO --------------------------------------------------------------
+  # To enable CAS:
+  #   1. Uncomment this block
+  #   2. Set RODA_SERVICES_CAS_ACTIVE=true in the eterna environment above
+  #   3. Uncomment the CAS_* environment variables in the eterna service above
+  #   4. Provide the required config files under ${CONFIG_PATH}/cas/
+  #
+  # cas:
+  #   image: ghcr.io/eterna-earkiv/cas:v7.3
+  #   container_name: cas
+  #   volumes:
+  #     - "${CONFIG_PATH:-./config}/cas/cas.properties:/etc/cas/config/cas.properties"
+  #     - "${CONFIG_PATH:-./config}/cas/services/service-1.json:/etc/cas/services/service-1.json"
+  #     - "${CONFIG_PATH:-./config}/cas/thekeystore:/etc/cas/thekeystore"
+  #   labels:
+  #     traefik.enable: "true"
+  #     traefik.http.routers.cas.rule: "Host(`${ETERNA_HOST}`) && PathPrefix(`/cas/`)"
+  #     traefik.http.routers.cas.entrypoints: web-secure
+  #     traefik.http.routers.cas.tls: "true"
+  #     traefik.http.services.cas.loadbalancer.server.port: "8080"
+  #   <<: *config
+
+  # ---- API documentation (Swagger UI) ---------------------------------------
+  # docs-api:
+  #   image: docker.io/swaggerapi/swagger-ui:latest
+  #   container_name: docs-api
+  #   environment:
+  #     - URL=https://${ETERNA_HOST}/api/openapi.json
+  #     - DOC_EXPANSION=none
+  #     - VALIDATOR_URL=none
+  #     - BASE_URL=/api-docs
+  #   labels:
+  #     traefik.enable: "true"
+  #     traefik.http.routers.docs-api.rule: "Host(`${ETERNA_HOST}`) && PathPrefix(`/api-docs/`)"
+  #     traefik.http.routers.docs-api.entrypoints: web-secure
+  #     traefik.http.routers.docs-api.tls: "true"
+  #     traefik.http.services.docs-api.loadbalancer.server.port: "8080"
+  #   <<: *config
+
+  # ---- SFTP drop folder -----------------------------------------------------
+  # To enable SFTP:
+  #   1. Uncomment this block
+  #   2. Set RODA_SERVICES_DROPFOLDER_ACTIVE=true in the eterna environment above
+  #   3. Provide ${CONFIG_PATH}/sftp/sftp-users.conf (see atmoz/sftp docs)
+  #
+  # sftp:
+  #   image: docker.io/atmoz/sftp:alpine
+  #   container_name: drop-folder-sftp
+  #   volumes:
+  #     - "${INTEGRATION_PATH:-./integration}/drop:/home/${SFTP_USERNAME:-transfer}/volumes/drop"
+  #     - "${CONFIG_PATH:-./config}/sftp/sftp-users.conf:/etc/sftp/users.conf:ro"
+  #   ports:
+  #     - "2222:22"
+  #   <<: *config
+
+# ---------------------------------------------------------------------------
+# Networking
+# ---------------------------------------------------------------------------
+networks:
+  eterna_net:
+    name: ${NETWORK_NAME:-eterna_net}
+
+# ---------------------------------------------------------------------------
+# Volumes
+# Named volumes are used for services where direct host access is not needed.
+# ETERNA data (storage, ldap, log) uses bind mounts (configured above) so
+# that backup tooling can reach the files directly.
+# ---------------------------------------------------------------------------
+volumes:
+  zookeeper_data:
+  zookeeper_datalog:
+  solr_data:
+  clam_data:
+  siegfried_data:

@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.roda-project</groupId>
     <artifactId>roda-common</artifactId>
-    <version>0.5.0</version>
+    <version>0.6.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -27,10 +27,6 @@
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
-      <artifactId>jackson-dataformat-xml</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.dataformat</groupId>
       <artifactId>jackson-dataformat-yaml</artifactId>
     </dependency>
     <dependency>
@@ -46,17 +42,13 @@
       <artifactId>jaxb-runtime</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.glassfish.jaxb</groupId>
-      <artifactId>jaxb-runtime</artifactId>
-      <classifier>sources</classifier>
-    </dependency>
-    <dependency>
       <groupId>jakarta.xml.bind</groupId>
       <artifactId>jakarta.xml.bind-api</artifactId>
     </dependency>
     <dependency>
       <groupId>jakarta.xml.bind</groupId>
-    <artifactId>jakarta.xml.bind-api</artifactId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
+      <version>4.0.2</version>
       <classifier>sources</classifier>
     </dependency>
     <dependency>
