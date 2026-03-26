@@ -821,6 +821,8 @@ public interface ClientMessages extends Messages {
 
   String selectFileSearchResults();
 
+  String aipPathRootLabel();
+
   /************* Rename Item ****************/
 
   String renameItemTitle();
