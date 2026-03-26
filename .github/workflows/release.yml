@@ -48,6 +48,9 @@ jobs:
         with:
           java-version: 21
           distribution: "temurin"
+          server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: GITHUB_TOKEN
       - name: Set up Maven
         run: |
           MVN_VERSION=3.9.10
