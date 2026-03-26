@@ -25,6 +25,7 @@ jobs:
     timeout-minutes: 60
     env:
       MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     services:
       zookeeper:
@@ -97,8 +98,6 @@ jobs:
       - name: Deploy to GitHub packages
         if: ${{ !inputs.dry_run }}
         run: mvn $MAVEN_CLI_OPTS deploy -Dmaven.test.skip=true -Pcore
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Copy target to docker context
         run: |
           mkdir -p docker/target
