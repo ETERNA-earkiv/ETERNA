@@ -270,7 +270,7 @@ services:
   #   3. Provide ${CONFIG_PATH}/sftp/sftp-users.conf (see atmoz/sftp docs)
   #
   # sftp:
-  #   image: docker.io/atmoz/sftp:debian
+  #   image: docker.io/atmoz/sftp:alpine
   #   container_name: drop-folder-sftp
   #   volumes:
   #     - "${INTEGRATION_PATH:-./integration}/drop:/home/${SFTP_USERNAME:-transfer}/volumes/drop"
