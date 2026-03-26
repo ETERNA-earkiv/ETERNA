@@ -1,5 +1,5 @@
 # ETERNA Changelog
-## v0.6.0 (2026-03-20)
+## v0.6.0 (2026-03-26)
 #### Bug fixes
 - Fixed null URL handling in Theme controller to return INITIAL_DATE when file is not found
 - Fixed malformed UTF-8 encoding in file uploads and improved filename validation in TransferredResource
@@ -18,7 +18,6 @@
 
 #### Infrastructure
 - Added GitHub Actions workflows for development builds on AMD64 and ARM64 architectures
-- Added GitHub Action to sync project board order to Linear
 - Added OpenSSF Best Practices badge to README
 - Refactored GitHub Actions workflows for issue labeling
 
@@ -28,7 +27,7 @@
 - Upgraded Jersey (JAX-RS) 3.1.6 → 4.0.2
 - Upgraded Jackson 2.17.0 → 2.18.6
 - Upgraded Apache Pekko 1.0.2 → 1.1.4
-- Upgraded Apache Solr client 9.7.0 → 9.8.1
+- Upgraded Apache Solr client 9.7.0 → 9.10.1
 - Upgraded GWT 2.11.0 → 2.13.0
 - Upgraded Logback 1.5.13 → 1.5.25
 - Upgraded commons-lang3 3.14.0 → 3.18.0
