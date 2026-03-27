@@ -70,6 +70,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.base.antivirus.AntivirusPlugin;
+import org.roda.core.plugins.base.antivirus.TestAntiVirus;
 import org.roda.core.plugins.base.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.base.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.base.ingest.AutoAcceptSIPPlugin;
@@ -98,7 +99,7 @@ import gov.loc.premis.v3.FormatRegistryComplexType;
 import gov.loc.premis.v3.LinkingAgentIdentifierComplexType;
 import gov.loc.premis.v3.ObjectCharacteristicsComplexType;
 import gov.loc.premis.v3.Representation;
-import jersey.repackaged.com.google.common.collect.Lists;
+import com.google.common.collect.Lists;
 
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
 public class InternalPluginsTest {
@@ -133,6 +134,10 @@ public class InternalPluginsTest {
     boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
       deployPluginManager, deployDefaultResources, false);
+    RodaCoreFactory.getRodaConfiguration().setProperty("core.plugins.internal.virus_check.antiVirusClassname",
+      TestAntiVirus.class.getName());
+    RodaCoreFactory.getRodaConfiguration().setProperty("core.plugins.internal.take_precedence_over_external", false);
+    RodaCoreFactory.getPluginManager().registerPlugin(new AntivirusPlugin());
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
 

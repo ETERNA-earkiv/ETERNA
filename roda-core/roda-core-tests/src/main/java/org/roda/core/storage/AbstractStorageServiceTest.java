@@ -41,7 +41,7 @@ import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
-import jersey.repackaged.com.google.common.collect.Iterables;
+import com.google.common.collect.Iterables;
 
 /**
  *

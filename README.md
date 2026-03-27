@@ -1,5 +1,6 @@
 [![CodeQL](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/github-code-scanning/codeql)
 [![Release](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/release.yml/badge.svg)](https://github.com/ETERNA-earkiv/ETERNA/actions/workflows/release.yml)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/12074/badge)](https://www.bestpractices.dev/projects/12074)
 
 Read this in: [English](README.md) | [Svenska](README_sv_SE.md)
 
