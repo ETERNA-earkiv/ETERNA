@@ -1,4 +1,11 @@
 # ETERNA Changelog
+## v0.7.0-SNAPSHOT (TBD)
+#### Cleanup
+- Removed Pre-ingest menu option from the UI and cleaned up associated i18n keys
+
+#### Documentation
+- Restored classification plan section to Pre-Ingest documentation in English and Swedish, describing how ETERNA's catalog structure is used to generate a downloadable classification scheme for use with RODA-in
+
 ## v0.6.0 (2026-03-26)
 #### Bug fixes
 - Fixed null URL handling in Theme controller to return INITIAL_DATE when file is not found
