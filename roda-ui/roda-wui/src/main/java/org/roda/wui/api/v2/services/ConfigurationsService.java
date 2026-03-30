@@ -95,20 +95,24 @@ public class ConfigurationsService {
     List<String> dropdownItems = RodaUtils.copyList(
       RodaCoreFactory.getRodaConfiguration().getList("core.plugins.conversion.profile." + pluginName + ".profiles[]"));
     Locale locale = ServerTools.parseLocale(localeString);
-
     ResourceBundle pluginMessages = RodaCoreFactory.getPluginMessages(pluginId, locale);
 
+    List<ConversionProfile> profiles = new ArrayList<>();
     for (String item : dropdownItems) {
       ConversionProfile conversionProfile = retrieveConversionProfileItem(item, pluginName, pluginMessages);
       if (outcomeType.equals(ConversionProfileOutcomeType.REPRESENTATION)
         && conversionProfile.canBeUsedForRepresentation()) {
-        items.addObject(conversionProfile);
+        profiles.add(conversionProfile);
       }
 
       if (outcomeType.equals(ConversionProfileOutcomeType.DISSEMINATION)
         && conversionProfile.canBeUsedForDissemination()) {
-        items.addObject(conversionProfile);
+        profiles.add(conversionProfile);
       }
+    }
+    profiles.sort((a, b) -> a.getTitle().compareToIgnoreCase(b.getTitle()));
+    for (ConversionProfile profile : profiles) {
+      items.addObject(profile);
     }
 
     return items;
