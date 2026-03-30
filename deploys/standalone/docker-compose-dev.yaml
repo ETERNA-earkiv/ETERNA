@@ -1,7 +1,6 @@
 services:
   zoo:
-    image: docker.io/zookeeper:3.9-jre-17
-    container_name: zookeeper
+    image: ghcr.io/eterna-earkiv/zookeeper:3.9.5
     restart: unless-stopped
     ports:
       - "2181:2181"
@@ -12,12 +11,13 @@ services:
       - zookeeper_datalog:/datalog
 
   solr:
-    image: docker.io/solr:9
-    container_name: solr
+    image: ghcr.io/eterna-earkiv/solr:9.10.1
+    user: "8983"
     restart: unless-stopped
     ports:
       - "8983:8983"
     environment:
+      SOLR_HEAP: 2g
       ZK_HOST: zoo:2181
       SOLR_HOST: localhost
       SOLR_OPTS: "-Dsolr.environment=dev,label=DEV+ENV"
@@ -29,22 +29,20 @@ services:
       - solr_data:/var/solr
 
   clamd:
-    image: docker.io/clamav/clamav:1.4
-    container_name: clamd
+    image: docker.io/clamav/clamav:stable
     restart: unless-stopped
     ports:
       - "3310:3310"
     volumes:
       - clam_data:/var/lib/clamav
       # Mapping $HOME/.roda to enable usage with spring-boot mode
-      - $HOME/.roda/data/storage:$HOME/.roda/data/storage:ro
-      - $HOME/.roda/data/staging-storage:$HOME/.roda/data/staging-storage:ro
+      - ./.roda/data/storage:$HOME/.roda/data/storage:ro
+      - ./.roda/data/staging-storage:$HOME/.roda/data/staging-storage:ro
       # Mapping /tmp to enable usage with local testing via mvn test
       - /tmp:/tmp
 
   siegfried:
-    image: ghcr.io/keeps/siegfried:v1.11.0
-    container_name: siegfried
+    image: ghcr.io/eterna-earkiv/siegfried:v1.11.4
     restart: unless-stopped
     ports:
       - "5138:5138"
@@ -54,14 +52,13 @@ services:
     volumes:
       - siegfried_data:/root/siegfried/
       # Mapping $HOME/.roda to enable usage with spring-boot mode
-      - $HOME/.roda/data/storage:$HOME/.roda/data/storage:ro
-      - $HOME/.roda/data/staging-storage:$HOME/.roda/data/staging-storage:ro
+      - ./.roda/data/storage:$HOME/.roda/data/storage:ro
+      - ./.roda/data/staging-storage:$HOME/.roda/data/staging-storage:ro
       # Mapping /tmp to enable usage with local testing via mvn test
       - /tmp:/tmp:ro
 
   swagger:
     image: docker.io/swaggerapi/swagger-ui:latest
-    container_name: swagger
     restart: on-failure
     ports:
       - "8081:8080"
@@ -72,15 +69,13 @@ services:
 
   mailpit:
     image: axllent/mailpit:v1.24
-    container_name: mailpit
     restart: unless-stopped
     ports:
       - "1025:1025" # smtp server
       - "8025:8025" # web ui
 
   openldap:
-    image: docker.io/bitnami/openldap:2.6
-    container_name: openldap
+    image: docker.io/bitnamilegacy/openldap:2.6
     restart: unless-stopped
     user: 1001:root
     ports:

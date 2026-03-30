@@ -1,7 +1,7 @@
 services:
 
   zoo:
-    image: docker.io/zookeeper:3.9-jre-17
+    image: ghcr.io/eterna-earkiv/zookeeper:3.9.5
     restart: unless-stopped
     environment:
       - ZOO_4LW_COMMANDS_WHITELIST=mntr,conf,ruok
@@ -10,7 +10,8 @@ services:
       - zookeeper_datalog:/datalog
 
   solr:
-    image: docker.io/solr:9.8.1
+    image: ghcr.io/eterna-earkiv/solr:9.10.1
+    user: "8983"
     restart: unless-stopped
     ports:
       - "8983:8983"
@@ -22,14 +23,14 @@ services:
       - solr_data:/var/solr
 
   clamd:
-    image: docker.io/clamav/clamav:1.4
+    image: docker.io/clamav/clamav:stable
     restart: unless-stopped
     volumes:
       - clam_data:/var/lib/clamav
       - roda_data:/roda/data/
 
   siegfried:
-    image: ghcr.io/keeps/siegfried:v1.11.0
+    image: ghcr.io/eterna-earkiv/siegfried:v1.11.4
     restart: unless-stopped
     environment:
       SIEGFRIED_HOST: 0.0.0.0
@@ -56,7 +57,7 @@ services:
       - "8025:8025" # web ui
 
   openldap:
-    image: docker.io/bitnami/openldap:2.6
+    image: docker.io/bitnamilegacy/openldap:2.6
     restart: unless-stopped
     user: 1001:root
     ports:
@@ -104,7 +105,6 @@ services:
 
   postgres:
     image: docker.io/postgres:17
-    container_name: postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: admin
