@@ -204,6 +204,19 @@ public class ScatteredFileStorageService extends FileStorageService  {
     Path path = ScatteredFSUtils.getEntityPath(basePath, storagePath);
     if (recursive) {
       return FSUtils.recursivelyCountPath(path);
+    } else if (storagePath.isFromAContainer()) {
+      try (CloseableIterable<Resource> resources =
+          ScatteredFSUtils.listResourcesUnderContainer(basePath, storagePath.getContainerName())) {
+        long count = 0;
+        Iterator<Resource> it = resources.iterator();
+        while (it.hasNext()) {
+          it.next();
+          count++;
+        }
+        return count;
+      } catch (IOException e) {
+        throw new GenericException("Could not count resources in container " + storagePath.getContainerName(), e);
+      }
     } else {
       return FSUtils.countPath(path);
     }
