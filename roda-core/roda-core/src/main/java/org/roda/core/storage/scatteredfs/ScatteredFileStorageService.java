@@ -191,8 +191,10 @@ public class ScatteredFileStorageService extends FileStorageService  {
     Path path = ScatteredFSUtils.getEntityPath(basePath, storagePath);
     if (recursive) {
       return ScatteredFSUtils.recursivelyListPath(basePath, path);
+    } else if (storagePath.isFromAContainer()) {
+      return ScatteredFSUtils.listResourcesUnderContainer(basePath, storagePath.getContainerName());
     } else {
-      return ScatteredFSUtils.listResourcesUnderContainer(basePath, path.getFileName().toString());
+      return ScatteredFSUtils.listPath(basePath, path);
     }
   }
 
