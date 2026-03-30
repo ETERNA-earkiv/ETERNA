@@ -42,7 +42,7 @@ services:
       - /tmp:/tmp
 
   siegfried:
-    image: ghcr.io/keeps/siegfried:v1.11.0
+    image: ghcr.io/eterna-earkiv/siegfried:v1.11.4
     restart: unless-stopped
     ports:
       - "5138:5138"
