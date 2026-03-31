@@ -8026,10 +8026,21 @@ span.code {
 }
 
 .my-asyncdatagrid-footer {
-    display: flex;
-    justify-content: end;
-    align-items: center;
-    gap: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.my-asyncdatagrid-footer .footer-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.my-asyncdatagrid-footer .footer-left {
+  display: flex;
+  align-items: center;
 }
 
 .ActionableStyleButtons {

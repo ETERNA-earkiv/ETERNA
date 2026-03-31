@@ -363,13 +363,18 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     FlowPanel footer = new FlowPanel();
     footer.addStyleName("my-asyncdatagrid-footer");
 
+    FlowPanel footerLeft = new FlowPanel();
+    footerLeft.addStyleName("footer-left");
+    FlowPanel footerRight = new FlowPanel();
+    footerRight.addStyleName("footer-right");
+    footerLeft.add(csvDownloadButton);
+    footerRight.add(pageSizeSelectorPanel);
+    footerRight.add(resultsPager);
+    footerRight.add(autoUpdatePanel);
+    footer.add(footerLeft);
+    footer.add(footerRight);
     mainPanel.add(display);
     mainPanel.add(footer);
-    footer.add(csvDownloadButton);
-    footer.add(pageSizePager);
-    mainPanel.add(pageSizeSelectorPanel);
-    footer.add(resultsPager);
-    footer.add(autoUpdatePanel);
 
     sidePanel.add(actionsToolbar);
     sidePanel.add(sidePanelDivider);
