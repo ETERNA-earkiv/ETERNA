@@ -1,4 +1,7 @@
 import { api } from './client'
+import type { FacetValue, FacetResult, IndexResult, FindRequest } from '../types'
+
+export type { FacetValue, FacetResult, IndexResult, FindRequest }
 
 export interface IndexedAIP {
   id: string
@@ -16,47 +19,6 @@ export interface IndexedAIP {
   onHold: boolean
 }
 
-export interface FacetValue {
-  value: string
-  count: number
-}
-
-export interface FacetResult {
-  field: string
-  values: FacetValue[]
-}
-
-export interface IndexResult<T> {
-  results: T[] | null
-  totalCount: number
-  offset: number
-  limit: number
-  facetResults?: FacetResult[] | null
-}
-
-export interface FindRequest {
-  filter?: {
-    filterParameters: Array<{
-      type: string
-      name: string
-      value: string
-    }>
-  }
-  sorter?: {
-    parameters: Array<{
-      name: string
-      descending: boolean
-    }>
-  }
-  sublist?: {
-    firstElementIndex: number
-    maximumElementCount: number
-  }
-  facets?: {
-    parameters: Record<string, unknown>
-  }
-  onlyActive?: boolean
-}
 
 export interface DescriptiveMetadataInfo {
   id: string

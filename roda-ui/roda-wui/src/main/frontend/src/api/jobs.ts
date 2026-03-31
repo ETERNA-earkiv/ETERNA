@@ -1,5 +1,5 @@
 import { api } from './client'
-import type { IndexResult } from './aips'
+import type { IndexResult } from '../types'
 
 export interface JobStats {
   sourceObjectsCount: number

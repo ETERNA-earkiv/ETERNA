@@ -1,4 +1,5 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
+import { DigiButton } from '@designsystem-se/af-react'
 import { useAuth } from './AuthProvider'
 import { logout } from '../api/auth'
 
@@ -55,13 +56,13 @@ export function AppShell() {
               {user.fullName || user.name}
             </span>
           )}
-          <digi-button
-            af-variation="secondary"
-            onClick={handleLogout}
+          <DigiButton
+            afVariation="secondary"
+            onAfOnClick={handleLogout}
             style={{ '--digi-button-color': 'white', '--digi-button-border-color': 'white' } as React.CSSProperties}
           >
             Logga ut
-          </digi-button>
+          </DigiButton>
         </div>
       </header>
 

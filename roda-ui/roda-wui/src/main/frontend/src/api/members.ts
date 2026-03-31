@@ -1,5 +1,5 @@
 import { api } from './client'
-import type { FindRequest, IndexResult } from './aips'
+import type { FindRequest, IndexResult } from '../types'
 
 export interface RODAMember {
   id: string
