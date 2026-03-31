@@ -15,6 +15,7 @@ import { IngestPage } from './pages/IngestPage'
 import { JobsPage } from './pages/JobsPage'
 import { JobDetail } from './pages/JobDetail'
 import { AuditLogPage } from './pages/AuditLogPage'
+import { StatisticsPage } from './pages/StatisticsPage'
 import { PlanningPage } from './pages/planning/PlanningPage'
 import { RiskDetail } from './pages/planning/RiskDetail'
 import { DisposalPage } from './pages/disposal/DisposalPage'
@@ -36,7 +37,8 @@ export default function App() {
               </PrivateRoute>
             }
           >
-            <Route index element={<Navigate to="/browse" replace />} />
+            <Route index element={<Navigate to="/statistics" replace />} />
+            <Route path="statistics" element={<StatisticsPage />} />
             <Route path="browse" element={<BrowseAIPs />} />
             <Route path="browse/dip/:dipId" element={<DIPDetail />} />
             <Route path="browse/:aipId" element={<AIPDetail />} />

@@ -30,6 +30,7 @@ export function AppShell() {
           <strong style={{ fontSize: '1.125rem' }}>ETERNA</strong>
           <nav style={{ display: 'flex', gap: '1.5rem' }}>
             {[
+              { to: '/statistics', label: 'Statistik' },
               { to: '/browse', label: 'Arkivobjekt' },
               { to: '/ingest', label: 'Ingest' },
               { to: '/planning', label: 'Planering' },
