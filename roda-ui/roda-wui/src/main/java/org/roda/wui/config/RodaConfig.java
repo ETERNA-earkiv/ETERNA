@@ -214,7 +214,7 @@ public class RodaConfig {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-      registry.addViewController("/").setViewName("forward:/Main.html");
+      registry.addViewController("/").setViewName("forward:/index.html");
       registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
     }
   }
