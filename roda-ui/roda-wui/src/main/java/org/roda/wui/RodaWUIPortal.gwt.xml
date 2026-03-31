@@ -6,8 +6,8 @@
 	<inherits name="com.google.gwt.http.HTTP" />
 	<inherits name="com.google.gwt.logging.Logging" />
 	<inherits name="com.google.gwt.resources.Resources" />
-	<inherits name="org.fusesource.restygwt.RestyGWT"/>
-	<inherits name='com.ekotrope.gwt.CompletableFuture'/>
+	<inherits name="org.fusesource.restygwt.RestyGWT" />
+	<inherits name='com.ekotrope.gwt.CompletableFuture' />
 	<source path="client" />
 
 	<!-- I18N -->

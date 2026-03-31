@@ -3,9 +3,8 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
-
 /**
  *
  */
@@ -177,15 +176,14 @@ public class Header extends Composite {
       createCommand(NotificationRegister.RESOLVER.getHistoryPath()));
     administrationNotifications.addStyleName("administration_notifications_item");
 
-    boolean reportingActive = ConfigurationManager.getBoolean(false,
-        RodaConstants.UI_SERVICE_REPORTING_ACTIVE);
+    boolean reportingActive = ConfigurationManager.getBoolean(false, RodaConstants.UI_SERVICE_REPORTING_ACTIVE);
 
     if (reportingActive) {
       administrationStatistics = administrationMenu.addItem(messages.title("administration_statistics"),
-          createURLCommand(ConfigurationManager.getString(RodaConstants.UI_SERVICE_REPORTING_URL)));
+        createURLCommand(ConfigurationManager.getString(RodaConstants.UI_SERVICE_REPORTING_URL)));
     } else {
       administrationStatistics = administrationMenu.addItem(messages.title("administration_statistics"),
-          createCommand(Statistics.RESOLVER.getHistoryPath()));
+        createCommand(Statistics.RESOLVER.getHistoryPath()));
     }
 
     administrationStatistics.addStyleName("administration_statistics_item");

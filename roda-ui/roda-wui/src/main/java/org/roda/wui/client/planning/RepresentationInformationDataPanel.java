@@ -3,9 +3,8 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
-
 package org.roda.wui.client.planning;
 
 import java.util.Collections;
@@ -133,11 +132,10 @@ public class RepresentationInformationDataPanel extends Composite
           .whenComplete((representationInformationFamily, throwable) -> {
             customForm = new RepresentationInformationCustomForm();
             customForm.setValues(representationInformationFamily.getFamilyValues());
-            FormUtilities.create(extras,
-            representationInformationFamily.getFamilyValues(), false, () -> {
+            FormUtilities.create(extras, representationInformationFamily.getFamilyValues(), false, () -> {
               RepresentationInformationDataPanel.this.onChange();
               return null;
-              });
+            });
           });
       } else {
         services
@@ -173,8 +171,8 @@ public class RepresentationInformationDataPanel extends Composite
     if (editMode) {
       Services services = new Services("Retrieve representation information family metadata", "get");
       CompletableFuture<RepresentationInformationFamily> riFamilyCompletableFuture = services
-        .representationInformationResource(s -> s.retrieveRepresentationInformationFamily(ri.getId(),
-          LocaleInfo.getCurrentLocale().getLocaleName()))
+        .representationInformationResource(
+          s -> s.retrieveRepresentationInformationFamily(ri.getId(), LocaleInfo.getCurrentLocale().getLocaleName()))
         .toCompletableFuture();
       CompletableFuture<RepresentationInformationFamilyOptions> riFamilyOptionsCompletableFuture = services
         .representationInformationResource(

@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.actions;
 
@@ -149,10 +149,10 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     if (file.isDirectory()) {
       return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_FILE_DIRECTORY.contains(action), CanActResult.Reason.CONTEXT,
         messages.reasonCantActOnFileDirectory());
-      } else {
-        return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_FILE_BITSTREAM.contains(action), CanActResult.Reason.CONTEXT,
+    } else {
+      return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_FILE_BITSTREAM.contains(action), CanActResult.Reason.CONTEXT,
         messages.reasonCantActOnFileBitstream());
-      }
+    }
   }
 
   @Override
@@ -594,7 +594,8 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
     if (Objects.equals(mime, mimeType)) {
       return true;
-    } else if (mime == null && extension != null && (extension.equalsIgnoreCase("." + fileExtension) || extension.equalsIgnoreCase(fileExtension))) {
+    } else if (mime == null && extension != null
+      && (extension.equalsIgnoreCase("." + fileExtension) || extension.equalsIgnoreCase(fileExtension))) {
       return true;
     } else {
       return mime == null && extension == null && fileIdExtension.equalsIgnoreCase(fileExtension);
@@ -609,7 +610,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     }
 
     List<String> historyItems = ListUtils.concat(
-            ListUtils.concat(Arrays.asList(file.getAipId(), file.getRepresentationId()), file.getPath()), file.getId());
+      ListUtils.concat(Arrays.asList(file.getAipId(), file.getRepresentationId()), file.getPath()), file.getId());
 
     callback.onSuccess(ActionImpact.NONE);
     HistoryUtils.newHistory(PDFRedactor.RESOLVER, historyItems.toArray(new String[0]));
@@ -635,7 +636,8 @@ public class FileActions extends AbstractActionable<IndexedFile> {
       "fileRemoveButton");
 
     // REDACTION
-    managementGroup.addButton(messages.redactPdfButton(), FileAction.REDACT_PDF, ActionImpact.UPDATED, "btn-eraser", "fileRedactButton");
+    managementGroup.addButton(messages.redactPdfButton(), FileAction.REDACT_PDF, ActionImpact.UPDATED, "btn-eraser",
+      "fileRedactButton");
 
     // PRESERVATION
     ActionableGroup<IndexedFile> preservationGroup = new ActionableGroup<>(messages.preservationTitle());
@@ -656,8 +658,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
     IDENTIFY_FORMATS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
     SHOW_EVENTS(RodaConstants.PERMISSION_METHOD_FIND_PRESERVATION_EVENT),
-    SHOW_RISKS(RodaConstants.PERMISSION_METHOD_FIND_RISK),
-    REDACT_PDF(RodaConstants.PERMISSION_METHOD_CREATE_FILE);
+    SHOW_RISKS(RodaConstants.PERMISSION_METHOD_FIND_RISK), REDACT_PDF(RodaConstants.PERMISSION_METHOD_CREATE_FILE);
 
     private List<String> methods;
 

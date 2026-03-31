@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 /**
  *
@@ -122,8 +122,8 @@ public interface UserManagementService extends RemoteService {
    * @throws GenericException
    */
   public User createUser(User user, SecureString password, UserExtraBundle extra)
-          throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException,
-          GenericException, IllegalOperationException, RequestNotValidException, ValidationException;
+    throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException,
+    IllegalOperationException, RequestNotValidException, ValidationException;
 
   /**
    * Modify a user
@@ -137,8 +137,8 @@ public interface UserManagementService extends RemoteService {
    * @throws AlreadyExistsException
    * @throws GenericException
    */
-  public void updateUser(User user, SecureString password, UserExtraBundle extra)
-          throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException, ValidationException, RequestNotValidException;
+  public void updateUser(User user, SecureString password, UserExtraBundle extra) throws AuthorizationDeniedException,
+    NotFoundException, AlreadyExistsException, GenericException, ValidationException, RequestNotValidException;
 
   /**
    * Modify the authenticated user
@@ -153,8 +153,9 @@ public interface UserManagementService extends RemoteService {
    * @throws GenericException
    * @throws IllegalOperationException
    */
-  public User updateMyUser(User user, SecureString password, UserExtraBundle extra) throws AuthorizationDeniedException,
-          NotFoundException, AlreadyExistsException, GenericException, IllegalOperationException, ValidationException, RequestNotValidException;
+  public User updateMyUser(User user, SecureString password, UserExtraBundle extra)
+    throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException,
+    IllegalOperationException, ValidationException, RequestNotValidException;
 
   /**
    * Try to remove a user, if user cannot be removed it will be deactivated

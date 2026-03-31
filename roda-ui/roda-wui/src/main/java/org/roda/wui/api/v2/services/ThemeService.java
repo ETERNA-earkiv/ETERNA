@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.api.v2.services;
 
@@ -43,8 +43,7 @@ public class ThemeService {
     String resourceId;
 
     if (RodaConstants.ResourcesTypes.PLUGINS.toString().equals(type)) {
-      resourcePath = RodaCoreFactory.getConfigPath()
-        .resolve(RodaConstants.CORE_PLUGINS_FOLDER);
+      resourcePath = RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_PLUGINS_FOLDER);
       resourceId = RodaConstants.CORE_PLUGINS_FOLDER + "/" + normalizedID;
     } else {
       resourcePath = RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_THEME_FOLDER);
@@ -53,8 +52,7 @@ public class ThemeService {
 
     URL url = RodaCoreFactory.getConfigurationFile(resourceId);
     if (url != null) {
-      ret = Pair.of(id,
-        () -> RodaCoreFactory.getConfigurationFileAsStream(resourcePath, normalizedID));
+      ret = Pair.of(id, () -> RodaCoreFactory.getConfigurationFileAsStream(resourcePath, normalizedID));
     } else {
       ret = Pair.of(normalizedFallBackResource,
         () -> RodaCoreFactory.getConfigurationFileAsStream(resourcePath, normalizedFallBackResource));
@@ -111,8 +109,7 @@ public class ThemeService {
     Date modifiedDate;
     URL file;
     if (RodaConstants.ResourcesTypes.PLUGINS.toString().equals(type)) {
-      file = RodaCoreFactory
-        .getConfigurationFile(RodaConstants.CORE_PLUGINS_FOLDER + "/" + resourceId);
+      file = RodaCoreFactory.getConfigurationFile(RodaConstants.CORE_PLUGINS_FOLDER + "/" + resourceId);
     } else {
       file = RodaCoreFactory.getConfigurationFile(RodaConstants.CORE_THEME_FOLDER + "/" + resourceId);
     }

@@ -2,8 +2,8 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
- * <p>
- * https://github.com/keeps/roda
+ *
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.filter;
 
@@ -25,7 +25,7 @@ public class SecurityHeadersFilter implements Filter {
   public void init(final FilterConfig filterConfig) throws ServletException {
     final String configPrefix = filterConfig.getInitParameter("config-prefix");
 
-    Configuration configuration  = RodaCoreFactory.getRodaConfiguration();
+    Configuration configuration = RodaCoreFactory.getRodaConfiguration();
     contentSecurityPolicyEnabled = configuration.getBoolean(configPrefix + ".csp.enabled", true);
 
     if (contentSecurityPolicyEnabled) {
@@ -38,7 +38,8 @@ public class SecurityHeadersFilter implements Filter {
   }
 
   @Override
-  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+    throws IOException, ServletException {
     HttpServletResponse httpServletResponse = (HttpServletResponse) response;
 
     httpServletResponse.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
@@ -49,7 +50,8 @@ public class SecurityHeadersFilter implements Filter {
 
     httpServletResponse.setHeader("X-XSS-Protection", "1; mode=block");
     httpServletResponse.setHeader("X-Permitted-Cross-Domain-Policies", "none");
-    httpServletResponse.setHeader("Feature-Policy", "camera 'none'; fullscreen 'self'; geolocation *; " + "microphone 'self'");
+    httpServletResponse.setHeader("Feature-Policy",
+      "camera 'none'; fullscreen 'self'; geolocation *; " + "microphone 'self'");
     httpServletResponse.setHeader("X-Frame-Options", "SAMEORIGIN");
     httpServletResponse.setHeader("X-Content-Type-Options", "nosniff");
     httpServletResponse.setHeader("Referrer-Policy", "no-referrer");

@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.api.v2.controller;
 
@@ -60,9 +60,8 @@ public class ThemesController {
     @Parameter(description = "The resource type, can be internal or plugin", schema = @Schema(implementation = RodaConstants.ResourcesTypes.class, defaultValue = RodaConstants.API_QUERY_PARAM_DEFAULT_RESOURCE_TYPE)) @RequestParam(defaultValue = RodaConstants.API_QUERY_PARAM_DEFAULT_RESOURCE_TYPE, name = "resource-type", required = false) String type,
     WebRequest request) {
 
-    return requestHandler
-      .processRequestWithoutCheckRolesAndLog(
-        new RequestHandler.RequestProcessor<ResponseEntity<StreamingResponseBody>>() {
+    return requestHandler.processRequestWithoutCheckRolesAndLog(
+      new RequestHandler.RequestProcessor<ResponseEntity<StreamingResponseBody>>() {
         @Override
         public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
           RequestControllerAssistant controllerAssistant) throws RODAException, RESTException, IOException {

@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.api.v2.controller;
 
@@ -120,7 +120,7 @@ public class RequestHandler {
   }
 
   private boolean isAValidTransactionalContext(boolean isTransactional) {
-    if(transactionManager != null && transactionManager.isInitialized()) {
+    if (transactionManager != null && transactionManager.isInitialized()) {
       // Check if the current node is not a read-only node
       boolean writeIsAllowed = RodaCoreFactory.checkIfWriteIsAllowed(RodaCoreFactory.getNodeType());
       return writeIsAllowed && isTransactional;

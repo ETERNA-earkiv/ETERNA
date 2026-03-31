@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.browse.tabs;
 
@@ -54,8 +54,8 @@ public class BrowseRepresentationTabs extends Tabs {
 
         ListBuilder<IndexedFile> fileListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
           new AsyncTableCellOptions<>(IndexedFile.class, "BrowseRepresentation_files").withFilter(filesFilter)
-            .withJustActive(justActive).withSummary(summary).bindOpener()
-            .withActionable(FileSearchWrapperActions.get(aip.getId(), representation.getId(), aip.getState(), aip.getPermissions())));
+            .withJustActive(justActive).withSummary(summary).bindOpener().withActionable(
+              FileSearchWrapperActions.get(aip.getId(), representation.getId(), aip.getState(), aip.getPermissions())));
 
         return new SearchWrapper(false).createListAndSearchPanel(fileListBuilder);
       }

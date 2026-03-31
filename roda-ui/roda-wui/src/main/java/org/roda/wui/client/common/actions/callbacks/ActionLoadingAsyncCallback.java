@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.actions.callbacks;
 
@@ -23,7 +23,7 @@ public abstract class ActionLoadingAsyncCallback<T> extends LoadingAsyncCallback
   }
 
   public void doActionCallbackNone() {
-      actionCallback.onSuccess(Actionable.ActionImpact.NONE);
+    actionCallback.onSuccess(Actionable.ActionImpact.NONE);
   }
 
   public void doActionCallbackUpdated() {

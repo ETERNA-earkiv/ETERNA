@@ -27,7 +27,6 @@
     font-weight: 500;
     text-shadow: none !important
 }
-
 .table-empty .cellTableWidget {
     border-bottom: none
 }
@@ -46,10 +45,10 @@
     font-size: 1.3rem
 }
 .cellTableOddRow {
-    background: white;
+    background: white
 }
 .cellTableOddRowCell {
-    border-color: white;
+    border-color: white
 }
 .cellTableSelectedRow {
     background: #5bbeff
@@ -88,9 +87,7 @@
     background: -webkit-linear-gradient(right, rgb(255, 255, 255) 30%, rgba(255, 255, 255, 0) 100%);
     background: linear-gradient(-90deg, rgb(255, 255, 255) 30%, rgba(255, 255, 255, 0) 100%)
 }
-.cellTableOddRowCell.cellTableFadeOut:after {
-    /*background: linear-gradient(-90deg, rgb(248, 248, 248) 30%, rgba(255, 255, 255, 0) 100%)*/
-}
+.cellTableOddRowCell.cellTableFadeOut:after { }
 .cellTableSelectedRowCell.cellTableFadeOut:after {
     background: linear-gradient(-90deg, rgb(91, 190, 255) 30%, rgba(255, 255, 255, 0) 100%)
 }

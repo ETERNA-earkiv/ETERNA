@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.lists.pagination;
 
@@ -110,8 +110,7 @@ public class ListSelectionUtils {
     if (newIndex >= 0) {
 
       Services services = new Services("Find relatives", "get");
-      FindRequest request = FindRequest
-        .getBuilder(state.getFilter(), state.getJustActive())
+      FindRequest request = FindRequest.getBuilder(state.getFilter(), state.getJustActive())
         .withSorter(state.getSorter()).withSublist(new Sublist(newIndex, 1)).withFacets(state.getFacets()).build();
       services.rodaEntityRestService(s -> s.find(request, LocaleInfo.getCurrentLocale().getLocaleName()),
         state.getSelected().getClass()).whenComplete((indexResult, throwable) -> {

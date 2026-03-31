@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.api.v2.controller;
 
@@ -134,7 +134,6 @@ public class RiskIncidenceController implements RiskIncidenceRestService, Export
   @Override
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
     // delegate
-    return ApiUtils.okResponse(
-      indexService.exportToCSV(findRequestString, RiskIncidence.class));
+    return ApiUtils.okResponse(indexService.exportToCSV(findRequestString, RiskIncidence.class));
   }
 }

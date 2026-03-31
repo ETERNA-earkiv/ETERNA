@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.api.v2.utils;
 
@@ -105,26 +105,26 @@ public class ApiUtils {
   }
 
   public static StreamResponse download(RequestContext requestContext, IsRODAObject object, String... pathPartials)
-      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     return download(requestContext, object, null, false, pathPartials);
   }
 
   public static StreamResponse download(RequestContext requestContext, LiteRODAObject lite, String... pathPartials)
-          throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    return download(requestContext,lite, null, false, pathPartials);
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    return download(requestContext, lite, null, false, pathPartials);
   }
 
-  public static StreamResponse download(RequestContext requestContext, IsRODAObject object, String fileName, boolean addTopDirectory,
-    String... pathPartials)
-      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+  public static StreamResponse download(RequestContext requestContext, IsRODAObject object, String fileName,
+    boolean addTopDirectory, String... pathPartials)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     ModelService model = requestContext.getModelService();
     ConsumesOutputStream download = model.exportObjectToStream(object, fileName, addTopDirectory, pathPartials);
     return new StreamResponse(download);
   }
 
-  public static StreamResponse download(RequestContext requestContext, LiteRODAObject lite, String fileName, boolean addTopDirectory,
-                                        String... pathPartials)
-          throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+  public static StreamResponse download(RequestContext requestContext, LiteRODAObject lite, String fileName,
+    boolean addTopDirectory, String... pathPartials)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     ModelService model = requestContext.getModelService();
     ConsumesOutputStream download = model.exportObjectToStream(lite, fileName, addTopDirectory, pathPartials);
     return new StreamResponse(download);

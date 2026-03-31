@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.api.v2.controller;
 
@@ -426,8 +426,8 @@ public class DistributedInstancesController implements DistributedInstancesRestS
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext, state,
-        RodaConstants.CONTROLLER_LOCAL_INSTANCE_ID_PARAM, localInstance.getId());
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_ID_PARAM,
+        localInstance.getId());
     }
   }
 
@@ -459,8 +459,7 @@ public class DistributedInstancesController implements DistributedInstancesRestS
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext, state,
-        RodaConstants.CONTROLLER_LOCAL_INSTANCE_ID_PARAM, id);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_ID_PARAM, id);
     }
   }
 
@@ -613,8 +612,7 @@ public class DistributedInstancesController implements DistributedInstancesRestS
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM,
-        id);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM, id);
     }
   }
 
@@ -643,8 +641,7 @@ public class DistributedInstancesController implements DistributedInstancesRestS
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM,
-        id);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM, id);
     }
   }
 
@@ -673,8 +670,7 @@ public class DistributedInstancesController implements DistributedInstancesRestS
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext, state,
-        RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
     }
   }
 }

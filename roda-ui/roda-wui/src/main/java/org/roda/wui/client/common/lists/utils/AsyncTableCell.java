@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.lists.utils;
 
@@ -272,9 +272,9 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     }
 
     pageSizeListBox.addChangeHandler(event -> {
-        selectedPageSize = Integer.parseInt(pageSizeListBox.getSelectedValue());
-        display.setVisibleRangeAndClearData(new Range(0, selectedPageSize), true);
-        resultsPager.setPageSize(selectedPageSize);
+      selectedPageSize = Integer.parseInt(pageSizeListBox.getSelectedValue());
+      display.setVisibleRangeAndClearData(new Range(0, selectedPageSize), true);
+      resultsPager.setPageSize(selectedPageSize);
     });
 
     // Optional label
@@ -285,7 +285,6 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     pageSizeLabel.addStyleName("page-size-label");
     pageSizeSelectorPanel.add(pageSizeLabel);
     pageSizeSelectorPanel.add(pageSizeListBox);
-
 
     Button csvDownloadButton = new Button(messages.tableDownloadCSV());
     csvDownloadButton.addStyleName("btn btn-link btn-download csvDownloadButton");
@@ -404,7 +403,6 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     } else {
       display.setSelectionModel(selectionModel);
     }
-
 
     getElement().setId("list-" + listId);
     resultsPager.addStyleName("my-asyncdatagrid-pager-results");
@@ -1325,7 +1323,6 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
   // ---------------------- SORT PERSISTENCE LOGIC START ----------------------
 
-
   private String getSortStorageKey() {
     String historyToken = History.getToken(); // Guaranteed unique for this page
     return "Sort." + listId + "." + historyToken;
@@ -1346,28 +1343,27 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     }
   }
 
-    private void applySavedSortState(CellTable<T> display) {
-      Storage storage = Storage.getSessionStorageIfSupported();
-      if (storage == null) {
-        return;
-      }
+  private void applySavedSortState(CellTable<T> display) {
+    Storage storage = Storage.getSessionStorageIfSupported();
+    if (storage == null) {
+      return;
+    }
 
-      String saved = storage.getItem(getSortStorageKey());
-      if (saved != null && saved.contains(":")) {
-        String[] parts = saved.split(":");
-        String savedColumn = parts[0];
-        boolean ascending = parts[1].equals("asc");
+    String saved = storage.getItem(getSortStorageKey());
+    if (saved != null && saved.contains(":")) {
+      String[] parts = saved.split(":");
+      String savedColumn = parts[0];
+      boolean ascending = parts[1].equals("asc");
 
-          for (int i = 0; i < display.getColumnCount(); i++) {
-            Column<T, ?> col = display.getColumn(i);
-            if (savedColumn.equals(col.getDataStoreName())) {
-              display.getColumnSortList().push(new ColumnSortList.ColumnSortInfo(col, ascending));
-              break;
-            }
-          }
+      for (int i = 0; i < display.getColumnCount(); i++) {
+        Column<T, ?> col = display.getColumn(i);
+        if (savedColumn.equals(col.getDataStoreName())) {
+          display.getColumnSortList().push(new ColumnSortList.ColumnSortInfo(col, ascending));
+          break;
         }
       }
-
+    }
+  }
 
   public FlowPanel getSidePanel() {
     return this.sidePanel;

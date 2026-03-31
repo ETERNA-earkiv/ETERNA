@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common;
 
@@ -75,7 +75,7 @@ public class BadgePanel extends FlowPanel {
     super.addStyleName(style);
   }
 
-  public void enableNotification(boolean value){
+  public void enableNotification(boolean value) {
     notificationHTML.setVisible(value);
   }
 }

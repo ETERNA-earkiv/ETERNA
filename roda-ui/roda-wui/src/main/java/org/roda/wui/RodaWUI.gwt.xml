@@ -4,8 +4,8 @@
 	<inherits name='com.google.gwt.user.User' />
 	<inherits name="com.google.gwt.http.HTTP" />
 	<inherits name="com.google.gwt.logging.Logging" />
-	<inherits name="org.fusesource.restygwt.RestyGWT"/>
-	<inherits name='com.ekotrope.gwt.CompletableFuture'/>
+	<inherits name="org.fusesource.restygwt.RestyGWT" />
+	<inherits name='com.ekotrope.gwt.CompletableFuture' />
 	<source path="client" />
 	<source path="api" />
 
@@ -56,5 +56,5 @@
 	<!-- <stylesheet src="Main.css" /> Replaced by MyResources -->
 	<stylesheet src="../api/v2/themes?resource-id=theme.css" />
 	<stylesheet src="../api/v2/themes?resource-id=printing.css" />
-	<collapse-all-properties/>
+	<collapse-all-properties />
 </module>

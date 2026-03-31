@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.lists;
 
@@ -55,7 +55,8 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.LOG_ID,
     RodaConstants.LOG_DATETIME, RodaConstants.LOG_ACTION_COMPONENT, RodaConstants.LOG_ACTION_METHOD,
     RodaConstants.LOG_USERNAME, RodaConstants.LOG_DURATION, RodaConstants.LOG_ADDRESS, RodaConstants.LOG_STATE,
-    RodaConstants.LOG_REQUEST_HEADER_UUID, RodaConstants.LOG_REQUEST_HEADER_REASON, RodaConstants.LOG_REQUEST_HEADER_TYPE);
+    RodaConstants.LOG_REQUEST_HEADER_UUID, RodaConstants.LOG_REQUEST_HEADER_REASON,
+    RodaConstants.LOG_REQUEST_HEADER_TYPE);
 
   public LogEntryList() {
     this(true);

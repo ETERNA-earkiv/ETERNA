@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.utils;
 
@@ -15,13 +15,13 @@ import org.roda.wui.common.client.widgets.Toast;
  * @author Miguel Guimarãese <mguimaraes@keep.pt>
  */
 public class SavedSearchUtils {
-    private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-    private SavedSearchUtils() {
-    };
+  private SavedSearchUtils() {
+  };
 
-    public static void share() {
-        Toast.showInfo(messages.copiedToClipboardTitle(), messages.copiedToClipboardMessage());
-        JavascriptUtils.copyURLToClipboard();
-    }
+  public static void share() {
+    Toast.showInfo(messages.copiedToClipboardTitle(), messages.copiedToClipboardMessage());
+    JavascriptUtils.copyURLToClipboard();
+  }
 }

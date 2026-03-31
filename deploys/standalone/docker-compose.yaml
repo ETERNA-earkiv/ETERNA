@@ -6,6 +6,7 @@ services:
     environment:
       - ZOO_4LW_COMMANDS_WHITELIST=mntr,conf,ruok
     volumes:
+      - zookeeper_conf:/conf
       - zookeeper_data:/data
       - zookeeper_datalog:/datalog
 
@@ -13,8 +14,9 @@ services:
     image: ghcr.io/eterna-earkiv/solr:9.10.1
     user: "8983"
     restart: unless-stopped
-    ports:
-      - "8983:8983"
+    user: "8983"
+    depends_on:
+      - zoo
     environment:
       SOLR_HEAP: 2g
       ZK_HOST: zoo:2181
@@ -36,7 +38,7 @@ services:
       SIEGFRIED_HOST: 0.0.0.0
       SIEGFRIED_PORT: 5138
     volumes:
-      - siegfried_data:/root/siegfried/
+      - siegfried_data:/home/siegfried/
       - roda_data:/roda/data/
 
   swagger:
@@ -79,6 +81,7 @@ services:
     ports:
       - "8080:8080"
     depends_on:
+      - zoo
       - solr
       - clamd
       - siegfried
@@ -117,6 +120,7 @@ services:
 
 
 volumes:
+  zookeeper_conf:
   zookeeper_data:
   zookeeper_datalog:
   solr_data:

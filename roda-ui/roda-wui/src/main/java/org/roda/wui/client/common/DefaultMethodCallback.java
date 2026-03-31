@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common;
 
@@ -39,8 +39,8 @@ public abstract class DefaultMethodCallback<T> implements MethodCallback<T> {
       public void onFailure(Method method, Throwable throwable) {
         if (throwable instanceof NotFoundException) {
           Dialogs.showInformationDialog(messages.ingestTransferNotFoundDialogTitle(),
-            messages.ingestTransferNotFoundDialogMessage(), messages.ingestTransferNotFoundDialogButton(),
-            false, new AsyncCallback<Void>() {
+            messages.ingestTransferNotFoundDialogMessage(), messages.ingestTransferNotFoundDialogButton(), false,
+            new AsyncCallback<Void>() {
 
               @Override
               public void onFailure(Throwable caught) {
@@ -57,6 +57,7 @@ public abstract class DefaultMethodCallback<T> implements MethodCallback<T> {
           HistoryUtils.newHistory(IngestTransfer.RESOLVER);
         }
       }
+
       @Override
       public void onSuccess(Method method, T t) {
         consumer.accept(t);
@@ -112,7 +113,7 @@ public abstract class DefaultMethodCallback<T> implements MethodCallback<T> {
 
       @Override
       public void onSuccess(Method method, T t) {
-          callback.onSuccess(t);
+        callback.onSuccess(t);
       }
     };
 

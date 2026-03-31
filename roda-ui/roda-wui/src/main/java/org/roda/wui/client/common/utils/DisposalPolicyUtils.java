@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.utils;
 
@@ -107,8 +107,7 @@ public class DisposalPolicyUtils {
         return new DisposalPolicySummary(DisposalPolicySummary.PolicyStatus.HOLD, messages.disposalPolicyHoldSummary());
       } else if (aip.getDisposalScheduleId() != null) {
         return onSchedule(aip);
-      }
-      else {
+      } else {
         return new DisposalPolicySummary(DisposalPolicySummary.PolicyStatus.NONE, messages.disposalPolicyNoneSummary());
       }
     }

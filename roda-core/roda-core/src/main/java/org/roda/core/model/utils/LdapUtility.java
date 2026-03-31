@@ -1474,11 +1474,16 @@ public class LdapUtility {
   }
 
   private Set<String> getDNsOfDirectRolesForMember(final String memberDN) throws NamingException {
-    Set<LdapRole> ldapRoles = ldapRoleRepository.findAllByRoleOccupants(memberDN);
+    // Use ldapTemplate.search directly to avoid Spring Data LDAP ODM mapping issues
+    // with DN-typed attributes (roleOccupant) returned as javax.naming.Name by JNDI.
     final Set<String> rolesDN = new HashSet<>();
-    for (LdapRole ldapRole : ldapRoles) {
-      rolesDN.add(ldapRole.getDn().toString());
-    }
+    ldapTemplate.search(
+      LdapQueryBuilder.query().base(removeBaseDN(ldapRolesDN)).where("roleOccupant").is(memberDN),
+      (org.springframework.ldap.core.ContextMapper<String>) ctx -> {
+        DirContextOperations dco = (DirContextOperations) ctx;
+        return LdapNameBuilder.newInstance(ldapRootDN).add(dco.getDn()).build().toString();
+      }
+    ).forEach(rolesDN::add);
     return rolesDN;
   }
 

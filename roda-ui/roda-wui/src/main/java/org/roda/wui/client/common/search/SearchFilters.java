@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.search;
 
@@ -36,7 +36,8 @@ public class SearchFilters {
   public static Filter createIncrementalFilterFromTokens(final List<String> historyTokens, Filter baseFilter) {
     // historyTokens like TYPE/key/value/key/value or key/value/key/value
 
-    Filter resultingFilter = baseFilter == null ? new Filter(new Filter(new AllFilterParameter())) : new Filter(baseFilter);
+    Filter resultingFilter = baseFilter == null ? new Filter(new Filter(new AllFilterParameter()))
+      : new Filter(baseFilter);
 
     List<String> parts = new ArrayList<>(historyTokens);
     if (!parts.isEmpty()) {

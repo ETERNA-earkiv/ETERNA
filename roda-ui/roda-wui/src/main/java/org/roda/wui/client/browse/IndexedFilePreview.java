@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.browse;
 
@@ -52,8 +52,8 @@ public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
     ListBuilder<IndexedFile> folderListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
       new AsyncTableCellOptions<>(IndexedFile.class, "IndexedFilePreview_files").withFilter(filter)
         .withSummary(messages.representationListOfFiles()).withJustActive(getJustActive()).bindOpener()
-        .withActionable(FileSearchWrapperActions.get(getObject().getAipId(), getObject().getRepresentationId(), getState(),
-          getObject(), getPermissions())));
+        .withActionable(FileSearchWrapperActions.get(getObject().getAipId(), getObject().getRepresentationId(),
+          getState(), getObject(), getPermissions())));
 
     LastSelectedItemsSingleton.getInstance().setSelectedJustActive(getJustActive());
 

@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.browse.tabs;
 
@@ -71,9 +71,8 @@ public class FileTechnicalMetadataTabs extends Tabs {
               descriptiveMetadataToolbar.addAction(new ClickHandler() {
                 @Override
                 public void onClick(ClickEvent event) {
-                  Window.Location
-                    .assign(RestUtils.createTechnicalMetadataDownloadUri(file.getUUID(), metadataInfo.getTypeId(), null)
-                      .asString());
+                  Window.Location.assign(RestUtils
+                    .createTechnicalMetadataDownloadUri(file.getUUID(), metadataInfo.getTypeId(), null).asString());
                 }
               }, messages.downloadButton(), "btn-download");
               // HTML

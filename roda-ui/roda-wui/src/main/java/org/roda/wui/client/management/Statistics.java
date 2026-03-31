@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 /**
  *
@@ -104,7 +104,7 @@ public class Statistics {
             } else {
               Element panelStatisticsButton = DOM.getElementById("reporting-action-button");
               JavascriptUtils.handleClickLeanMore(panelStatisticsButton,
-                  ConfigurationManager.getString(RodaConstants.UI_SERVICE_REPORTING_URL));
+                ConfigurationManager.getString(RodaConstants.UI_SERVICE_REPORTING_URL));
             }
 
             Element panelCloseButton = DOM.getElementById("closeButton");

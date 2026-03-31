@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.management.distributed;
 
@@ -109,12 +109,13 @@ public class DistributedInstancesManagement extends Composite {
     distributedInstancesManagementDescription.add(new HTMLWidgetWrapper(("DistributedInstancesDescription.html")));
 
     Services services = new Services("List distributed instances", "get");
-    services.distributedInstanceResource(DistributedInstancesRestService::getDistributedInstances).whenComplete((distributedInstances, throwable) -> {
-      if (throwable == null) {
-        init(distributedInstances);
-        initSidebar();
-      }
-    });
+    services.distributedInstanceResource(DistributedInstancesRestService::getDistributedInstances)
+      .whenComplete((distributedInstances, throwable) -> {
+        if (throwable == null) {
+          init(distributedInstances);
+          initSidebar();
+        }
+      });
   }
 
   private void initSidebar() {
@@ -206,11 +207,12 @@ public class DistributedInstancesManagement extends Composite {
 
   private void refresh() {
     Services services = new Services("List distributed instances", "get");
-    services.distributedInstanceResource(DistributedInstancesRestService::getDistributedInstances).whenComplete((distributedInstances, throwable) -> {
-      if (throwable == null) {
-        init(distributedInstances);
-      }
-    });
+    services.distributedInstanceResource(DistributedInstancesRestService::getDistributedInstances)
+      .whenComplete((distributedInstances, throwable) -> {
+        if (throwable == null) {
+          init(distributedInstances);
+        }
+      });
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {

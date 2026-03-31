@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.api.v2.services;
 
@@ -58,19 +58,19 @@ public class TransferredResourceService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TransferredResourceService.class);
 
-  public List<TransferredResource> retrieveSelectedTransferredResource(IndexService index, SelectedItems<TransferredResource> selected)
-    throws GenericException, RequestNotValidException {
+  public List<TransferredResource> retrieveSelectedTransferredResource(IndexService index,
+    SelectedItems<TransferredResource> selected) throws GenericException, RequestNotValidException {
     switch (selected) {
       case SelectedItemsList<TransferredResource> selectedList -> {
         Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, selectedList.getIds()));
-        IndexResult<TransferredResource> results = index.find(TransferredResource.class,
-          filter, Sorter.NONE, new Sublist(0, selectedList.getIds().size()), new ArrayList<>());
+        IndexResult<TransferredResource> results = index.find(TransferredResource.class, filter, Sorter.NONE,
+          new Sublist(0, selectedList.getIds().size()), new ArrayList<>());
         return results.getResults();
       }
       case SelectedItemsFilter<TransferredResource> selectedFilter -> {
         Long counter = index.count(TransferredResource.class, selectedFilter.getFilter());
-        IndexResult<TransferredResource> results = index.find(TransferredResource.class,
-          selectedFilter.getFilter(), Sorter.NONE, new Sublist(0, counter.intValue()), new ArrayList<>());
+        IndexResult<TransferredResource> results = index.find(TransferredResource.class, selectedFilter.getFilter(),
+          Sorter.NONE, new Sublist(0, counter.intValue()), new ArrayList<>());
         return results.getResults();
       }
       case null, default -> {
@@ -86,15 +86,15 @@ public class TransferredResourceService {
       "Could not execute delete transferred resources action");
   }
 
-  public String renameTransferredResource(IndexService index, String transferredResourceId, String newName, Boolean replaceExisting)
-    throws GenericException, RequestNotValidException, AlreadyExistsException, IsStillUpdatingException,
-    NotFoundException, AuthorizationDeniedException {
+  public String renameTransferredResource(IndexService index, String transferredResourceId, String newName,
+    Boolean replaceExisting) throws GenericException, RequestNotValidException, AlreadyExistsException,
+    IsStillUpdatingException, NotFoundException, AuthorizationDeniedException {
     List<String> resourceFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.TRANSFERRED_RESOURCE_FULLPATH,
       RodaConstants.TRANSFERRED_RESOURCE_PARENT_UUID);
 
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, transferredResourceId));
-    IndexResult<TransferredResource> resources = index.find(TransferredResource.class,
-      filter, Sorter.NONE, new Sublist(0, 1), resourceFields);
+    IndexResult<TransferredResource> resources = index.find(TransferredResource.class, filter, Sorter.NONE,
+      new Sublist(0, 1), resourceFields);
 
     if (!resources.getResults().isEmpty()) {
       TransferredResource resource = resources.getResults().getFirst();
@@ -115,8 +115,8 @@ public class TransferredResourceService {
     TransferredResourcesScanner scanner = RodaCoreFactory.getTransferredResourcesScanner();
     Optional<String> normalizedPath = scanner.updateTransferredResources(Optional.ofNullable(path), true);
     if (normalizedPath.isPresent()) {
-      return indexService.retrieve(TransferredResource.class,
-        IdUtils.getTransferredResourceUUID(normalizedPath.get()), Collections.emptyList());
+      return indexService.retrieve(TransferredResource.class, IdUtils.getTransferredResourceUUID(normalizedPath.get()),
+        Collections.emptyList());
     } else {
       return null;
     }

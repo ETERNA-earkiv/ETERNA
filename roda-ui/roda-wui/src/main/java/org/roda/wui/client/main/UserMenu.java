@@ -3,9 +3,8 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
-
 /**
  *
  */
@@ -126,7 +125,8 @@ public class UserMenu extends Composite {
       menu.addItem(userItem);
     }
 
-    MenuItem languageMenuItem = customMenuItem("fa fa-globe", selectedLanguage, "navigationMenu-item-label", languagesMenu, null);
+    MenuItem languageMenuItem = customMenuItem("fa fa-globe", selectedLanguage, "navigationMenu-item-label",
+      languagesMenu, null);
     languageMenuItem.addStyleName("navigationMenu-item-language");
     menu.addItem(languageMenuItem);
   }

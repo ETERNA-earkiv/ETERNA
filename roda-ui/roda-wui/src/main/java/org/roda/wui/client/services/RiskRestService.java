@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.services;
 
@@ -108,6 +108,6 @@ public interface RiskRestService extends RODAEntityRestService<IndexedRisk> {
   @RequestMapping(path = "/refresh", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @Operation(summary = "Refreshes risks", description = "Refreshes risks", responses = {
-          @ApiResponse(responseCode = "204", description = "No Content")})
+    @ApiResponse(responseCode = "204", description = "No Content")})
   Void refreshRisk();
 }

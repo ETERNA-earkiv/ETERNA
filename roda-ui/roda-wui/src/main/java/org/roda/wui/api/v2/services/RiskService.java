@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.api.v2.services;
 
@@ -112,18 +112,17 @@ public class RiskService {
       Collections.emptyMap(), "Could not execute risk delete action");
   }
 
-  public void updateRiskCounters(IndexService index)
-    throws GenericException, RequestNotValidException {
+  public void updateRiskCounters(IndexService index) throws GenericException, RequestNotValidException {
 
     IndexResult<RiskIncidence> findAllRiskIncidences = index.find(RiskIncidence.class, Filter.ALL, Sorter.NONE,
-            new Sublist(0, 0), new Facets(new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_RISK_ID)),
-            Arrays.asList(RodaConstants.INDEX_UUID));
+      new Sublist(0, 0), new Facets(new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_RISK_ID)),
+      Arrays.asList(RodaConstants.INDEX_UUID));
 
     Filter filter = new Filter(
-            new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_STATUS, IncidenceStatus.UNMITIGATED.toString()));
+      new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_STATUS, IncidenceStatus.UNMITIGATED.toString()));
     IndexResult<RiskIncidence> findNotMitigatedRiskIncidences = index.find(RiskIncidence.class, filter, Sorter.NONE,
-            new Sublist(0, 0), new Facets(new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_RISK_ID)),
-            Arrays.asList(RodaConstants.INDEX_UUID));
+      new Sublist(0, 0), new Facets(new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_RISK_ID)),
+      Arrays.asList(RodaConstants.INDEX_UUID));
 
     Map<String, IndexedRisk> allRisks = new HashMap<>();
 
@@ -135,7 +134,7 @@ public class RiskService {
         allRisks.put(indexedRisk.getId(), indexedRisk);
       }
     } catch (IOException e) {
-      //LOGGER.error("Error getting risks when updating counters", e);
+      // LOGGER.error("Error getting risks when updating counters", e);
     }
 
     // update risks from facets (all incidences)
@@ -148,7 +147,8 @@ public class RiskService {
         if (risk != null) {
           risk.setIncidencesCount((int) counter);
         } else {
-          //LOGGER.warn("Updating risk counters found incidences pointing to non-existing risk: {}", riskId);
+          // LOGGER.warn("Updating risk counters found incidences pointing to non-existing
+          // risk: {}", riskId);
         }
       }
     }
@@ -163,7 +163,8 @@ public class RiskService {
         if (risk != null) {
           risk.setUnmitigatedIncidencesCount((int) counter);
         } else {
-         // LOGGER.warn("Updating risk counters found incidences pointing to non-existing risk: {}", riskId);
+          // LOGGER.warn("Updating risk counters found incidences pointing to non-existing
+          // risk: {}", riskId);
         }
       }
     }
@@ -173,6 +174,7 @@ public class RiskService {
       index.reindexRisk(risk);
     }
   }
+
   public boolean hasRiskVersions(String riskId, ModelService modelService)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Optional<LiteRODAObject> liteRisk = LiteRODAObjectFactory.get(Risk.class, riskId);

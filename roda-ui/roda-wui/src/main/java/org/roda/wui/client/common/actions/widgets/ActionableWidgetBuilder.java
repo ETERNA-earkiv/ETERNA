@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.actions.widgets;
 
@@ -431,7 +431,8 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
       ActionButton<T> backButton = new ActionButton<>(
         new ActionableButton<>(messages.backButton(), null, ActionImpact.NONE, "fas fa-arrow-circle-left"));
       backButton.addClickHandler(event -> {
-        HistoryUtils.newHistory(MemberManagement.RESOLVER);});
+        HistoryUtils.newHistory(MemberManagement.RESOLVER);
+      });
       backButton.addStyleName("groupedActionableButtonBack");
       panel.add(backButton);
       addedButtonCount++;

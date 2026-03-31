@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 /**
  *
@@ -176,7 +176,7 @@ public class BreadcrumbPanel extends FlowPanel {
 
     /**
      * Set if this breadcrumb a root one. The root breadcrumb has a different style.
-     * 
+     *
      * @param root
      */
     public void setRoot(boolean root) {

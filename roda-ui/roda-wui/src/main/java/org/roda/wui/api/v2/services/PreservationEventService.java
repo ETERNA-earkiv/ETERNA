@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.api.v2.services;
 
@@ -258,8 +258,7 @@ public class PreservationEventService {
       }
 
       if (preservationEvent.getFileUUID() != null) {
-        IndexedFile file = indexService.retrieve(IndexedFile.class, preservationEvent.getFileUUID(),
-          new ArrayList<>());
+        IndexedFile file = indexService.retrieve(IndexedFile.class, preservationEvent.getFileUUID(), new ArrayList<>());
         fileId = file.getId();
         directoryFilePath = file.getPath();
       }

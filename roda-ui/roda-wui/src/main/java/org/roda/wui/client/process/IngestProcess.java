@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 /**
  *
@@ -90,7 +90,7 @@ public class IngestProcess extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  public static final String cardIdentifier="collapsable-ingest-process-card";
+  public static final String cardIdentifier = "collapsable-ingest-process-card";
 
   @UiField
   FlowPanel ingestProcessDescription;

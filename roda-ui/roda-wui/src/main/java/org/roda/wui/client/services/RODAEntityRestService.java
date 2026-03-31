@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.services;
 
@@ -60,9 +60,9 @@ public interface RODAEntityRestService<T extends IsIndexed> extends DirectRestSe
 
   @RequestMapping(path = "/suggest", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Returns a set of suggestions giving a query", description = "Returns a set of suggestions giving a query", responses = {
-      @ApiResponse(responseCode = "200", description = "List of suggestions", content = @Content(schema = @Schema(implementation = List.class))),
-      @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
-      @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+    @ApiResponse(responseCode = "200", description = "List of suggestions", content = @Content(schema = @Schema(implementation = List.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   List<String> suggest(
-      @RequestBody(description = "Suggest parameters", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SuggestRequest.class))) SuggestRequest suggestRequest);
+    @RequestBody(description = "Suggest parameters", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SuggestRequest.class))) SuggestRequest suggestRequest);
 }

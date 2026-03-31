@@ -1,0 +1,5 @@
+node_modules/
+dist/
+.vite/
+# Node binaries downloaded by frontend-maven-plugin
+node/
