@@ -2,6 +2,9 @@ import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { getAIP, getMetadataList, getMetadataHtml, type IndexedAIP, type DescriptiveMetadataInfo } from '../api/aips'
+import { api } from '../api/client'
+import type { IndexResult } from '../types'
+import { Pagination } from '../components/common/Pagination'
 import { findRepresentations, type IndexedRepresentation } from '../api/representations'
 import { findDIPs, type IndexedDIP } from '../api/dips'
 import { findPreservationEvents, type IndexedPreservationEvent } from '../api/preservation-events'
@@ -12,7 +15,7 @@ import { StatusBadge } from '../components/common/StatusBadge'
 import { DataTable, type Column } from '../components/common/DataTable'
 import { DigiTable, DigiLoaderSpinner, DigiNotificationAlert } from '@designsystem-se/af-react'
 
-type TabId = 'overview' | 'metadata' | 'files' | 'events' | 'dips'
+type TabId = 'overview' | 'metadata' | 'files' | 'events' | 'dips' | 'children'
 
 const TABS = [
   { id: 'overview' as TabId, label: 'Översikt' },
@@ -20,6 +23,7 @@ const TABS = [
   { id: 'files' as TabId, label: 'Filer' },
   { id: 'events' as TabId, label: 'Händelser' },
   { id: 'dips' as TabId, label: 'DIPs' },
+  { id: 'children' as TabId, label: 'Barn' },
 ]
 
 function formatSize(bytes: number): string {
@@ -387,6 +391,61 @@ function DIPsTab({ aipId }: { aipId: string }) {
   )
 }
 
+function ChildrenTab({ aipId }: { aipId: string }) {
+  const PAGE_SIZE = 20
+  const [page, setPage] = useState(0)
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['aip-children', aipId, page],
+    queryFn: () =>
+      api.post<IndexResult<{ id: string; title: string; level: string; state: string }>>('/aips/find', {
+        filter: {
+          filterParameters: [
+            { type: 'SimpleFilterParameter', name: 'parentID', value: aipId },
+          ],
+        },
+        sublist: { firstElementIndex: page * PAGE_SIZE, maximumElementCount: PAGE_SIZE },
+        sorter: { parameters: [{ name: 'title', descending: false }] },
+        facets: { parameters: {} },
+      }),
+  })
+
+  const children = data?.results ?? []
+  const totalCount = data?.totalCount ?? 0
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE)
+
+  const columns: Column<{ id: string; title: string; level: string; state: string }>[] = [
+    {
+      key: 'title',
+      header: 'Titel',
+      render: (child) => (
+        <Link
+          to={`/browse/${child.id}`}
+          style={{ color: 'var(--digi-color-primary, #006991)' }}
+        >
+          {child.title || child.id}
+        </Link>
+      ),
+    },
+    { key: 'level', header: 'Nivå', width: '120px', render: (c) => c.level },
+    { key: 'state', header: 'Status', width: '120px', render: (c) => <StatusBadge state={c.state} /> },
+  ]
+
+  return (
+    <>
+      <DataTable
+        columns={columns}
+        rows={children}
+        rowKey={(c) => c.id}
+        isLoading={isLoading}
+        error={error?.message ?? null}
+        emptyMessage="Inga underordnade arkivobjekt hittades"
+      />
+      <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+    </>
+  )
+}
+
 export function AIPDetail() {
   const { id } = useParams<{ id: string }>()
   const [activeTab, setActiveTab] = useState<TabId>('overview')
@@ -438,6 +497,7 @@ export function AIPDetail() {
       {activeTab === 'files' && <FilesTab aipId={id!} representations={representations} />}
       {activeTab === 'events' && <EventsTab aipId={id!} />}
       {activeTab === 'dips' && <DIPsTab aipId={id!} />}
+      {activeTab === 'children' && <ChildrenTab aipId={id!} />}
     </div>
   )
 }

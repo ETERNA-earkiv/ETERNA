@@ -292,7 +292,15 @@ export function DisposalPage() {
     <div>
       <h1 style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>Gallring</h1>
 
-      <TabBar tabs={TABS} activeTab={activeTab} onTabChange={(id) => setActiveTab(id as TabId)} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+        <TabBar tabs={TABS} activeTab={activeTab} onTabChange={(id) => setActiveTab(id as TabId)} />
+        <Link
+          to="/disposal/destroyed"
+          style={{ fontSize: '0.875rem', color: 'var(--digi-color-primary, #006991)', whiteSpace: 'nowrap', marginLeft: '1rem' }}
+        >
+          Förstörda poster →
+        </Link>
+      </div>
 
       {activeTab === 'schedules' && <SchedulesTab />}
       {activeTab === 'holds' && <HoldsTab />}

@@ -36,6 +36,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { to: '/jobs', label: 'Jobb' },
       { to: '/audit', label: 'Logg' },
+      { to: '/notifications', label: 'Notifieringar' },
       { to: '/management/users', label: 'Användare' },
     ],
   },

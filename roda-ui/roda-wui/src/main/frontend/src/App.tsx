@@ -28,6 +28,8 @@ import { DisposalScheduleDetail } from './pages/disposal/DisposalScheduleDetail'
 import { DisposalHoldDetail } from './pages/disposal/DisposalHoldDetail'
 import { DisposalConfirmationDetail } from './pages/disposal/DisposalConfirmationDetail'
 import { DisposalRuleDetail } from './pages/disposal/DisposalRuleDetail'
+import { NotificationsPage } from './pages/NotificationsPage'
+import { DestroyedRecordsPage } from './pages/disposal/DestroyedRecordsPage'
 
 export default function App() {
   return (
@@ -69,6 +71,8 @@ export default function App() {
             <Route path="disposal/holds/:holdId" element={<DisposalHoldDetail />} />
             <Route path="disposal/confirmations/:confirmationId" element={<DisposalConfirmationDetail />} />
             <Route path="disposal/rules/:ruleId" element={<DisposalRuleDetail />} />
+            <Route path="notifications" element={<NotificationsPage />} />
+            <Route path="disposal/destroyed" element={<DestroyedRecordsPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/browse" replace />} />
         </Routes>
