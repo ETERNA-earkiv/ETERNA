@@ -11,6 +11,7 @@ import { DIPDetail } from './pages/browse/DIPDetail'
 import { UserManagement } from './pages/UserManagement'
 import { IngestPage } from './pages/IngestPage'
 import { JobsPage } from './pages/JobsPage'
+import { JobDetail } from './pages/JobDetail'
 import { AuditLogPage } from './pages/AuditLogPage'
 import { PlanningPage } from './pages/planning/PlanningPage'
 import { RiskDetail } from './pages/planning/RiskDetail'
@@ -41,6 +42,7 @@ export default function App() {
             <Route path="browse/:aipId/representation/:repId/file/:fileId" element={<FileDetail />} />
             <Route path="ingest" element={<IngestPage />} />
             <Route path="jobs" element={<JobsPage />} />
+            <Route path="jobs/:jobId" element={<JobDetail />} />
             <Route path="audit" element={<AuditLogPage />} />
             <Route path="management/users" element={<UserManagement />} />
             <Route path="planning" element={<PlanningPage />} />

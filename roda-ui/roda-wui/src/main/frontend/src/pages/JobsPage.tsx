@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { useFindRequest } from '../hooks/useFindRequest'
 import { useInterval } from '../hooks/useInterval'
@@ -25,6 +26,7 @@ function formatProgress(job: IndexedJob): string {
 
 export function JobsPage() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   const { data: jobs, totalCount, isLoading, error, page, pageSize, setPage } =
@@ -50,7 +52,14 @@ export function JobsPage() {
     {
       key: 'name',
       header: t('label.name', 'Namn'),
-      render: (job) => <span style={{ fontSize: '0.875rem' }}>{job.name || job.plugin}</span>,
+      render: (job) => (
+        <button
+          onClick={() => navigate(`/jobs/${job.uuid}`)}
+          style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: 'var(--digi-color-primary, #006991)', fontSize: '0.875rem', textAlign: 'left' }}
+        >
+          {job.name || job.plugin}
+        </button>
+      ),
     },
     {
       key: 'state',

@@ -28,6 +28,49 @@ export function searchJobs(offset = 0, limit = 20): Promise<IndexResult<IndexedJ
   })
 }
 
+export function getJob(id: string): Promise<IndexedJob> {
+  return api.get<IndexedJob>(`/jobs/find/${id}`)
+}
+
 export function stopJob(id: string): Promise<void> {
   return api.put<void>(`/jobs/${id}/stop`, {})
+}
+
+export interface JobReport {
+  id: string
+  jobId: string
+  jobName: string
+  sourceObjectId: string
+  sourceObjectLabel: string
+  sourceObjectClass: string
+  outcomeObjectId: string
+  outcomeObjectLabel: string
+  outcomeObjectClass: string
+  dateCreated: string
+  dateUpdated: string
+  completionPercentage: number
+  stepsCompleted: number
+  totalSteps: number
+  successfulPlugins: number
+  unsuccessfulPlugins: number
+  pluginState: string
+  pluginDetails: string
+}
+
+export interface JobReports {
+  results: JobReport[]
+  totalCount: number
+  offset: number
+  limit: number
+}
+
+export function listJobReports(
+  jobId: string,
+  justFailed = false,
+  offset = 0,
+  limit = 20
+): Promise<JobReports> {
+  return api.get<JobReports>(
+    `/jobs/${jobId}/reports?justFailed=${justFailed}&start=${offset}&limit=${limit}`
+  )
 }
