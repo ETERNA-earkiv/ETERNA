@@ -9,6 +9,8 @@ import { RepresentationDetail } from './pages/browse/RepresentationDetail'
 import { FileDetail } from './pages/browse/FileDetail'
 import { DIPDetail } from './pages/browse/DIPDetail'
 import { UserManagement } from './pages/UserManagement'
+import { UserDetail } from './pages/management/UserDetail'
+import { GroupDetail } from './pages/management/GroupDetail'
 import { IngestPage } from './pages/IngestPage'
 import { JobsPage } from './pages/JobsPage'
 import { JobDetail } from './pages/JobDetail'
@@ -45,6 +47,8 @@ export default function App() {
             <Route path="jobs/:jobId" element={<JobDetail />} />
             <Route path="audit" element={<AuditLogPage />} />
             <Route path="management/users" element={<UserManagement />} />
+            <Route path="management/users/:username" element={<UserDetail />} />
+            <Route path="management/groups/:groupName" element={<GroupDetail />} />
             <Route path="planning" element={<PlanningPage />} />
             <Route path="planning/risks/:riskId" element={<RiskDetail />} />
             <Route path="disposal" element={<DisposalPage />} />

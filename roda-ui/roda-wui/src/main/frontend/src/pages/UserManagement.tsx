@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { DigiFormInputSearch } from '@designsystem-se/af-react'
 import { useFindRequest } from '../hooks/useFindRequest'
 import { DataTable, type Column } from '../components/common/DataTable'
@@ -51,7 +52,14 @@ export function UserManagement() {
     {
       key: 'name',
       header: t('label.name', 'Namn'),
-      render: (m) => <strong>{m.name}</strong>,
+      render: (m) => (
+        <Link
+          to={m.isUser ? `/management/users/${m.name}` : `/management/groups/${m.name}`}
+          style={{ color: 'var(--digi-color-primary, #006991)', fontWeight: 600 }}
+        >
+          {m.name}
+        </Link>
+      ),
     },
     {
       key: 'fullName',
