@@ -12,6 +12,10 @@ import { UserManagement } from './pages/UserManagement'
 import { IngestPage } from './pages/IngestPage'
 import { JobsPage } from './pages/JobsPage'
 import { AuditLogPage } from './pages/AuditLogPage'
+import { DisposalPage } from './pages/disposal/DisposalPage'
+import { DisposalScheduleDetail } from './pages/disposal/DisposalScheduleDetail'
+import { DisposalHoldDetail } from './pages/disposal/DisposalHoldDetail'
+import { DisposalConfirmationDetail } from './pages/disposal/DisposalConfirmationDetail'
 
 export default function App() {
   return (
@@ -37,6 +41,10 @@ export default function App() {
             <Route path="jobs" element={<JobsPage />} />
             <Route path="audit" element={<AuditLogPage />} />
             <Route path="management/users" element={<UserManagement />} />
+            <Route path="disposal" element={<DisposalPage />} />
+            <Route path="disposal/schedules/:scheduleId" element={<DisposalScheduleDetail />} />
+            <Route path="disposal/holds/:holdId" element={<DisposalHoldDetail />} />
+            <Route path="disposal/confirmations/:confirmationId" element={<DisposalConfirmationDetail />} />
           </Route>
           <Route path="*" element={<Navigate to="/browse" replace />} />
         </Routes>
