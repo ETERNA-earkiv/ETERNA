@@ -18,6 +18,7 @@ import { AuditLogPage } from './pages/AuditLogPage'
 import { StatisticsPage } from './pages/StatisticsPage'
 import { SearchPage } from './pages/SearchPage'
 import { ProfilePage } from './pages/ProfilePage'
+import { PreservationEventsPage } from './pages/PreservationEventsPage'
 import { PlanningPage } from './pages/planning/PlanningPage'
 import { RiskDetail } from './pages/planning/RiskDetail'
 import { RepInfoDetail } from './pages/planning/RepInfoDetail'
@@ -58,6 +59,7 @@ export default function App() {
             <Route path="management/groups/:groupName" element={<GroupDetail />} />
             <Route path="profile" element={<ProfilePage />} />
             <Route path="search" element={<SearchPage />} />
+            <Route path="preservation-events" element={<PreservationEventsPage />} />
             <Route path="planning" element={<PlanningPage />} />
             <Route path="planning/risks/:riskId" element={<RiskDetail />} />
             <Route path="planning/repinfo/:repInfoId" element={<RepInfoDetail />} />
