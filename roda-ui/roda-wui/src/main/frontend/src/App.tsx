@@ -12,6 +12,8 @@ import { UserManagement } from './pages/UserManagement'
 import { IngestPage } from './pages/IngestPage'
 import { JobsPage } from './pages/JobsPage'
 import { AuditLogPage } from './pages/AuditLogPage'
+import { PlanningPage } from './pages/planning/PlanningPage'
+import { RiskDetail } from './pages/planning/RiskDetail'
 import { DisposalPage } from './pages/disposal/DisposalPage'
 import { DisposalScheduleDetail } from './pages/disposal/DisposalScheduleDetail'
 import { DisposalHoldDetail } from './pages/disposal/DisposalHoldDetail'
@@ -41,6 +43,8 @@ export default function App() {
             <Route path="jobs" element={<JobsPage />} />
             <Route path="audit" element={<AuditLogPage />} />
             <Route path="management/users" element={<UserManagement />} />
+            <Route path="planning" element={<PlanningPage />} />
+            <Route path="planning/risks/:riskId" element={<RiskDetail />} />
             <Route path="disposal" element={<DisposalPage />} />
             <Route path="disposal/schedules/:scheduleId" element={<DisposalScheduleDetail />} />
             <Route path="disposal/holds/:holdId" element={<DisposalHoldDetail />} />

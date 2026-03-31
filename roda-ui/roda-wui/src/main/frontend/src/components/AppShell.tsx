@@ -32,6 +32,7 @@ export function AppShell() {
             {[
               { to: '/browse', label: 'Arkivobjekt' },
               { to: '/ingest', label: 'Ingest' },
+              { to: '/planning', label: 'Planering' },
               { to: '/disposal', label: 'Gallring' },
               { to: '/jobs', label: 'Jobb' },
               { to: '/audit', label: 'Logg' },
