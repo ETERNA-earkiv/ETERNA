@@ -189,7 +189,11 @@ function AgentsTab() {
     {
       key: 'name',
       header: 'Namn',
-      render: (a) => a.name,
+      render: (a) => (
+        <Link to={`/planning/agents/${a.id}`} style={{ color: 'var(--digi-color-primary, #006991)' }}>
+          {a.name}
+        </Link>
+      ),
     },
     {
       key: 'type',

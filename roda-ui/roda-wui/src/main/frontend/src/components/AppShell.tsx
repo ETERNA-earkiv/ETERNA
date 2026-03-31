@@ -1,4 +1,4 @@
-import { Outlet, NavLink, useNavigate } from 'react-router-dom'
+import { Outlet, NavLink, Link, useNavigate } from 'react-router-dom'
 import { DigiButton } from '@designsystem-se/af-react'
 import { useAuth } from './AuthProvider'
 import { logout } from '../api/auth'
@@ -31,6 +31,7 @@ export function AppShell() {
           <nav style={{ display: 'flex', gap: '1.5rem' }}>
             {[
               { to: '/statistics', label: 'Statistik' },
+              { to: '/search', label: 'Sök' },
               { to: '/browse', label: 'Arkivobjekt' },
               { to: '/ingest', label: 'Ingest' },
               { to: '/planning', label: 'Planering' },
@@ -55,9 +56,13 @@ export function AppShell() {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           {user && (
-            <span style={{ fontSize: '0.875rem' }}>
+            <Link
+              to="/profile"
+              style={{ color: 'white', fontSize: '0.875rem', textDecoration: 'none' }}
+              title="Min profil"
+            >
               {user.fullName || user.name}
-            </span>
+            </Link>
           )}
           <DigiButton
             afVariation="secondary"

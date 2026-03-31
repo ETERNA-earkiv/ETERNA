@@ -16,12 +16,17 @@ import { JobsPage } from './pages/JobsPage'
 import { JobDetail } from './pages/JobDetail'
 import { AuditLogPage } from './pages/AuditLogPage'
 import { StatisticsPage } from './pages/StatisticsPage'
+import { SearchPage } from './pages/SearchPage'
+import { ProfilePage } from './pages/ProfilePage'
 import { PlanningPage } from './pages/planning/PlanningPage'
 import { RiskDetail } from './pages/planning/RiskDetail'
+import { RepInfoDetail } from './pages/planning/RepInfoDetail'
+import { PreservationAgentDetail } from './pages/planning/PreservationAgentDetail'
 import { DisposalPage } from './pages/disposal/DisposalPage'
 import { DisposalScheduleDetail } from './pages/disposal/DisposalScheduleDetail'
 import { DisposalHoldDetail } from './pages/disposal/DisposalHoldDetail'
 import { DisposalConfirmationDetail } from './pages/disposal/DisposalConfirmationDetail'
+import { DisposalRuleDetail } from './pages/disposal/DisposalRuleDetail'
 
 export default function App() {
   return (
@@ -51,12 +56,17 @@ export default function App() {
             <Route path="management/users" element={<UserManagement />} />
             <Route path="management/users/:username" element={<UserDetail />} />
             <Route path="management/groups/:groupName" element={<GroupDetail />} />
+            <Route path="profile" element={<ProfilePage />} />
+            <Route path="search" element={<SearchPage />} />
             <Route path="planning" element={<PlanningPage />} />
             <Route path="planning/risks/:riskId" element={<RiskDetail />} />
+            <Route path="planning/repinfo/:repInfoId" element={<RepInfoDetail />} />
+            <Route path="planning/agents/:agentId" element={<PreservationAgentDetail />} />
             <Route path="disposal" element={<DisposalPage />} />
             <Route path="disposal/schedules/:scheduleId" element={<DisposalScheduleDetail />} />
             <Route path="disposal/holds/:holdId" element={<DisposalHoldDetail />} />
             <Route path="disposal/confirmations/:confirmationId" element={<DisposalConfirmationDetail />} />
+            <Route path="disposal/rules/:ruleId" element={<DisposalRuleDetail />} />
           </Route>
           <Route path="*" element={<Navigate to="/browse" replace />} />
         </Routes>
