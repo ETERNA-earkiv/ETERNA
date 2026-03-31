@@ -1,24 +1,26 @@
-import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import {
-  getAIP,
-  getRepresentations,
-  getMetadataList,
-  getMetadataHtml,
-  type IndexedAIP,
-  type Representation,
-  type DescriptiveMetadataInfo,
-} from '../api/aips'
+import { useState } from 'react'
+import { useParams, Link } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { getAIP, getMetadataList, getMetadataHtml, type IndexedAIP, type DescriptiveMetadataInfo } from '../api/aips'
+import { findRepresentations, type IndexedRepresentation } from '../api/representations'
+import { findDIPs, type IndexedDIP } from '../api/dips'
+import { findPreservationEvents, type IndexedPreservationEvent } from '../api/preservation-events'
 import { searchFiles, fileDownloadUrl, type IndexedFile } from '../api/files'
-import { DigiTable, DigiLoaderSpinner, DigiNotificationAlert, DigiButton } from '@designsystem-se/af-react'
+import { TabBar } from '../components/common/TabBar'
+import { Breadcrumb } from '../components/common/Breadcrumb'
+import { StatusBadge } from '../components/common/StatusBadge'
+import { DataTable, type Column } from '../components/common/DataTable'
+import { DigiTable, DigiLoaderSpinner, DigiNotificationAlert } from '@designsystem-se/af-react'
 
-type Tab = 'overview' | 'metadata' | 'files'
+type TabId = 'overview' | 'metadata' | 'files' | 'events' | 'dips'
 
-const TAB_LABELS: Record<Tab, string> = {
-  overview: 'Översikt',
-  metadata: 'Metadata',
-  files: 'Filer',
-}
+const TABS = [
+  { id: 'overview' as TabId, label: 'Översikt' },
+  { id: 'metadata' as TabId, label: 'Metadata' },
+  { id: 'files' as TabId, label: 'Filer' },
+  { id: 'events' as TabId, label: 'Händelser' },
+  { id: 'dips' as TabId, label: 'DIPs' },
+]
 
 function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`
@@ -26,51 +28,62 @@ function formatSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-function TabBar({ active, onChange }: { active: Tab; onChange: (t: Tab) => void }) {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        borderBottom: '2px solid #e0e0e0',
-        marginBottom: '1.5rem',
-        gap: '0',
-      }}
-    >
-      {(Object.keys(TAB_LABELS) as Tab[]).map((tab) => (
-        <button
-          key={tab}
-          onClick={() => onChange(tab)}
-          style={{
-            padding: '0.625rem 1.25rem',
-            border: 'none',
-            background: 'none',
-            cursor: 'pointer',
-            fontSize: '0.9375rem',
-            borderBottom: active === tab ? '2px solid var(--digi-color-primary, #006991)' : '2px solid transparent',
-            marginBottom: '-2px',
-            fontWeight: active === tab ? 600 : 400,
-            color: active === tab ? 'var(--digi-color-primary, #006991)' : '#555',
-          }}
-        >
-          {TAB_LABELS[tab]}
-        </button>
-      ))}
-    </div>
-  )
-}
+function OverviewTab({ aip, representations }: { aip: IndexedAIP; representations: IndexedRepresentation[] }) {
+  const aipId = aip.id
 
-function OverviewTab({ aip, representations }: { aip: IndexedAIP; representations: Representation[] }) {
-  const fields: Array<{ label: string; value: string | number | boolean | undefined | null }> = [
+  const fields = [
     { label: 'ID', value: aip.id },
     { label: 'Titel', value: aip.title },
     { label: 'Nivå', value: aip.level },
-    { label: 'Status', value: aip.state },
     { label: 'Skapad', value: aip.dateCreated ? new Date(aip.dateCreated).toLocaleString('sv-SE') : null },
     { label: 'Ändrad', value: aip.dateModified ? new Date(aip.dateModified).toLocaleString('sv-SE') : null },
-    { label: 'Har representationer', value: aip.hasRepresentations ? 'Ja' : 'Nej' },
-    { label: 'Antal filer (submission)', value: aip.numberOfSubmissionFiles },
-    { label: 'Antal filer (dokumentation)', value: aip.numberOfDocumentationFiles },
+    { label: 'Ingest-jobb', value: aip.ingestJobId },
     { label: 'Spärrat', value: aip.onHold ? 'Ja' : 'Nej' },
+    { label: 'Submission-filer', value: aip.numberOfSubmissionFiles },
+    { label: 'Dokumentationsfiler', value: aip.numberOfDocumentationFiles },
+  ]
+
+  const repColumns: Column<IndexedRepresentation>[] = [
+    {
+      key: 'id',
+      header: 'ID',
+      render: (r) => (
+        <Link
+          to={`/browse/${aipId}/representation/${r.uuid}`}
+          style={{ color: 'var(--digi-color-primary, #006991)', fontFamily: 'monospace', fontSize: '0.8rem' }}
+        >
+          {r.id}
+        </Link>
+      ),
+    },
+    {
+      key: 'type',
+      header: 'Typ',
+      render: (r) => r.type || '—',
+      width: '140px',
+    },
+    {
+      key: 'original',
+      header: 'Original',
+      render: (r) => (
+        <span style={{ color: r.original ? '#2d7a3a' : '#555' }}>
+          {r.original ? 'Ja' : 'Nej'}
+        </span>
+      ),
+      width: '80px',
+    },
+    {
+      key: 'files',
+      header: 'Filer',
+      render: (r) => r.numberOfDataFiles,
+      width: '70px',
+    },
+    {
+      key: 'size',
+      header: 'Storlek',
+      render: (r) => (r.sizeInBytes ? formatSize(r.sizeInBytes) : '—'),
+      width: '100px',
+    },
   ]
 
   return (
@@ -83,8 +96,8 @@ function OverviewTab({ aip, representations }: { aip: IndexedAIP; representation
               {fields.map(({ label, value }) =>
                 value !== null && value !== undefined ? (
                   <tr key={label}>
-                    <th style={{ width: '40%', textAlign: 'left' }}>{label}</th>
-                    <td>{String(value)}</td>
+                    <th style={{ width: '40%', textAlign: 'left', padding: '0.4rem' }}>{label}</th>
+                    <td style={{ padding: '0.4rem' }}>{String(value)}</td>
                   </tr>
                 ) : null
               )}
@@ -98,28 +111,12 @@ function OverviewTab({ aip, representations }: { aip: IndexedAIP; representation
           <h2 style={{ fontSize: '1.125rem', marginBottom: '0.75rem' }}>
             Representationer ({representations.length})
           </h2>
-          <DigiTable>
-            <table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Typ</th>
-                  <th>Original</th>
-                  <th>Antal filer</th>
-                </tr>
-              </thead>
-              <tbody>
-                {representations.map((rep) => (
-                  <tr key={rep.id}>
-                    <td style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{rep.id}</td>
-                    <td>{rep.type}</td>
-                    <td>{rep.original ? 'Ja' : 'Nej'}</td>
-                    <td>{rep.numberOfDataFiles}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </DigiTable>
+          <DataTable
+            columns={repColumns}
+            rows={representations}
+            rowKey={(r) => r.uuid}
+            emptyMessage="Inga representationer"
+          />
         </section>
       )}
     </>
@@ -127,36 +124,27 @@ function OverviewTab({ aip, representations }: { aip: IndexedAIP; representation
 }
 
 function MetadataTab({ aipId }: { aipId: string }) {
-  const [metadataList, setMetadataList] = useState<DescriptiveMetadataInfo[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [html, setHtml] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [htmlLoading, setHtmlLoading] = useState(false)
-  const [error, setError] = useState('')
 
-  useEffect(() => {
-    getMetadataList(aipId)
-      .then((res) => {
-        const list = res.metadataInfos ?? []
-        setMetadataList(list)
-        if (list.length > 0) setSelectedId(list[0].id)
-      })
-      .catch(() => setError('Kunde inte hämta metadata.'))
-      .finally(() => setLoading(false))
-  }, [aipId])
+  const { data: metadataListRes, isLoading, error } = useQuery({
+    queryKey: ['metadata-list', aipId],
+    queryFn: async () => {
+      const res = await getMetadataList(aipId)
+      return res.metadataInfos ?? []
+    },
+  })
 
-  useEffect(() => {
-    if (!selectedId) return
-    setHtmlLoading(true)
-    setHtml(null)
-    getMetadataHtml(aipId, selectedId)
-      .then(setHtml)
-      .catch(() => setHtml('<p>Kunde inte rendera metadata-HTML.</p>'))
-      .finally(() => setHtmlLoading(false))
-  }, [aipId, selectedId])
+  const metadataList: DescriptiveMetadataInfo[] = metadataListRes ?? []
+  const activeId = selectedId ?? metadataList[0]?.id ?? null
 
-  if (loading) return <div style={{ textAlign: 'center', padding: '2rem' }}><DigiLoaderSpinner /></div>
-  if (error) return <DigiNotificationAlert afVariation="danger" afHeading="Fel">{error}</DigiNotificationAlert>
+  const { data: html, isLoading: htmlLoading } = useQuery({
+    queryKey: ['metadata-html', aipId, activeId],
+    queryFn: () => getMetadataHtml(aipId, activeId!),
+    enabled: !!activeId,
+  })
+
+  if (isLoading) return <div style={{ textAlign: 'center', padding: '2rem' }}><DigiLoaderSpinner /></div>
+  if (error) return <DigiNotificationAlert afVariation="danger" afHeading="Fel">Kunde inte hämta metadata.</DigiNotificationAlert>
   if (metadataList.length === 0) return <p style={{ color: '#666' }}>Ingen beskrivande metadata hittades.</p>
 
   return (
@@ -170,10 +158,10 @@ function MetadataTab({ aipId }: { aipId: string }) {
               style={{
                 padding: '0.375rem 0.875rem',
                 border: '1px solid',
-                borderColor: selectedId === m.id ? 'var(--digi-color-primary, #006991)' : '#ccc',
+                borderColor: activeId === m.id ? 'var(--digi-color-primary, #006991)' : '#ccc',
                 borderRadius: '4px',
-                background: selectedId === m.id ? 'var(--digi-color-primary, #006991)' : 'white',
-                color: selectedId === m.id ? 'white' : '#333',
+                background: activeId === m.id ? 'var(--digi-color-primary, #006991)' : 'white',
+                color: activeId === m.id ? 'white' : '#333',
                 cursor: 'pointer',
                 fontSize: '0.875rem',
               }}
@@ -184,10 +172,10 @@ function MetadataTab({ aipId }: { aipId: string }) {
         </div>
       )}
 
-      {selectedId && (
+      {activeId && (
         <div style={{ marginBottom: '0.75rem', fontSize: '0.875rem' }}>
           <a
-            href={`/api/v2/aips/${aipId}/metadata/descriptive/${selectedId}/download`}
+            href={`/api/v2/aips/${aipId}/metadata/descriptive/${activeId}/download`}
             style={{ color: 'var(--digi-color-primary, #006991)' }}
           >
             Ladda ned XML
@@ -209,94 +197,70 @@ function MetadataTab({ aipId }: { aipId: string }) {
   )
 }
 
-function FilesTab({ representations }: { representations: Representation[] }) {
+function FilesTab({ aipId, representations }: { aipId: string; representations: IndexedRepresentation[] }) {
   const [expandedRep, setExpandedRep] = useState<string | null>(null)
-  const [filesMap, setFilesMap] = useState<Record<string, IndexedFile[]>>({})
-  const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>({})
+
+  const { data: filesData } = useQuery({
+    queryKey: ['files', expandedRep],
+    queryFn: () => searchFiles(expandedRep!),
+    enabled: !!expandedRep,
+  })
 
   function toggleRep(repId: string) {
-    if (expandedRep === repId) {
-      setExpandedRep(null)
-      return
-    }
-    setExpandedRep(repId)
-    if (filesMap[repId]) return
-    setLoadingMap((prev) => ({ ...prev, [repId]: true }))
-    searchFiles(repId)
-      .then((result) => setFilesMap((prev) => ({ ...prev, [repId]: result.results ?? [] })))
-      .finally(() => setLoadingMap((prev) => ({ ...prev, [repId]: false })))
+    setExpandedRep((prev) => (prev === repId ? null : repId))
   }
 
-  if (representations.length === 0) {
-    return <p style={{ color: '#666' }}>Inga representationer hittades.</p>
-  }
+  if (representations.length === 0) return <p style={{ color: '#666' }}>Inga representationer hittades.</p>
 
   return (
     <div>
       {representations.map((rep) => (
         <div key={rep.id} style={{ marginBottom: '1rem', border: '1px solid #e0e0e0', borderRadius: '4px' }}>
           <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '0.75rem 1rem',
-              background: '#f8f8f8',
-              cursor: 'pointer',
-            }}
-            onClick={() => toggleRep(rep.id)}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1rem', background: '#f8f8f8', cursor: 'pointer' }}
+            onClick={() => toggleRep(rep.uuid)}
           >
             <div>
-              <strong style={{ fontSize: '0.875rem' }}>{rep.type || rep.id}</strong>
-              {rep.original && (
-                <span style={{ marginLeft: '0.5rem', fontSize: '0.8rem', color: '#2d7a3a' }}>
-                  (Original)
-                </span>
-              )}
-              <span style={{ marginLeft: '0.75rem', fontSize: '0.8rem', color: '#666' }}>
-                {rep.numberOfDataFiles} filer
-              </span>
+              <Link
+                to={`/browse/${aipId}/representation/${rep.uuid}`}
+                style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--digi-color-primary, #006991)' }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {rep.type || rep.id}
+              </Link>
+              {rep.original && <span style={{ marginLeft: '0.5rem', fontSize: '0.8rem', color: '#2d7a3a' }}>(Original)</span>}
+              <span style={{ marginLeft: '0.75rem', fontSize: '0.8rem', color: '#666' }}>{rep.numberOfDataFiles} filer</span>
             </div>
-            <span style={{ color: '#666', fontSize: '0.875rem' }}>
-              {expandedRep === rep.id ? '▲' : '▼'}
-            </span>
+            <span style={{ color: '#666', fontSize: '0.875rem' }}>{expandedRep === rep.uuid ? '▲' : '▼'}</span>
           </div>
 
-          {expandedRep === rep.id && (
+          {expandedRep === rep.uuid && (
             <div style={{ padding: '0.75rem 1rem' }}>
-              {loadingMap[rep.id] ? (
+              {!filesData ? (
                 <div style={{ textAlign: 'center', padding: '1rem' }}><DigiLoaderSpinner /></div>
-              ) : (filesMap[rep.id] ?? []).length === 0 ? (
+              ) : (filesData?.results ?? []).length === 0 ? (
                 <p style={{ color: '#666', fontSize: '0.875rem' }}>Inga filer hittades.</p>
               ) : (
                 <DigiTable>
                   <table>
                     <thead>
-                      <tr>
-                        <th>Filnamn</th>
-                        <th>Sökväg</th>
-                        <th>Storlek</th>
-                        <th>Format</th>
-                        <th></th>
-                      </tr>
+                      <tr><th>Filnamn</th><th>Sökväg</th><th>Storlek</th><th>Format</th><th></th></tr>
                     </thead>
                     <tbody>
-                      {(filesMap[rep.id] ?? []).map((file) => (
+                      {(filesData?.results ?? []).map((file: IndexedFile) => (
                         <tr key={file.uuid}>
-                          <td style={{ fontSize: '0.875rem' }}>{file.fileId}</td>
-                          <td style={{ fontSize: '0.8rem', color: '#666' }}>
-                            {file.path?.join('/') || '—'}
+                          <td style={{ fontSize: '0.875rem' }}>
+                            <Link
+                              to={`/browse/${aipId}/representation/${rep.uuid}/file/${file.uuid}`}
+                              style={{ color: 'var(--digi-color-primary, #006991)' }}
+                            >
+                              {file.fileId}
+                            </Link>
                           </td>
+                          <td style={{ fontSize: '0.8rem', color: '#666' }}>{file.path?.join('/') || '—'}</td>
                           <td style={{ fontSize: '0.8rem' }}>{formatSize(file.size)}</td>
                           <td style={{ fontSize: '0.8rem' }}>{file.fileFormat || '—'}</td>
-                          <td>
-                            <a
-                              href={fileDownloadUrl(file.uuid)}
-                              style={{ fontSize: '0.8rem', color: 'var(--digi-color-primary, #006991)' }}
-                            >
-                              Ladda ned
-                            </a>
-                          </td>
+                          <td><a href={fileDownloadUrl(file.uuid)} style={{ fontSize: '0.8rem', color: 'var(--digi-color-primary, #006991)' }}>Ladda ned</a></td>
                         </tr>
                       ))}
                     </tbody>
@@ -311,90 +275,147 @@ function FilesTab({ representations }: { representations: Representation[] }) {
   )
 }
 
+function EventsTab({ aipId }: { aipId: string }) {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['preservation-events', aipId],
+    queryFn: () => findPreservationEvents({ aipId }, 0, 50),
+  })
+
+  const events = data?.results ?? []
+
+  const columns: Column<IndexedPreservationEvent>[] = [
+    {
+      key: 'datetime',
+      header: 'Tidpunkt',
+      render: (e) => <span style={{ fontSize: '0.8rem' }}>{new Date(e.eventDateTime).toLocaleString('sv-SE')}</span>,
+      width: '160px',
+    },
+    {
+      key: 'type',
+      header: 'Händelsetyp',
+      render: (e) => e.eventType,
+    },
+    {
+      key: 'outcome',
+      header: 'Utfall',
+      render: (e) => <StatusBadge state={e.eventOutcome} />,
+      width: '120px',
+    },
+    {
+      key: 'detail',
+      header: 'Detalj',
+      render: (e) => <span style={{ fontSize: '0.8rem', color: '#555' }}>{e.eventOutcomeDetailNote || '—'}</span>,
+    },
+  ]
+
+  return (
+    <DataTable
+      columns={columns}
+      rows={events}
+      rowKey={(e) => e.id}
+      isLoading={isLoading}
+      error={error?.message ?? null}
+      emptyMessage="Inga händelser hittades"
+      summary={!isLoading && events.length > 0 ? `${data?.totalCount ?? 0} händelser totalt` : undefined}
+    />
+  )
+}
+
+function DIPsTab({ aipId }: { aipId: string }) {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['dips', aipId],
+    queryFn: () => findDIPs(aipId),
+  })
+
+  const dips = data?.results ?? []
+
+  const columns: Column<IndexedDIP>[] = [
+    {
+      key: 'title',
+      header: 'Titel',
+      render: (d) => (
+        <Link to={`/browse/dip/${d.uuid}`} style={{ color: 'var(--digi-color-primary, #006991)' }}>
+          {d.title || d.uuid}
+        </Link>
+      ),
+    },
+    {
+      key: 'type',
+      header: 'Typ',
+      render: (d) => d.type || '—',
+      width: '120px',
+    },
+    {
+      key: 'created',
+      header: 'Skapad',
+      render: (d) => (d.dateCreated ? new Date(d.dateCreated).toLocaleDateString('sv-SE') : '—'),
+      width: '120px',
+    },
+  ]
+
+  return (
+    <DataTable
+      columns={columns}
+      rows={dips}
+      rowKey={(d) => d.uuid}
+      isLoading={isLoading}
+      error={error?.message ?? null}
+      emptyMessage="Inga DIPs hittades"
+    />
+  )
+}
+
 export function AIPDetail() {
   const { id } = useParams<{ id: string }>()
-  const navigate = useNavigate()
-  const [aip, setAip] = useState<IndexedAIP | null>(null)
-  const [representations, setRepresentations] = useState<Representation[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [tab, setTab] = useState<Tab>('overview')
+  const [activeTab, setActiveTab] = useState<TabId>('overview')
 
-  useEffect(() => {
-    if (!id) return
-    setLoading(true)
-    Promise.all([getAIP(id), getRepresentations(id)])
-      .then(([aipData, repsResult]) => {
-        setAip(aipData)
-        setRepresentations(repsResult.results ?? [])
-      })
-      .catch(() => setError('Kunde inte hämta arkivobjektet.'))
-      .finally(() => setLoading(false))
-  }, [id])
+  const { data: aip, isLoading: aipLoading, error: aipError } = useQuery({
+    queryKey: ['aip', id],
+    queryFn: () => getAIP(id!),
+    enabled: !!id,
+  })
 
-  if (loading) {
-    return (
-      <div style={{ textAlign: 'center', padding: '4rem' }}>
-        <DigiLoaderSpinner />
-      </div>
-    )
+  const { data: repsResult } = useQuery({
+    queryKey: ['representations', id],
+    queryFn: () => findRepresentations(id!),
+    enabled: !!id,
+  })
+
+  const representations: IndexedRepresentation[] = repsResult?.results ?? []
+
+  if (aipLoading) {
+    return <div style={{ textAlign: 'center', padding: '4rem' }}><DigiLoaderSpinner /></div>
   }
 
-  if (error || !aip) {
+  if (aipError || !aip) {
     return (
       <DigiNotificationAlert afVariation="danger" afHeading="Fel">
-        {error || 'Arkivobjektet hittades inte.'}
+        {aipError?.message || 'Arkivobjektet hittades inte.'}
       </DigiNotificationAlert>
     )
   }
 
   return (
     <div>
-      <nav style={{ marginBottom: '1rem', fontSize: '0.875rem' }}>
-        <DigiButton
-          afVariation="tertiary"
-          onAfOnClick={() => navigate('/browse')}
-          style={{ padding: 0 }}
-        >
-          Arkivobjekt
-        </DigiButton>
-        <span style={{ margin: '0 0.5rem', color: '#555' }}>›</span>
-        <span>{aip.title || aip.id}</span>
-      </nav>
+      <Breadcrumb
+        items={[
+          { label: 'Arkivobjekt', to: '/browse' },
+          { label: aip.title || aip.id },
+        ]}
+      />
 
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          marginBottom: '1.5rem',
-        }}
-      >
-        <h1>{aip.title || aip.id}</h1>
-        <span
-          style={{
-            padding: '0.25rem 0.75rem',
-            borderRadius: '2px',
-            fontSize: '0.875rem',
-            background: aip.state === 'ACTIVE' ? '#e6f4ea' : '#fce8e6',
-            color: aip.state === 'ACTIVE' ? '#2d7a3a' : '#c5221f',
-          }}
-        >
-          {aip.state}
-        </span>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+        <h1 style={{ margin: 0 }}>{aip.title || aip.id}</h1>
+        <StatusBadge state={aip.state} />
       </div>
 
-      <TabBar active={tab} onChange={setTab} />
+      <TabBar tabs={TABS} activeTab={activeTab} onTabChange={(id) => setActiveTab(id as TabId)} />
 
-      {tab === 'overview' && (
-        <OverviewTab aip={aip} representations={representations} />
-      )}
-      {tab === 'metadata' && id && (
-        <MetadataTab aipId={id} />
-      )}
-      {tab === 'files' && (
-        <FilesTab representations={representations} />
-      )}
+      {activeTab === 'overview' && <OverviewTab aip={aip} representations={representations} />}
+      {activeTab === 'metadata' && id && <MetadataTab aipId={id} />}
+      {activeTab === 'files' && <FilesTab aipId={id!} representations={representations} />}
+      {activeTab === 'events' && <EventsTab aipId={id!} />}
+      {activeTab === 'dips' && <DIPsTab aipId={id!} />}
     </div>
   )
 }

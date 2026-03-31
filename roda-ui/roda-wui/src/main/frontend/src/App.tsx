@@ -5,6 +5,9 @@ import { AppShell } from './components/AppShell'
 import { Login } from './pages/Login'
 import { BrowseAIPs } from './pages/BrowseAIPs'
 import { AIPDetail } from './pages/AIPDetail'
+import { RepresentationDetail } from './pages/browse/RepresentationDetail'
+import { FileDetail } from './pages/browse/FileDetail'
+import { DIPDetail } from './pages/browse/DIPDetail'
 import { UserManagement } from './pages/UserManagement'
 import { IngestPage } from './pages/IngestPage'
 import { JobsPage } from './pages/JobsPage'
@@ -26,7 +29,10 @@ export default function App() {
           >
             <Route index element={<Navigate to="/browse" replace />} />
             <Route path="browse" element={<BrowseAIPs />} />
-            <Route path="browse/:id" element={<AIPDetail />} />
+            <Route path="browse/dip/:dipId" element={<DIPDetail />} />
+            <Route path="browse/:aipId" element={<AIPDetail />} />
+            <Route path="browse/:aipId/representation/:repId" element={<RepresentationDetail />} />
+            <Route path="browse/:aipId/representation/:repId/file/:fileId" element={<FileDetail />} />
             <Route path="ingest" element={<IngestPage />} />
             <Route path="jobs" element={<JobsPage />} />
             <Route path="audit" element={<AuditLogPage />} />
