@@ -17,7 +17,7 @@ export function searchFiles(
   offset = 0,
   limit = 100
 ): Promise<IndexResult<IndexedFile>> {
-  return api.post<IndexResult<IndexedFile>>('/files', {
+  return api.post<IndexResult<IndexedFile>>('/files/find', {
     filter: {
       filterParameters: [
         { type: 'SimpleFilterParameter', name: 'representationUUID', value: representationUuid },

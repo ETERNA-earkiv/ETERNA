@@ -31,7 +31,7 @@ export function JobsPage() {
 
   const { data: jobs, totalCount, isLoading, error, page, pageSize, setPage } =
     useFindRequest<IndexedJob>({
-      endpoint: '/jobs',
+      endpoint: '/jobs/find',
       queryKey: 'jobs',
       defaultSort: [{ name: 'startDate', descending: true }],
     })

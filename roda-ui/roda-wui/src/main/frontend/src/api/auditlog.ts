@@ -19,7 +19,7 @@ export function searchLogs(query: string, offset = 0, limit = 20): Promise<Index
     filterParameters.push({ type: 'SimpleFilterParameter', name: 'fulltext', value: query })
   }
 
-  return api.post<IndexResult<LogEntry>>('/audit-logs', {
+  return api.post<IndexResult<LogEntry>>('/audit-logs/find', {
     filter: { filterParameters },
     sublist: { firstElementIndex: offset, maximumElementCount: limit },
     sorter: { parameters: [{ name: 'datetime', descending: true }] },

@@ -19,7 +19,7 @@ export interface IndexedJob {
 }
 
 export function searchJobs(offset = 0, limit = 20): Promise<IndexResult<IndexedJob>> {
-  return api.post<IndexResult<IndexedJob>>('/jobs', {
+  return api.post<IndexResult<IndexedJob>>('/jobs/find', {
     filter: { filterParameters: [] },
     sublist: { firstElementIndex: offset, maximumElementCount: limit },
     sorter: { parameters: [{ name: 'startDate', descending: true }] },
