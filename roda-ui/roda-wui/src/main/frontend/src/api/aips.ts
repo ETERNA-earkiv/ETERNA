@@ -6,17 +6,28 @@ export type { FacetValue, FacetResult, IndexResult, FindRequest }
 export interface IndexedAIP {
   id: string
   title: string
+  description: string | null
   dateCreated: string
   dateModified: string
+  dateInitial: string | null
+  dateFinal: string | null
   level: string
   state: string
+  parentID: string | null
+  ancestors: string[]
   hasRepresentations: boolean
   numberOfSubmissionFiles: number
   numberOfDocumentationFiles: number
   numberOfSchemasFiles: number
-  ingestJobId: string
+  numberOfSchemasFiles2: number
+  ingestJobId: string | null
   ghost: boolean
   onHold: boolean
+  disposalScheduleId: string | null
+  disposalScheduleName: string | null
+  disposalAction: string | null
+  disposalHoldsId: string[]
+  disposalConfirmationId: string | null
 }
 
 

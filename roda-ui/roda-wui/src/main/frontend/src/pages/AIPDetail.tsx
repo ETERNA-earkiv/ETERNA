@@ -34,13 +34,35 @@ function OverviewTab({ aip, representations }: { aip: IndexedAIP; representation
   const fields = [
     { label: 'ID', value: aip.id },
     { label: 'Titel', value: aip.title },
+    { label: 'Beskrivning', value: aip.description },
     { label: 'Nivå', value: aip.level },
+    {
+      label: 'Förälder',
+      value: aip.parentID ? (
+        <Link to={`/browse/${aip.parentID}`} style={{ color: 'var(--digi-color-primary, #006991)', fontFamily: 'monospace', fontSize: '0.85rem' }}>
+          {aip.parentID}
+        </Link>
+      ) : null,
+    },
     { label: 'Skapad', value: aip.dateCreated ? new Date(aip.dateCreated).toLocaleString('sv-SE') : null },
     { label: 'Ändrad', value: aip.dateModified ? new Date(aip.dateModified).toLocaleString('sv-SE') : null },
-    { label: 'Ingest-jobb', value: aip.ingestJobId },
+    { label: 'Ingest-jobb', value: aip.ingestJobId ? (
+      <Link to={`/jobs/${aip.ingestJobId}`} style={{ color: 'var(--digi-color-primary, #006991)', fontFamily: 'monospace', fontSize: '0.85rem' }}>
+        {aip.ingestJobId}
+      </Link>
+    ) : null },
     { label: 'Spärrat', value: aip.onHold ? 'Ja' : 'Nej' },
     { label: 'Submission-filer', value: aip.numberOfSubmissionFiles },
     { label: 'Dokumentationsfiler', value: aip.numberOfDocumentationFiles },
+    {
+      label: 'Gallringsplan',
+      value: aip.disposalScheduleId ? (
+        <Link to={`/disposal/schedules/${aip.disposalScheduleId}`} style={{ color: 'var(--digi-color-primary, #006991)' }}>
+          {aip.disposalScheduleName || aip.disposalScheduleId}
+        </Link>
+      ) : null,
+    },
+    { label: 'Gallringsåtgärd', value: aip.disposalAction },
   ]
 
   const repColumns: Column<IndexedRepresentation>[] = [
