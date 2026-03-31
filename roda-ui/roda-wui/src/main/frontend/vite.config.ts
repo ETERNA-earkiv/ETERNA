@@ -6,6 +6,15 @@ export default defineConfig({
   build: {
     outDir: '../resources/static',
     emptyOutDir: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-query': ['@tanstack/react-query'],
+          'vendor-digi': ['@designsystem-se/af-react', '@designsystem-se/af'],
+        },
+      },
+    },
   },
   server: {
     port: 3000,
