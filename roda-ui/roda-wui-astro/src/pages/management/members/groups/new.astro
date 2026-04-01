@@ -1,0 +1,18 @@
+---
+import AdminLayout from "@/components/layout/AdminLayout.astro";
+import GroupForm from "@/components/management/GroupForm.tsx";
+
+const breadcrumb = [
+  { label: "Administration", href: "/management" },
+  { label: "Users and groups", href: "/management/members" },
+  { label: "New group" },
+];
+---
+<AdminLayout title="New group" breadcrumb={breadcrumb}>
+  <div class="space-y-6">
+    <h1 class="text-2xl font-bold text-gray-800">New group</h1>
+    <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+      <GroupForm client:load />
+    </div>
+  </div>
+</AdminLayout>

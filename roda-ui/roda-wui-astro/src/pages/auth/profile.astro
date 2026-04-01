@@ -25,7 +25,9 @@ const user = Astro.locals.user;
           <dd class="text-gray-800">{user.groups.join(", ") || "—"}</dd>
         </div>
       </dl>
-      <!-- TODO: UserForm island (Phase 3) -->
+      <div class="mt-6 pt-6 border-t border-gray-100">
+        <a href={`/management/members/users/${user.id}`} class="text-sm text-blue-600 hover:underline">Edit profile</a>
+      </div>
     </div>
   )}
 </AdminLayout>

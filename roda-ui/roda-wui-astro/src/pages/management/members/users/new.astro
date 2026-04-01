@@ -1,0 +1,18 @@
+---
+import AdminLayout from "@/components/layout/AdminLayout.astro";
+import UserForm from "@/components/management/UserForm.tsx";
+
+const breadcrumb = [
+  { label: "Administration", href: "/management" },
+  { label: "Users and groups", href: "/management/members" },
+  { label: "New user" },
+];
+---
+<AdminLayout title="New user" breadcrumb={breadcrumb}>
+  <div class="space-y-6">
+    <h1 class="text-2xl font-bold text-gray-800">New user</h1>
+    <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+      <UserForm client:load />
+    </div>
+  </div>
+</AdminLayout>

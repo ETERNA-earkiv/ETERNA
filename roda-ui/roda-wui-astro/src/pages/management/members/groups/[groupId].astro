@@ -1,0 +1,40 @@
+---
+import AdminLayout from "@/components/layout/AdminLayout.astro";
+import GroupForm from "@/components/management/GroupForm.tsx";
+import { apiGet } from "@/lib/api/client";
+
+const { groupId } = Astro.params;
+const cookieHeader = Astro.request.headers.get("cookie") ?? undefined;
+
+interface RodaGroup {
+  id: string;
+  name: string;
+  fullname?: string;
+}
+
+let group: RodaGroup | null = null;
+try {
+  group = await apiGet<RodaGroup>(`/members/groups/${groupId}`, { cookie: cookieHeader });
+} catch (e: unknown) {
+  if ((e as { status?: number }).status === 404 || (e as { status?: number }).status === 403) {
+    return Astro.redirect("/management/members");
+  }
+  throw e;
+}
+
+if (!group) return Astro.redirect("/management/members");
+
+const breadcrumb = [
+  { label: "Administration", href: "/management" },
+  { label: "Users and groups", href: "/management/members" },
+  { label: group.name },
+];
+---
+<AdminLayout title={group.name} breadcrumb={breadcrumb}>
+  <div class="space-y-6">
+    <h1 class="text-2xl font-bold text-gray-800">{group.name}</h1>
+    <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+      <GroupForm groupId={groupId} client:load />
+    </div>
+  </div>
+</AdminLayout>
