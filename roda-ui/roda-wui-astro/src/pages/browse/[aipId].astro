@@ -1,18 +1,10 @@
 ---
 import AdminLayout from "@/components/layout/AdminLayout.astro";
+import RepresentationList from "@/components/browse/RepresentationList.tsx";
 import { apiGet } from "@/lib/api/client";
 
 const { aipId } = Astro.params;
 const cookieHeader = Astro.request.headers.get("cookie") ?? undefined;
-
-interface AIP {
-  id: string;
-  title?: string;
-  level?: string;
-  state?: string;
-  parentId?: string;
-  permissions?: { users?: string[]; groups?: string[] };
-}
 
 interface DescriptiveMetadataInfo {
   id: string;
@@ -20,9 +12,18 @@ interface DescriptiveMetadataInfo {
   version?: string;
 }
 
+interface AIP {
+  id: string;
+  title?: string;
+  level?: string;
+  state?: string;
+  parentId?: string;
+  dateInitial?: string;
+  dateFinal?: string;
+}
+
 let aip: AIP | null = null;
 let metadata: DescriptiveMetadataInfo[] = [];
-let notFound = false;
 
 try {
   aip = await apiGet<AIP>(`/aips/find/${aipId}`, { cookie: cookieHeader });
@@ -30,97 +31,128 @@ try {
     `/aips/${aipId}/metadata/descriptive/information`,
     { cookie: cookieHeader },
   ).catch(() => ({ metadataList: [] }));
-  metadata = metaRes.metadataList ?? [];
+  metadata = metaRes?.metadataList ?? [];
 } catch (e: unknown) {
-  if ((e as { status?: number }).status === 404) {
-    notFound = true;
-  } else {
-    throw e;
+  if ((e as { status?: number }).status === 404 || (e as { status?: number }).status === 403) {
+    return Astro.redirect("/browse");
   }
+  throw e;
 }
 
-if (notFound) {
-  return Astro.redirect("/404");
-}
+if (!aip) return Astro.redirect("/browse");
 
-const title = aip?.title ?? aipId ?? "AIP";
+const title = aip.title ?? aipId ?? "AIP";
 const breadcrumb = [
   { label: "Browse", href: "/browse" },
   { label: title },
 ];
 ---
 <AdminLayout title={title} breadcrumb={breadcrumb}>
-  {aip && (
-    <div class="space-y-6">
-      <!-- AIP Header -->
-      <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-        <div class="flex items-start justify-between">
-          <div>
-            <h1 class="text-2xl font-bold text-gray-800">{title}</h1>
-            <div class="mt-2 flex items-center gap-3 text-sm text-gray-500">
-              {aip.level && (
-                <span class="px-2 py-0.5 bg-gray-100 rounded-full">{aip.level}</span>
-              )}
-              {aip.state && (
-                <span class={`px-2 py-0.5 rounded-full ${aip.state === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
-                  {aip.state}
-                </span>
-              )}
-              <span class="font-mono text-xs text-gray-400">{aip.id}</span>
-            </div>
+  <div class="space-y-6">
+    <!-- AIP Header -->
+    <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+      <div class="flex items-start justify-between gap-4">
+        <div class="min-w-0">
+          <h1 class="text-2xl font-bold text-gray-800 truncate">{title}</h1>
+          <div class="mt-2 flex flex-wrap items-center gap-3 text-sm text-gray-500">
+            {aip.level && (
+              <span class="px-2 py-0.5 bg-gray-100 rounded-full text-xs">{aip.level}</span>
+            )}
+            {aip.state && (
+              <span class={`px-2 py-0.5 rounded-full text-xs ${aip.state === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+                {aip.state}
+              </span>
+            )}
+            {aip.dateInitial && (
+              <span class="text-xs">{new Date(aip.dateInitial).toLocaleDateString()}</span>
+            )}
+            {aip.dateFinal && aip.dateFinal !== aip.dateInitial && (
+              <span class="text-xs">— {new Date(aip.dateFinal).toLocaleDateString()}</span>
+            )}
+            <span class="font-mono text-xs text-gray-300">{aip.id}</span>
           </div>
-          <div class="flex gap-2">
-            <a href={`/api/v2/aips/${aipId}/download`} class="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50 flex items-center gap-1">
-              ↓ Download
+        </div>
+        <div class="flex gap-2 shrink-0">
+          {aip.parentId && (
+            <a href={`/browse/${aip.parentId}`} class="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50">
+              ↑ Parent
             </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Descriptive Metadata -->
-      {metadata.length > 0 && (
-        <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
-          <div class="px-6 py-4 border-b border-gray-100">
-            <h2 class="text-lg font-semibold text-gray-700">Descriptive Metadata</h2>
-          </div>
-          <div class="divide-y divide-gray-100">
-            {metadata.map((m) => (
-              <div class="px-6 py-4 flex items-center justify-between">
-                <div>
-                  <span class="font-medium text-gray-800">{m.type}</span>
-                  {m.version && <span class="ml-2 text-sm text-gray-400">v{m.version}</span>}
-                </div>
-                <div class="flex gap-2">
-                  <a
-                    href={`/api/v2/aips/${aipId}/metadata/descriptive/${m.id}/html`}
-                    target="_blank"
-                    class="text-sm text-blue-600 hover:underline"
-                  >
-                    View
-                  </a>
-                  <a
-                    href={`/api/v2/aips/${aipId}/metadata/descriptive/${m.id}/download`}
-                    class="text-sm text-blue-600 hover:underline"
-                  >
-                    Download
-                  </a>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <!-- Representations (lazy-loaded) -->
-      <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
-        <div class="px-6 py-4 border-b border-gray-100">
-          <h2 class="text-lg font-semibold text-gray-700">Representations</h2>
-        </div>
-        <div class="p-4">
-          <!-- TODO: RepresentationList island (Phase 1) -->
-          <p class="text-sm text-gray-400 italic">Representations loading coming in Phase 1.</p>
+          )}
+          <a href={`/api/v2/aips/${aipId}/download`} class="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50">
+            ↓ Download AIP
+          </a>
         </div>
       </div>
     </div>
-  )}
+
+    <!-- Descriptive Metadata -->
+    {metadata.length > 0 && (
+      <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h2 class="text-lg font-semibold text-gray-700">Descriptive Metadata</h2>
+          <a
+            href={`/browse/${aipId}/metadata/new`}
+            class="text-sm text-[var(--color-primary)] hover:underline"
+          >
+            + Add
+          </a>
+        </div>
+        <div class="divide-y divide-gray-100">
+          {metadata.map((m) => (
+            <div class="px-6 py-4 flex items-center justify-between">
+              <div>
+                <span class="font-medium text-gray-800 text-sm">{m.type}</span>
+                {m.version && <span class="ml-2 text-xs text-gray-400">v{m.version}</span>}
+              </div>
+              <div class="flex gap-3">
+                <a
+                  href={`/api/v2/aips/${aipId}/metadata/descriptive/${m.id}/html`}
+                  target="_blank"
+                  class="text-sm text-blue-600 hover:underline"
+                >
+                  View
+                </a>
+                <a
+                  href={`/api/v2/aips/${aipId}/metadata/descriptive/${m.id}/download`}
+                  class="text-sm text-blue-600 hover:underline"
+                >
+                  Download
+                </a>
+                <a
+                  href={`/browse/${aipId}/metadata/${m.id}/history`}
+                  class="text-sm text-gray-400 hover:underline"
+                >
+                  History
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
+    <!-- Representations -->
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
+      <div class="px-6 py-4 border-b border-gray-100">
+        <h2 class="text-lg font-semibold text-gray-700">Representations</h2>
+      </div>
+      <div class="p-4">
+        <RepresentationList aipId={aipId!} client:load />
+      </div>
+    </div>
+
+    <!-- Preservation Events -->
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-gray-700">Preservation Events</h2>
+        <a href={`/browse/${aipId}/events`} class="text-sm text-[var(--color-primary)] hover:underline">
+          View all
+        </a>
+      </div>
+      <div class="p-4 text-sm text-gray-400 italic">
+        <!-- TODO: PreservationEventList with aipId filter (Phase 4) -->
+        Preservation events will be shown here.
+      </div>
+    </div>
+  </div>
 </AdminLayout>

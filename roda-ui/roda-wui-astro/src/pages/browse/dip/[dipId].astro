@@ -1,0 +1,101 @@
+---
+import AdminLayout from "@/components/layout/AdminLayout.astro";
+import { apiGet, apiFindRequest } from "@/lib/api/client";
+
+const { dipId } = Astro.params;
+const cookieHeader = Astro.request.headers.get("cookie") ?? undefined;
+
+interface DIP {
+  id: string;
+  title?: string;
+  description?: string;
+  type?: string;
+  dateCreated?: string;
+  aipIds?: string[];
+}
+
+interface DIPFile {
+  id: string;
+  uuid?: string;
+  dipId: string;
+  path: string[];
+  originalName?: string;
+  size?: number;
+  formatDesignationName?: string;
+}
+
+let dip: DIP | null = null;
+let files: DIPFile[] = [];
+let totalFiles = 0;
+
+try {
+  dip = await apiGet<DIP>(`/dips/find/${dipId}`, { cookie: cookieHeader });
+  const fileRes = await apiFindRequest<DIPFile>("dip-files", {
+    filter: { parameters: [{ type: "SimpleFilterParameter", name: "dipId", value: dipId! }] },
+    sublist: { firstElementIndex: 0, maximumElementCount: 50 },
+  }, { cookie: cookieHeader });
+  files = fileRes.results;
+  totalFiles = fileRes.totalCount;
+} catch (e: unknown) {
+  if ((e as { status?: number }).status === 404 || (e as { status?: number }).status === 403) {
+    return Astro.redirect("/browse");
+  }
+  throw e;
+}
+
+if (!dip) return Astro.redirect("/browse");
+
+const title = dip.title ?? dipId ?? "DIP";
+const breadcrumb = [
+  { label: "Browse", href: "/browse" },
+  { label: "DIP: " + title },
+];
+---
+<AdminLayout title={title} breadcrumb={breadcrumb}>
+  <div class="space-y-6">
+    <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-800">{title}</h1>
+          {dip.description && <p class="mt-2 text-sm text-gray-600">{dip.description}</p>}
+          <div class="mt-2 flex gap-3">
+            {dip.type && <span class="px-2 py-0.5 bg-purple-50 text-purple-700 rounded text-xs">{dip.type}</span>}
+            {dip.dateCreated && <span class="text-xs text-gray-400">{new Date(dip.dateCreated).toLocaleDateString()}</span>}
+          </div>
+        </div>
+        <a
+          href={`/api/v2/dips/${dipId}/download`}
+          class="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50 shrink-0"
+        >
+          ↓ Download DIP
+        </a>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
+      <div class="px-6 py-4 border-b border-gray-100">
+        <h2 class="text-lg font-semibold text-gray-700">Files ({totalFiles})</h2>
+      </div>
+      <div class="divide-y divide-gray-100">
+        {files.length === 0 ? (
+          <p class="px-6 py-8 text-center text-sm text-gray-400">No files found.</p>
+        ) : (
+          files.map((f) => {
+            const name = f.originalName ?? (f.path?.length ? f.path[f.path.length - 1] : f.id);
+            return (
+              <div class="px-6 py-3 flex items-center justify-between">
+                <span class="text-sm text-gray-700 truncate">📄 {name}</span>
+                <a
+                  href={`/api/v2/files/${f.uuid ?? f.id}/download`}
+                  class="text-xs text-blue-600 hover:underline ml-4 shrink-0"
+                >
+                  Download
+                </a>
+              </div>
+            );
+          })
+        )}
+      </div>
+    </div>
+  </div>
+</AdminLayout>

@@ -1,0 +1,74 @@
+---
+import AdminLayout from "@/components/layout/AdminLayout.astro";
+import FileList from "@/components/browse/FileList.tsx";
+import { apiGet } from "@/lib/api/client";
+
+const { repId } = Astro.params;
+const cookieHeader = Astro.request.headers.get("cookie") ?? undefined;
+
+interface IndexedRepresentation {
+  id: string;
+  uuid?: string;
+  aipId: string;
+  type?: string;
+  status?: string;
+  original?: boolean;
+  numberOfDataFiles?: number;
+  sizeInBytes?: number;
+  label?: string;
+}
+
+let rep: IndexedRepresentation | null = null;
+
+try {
+  rep = await apiGet<IndexedRepresentation>(`/representations/find/${repId}`, { cookie: cookieHeader });
+} catch (e: unknown) {
+  if ((e as { status?: number }).status === 404 || (e as { status?: number }).status === 403) {
+    return Astro.redirect("/browse");
+  }
+  throw e;
+}
+
+if (!rep) return Astro.redirect("/browse");
+
+const title = rep.label ?? `Representation (${rep.type ?? repId})`;
+const breadcrumb = [
+  { label: "Browse", href: "/browse" },
+  { label: "AIP", href: `/browse/${rep.aipId}` },
+  { label: title },
+];
+---
+<AdminLayout title={title} breadcrumb={breadcrumb}>
+  <div class="space-y-6">
+    <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-800">{title}</h1>
+          <div class="mt-2 flex flex-wrap gap-3 text-sm">
+            {rep.type && <span class="px-2 py-0.5 bg-purple-50 text-purple-700 rounded text-xs">{rep.type}</span>}
+            {rep.original && <span class="px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs">Original</span>}
+            {rep.status && <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">{rep.status}</span>}
+            {rep.numberOfDataFiles != null && (
+              <span class="text-xs text-gray-500">{rep.numberOfDataFiles} file{rep.numberOfDataFiles !== 1 ? "s" : ""}</span>
+            )}
+          </div>
+        </div>
+        <a
+          href={`/api/v2/representations/${rep.uuid ?? rep.id}/download`}
+          class="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50 shrink-0"
+        >
+          ↓ Download
+        </a>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
+      <div class="px-6 py-4 border-b border-gray-100">
+        <h2 class="text-lg font-semibold text-gray-700">Files</h2>
+      </div>
+      <div class="p-4">
+        <FileList aipId={rep.aipId} representationId={rep.uuid ?? rep.id} client:load />
+      </div>
+    </div>
+  </div>
+</AdminLayout>

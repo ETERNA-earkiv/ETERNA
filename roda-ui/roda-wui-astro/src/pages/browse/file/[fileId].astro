@@ -1,0 +1,100 @@
+---
+import AdminLayout from "@/components/layout/AdminLayout.astro";
+import FilePreview from "@/components/browse/FilePreview.tsx";
+import { apiGet } from "@/lib/api/client";
+
+const { fileId } = Astro.params;
+const cookieHeader = Astro.request.headers.get("cookie") ?? undefined;
+
+interface IndexedFile {
+  id: string;
+  uuid?: string;
+  aipId: string;
+  representationId: string;
+  representationUUID?: string;
+  path: string[];
+  originalName?: string;
+  size?: number;
+  formatDesignationName?: string;
+  formatDesignationVersion?: string;
+  pronom?: string;
+  fileFormat?: string;
+  mimeType?: string;
+}
+
+let file: IndexedFile | null = null;
+
+try {
+  file = await apiGet<IndexedFile>(`/files/find/${fileId}`, { cookie: cookieHeader });
+} catch (e: unknown) {
+  if ((e as { status?: number }).status === 404 || (e as { status?: number }).status === 403) {
+    return Astro.redirect("/browse");
+  }
+  throw e;
+}
+
+if (!file) return Astro.redirect("/browse");
+
+const filename = file.originalName ?? (file.path?.length ? file.path[file.path.length - 1] : fileId);
+const repId = file.representationUUID ?? file.representationId;
+
+const breadcrumb = [
+  { label: "Browse", href: "/browse" },
+  { label: "AIP", href: `/browse/${file.aipId}` },
+  { label: "Representation", href: `/browse/representation/${repId}` },
+  { label: filename ?? "File" },
+];
+---
+<AdminLayout title={filename ?? "File"} breadcrumb={breadcrumb}>
+  <div class="space-y-6">
+    <!-- File metadata card -->
+    <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+      <h1 class="text-xl font-bold text-gray-800 mb-3 break-all">{filename}</h1>
+      <dl class="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+        {file.formatDesignationName && (
+          <>
+            <dt class="font-medium text-gray-500">Format</dt>
+            <dd class="text-gray-700">
+              {file.formatDesignationName}
+              {file.formatDesignationVersion && ` ${file.formatDesignationVersion}`}
+            </dd>
+          </>
+        )}
+        {file.pronom && (
+          <>
+            <dt class="font-medium text-gray-500">PRONOM</dt>
+            <dd class="text-gray-700 font-mono text-xs">{file.pronom}</dd>
+          </>
+        )}
+        {file.mimeType && (
+          <>
+            <dt class="font-medium text-gray-500">MIME type</dt>
+            <dd class="text-gray-700 font-mono text-xs">{file.mimeType}</dd>
+          </>
+        )}
+        {file.size != null && (
+          <>
+            <dt class="font-medium text-gray-500">Size</dt>
+            <dd class="text-gray-700">
+              {file.size < 1024 ? `${file.size} B`
+                : file.size < 1024 * 1024 ? `${(file.size / 1024).toFixed(1)} KB`
+                : file.size < 1024 * 1024 * 1024 ? `${(file.size / 1024 / 1024).toFixed(1)} MB`
+                : `${(file.size / 1024 / 1024 / 1024).toFixed(2)} GB`}
+            </dd>
+          </>
+        )}
+        <dt class="font-medium text-gray-500">UUID</dt>
+        <dd class="text-gray-400 font-mono text-xs break-all">{file.uuid ?? file.id}</dd>
+      </dl>
+    </div>
+
+    <!-- Preview -->
+    <FilePreview
+      fileId={file.uuid ?? file.id ?? ""}
+      filename={filename}
+      mimeType={file.mimeType}
+      size={file.size}
+      client:idle
+    />
+  </div>
+</AdminLayout>
