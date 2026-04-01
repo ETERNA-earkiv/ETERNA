@@ -51,6 +51,7 @@ try {
       [/^register$/, () => "/auth/register"],
       [/^process$/, () => "/process"],
       [/^redactor\/(.+)$/, (m) => `/redactor/${m[1]}`],
+      [/^relation\/(.+)$/, (m) => `/relation/${m[1]}`],
     ];
 
     for (const [pattern, build] of rules) {

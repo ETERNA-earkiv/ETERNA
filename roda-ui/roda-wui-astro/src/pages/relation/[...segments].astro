@@ -1,0 +1,58 @@
+---
+/**
+ * Legacy GWT relation resolver: #relation/{type}/{key}/{value}/...
+ *
+ * Searches AIPs with the given key/value filter parameters.
+ * - If exactly 1 result → redirect to /browse/{aipUuid}
+ * - Otherwise → redirect to /search with the filter encoded as query params
+ */
+import { apiPost } from "@/lib/api/client";
+
+const { segments } = Astro.params;
+const parts = segments ? segments.split("/") : [];
+
+// parts[0] = type (ignored by filter, used for display)
+// parts[1..] = key/value pairs
+const filterParams: Array<{ type: string; name: string; value: string }> = [];
+
+for (let i = 1; i < parts.length - 1; i += 2) {
+  filterParams.push({
+    type: "SimpleFilterParameter",
+    name: parts[i],
+    value: parts[i + 1],
+  });
+}
+
+const cookieHeader = Astro.request.headers.get("cookie") ?? undefined;
+
+if (filterParams.length === 0) {
+  return Astro.redirect("/search");
+}
+
+try {
+  const result = await apiPost<{
+    results: Array<{ id: string; uuid: string }>;
+    totalCount: number;
+  }>(
+    "/aips/find",
+    {
+      filter: { parameters: filterParams },
+      sublist: { firstElementIndex: 0, maximumElementCount: 1 },
+      fieldsToReturn: ["id", "uuid"],
+      onlyActive: false,
+    },
+    { cookie: cookieHeader }
+  );
+
+  if (result.totalCount === 1) {
+    return Astro.redirect(`/browse/${encodeURIComponent(result.results[0].uuid)}`);
+  }
+} catch {
+  // Fall through to search on any error
+}
+
+// Build search URL with filter params encoded
+const searchParams = new URLSearchParams();
+filterParams.forEach(({ name, value }) => searchParams.append("filter", `${name}:${value}`));
+return Astro.redirect(`/search?${searchParams.toString()}`);
+---
