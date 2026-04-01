@@ -1,0 +1,18 @@
+---
+import AdminLayout from "@/components/layout/AdminLayout.astro";
+---
+<AdminLayout title="Page not found">
+  <div class="min-h-[60vh] flex flex-col items-center justify-center text-center">
+    <p class="text-6xl font-bold text-gray-200 mb-4">404</p>
+    <h1 class="text-2xl font-bold text-gray-800 mb-2">Page not found</h1>
+    <p class="text-gray-500 mb-8">The page you are looking for does not exist or has been moved.</p>
+    <div class="flex gap-3">
+      <a href="/" class="px-4 py-2 bg-[var(--color-primary)] text-white text-sm rounded hover:bg-[var(--color-primary-dark)] transition-colors">
+        Go home
+      </a>
+      <a href="/browse" class="px-4 py-2 border border-gray-300 text-sm rounded hover:bg-gray-50 transition-colors">
+        Browse archive
+      </a>
+    </div>
+  </div>
+</AdminLayout>

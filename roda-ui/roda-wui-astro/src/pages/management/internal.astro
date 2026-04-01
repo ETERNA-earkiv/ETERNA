@@ -1,13 +1,11 @@
 ---
 import AdminLayout from "@/components/layout/AdminLayout.astro";
+import JobList from "@/components/ingest/JobList.tsx";
 ---
 <AdminLayout
   title="Internal actions"
   breadcrumb={[{ label: "Administration", href: "/management" }, { label: "Internal actions" }]}
 >
   <h1 class="text-2xl font-bold text-gray-800 mb-6">Internal actions</h1>
-  <!-- TODO: InternalProcess island (Phase 6) -->
-  <div class="bg-white rounded-lg border border-gray-200 p-8 text-center text-gray-400 shadow-sm">
-    <p>Internal actions coming in Phase 6.</p>
-  </div>
+  <JobList pluginType="INTERNAL_ACTION" client:load />
 </AdminLayout>

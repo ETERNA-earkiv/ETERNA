@@ -1,10 +1,8 @@
 ---
 import PortalLayout from "@/components/layout/PortalLayout.astro";
+import SearchPanel from "@/components/search/SearchPanel.tsx";
 ---
 <PortalLayout title="Search">
   <h1 class="text-2xl font-bold text-gray-800 mb-6">Search the archive</h1>
-  <!-- TODO: SearchPanel island (read-only, Phase 7) -->
-  <div class="bg-white rounded-lg border border-gray-200 p-8 text-center text-gray-400 shadow-sm">
-    <p>Portal search coming in Phase 7.</p>
-  </div>
+  <SearchPanel defaultResource="aips" showResourceToggle={true} client:load />
 </PortalLayout>

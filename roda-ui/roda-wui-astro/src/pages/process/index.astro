@@ -2,15 +2,12 @@
 import AdminLayout from "@/components/layout/AdminLayout.astro";
 import JobList from "@/components/ingest/JobList.tsx";
 ---
-<AdminLayout
-  title="Actions"
-  breadcrumb={[{ label: "Administration", href: "/management" }, { label: "Actions" }]}
->
+<AdminLayout title="Process" breadcrumb={[{ label: "Process" }]}>
   <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Actions</h1>
+    <h1 class="text-2xl font-bold text-gray-800">Process</h1>
     <a href="/ingest/process/create" class="px-4 py-2 bg-[var(--color-primary)] text-white text-sm rounded hover:bg-[var(--color-primary-dark)] transition-colors">
-      New action
+      New job
     </a>
   </div>
-  <JobList pluginType="AIP_TO_AIP" client:load />
+  <JobList client:load />
 </AdminLayout>
