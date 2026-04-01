@@ -19,6 +19,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return next();
   }
 
+  // Legacy GWT entry points — redirect to root so the hash-redirect script can run
+  if (pathname === "/Main.html" || pathname === "/Portal.html") {
+    return context.redirect("/", 302);
+  }
+
   // Public auth pages — no session needed
   if (PUBLIC_PATHS.has(pathname)) {
     context.locals.user = null;

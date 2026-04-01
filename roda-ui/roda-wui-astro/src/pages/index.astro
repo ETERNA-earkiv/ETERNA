@@ -13,6 +13,55 @@ try {
   // No custom welcome HTML — use default
 }
 ---
+<script>
+  // Legacy GWT hash-based URL redirect
+  // GWT served the app at /#<route> — translate to clean Astro URLs
+  (function () {
+    const hash = window.location.hash.replace(/^#\/?/, "");
+    if (!hash) return;
+
+    const rules: Array<[RegExp, (m: RegExpMatchArray) => string]> = [
+      [/^welcome$/, () => "/"],
+      [/^login$/, () => "/login"],
+      [/^browse\/AIP\/(.+)$/, (m) => `/browse/${m[1]}`],
+      [/^browse\/representation\/(.+)$/, (m) => `/browse/representation/${m[1]}`],
+      [/^browse\/file\/(.+)$/, (m) => `/browse/file/${m[1]}`],
+      [/^browse\/dip\/(.+)$/, (m) => `/browse/dip/${m[1]}`],
+      [/^browse$/, () => "/browse"],
+      [/^search$/, () => "/search"],
+      [/^ingest\/transfer$/, () => "/ingest/transfer"],
+      [/^ingest\/process\/job\/(.+)$/, (m) => `/ingest/process/${m[1]}`],
+      [/^ingest\/process$/, () => "/ingest/process"],
+      [/^ingest\/appraisal$/, () => "/ingest/appraisal"],
+      [/^ingest$/, () => "/ingest"],
+      [/^administration\/user$/, () => "/management/members"],
+      [/^administration\/log$/, () => "/management/log"],
+      [/^administration\/reporting$/, () => "/management/statistics"],
+      [/^administration$/, () => "/management"],
+      [/^disposal\/policy$/, () => "/disposal/policy"],
+      [/^disposal\/confirmations$/, () => "/disposal/confirmations"],
+      [/^disposal$/, () => "/disposal"],
+      [/^planning\/riskregister$/, () => "/planning/risks"],
+      [/^planning\/riskincidenceregister$/, () => "/planning/incidences"],
+      [/^planning\/representation_information_register$/, () => "/planning/representation-information"],
+      [/^planning\/events$/, () => "/planning/events"],
+      [/^planning\/agents$/, () => "/planning/agents"],
+      [/^planning$/, () => "/planning"],
+      [/^profile$/, () => "/auth/profile"],
+      [/^register$/, () => "/auth/register"],
+      [/^process$/, () => "/process"],
+    ];
+
+    for (const [pattern, build] of rules) {
+      const match = hash.match(pattern);
+      if (match) {
+        window.location.replace(build(match));
+        return;
+      }
+    }
+  })();
+</script>
+
 <AdminLayout title="Welcome">
   {welcomeHtml ? (
     <Fragment set:html={welcomeHtml} />
