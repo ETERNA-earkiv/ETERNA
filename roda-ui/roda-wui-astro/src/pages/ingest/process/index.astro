@@ -1,10 +1,18 @@
 ---
 import AdminLayout from "@/components/layout/AdminLayout.astro";
+import JobList from "@/components/ingest/JobList.tsx";
 ---
 <AdminLayout title="Ingest process" breadcrumb={[{ label: "Ingest", href: "/ingest" }, { label: "Process" }]}>
-  <h1 class="text-2xl font-bold text-gray-800 mb-6">Ingest process</h1>
-  <!-- TODO: JobList island filtered to INGEST type (Phase 2) -->
-  <div class="bg-white rounded-lg border border-gray-200 p-8 text-center text-gray-400 shadow-sm">
-    <p>Job list coming in Phase 2.</p>
+  <div class="space-y-6">
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl font-bold text-gray-800">Ingest process</h1>
+      <a
+        href="/ingest/process/create"
+        class="px-4 py-2 bg-[var(--color-primary)] text-white text-sm rounded hover:bg-[var(--color-primary-dark)] transition-colors"
+      >
+        New job
+      </a>
+    </div>
+    <JobList pluginType="INGEST" client:load />
   </div>
 </AdminLayout>

@@ -1,0 +1,195 @@
+---
+import AdminLayout from "@/components/layout/AdminLayout.astro";
+import { apiGet } from "@/lib/api/client";
+
+const { jobId } = Astro.params;
+const cookieHeader = Astro.request.headers.get("cookie") ?? undefined;
+
+interface Job {
+  id: string;
+  name?: string;
+  description?: string;
+  username?: string;
+  state?: string;
+  startDate?: string;
+  endDate?: string;
+  objectsCount?: number;
+  objectsProcessedWithSuccess?: number;
+  objectsProcessedWithFailure?: number;
+  objectsBeingProcessed?: number;
+  objectsWaitingToBeProcessed?: number;
+  pluginId?: string;
+  pluginName?: string;
+  pluginVersion?: string;
+  pluginType?: string;
+  inFinalState?: boolean;
+  jobParallelism?: number;
+  priority?: string;
+}
+
+interface JobReport {
+  id: string;
+  jobId?: string;
+  title?: string;
+  dateCreated?: string;
+  completionPercentage?: number;
+  pluginState?: string;
+  pluginDetails?: string;
+  sourceObjectClass?: string;
+  sourceObjectId?: string;
+  outcomeObjectClass?: string;
+  outcomeObjectId?: string;
+}
+
+let job: Job | null = null;
+let reports: JobReport[] = [];
+let totalReports = 0;
+
+try {
+  job = await apiGet<Job>(`/jobs/${jobId}`, { cookie: cookieHeader });
+} catch (e: unknown) {
+  if ((e as { status?: number }).status === 404 || (e as { status?: number }).status === 403) {
+    return Astro.redirect("/ingest/process");
+  }
+  throw e;
+}
+
+if (!job) return Astro.redirect("/ingest/process");
+
+try {
+  const { apiFindRequest } = await import("@/lib/api/client");
+  const res = await apiFindRequest<JobReport>("jobs/reports", {
+    filter: { parameters: [{ type: "SimpleFilterParameter", name: "jobId", value: jobId! }] },
+    sublist: { firstElementIndex: 0, maximumElementCount: 100 },
+  }, { cookie: cookieHeader });
+  reports = res.results;
+  totalReports = res.totalCount;
+} catch {
+  // reports not critical
+}
+
+function stateLabel(state?: string) {
+  switch (state) {
+    case "COMPLETED": return { label: "Completed", cls: "bg-green-100 text-green-700" };
+    case "FAILED_DURING_CREATION": return { label: "Failed (creation)", cls: "bg-red-100 text-red-700" };
+    case "FAILED_DURING_EXECUTION": return { label: "Failed (execution)", cls: "bg-red-100 text-red-700" };
+    case "CREATED": return { label: "Created", cls: "bg-yellow-100 text-yellow-700" };
+    case "STARTED": return { label: "Running", cls: "bg-blue-100 text-blue-700" };
+    default: return { label: state ?? "Unknown", cls: "bg-gray-100 text-gray-600" };
+  }
+}
+
+const { label: stateText, cls: stateCls } = stateLabel(job.state);
+const title = job.name ?? `Job ${jobId}`;
+const breadcrumb = [
+  { label: "Ingest", href: "/ingest" },
+  { label: "Process", href: "/ingest/process" },
+  { label: title },
+];
+---
+<AdminLayout title={title} breadcrumb={breadcrumb}>
+  <div class="space-y-6">
+    <!-- Job header -->
+    <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-800">{title}</h1>
+          {job.description && <p class="mt-1 text-sm text-gray-600">{job.description}</p>}
+          <div class="mt-3 flex flex-wrap gap-2">
+            <span class={`px-2 py-0.5 rounded text-xs font-medium ${stateCls}`}>{stateText}</span>
+            {job.pluginName && <span class="px-2 py-0.5 bg-purple-50 text-purple-700 rounded text-xs">{job.pluginName}</span>}
+            {job.pluginVersion && <span class="px-2 py-0.5 bg-gray-100 text-gray-500 rounded text-xs">v{job.pluginVersion}</span>}
+            {job.priority && <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">Priority: {job.priority}</span>}
+          </div>
+        </div>
+        {!job.inFinalState && (
+          <form method="POST" action={`/api/v2/jobs/${jobId}/stop`}>
+            <button type="submit" class="px-3 py-1.5 text-sm border border-red-300 text-red-600 rounded hover:bg-red-50 transition-colors shrink-0">
+              Stop job
+            </button>
+          </form>
+        )}
+      </div>
+
+      <!-- Progress + stats -->
+      <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+        <div>
+          <p class="text-xs text-gray-400 mb-0.5">Total objects</p>
+          <p class="font-semibold text-gray-800">{job.objectsCount ?? 0}</p>
+        </div>
+        <div>
+          <p class="text-xs text-gray-400 mb-0.5">Processed OK</p>
+          <p class="font-semibold text-green-700">{job.objectsProcessedWithSuccess ?? 0}</p>
+        </div>
+        <div>
+          <p class="text-xs text-gray-400 mb-0.5">Failed</p>
+          <p class="font-semibold text-red-600">{job.objectsProcessedWithFailure ?? 0}</p>
+        </div>
+        <div>
+          <p class="text-xs text-gray-400 mb-0.5">In progress</p>
+          <p class="font-semibold text-blue-600">{job.objectsBeingProcessed ?? 0}</p>
+        </div>
+      </div>
+
+      {(job.objectsCount ?? 0) > 0 && (
+        <div class="mt-4">
+          <div class="flex justify-between text-xs text-gray-400 mb-1">
+            <span>Progress</span>
+            <span>
+              {Math.round(((job.objectsProcessedWithSuccess ?? 0) + (job.objectsProcessedWithFailure ?? 0)) / job.objectsCount! * 100)}%
+            </span>
+          </div>
+          <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+            <div
+              class="h-full bg-green-500 rounded-full transition-all"
+              style={`width: ${Math.round((job.objectsProcessedWithSuccess ?? 0) / job.objectsCount! * 100)}%`}
+            />
+          </div>
+        </div>
+      )}
+
+      <!-- Dates -->
+      <div class="mt-4 flex flex-wrap gap-6 text-xs text-gray-500">
+        {job.username && <span>Started by: <strong class="text-gray-700">{job.username}</strong></span>}
+        {job.startDate && <span>Started: <strong class="text-gray-700">{new Date(job.startDate).toLocaleString()}</strong></span>}
+        {job.endDate && <span>Finished: <strong class="text-gray-700">{new Date(job.endDate).toLocaleString()}</strong></span>}
+      </div>
+    </div>
+
+    <!-- Reports -->
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
+      <div class="px-6 py-4 border-b border-gray-100">
+        <h2 class="text-lg font-semibold text-gray-700">Reports ({totalReports})</h2>
+      </div>
+      {reports.length === 0 ? (
+        <p class="px-6 py-8 text-center text-sm text-gray-400">No reports yet.</p>
+      ) : (
+        <div class="divide-y divide-gray-100">
+          {reports.map((r) => {
+            const ok = r.pluginState === "SUCCESS";
+            const fail = r.pluginState === "FAILURE";
+            return (
+              <div class="px-6 py-3 flex items-start gap-3">
+                <span class={`mt-0.5 text-sm ${ok ? "text-green-600" : fail ? "text-red-500" : "text-gray-400"}`}>
+                  {ok ? "✓" : fail ? "✗" : "·"}
+                </span>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm text-gray-800 font-medium">{r.title ?? r.id}</p>
+                  {r.pluginDetails && (
+                    <p class="text-xs text-gray-500 mt-0.5 whitespace-pre-wrap">{r.pluginDetails}</p>
+                  )}
+                  {r.sourceObjectId && (
+                    <p class="text-xs text-gray-400 mt-0.5 font-mono">{r.sourceObjectId}</p>
+                  )}
+                </div>
+                {r.dateCreated && (
+                  <span class="text-xs text-gray-400 shrink-0">{new Date(r.dateCreated).toLocaleString()}</span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  </div>
+</AdminLayout>
