@@ -50,6 +50,7 @@ try {
       [/^profile$/, () => "/auth/profile"],
       [/^register$/, () => "/auth/register"],
       [/^process$/, () => "/process"],
+      [/^redactor\/(.+)$/, (m) => `/redactor/${m[1]}`],
     ];
 
     for (const [pattern, build] of rules) {

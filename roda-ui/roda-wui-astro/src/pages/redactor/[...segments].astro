@@ -1,0 +1,107 @@
+---
+import AdminLayout from "@/components/layout/AdminLayout.astro";
+import PDFRedactorIsland from "@/components/redact/PDFRedactorIsland.tsx";
+import { apiPost } from "@/lib/api/client";
+
+const { segments } = Astro.params;
+const parts = segments ? segments.split("/") : [];
+
+// Route: /redactor/{aipId}/{representationId}/{...filePath}/{fileId}
+if (parts.length < 3) {
+  return Astro.redirect("/404");
+}
+
+const aipId = parts[0];
+const representationId = parts[1];
+const filePath = parts.slice(2, parts.length - 1);
+const fileId = parts[parts.length - 1];
+
+const cookieHeader = Astro.request.headers.get("cookie") ?? undefined;
+
+// Resolve the file UUID
+let fileUuid = "";
+let fileName = fileId;
+let aipTitle = aipId;
+let repTitle = representationId;
+
+try {
+  const fileResult = await apiPost<{
+    results: Array<{ id: string; uuid: string; originalName: string; aipId: string; representationId: string }>;
+    totalCount: number;
+  }>(
+    "/files/find",
+    {
+      filter: {
+        parameters: [
+          { type: "SimpleFilterParameter", name: "aipId", value: aipId },
+          { type: "SimpleFilterParameter", name: "representationId", value: representationId },
+          { type: "SimpleFilterParameter", name: "fileId", value: fileId },
+        ],
+      },
+      sublist: { firstElementIndex: 0, maximumElementCount: 1 },
+      onlyActive: true,
+    },
+    { cookie: cookieHeader }
+  );
+
+  if (fileResult.totalCount > 0) {
+    fileUuid = fileResult.results[0].uuid;
+    fileName = fileResult.results[0].originalName ?? fileId;
+  }
+} catch {
+  // Use fileId as fallback UUID if lookup fails
+  fileUuid = fileId;
+}
+
+try {
+  const aipResult = await apiPost<{
+    results: Array<{ id: string; title: string }>;
+    totalCount: number;
+  }>(
+    "/aips/find",
+    {
+      filter: {
+        parameters: [{ type: "SimpleFilterParameter", name: "id", value: aipId }],
+      },
+      sublist: { firstElementIndex: 0, maximumElementCount: 1 },
+      onlyActive: true,
+    },
+    { cookie: cookieHeader }
+  );
+  if (aipResult.totalCount > 0) aipTitle = aipResult.results[0].title ?? aipId;
+} catch {
+  // Keep aipId as title
+}
+---
+
+<AdminLayout
+  title={`Redact: ${fileName}`}
+  breadcrumb={[
+    { label: "Browse", href: "/browse" },
+    { label: aipTitle, href: `/browse/${encodeURIComponent(aipId)}` },
+    { label: fileName },
+  ]}
+>
+  <div class="mb-4">
+    <h1 class="text-xl font-bold text-gray-800">PDF Redactor</h1>
+    <p class="text-sm text-gray-500">
+      Redact sensitive content from <span class="font-medium">{fileName}</span>.
+      Saved changes will be stored in a new &ldquo;Redacted&rdquo; representation.
+    </p>
+  </div>
+
+  {fileUuid ? (
+    <PDFRedactorIsland
+      client:load
+      fileUuid={fileUuid}
+      aipId={aipId}
+      representationId={representationId}
+      filePath={filePath}
+      fileId={fileId}
+    />
+  ) : (
+    <div class="flex items-center justify-center h-64 text-gray-500">
+      File not found.
+    </div>
+  )}
+</AdminLayout>
