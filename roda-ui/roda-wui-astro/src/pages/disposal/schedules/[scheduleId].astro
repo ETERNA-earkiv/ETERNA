@@ -1,0 +1,85 @@
+---
+import AdminLayout from "@/components/layout/AdminLayout.astro";
+import { apiGet } from "@/lib/api/client";
+
+const { scheduleId } = Astro.params;
+const cookieHeader = Astro.request.headers.get("cookie") ?? undefined;
+
+interface DisposalSchedule {
+  id: string;
+  title?: string;
+  description?: string;
+  mandate?: string;
+  scopeNotes?: string;
+  actionCode?: string;
+  period?: string;
+  periodUnit?: string;
+  state?: string;
+  createdBy?: string;
+  createdOn?: string;
+  updatedBy?: string;
+  updatedOn?: string;
+}
+
+let schedule: DisposalSchedule | null = null;
+try {
+  schedule = await apiGet<DisposalSchedule>(`/disposal/schedules/${scheduleId}`, { cookie: cookieHeader });
+} catch (e: unknown) {
+  if ((e as { status?: number }).status === 404 || (e as { status?: number }).status === 403) {
+    return Astro.redirect("/disposal/policy");
+  }
+  throw e;
+}
+
+if (!schedule) return Astro.redirect("/disposal/policy");
+
+const title = schedule.title ?? `Schedule ${scheduleId}`;
+const breadcrumb = [
+  { label: "Disposal", href: "/disposal" },
+  { label: "Policy", href: "/disposal/policy" },
+  { label: title },
+];
+---
+<AdminLayout title={title} breadcrumb={breadcrumb}>
+  <div class="space-y-6">
+    <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+      <div class="flex items-start justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-800">{title}</h1>
+          <div class="mt-2 flex gap-2">
+            {schedule.state && (
+              <span class={`px-2 py-0.5 rounded text-xs font-medium ${schedule.state === "ACTIVE" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"}`}>
+                {schedule.state}
+              </span>
+            )}
+            {schedule.actionCode && (
+              <span class="px-2 py-0.5 bg-purple-50 text-purple-700 rounded text-xs">{schedule.actionCode}</span>
+            )}
+          </div>
+          {schedule.description && <p class="mt-3 text-sm text-gray-600">{schedule.description}</p>}
+        </div>
+        <a href={`/disposal/schedules/${scheduleId}/edit`} class="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50">Edit</a>
+      </div>
+      <dl class="mt-4 grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+        {schedule.period && (
+          <>
+            <dt class="font-medium text-gray-500">Retention period</dt>
+            <dd class="text-gray-700">{schedule.period} {schedule.periodUnit}</dd>
+          </>
+        )}
+        {schedule.mandate && (
+          <>
+            <dt class="font-medium text-gray-500">Mandate</dt>
+            <dd class="text-gray-700">{schedule.mandate}</dd>
+          </>
+        )}
+        {schedule.scopeNotes && (
+          <>
+            <dt class="font-medium text-gray-500">Scope notes</dt>
+            <dd class="text-gray-700">{schedule.scopeNotes}</dd>
+          </>
+        )}
+      </dl>
+    </div>
+  </div>
+</AdminLayout>

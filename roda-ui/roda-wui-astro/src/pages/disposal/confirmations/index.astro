@@ -1,5 +1,6 @@
 ---
 import AdminLayout from "@/components/layout/AdminLayout.astro";
+import DisposalConfirmationList from "@/components/disposal/DisposalConfirmationList.tsx";
 ---
 <AdminLayout
   title="Disposal confirmations"
@@ -11,8 +12,5 @@ import AdminLayout from "@/components/layout/AdminLayout.astro";
       New confirmation
     </a>
   </div>
-  <!-- TODO: DisposalConfirmationList island (Phase 5) -->
-  <div class="bg-white rounded-lg border border-gray-200 p-8 text-center text-gray-400 shadow-sm">
-    <p>Disposal confirmation list coming in Phase 5.</p>
-  </div>
+  <DisposalConfirmationList client:load />
 </AdminLayout>

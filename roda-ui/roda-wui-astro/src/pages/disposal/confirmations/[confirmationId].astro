@@ -1,0 +1,136 @@
+---
+import AdminLayout from "@/components/layout/AdminLayout.astro";
+import { apiGet, apiFindRequest } from "@/lib/api/client";
+
+const { confirmationId } = Astro.params;
+const cookieHeader = Astro.request.headers.get("cookie") ?? undefined;
+
+interface DisposalConfirmation {
+  id: string;
+  title?: string;
+  state?: string;
+  createdBy?: string;
+  createdOn?: string;
+  executedBy?: string;
+  executedOn?: string;
+  approvedBy?: string;
+  approvedOn?: string;
+  numberOfAIPs?: number;
+  numberOfDestroyedAIPs?: number;
+  scheduleTitle?: string;
+  description?: string;
+  extra?: string;
+}
+
+interface ConfirmationAIP {
+  id: string;
+  title?: string;
+  level?: string;
+}
+
+let confirmation: DisposalConfirmation | null = null;
+let aips: ConfirmationAIP[] = [];
+
+try {
+  confirmation = await apiGet<DisposalConfirmation>(`/disposal/confirmations/${confirmationId}`, { cookie: cookieHeader });
+  const res = await apiFindRequest<ConfirmationAIP>("disposal/confirmations/" + confirmationId + "/aips", {
+    sublist: { firstElementIndex: 0, maximumElementCount: 50 },
+  }, { cookie: cookieHeader });
+  aips = res.results;
+} catch (e: unknown) {
+  if ((e as { status?: number }).status === 404 || (e as { status?: number }).status === 403) {
+    return Astro.redirect("/disposal/confirmations");
+  }
+  if (!(e as { status?: number }).status) throw e;
+}
+
+if (!confirmation) return Astro.redirect("/disposal/confirmations");
+
+const stateMap: Record<string, string> = {
+  APPROVED: "bg-green-100 text-green-700",
+  REJECTED: "bg-red-100 text-red-700",
+  PENDING_APPROVAL: "bg-yellow-100 text-yellow-700",
+};
+const title = confirmation.title ?? `Confirmation ${confirmationId}`;
+const breadcrumb = [
+  { label: "Disposal", href: "/disposal" },
+  { label: "Confirmations", href: "/disposal/confirmations" },
+  { label: title },
+];
+---
+<AdminLayout title={title} breadcrumb={breadcrumb}>
+  <div class="space-y-6">
+    <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+      <div class="flex items-start justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-800">{title}</h1>
+          <div class="mt-2 flex gap-2">
+            {confirmation.state && (
+              <span class={`px-2 py-0.5 rounded text-xs font-medium ${stateMap[confirmation.state] ?? "bg-gray-100 text-gray-600"}`}>
+                {confirmation.state.replace(/_/g, " ")}
+              </span>
+            )}
+          </div>
+          {confirmation.description && <p class="mt-3 text-sm text-gray-600">{confirmation.description}</p>}
+        </div>
+        {confirmation.state === "PENDING_APPROVAL" && (
+          <div class="flex gap-2">
+            <form method="POST" action={`/api/v2/disposal/confirmations/${confirmationId}/approve`}>
+              <button type="submit" class="px-3 py-1.5 text-sm bg-green-600 text-white rounded hover:bg-green-700">Approve</button>
+            </form>
+            <form method="POST" action={`/api/v2/disposal/confirmations/${confirmationId}/reject`}>
+              <button type="submit" class="px-3 py-1.5 text-sm border border-red-300 text-red-600 rounded hover:bg-red-50">Reject</button>
+            </form>
+          </div>
+        )}
+      </div>
+      <dl class="mt-4 grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+        <dt class="font-medium text-gray-500">AIPs</dt>
+        <dd class="text-gray-700">{confirmation.numberOfAIPs ?? 0}</dd>
+        {confirmation.scheduleTitle && (
+          <>
+            <dt class="font-medium text-gray-500">Schedule</dt>
+            <dd class="text-gray-700">{confirmation.scheduleTitle}</dd>
+          </>
+        )}
+        {confirmation.createdBy && (
+          <>
+            <dt class="font-medium text-gray-500">Created by</dt>
+            <dd class="text-gray-700">{confirmation.createdBy} {confirmation.createdOn && `on ${new Date(confirmation.createdOn).toLocaleDateString()}`}</dd>
+          </>
+        )}
+        {confirmation.approvedBy && (
+          <>
+            <dt class="font-medium text-gray-500">Approved by</dt>
+            <dd class="text-gray-700">{confirmation.approvedBy} {confirmation.approvedOn && `on ${new Date(confirmation.approvedOn).toLocaleDateString()}`}</dd>
+          </>
+        )}
+        {confirmation.executedBy && (
+          <>
+            <dt class="font-medium text-gray-500">Executed by</dt>
+            <dd class="text-gray-700">{confirmation.executedBy} {confirmation.executedOn && `on ${new Date(confirmation.executedOn).toLocaleDateString()}`}</dd>
+          </>
+        )}
+      </dl>
+    </div>
+
+    {aips.length > 0 && (
+      <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="text-lg font-semibold text-gray-700">AIPs ({aips.length})</h2>
+        </div>
+        <ul class="divide-y divide-gray-100">
+          {aips.map((a) => (
+            <li class="px-6 py-3 flex items-center justify-between">
+              <div>
+                <a href={`/browse/${a.id}`} class="text-sm text-blue-600 hover:underline font-medium">{a.title ?? a.id}</a>
+                {a.level && <span class="ml-2 text-xs text-gray-400">{a.level}</span>}
+              </div>
+              <span class="text-xs text-gray-400 font-mono">{a.id}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </div>
+</AdminLayout>
