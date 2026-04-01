@@ -56,6 +56,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
       guest: boolean;
     }>("/members/users/authenticated", { cookie: cookieHeader });
 
+    if (user.guest && !isPortal) {
+      // Session expired / guest — treat as unauthenticated for protected pages
+      context.locals.user = null;
+      return context.redirect(`/login?redirect=${encodeURIComponent(pathname)}`);
+    }
+
     context.locals.user = {
       id: user.id,
       name: user.name,

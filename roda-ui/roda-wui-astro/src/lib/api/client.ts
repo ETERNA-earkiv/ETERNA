@@ -4,7 +4,16 @@
  * In browser context (React islands), credentials are sent automatically via cookies.
  */
 
-const API_BASE = "/api/v2";
+/**
+ * In SSR (Node.js) context, fetch requires absolute URLs.
+ * We call Spring Boot directly, bypassing the Vite proxy.
+ * SPRING_BOOT_URL defaults to http://localhost:8080.
+ */
+const isSSR = typeof window === "undefined";
+const SPRING_BOOT_URL = isSSR
+  ? (import.meta.env.SPRING_BOOT_URL ?? "http://localhost:8080")
+  : "";
+const API_BASE = `${SPRING_BOOT_URL}/api/v2`;
 
 export class ApiError extends Error {
   constructor(

@@ -20,7 +20,8 @@ export default function LoginForm({ redirectTo }: LoginFormProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ username, password }),
+        // SecureString on the server side expects { chars: char[] }
+        body: JSON.stringify({ username, password: { chars: password.split("") } }),
       });
 
       if (res.ok) {

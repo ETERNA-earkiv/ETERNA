@@ -18,8 +18,23 @@ export default defineConfig({
         "/api": {
           target: "http://localhost:8080",
           changeOrigin: true,
+          configure: (proxy) => {
+            // Strip "Secure" from Set-Cookie headers so cookies work over plain HTTP in dev
+            proxy.on("proxyRes", (proxyRes) => {
+              const cookies = proxyRes.headers["set-cookie"];
+              if (cookies) {
+                proxyRes.headers["set-cookie"] = cookies.map((c) =>
+                  c.replace(/;\s*Secure/gi, "").replace(/;\s*SameSite=Strict/gi, "; SameSite=Lax")
+                );
+              }
+            });
+          },
         },
         "/webjars": {
+          target: "http://localhost:8080",
+          changeOrigin: true,
+        },
+        "/logout": {
           target: "http://localhost:8080",
           changeOrigin: true,
         },
