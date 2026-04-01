@@ -89,7 +89,7 @@ public class UpdateOriginalMETS {
 		    	if (file.exists()) {
 			    	String relativeFilePath = IPConstants.METADATA + java.io.File.separator + IPConstants.PRESERVATION + java.io.File.separator + file.getName();
 			    	
-			    	checkAmdSec(metsWrapper, metsPath);
+			    	checkAmdSec(metsWrapper, metsPath, true);
 			    	
 			    	Optional<MdSecType> fileInMets = metsWrapper.getMets().getAmdSec().getFirst().getDigiprovMD().stream().filter(m -> m.getMdRef().getHref().equals(relativeFilePath)).findFirst();
 			    	if (!fileInMets.isPresent()) {
@@ -121,7 +121,7 @@ public class UpdateOriginalMETS {
 		    	if (file.exists()) {
 			    	String relativeFilePath = IPConstants.METADATA + java.io.File.separator + IPConstants.PRESERVATION + java.io.File.separator + pm.getFileDirectoryPath().stream().map(p -> p).collect(Collectors.joining(java.io.File.separator)) + java.io.File.separator + file.getName();
 			    	
-			    	checkAmdSec(metsWrapper, metsPath);
+			    	checkAmdSec(metsWrapper, metsPath, false);
 			    	
 			    	Optional<MdSecType> fileInMets = metsWrapper.getMets().getAmdSec().getFirst().getDigiprovMD().stream().filter(m -> m.getMdRef().getHref().equals(relativeFilePath)).findFirst();
 			    	if (!fileInMets.isPresent()) {
@@ -168,7 +168,7 @@ public class UpdateOriginalMETS {
 	    	if (file.exists()) {
 		    	String relativeFilePath = IPConstants.METADATA + java.io.File.separator + IPConstants.PRESERVATION + java.io.File.separator + file.getName();
 		    
-		    	checkAmdSec(metsWrapper, metsPath);
+		    	checkAmdSec(metsWrapper, metsPath, false);
 		    	
 		    	Optional<MdSecType> fileInMets = metsWrapper.getMets().getAmdSec().getFirst().getDigiprovMD().stream().filter(m -> m.getMdRef().getHref().equals(relativeFilePath)).findFirst();
 		    	if (!fileInMets.isPresent()) {
@@ -412,7 +412,7 @@ public class UpdateOriginalMETS {
 	}
 	
 	// Check if AMDSEC element is available
-	private static void checkAmdSec(MetsWrapper metsWrapper, Path metsPath) throws IOException, IPException, JAXBException {
+	private static void checkAmdSec(MetsWrapper metsWrapper, Path metsPath, boolean isRoot) throws IOException, IPException, JAXBException {
 		try {
     		metsWrapper.getMets().getAmdSec().getFirst();
     		
@@ -420,7 +420,7 @@ public class UpdateOriginalMETS {
     		AmdSecType amdSec = new AmdSecType();
 			amdSec.setID("uuid-" + UUID.randomUUID().toString());
 			metsWrapper.getMets().getAmdSec().add(amdSec);
-    		METSUtils.marshallMETS(metsWrapper.getMets(), metsPath, true);
+    		METSUtils.marshallMETS(metsWrapper.getMets(), metsPath, isRoot);
     	}
 	}
 }
