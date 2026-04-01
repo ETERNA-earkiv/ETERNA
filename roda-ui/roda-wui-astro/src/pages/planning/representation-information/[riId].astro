@@ -1,0 +1,93 @@
+---
+import AdminLayout from "@/components/layout/AdminLayout.astro";
+import { apiGet } from "@/lib/api/client";
+
+const { riId } = Astro.params;
+const cookieHeader = Astro.request.headers.get("cookie") ?? undefined;
+
+interface RepresentationInformation {
+  id: string;
+  name?: string;
+  family?: string;
+  categories?: string[];
+  tags?: string[];
+  extras?: string;
+  support?: string;
+  relations?: { relationType?: string; objectType?: string; link?: string; title?: string }[];
+}
+
+let ri: RepresentationInformation | null = null;
+try {
+  ri = await apiGet<RepresentationInformation>(`/representation_information/${riId}`, { cookie: cookieHeader });
+} catch (e: unknown) {
+  if ((e as { status?: number }).status === 404 || (e as { status?: number }).status === 403) {
+    return Astro.redirect("/planning/representation-information");
+  }
+  throw e;
+}
+
+if (!ri) return Astro.redirect("/planning/representation-information");
+
+const title = ri.name ?? riId ?? "Representation information";
+const supportCls = ri.support === "SUPPORTED" ? "bg-green-100 text-green-700"
+  : ri.support === "UNSUPPORTED" ? "bg-red-100 text-red-700"
+  : "bg-gray-100 text-gray-600";
+
+const breadcrumb = [
+  { label: "Planning", href: "/planning" },
+  { label: "Representation information", href: "/planning/representation-information" },
+  { label: title },
+];
+---
+<AdminLayout title={title} breadcrumb={breadcrumb}>
+  <div class="space-y-6">
+    <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-800">{title}</h1>
+          <div class="mt-2 flex flex-wrap gap-2">
+            {ri.family && <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">{ri.family}</span>}
+            {ri.support && <span class={`px-2 py-0.5 rounded text-xs font-medium ${supportCls}`}>{ri.support}</span>}
+          </div>
+          {ri.categories && ri.categories.length > 0 && (
+            <div class="mt-2 flex flex-wrap gap-1">
+              {ri.categories.map((c) => <span class="px-1.5 py-0.5 bg-purple-50 text-purple-600 rounded text-xs">{c}</span>)}
+            </div>
+          )}
+          {ri.tags && ri.tags.length > 0 && (
+            <div class="mt-2 flex flex-wrap gap-1">
+              {ri.tags.map((t) => <span class="px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded text-xs">{t}</span>)}
+            </div>
+          )}
+        </div>
+        <a href={`/planning/representation-information/${riId}/edit`} class="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50 shrink-0">
+          Edit
+        </a>
+      </div>
+      {ri.extras && (
+        <div class="mt-4 p-3 bg-gray-50 rounded text-sm text-gray-700 whitespace-pre-wrap font-mono text-xs">{ri.extras}</div>
+      )}
+    </div>
+
+    {ri.relations && ri.relations.length > 0 && (
+      <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="text-lg font-semibold text-gray-700">Relations ({ri.relations.length})</h2>
+        </div>
+        <div class="divide-y divide-gray-100">
+          {ri.relations.map((r) => (
+            <div class="px-6 py-3 flex items-center gap-4">
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs shrink-0">{r.relationType ?? "relation"}</span>
+              {r.link ? (
+                <a href={r.link} class="text-sm text-blue-600 hover:underline truncate">{r.title || r.link}</a>
+              ) : (
+                <span class="text-sm text-gray-700">{r.title || "—"}</span>
+              )}
+              {r.objectType && <span class="text-xs text-gray-400 shrink-0">{r.objectType}</span>}
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+</AdminLayout>

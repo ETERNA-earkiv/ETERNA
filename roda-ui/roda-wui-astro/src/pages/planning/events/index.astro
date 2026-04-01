@@ -1,13 +1,11 @@
 ---
 import AdminLayout from "@/components/layout/AdminLayout.astro";
+import PreservationEventList from "@/components/planning/PreservationEventList.tsx";
 ---
 <AdminLayout
   title="Preservation events"
   breadcrumb={[{ label: "Planning", href: "/planning" }, { label: "Preservation events" }]}
 >
   <h1 class="text-2xl font-bold text-gray-800 mb-6">Preservation events</h1>
-  <!-- TODO: PreservationEventList island (Phase 4) -->
-  <div class="bg-white rounded-lg border border-gray-200 p-8 text-center text-gray-400 shadow-sm">
-    <p>Preservation events coming in Phase 4.</p>
-  </div>
+  <PreservationEventList client:load />
 </AdminLayout>

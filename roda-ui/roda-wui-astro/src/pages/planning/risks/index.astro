@@ -1,5 +1,6 @@
 ---
 import AdminLayout from "@/components/layout/AdminLayout.astro";
+import RiskList from "@/components/planning/RiskList.tsx";
 ---
 <AdminLayout
   title="Risk register"
@@ -11,8 +12,5 @@ import AdminLayout from "@/components/layout/AdminLayout.astro";
       New risk
     </a>
   </div>
-  <!-- TODO: RiskList island (Phase 4) -->
-  <div class="bg-white rounded-lg border border-gray-200 p-8 text-center text-gray-400 shadow-sm">
-    <p>Risk register coming in Phase 4.</p>
-  </div>
+  <RiskList client:load />
 </AdminLayout>

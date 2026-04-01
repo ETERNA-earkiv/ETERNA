@@ -1,5 +1,6 @@
 ---
 import AdminLayout from "@/components/layout/AdminLayout.astro";
+import RepresentationInformationList from "@/components/planning/RepresentationInformationList.tsx";
 ---
 <AdminLayout
   title="Representation information"
@@ -11,8 +12,5 @@ import AdminLayout from "@/components/layout/AdminLayout.astro";
       New entry
     </a>
   </div>
-  <!-- TODO: RepresentationInformationList island (Phase 4) -->
-  <div class="bg-white rounded-lg border border-gray-200 p-8 text-center text-gray-400 shadow-sm">
-    <p>Representation information network coming in Phase 4.</p>
-  </div>
+  <RepresentationInformationList client:load />
 </AdminLayout>

@@ -1,0 +1,146 @@
+---
+import AdminLayout from "@/components/layout/AdminLayout.astro";
+import RiskIncidenceList from "@/components/planning/RiskIncidenceList.tsx";
+import { apiGet } from "@/lib/api/client";
+
+const { riskId } = Astro.params;
+const cookieHeader = Astro.request.headers.get("cookie") ?? undefined;
+
+interface Risk {
+  id: string;
+  name: string;
+  description?: string;
+  category?: string;
+  notes?: string;
+  owner?: string;
+  preMitigationProbability?: number;
+  preMitigationImpact?: number;
+  preMitigationSeverity?: number;
+  preMitigationNotes?: string;
+  postMitigationProbability?: number;
+  postMitigationImpact?: number;
+  postMitigationSeverity?: number;
+  postMitigationNotes?: string;
+  mitigationStrategy?: string;
+  mitigationOwner?: string;
+  mitigationRelatedEventIdentifierType?: string;
+  mitigationRelatedEventIdentifierValue?: string;
+  incidencesCount?: number;
+  createdBy?: string;
+  createdOn?: string;
+  updatedBy?: string;
+  updatedOn?: string;
+}
+
+let risk: Risk | null = null;
+try {
+  risk = await apiGet<Risk>(`/risks/${riskId}`, { cookie: cookieHeader });
+} catch (e: unknown) {
+  if ((e as { status?: number }).status === 404 || (e as { status?: number }).status === 403) {
+    return Astro.redirect("/planning/risks");
+  }
+  throw e;
+}
+
+if (!risk) return Astro.redirect("/planning/risks");
+
+function severityClass(val?: number) {
+  if (!val) return "bg-gray-100 text-gray-600";
+  if (val >= 15) return "bg-red-100 text-red-700";
+  if (val >= 8) return "bg-yellow-100 text-yellow-700";
+  return "bg-green-100 text-green-700";
+}
+
+const breadcrumb = [
+  { label: "Planning", href: "/planning" },
+  { label: "Risk register", href: "/planning/risks" },
+  { label: risk.name },
+];
+---
+<AdminLayout title={risk.name} breadcrumb={breadcrumb}>
+  <div class="space-y-6">
+    <!-- Header -->
+    <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-800">{risk.name}</h1>
+          {risk.category && <p class="text-sm text-gray-500 mt-1">{risk.category}</p>}
+          {risk.description && <p class="mt-3 text-sm text-gray-700">{risk.description}</p>}
+          {risk.notes && <p class="mt-2 text-xs text-gray-500 italic">{risk.notes}</p>}
+        </div>
+        <a href={`/planning/risks/${riskId}/edit`} class="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50 shrink-0">
+          Edit
+        </a>
+      </div>
+    </div>
+
+    <!-- Mitigation scores -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Pre-mitigation -->
+      <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+        <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Pre-mitigation</h2>
+        <div class="grid grid-cols-3 gap-3 text-center">
+          <div>
+            <p class="text-xs text-gray-400">Probability</p>
+            <p class="text-lg font-bold text-gray-800">{risk.preMitigationProbability ?? "—"}</p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-400">Impact</p>
+            <p class="text-lg font-bold text-gray-800">{risk.preMitigationImpact ?? "—"}</p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-400">Severity</p>
+            <span class={`inline-block px-3 py-1 rounded text-sm font-bold ${severityClass(risk.preMitigationSeverity)}`}>
+              {risk.preMitigationSeverity ?? "—"}
+            </span>
+          </div>
+        </div>
+        {risk.preMitigationNotes && <p class="mt-3 text-xs text-gray-500">{risk.preMitigationNotes}</p>}
+      </div>
+
+      <!-- Post-mitigation -->
+      <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+        <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Post-mitigation</h2>
+        <div class="grid grid-cols-3 gap-3 text-center">
+          <div>
+            <p class="text-xs text-gray-400">Probability</p>
+            <p class="text-lg font-bold text-gray-800">{risk.postMitigationProbability ?? "—"}</p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-400">Impact</p>
+            <p class="text-lg font-bold text-gray-800">{risk.postMitigationImpact ?? "—"}</p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-400">Severity</p>
+            <span class={`inline-block px-3 py-1 rounded text-sm font-bold ${severityClass(risk.postMitigationSeverity)}`}>
+              {risk.postMitigationSeverity ?? "—"}
+            </span>
+          </div>
+        </div>
+        {risk.postMitigationNotes && <p class="mt-3 text-xs text-gray-500">{risk.postMitigationNotes}</p>}
+      </div>
+    </div>
+
+    <!-- Mitigation strategy -->
+    {risk.mitigationStrategy && (
+      <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+        <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Mitigation strategy</h2>
+        <p class="text-sm text-gray-700">{risk.mitigationStrategy}</p>
+        {risk.mitigationOwner && (
+          <p class="mt-1 text-xs text-gray-500">Owner: <strong>{risk.mitigationOwner}</strong></p>
+        )}
+      </div>
+    )}
+
+    <!-- Incidences -->
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-gray-700">Incidences ({risk.incidencesCount ?? 0})</h2>
+        <a href={`/planning/incidences/new?riskId=${riskId}`} class="text-xs text-blue-600 hover:underline">Add incidence</a>
+      </div>
+      <div class="p-4">
+        <RiskIncidenceList riskId={riskId} client:load />
+      </div>
+    </div>
+  </div>
+</AdminLayout>
