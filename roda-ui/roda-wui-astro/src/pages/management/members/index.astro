@@ -1,0 +1,23 @@
+---
+import AdminLayout from "@/components/layout/AdminLayout.astro";
+---
+<AdminLayout
+  title="Users and groups"
+  breadcrumb={[{ label: "Administration", href: "/management" }, { label: "Users and groups" }]}
+>
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Users and groups</h1>
+    <div class="flex gap-2">
+      <a href="/management/members/user/new" class="px-4 py-2 bg-[var(--color-primary)] text-white text-sm rounded hover:bg-[var(--color-primary-dark)] transition-colors">
+        New user
+      </a>
+      <a href="/management/members/group/new" class="px-4 py-2 border border-gray-300 text-gray-700 text-sm rounded hover:bg-gray-50 transition-colors">
+        New group
+      </a>
+    </div>
+  </div>
+  <!-- TODO: MemberList island (Phase 3) -->
+  <div class="bg-white rounded-lg border border-gray-200 p-8 text-center text-gray-400 shadow-sm">
+    <p>Member list coming in Phase 3.</p>
+  </div>
+</AdminLayout>

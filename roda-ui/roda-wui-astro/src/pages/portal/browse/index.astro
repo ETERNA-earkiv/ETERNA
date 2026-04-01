@@ -1,0 +1,8 @@
+---
+import PortalLayout from "@/components/layout/PortalLayout.astro";
+import AIPList from "@/components/browse/AIPList.tsx";
+---
+<PortalLayout title="Browse">
+  <h1 class="text-2xl font-bold text-gray-800 mb-6">Browse the archive</h1>
+  <AIPList user={null} client:load />
+</PortalLayout>

@@ -1,0 +1,18 @@
+---
+import AdminLayout from "@/components/layout/AdminLayout.astro";
+---
+<AdminLayout
+  title="Risk register"
+  breadcrumb={[{ label: "Planning", href: "/planning" }, { label: "Risk register" }]}
+>
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Risk register</h1>
+    <a href="/planning/risks/new" class="px-4 py-2 bg-[var(--color-primary)] text-white text-sm rounded hover:bg-[var(--color-primary-dark)] transition-colors">
+      New risk
+    </a>
+  </div>
+  <!-- TODO: RiskList island (Phase 4) -->
+  <div class="bg-white rounded-lg border border-gray-200 p-8 text-center text-gray-400 shadow-sm">
+    <p>Risk register coming in Phase 4.</p>
+  </div>
+</AdminLayout>

@@ -1,0 +1,21 @@
+---
+import AuthLayout from "@/components/layout/AuthLayout.astro";
+import LoginForm from "@/components/auth/LoginForm.tsx";
+
+// If already logged in, redirect to home
+if (Astro.locals.user && !Astro.locals.user.isGuest) {
+  return Astro.redirect(Astro.url.searchParams.get("redirect") ?? "/");
+}
+
+---
+<AuthLayout title="Sign in">
+  <h1 class="text-xl font-semibold text-gray-800 mb-6 text-center">Sign in to ETERNA</h1>
+  <LoginForm redirectTo={Astro.url.searchParams.get("redirect") ?? "/"} client:load />
+  <div class="mt-4 text-center text-sm">
+    <a href="/auth/recover" class="text-[var(--color-primary)] hover:underline">Forgot password?</a>
+  </div>
+  <div class="mt-2 text-center text-sm text-gray-500">
+    Don't have an account?{" "}
+    <a href="/auth/register" class="text-[var(--color-primary)] hover:underline">Register</a>
+  </div>
+</AuthLayout>

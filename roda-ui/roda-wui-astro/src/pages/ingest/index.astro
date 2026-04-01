@@ -1,0 +1,21 @@
+---
+import AdminLayout from "@/components/layout/AdminLayout.astro";
+
+const sections = [
+  { title: "Pre-ingest", href: "/ingest/pre", desc: "Pre-ingest assessment and validation instructions." },
+  { title: "Transfer", href: "/ingest/transfer", desc: "Browse and upload submission information packages." },
+  { title: "Process", href: "/ingest/process", desc: "Monitor ongoing and completed ingest jobs." },
+  { title: "Appraisal", href: "/ingest/appraisal", desc: "Assess and appraise ingested content." },
+];
+---
+<AdminLayout title="Ingest" breadcrumb={[{ label: "Ingest" }]}>
+  <h1 class="text-2xl font-bold text-gray-800 mb-6">Ingest</h1>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    {sections.map((s) => (
+      <a href={s.href} class="block p-5 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all">
+        <h2 class="font-semibold text-gray-800 mb-1">{s.title}</h2>
+        <p class="text-sm text-gray-500">{s.desc}</p>
+      </a>
+    ))}
+  </div>
+</AdminLayout>

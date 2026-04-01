@@ -1,0 +1,20 @@
+---
+import AdminLayout from "@/components/layout/AdminLayout.astro";
+
+const sections = [
+  { title: "Policy", href: "/disposal/policy", desc: "Manage disposal schedules, holds, and rules." },
+  { title: "Confirmations", href: "/disposal/confirmations", desc: "Create and manage disposal confirmations." },
+  { title: "Destroyed records", href: "/disposal/destroyed", desc: "View records of destroyed content." },
+];
+---
+<AdminLayout title="Disposal" breadcrumb={[{ label: "Disposal" }]}>
+  <h1 class="text-2xl font-bold text-gray-800 mb-6">Disposal</h1>
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    {sections.map((s) => (
+      <a href={s.href} class="block p-5 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all">
+        <h2 class="font-semibold text-gray-800 mb-1">{s.title}</h2>
+        <p class="text-sm text-gray-500">{s.desc}</p>
+      </a>
+    ))}
+  </div>
+</AdminLayout>

@@ -1,0 +1,18 @@
+---
+import AdminLayout from "@/components/layout/AdminLayout.astro";
+---
+<AdminLayout
+  title="Representation information"
+  breadcrumb={[{ label: "Planning", href: "/planning" }, { label: "Representation information" }]}
+>
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Representation information</h1>
+    <a href="/planning/representation-information/new" class="px-4 py-2 bg-[var(--color-primary)] text-white text-sm rounded hover:bg-[var(--color-primary-dark)] transition-colors">
+      New entry
+    </a>
+  </div>
+  <!-- TODO: RepresentationInformationList island (Phase 4) -->
+  <div class="bg-white rounded-lg border border-gray-200 p-8 text-center text-gray-400 shadow-sm">
+    <p>Representation information network coming in Phase 4.</p>
+  </div>
+</AdminLayout>

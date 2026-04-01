@@ -1,0 +1,34 @@
+---
+import Header from "./Header.tsx";
+import Breadcrumb from "./Breadcrumb.astro";
+import type { BreadcrumbItem } from "./Breadcrumb.astro";
+import "@/styles/global.css";
+
+interface Props {
+  title: string;
+  breadcrumb?: BreadcrumbItem[];
+}
+
+const { title, breadcrumb = [] } = Astro.props;
+const user = Astro.locals.user;
+const currentPath = new URL(Astro.request.url).pathname;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title} — ETERNA</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  </head>
+  <body>
+    <Header user={user} currentPath={currentPath} client:load />
+    {breadcrumb.length > 0 && <Breadcrumb items={breadcrumb} />}
+    <main class="page-content">
+      <slot />
+    </main>
+    <footer class="text-center text-xs text-gray-400 py-6 border-t border-gray-200 mt-8">
+      ETERNA &mdash; Digital Preservation Repository
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,31 @@
+---
+import AdminLayout from "@/components/layout/AdminLayout.astro";
+
+const user = Astro.locals.user;
+---
+<AdminLayout title="Profile" breadcrumb={[{ label: "Profile" }]}>
+  <h1 class="text-2xl font-bold text-gray-800 mb-6">Profile</h1>
+  {user && (
+    <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm max-w-lg">
+      <dl class="space-y-3 text-sm">
+        <div class="flex gap-4">
+          <dt class="w-32 font-medium text-gray-500">Username</dt>
+          <dd class="text-gray-800">{user.name}</dd>
+        </div>
+        <div class="flex gap-4">
+          <dt class="w-32 font-medium text-gray-500">Full name</dt>
+          <dd class="text-gray-800">{user.fullname || "—"}</dd>
+        </div>
+        <div class="flex gap-4">
+          <dt class="w-32 font-medium text-gray-500">Email</dt>
+          <dd class="text-gray-800">{user.email || "—"}</dd>
+        </div>
+        <div class="flex gap-4">
+          <dt class="w-32 font-medium text-gray-500">Groups</dt>
+          <dd class="text-gray-800">{user.groups.join(", ") || "—"}</dd>
+        </div>
+      </dl>
+      <!-- TODO: UserForm island (Phase 3) -->
+    </div>
+  )}
+</AdminLayout>

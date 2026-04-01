@@ -12,5 +12,6 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>roda-wui</module>
+		<module>roda-wui-astro</module>
 	</modules>
 </project>

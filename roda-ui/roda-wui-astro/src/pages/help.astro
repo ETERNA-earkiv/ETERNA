@@ -1,0 +1,22 @@
+---
+import AdminLayout from "@/components/layout/AdminLayout.astro";
+import { apiGet } from "@/lib/api/client";
+
+const cookieHeader = Astro.request.headers.get("cookie") ?? undefined;
+let helpHtml = "";
+try {
+  helpHtml = await apiGet<string>("/themes?resource-id=Help.html", { cookie: cookieHeader });
+} catch { /* no custom HTML */ }
+---
+<AdminLayout title="Help" breadcrumb={[{ label: "Help" }]}>
+  {helpHtml ? (
+    <div class="prose max-w-none">
+      <Fragment set:html={helpHtml} />
+    </div>
+  ) : (
+    <div class="prose max-w-none bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+      <h1>Help</h1>
+      <p>For documentation and support, please refer to the ETERNA documentation.</p>
+    </div>
+  )}
+</AdminLayout>

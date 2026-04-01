@@ -1,0 +1,22 @@
+---
+import AdminLayout from "@/components/layout/AdminLayout.astro";
+import { apiGet } from "@/lib/api/client";
+
+const cookieHeader = Astro.request.headers.get("cookie") ?? undefined;
+let preIngestHtml = "";
+try {
+  preIngestHtml = await apiGet<string>("/themes?resource-id=IngestTransferDescription.html", { cookie: cookieHeader });
+} catch { /* no custom HTML */ }
+---
+<AdminLayout title="Pre-ingest" breadcrumb={[{ label: "Ingest", href: "/ingest" }, { label: "Pre-ingest" }]}>
+  <h1 class="text-2xl font-bold text-gray-800 mb-6">Pre-ingest</h1>
+  {preIngestHtml ? (
+    <div class="prose max-w-none">
+      <Fragment set:html={preIngestHtml} />
+    </div>
+  ) : (
+    <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm prose max-w-none">
+      <p>This section describes the pre-ingest process, including how to prepare Submission Information Packages (SIPs) for ingestion.</p>
+    </div>
+  )}
+</AdminLayout>

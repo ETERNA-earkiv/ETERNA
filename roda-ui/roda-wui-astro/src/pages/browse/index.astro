@@ -1,0 +1,12 @@
+---
+import AdminLayout from "@/components/layout/AdminLayout.astro";
+import AIPList from "@/components/browse/AIPList.tsx";
+
+const user = Astro.locals.user;
+---
+<AdminLayout title="Browse" breadcrumb={[{ label: "Browse" }]}>
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Browse</h1>
+  </div>
+  <AIPList user={user} client:load />
+</AdminLayout>
