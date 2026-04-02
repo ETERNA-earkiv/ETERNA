@@ -1,6 +1,7 @@
 package org.roda.wui.client.redact;
 
 import com.google.gwt.dom.client.Element;
+import elemental2.dom.AbortSignal;
 import elemental2.dom.Blob;
 import elemental2.promise.Promise;
 import jsinterop.annotations.JsFunction;
@@ -12,7 +13,7 @@ import jsinterop.annotations.JsType;
 public class PDFRedactorObject {
   @JsFunction
   public interface SaveCallback {
-    Promise<?> onInvoke(Blob pdfData);
+    Promise<?> onInvoke(Blob pdfData, AbortSignal signal);
   }
 
   @JsMethod
