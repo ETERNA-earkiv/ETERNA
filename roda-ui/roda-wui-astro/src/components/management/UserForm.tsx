@@ -13,12 +13,12 @@ const qc = new QueryClient();
 interface RodaUser {
   id: string;
   name: string;
-  fullname?: string;
+  fullName?: string;
   email?: string;
   active?: boolean;
-  isGuest?: boolean;
+  guest?: boolean;
   groups?: string[];
-  roles?: string[];
+  allRoles?: string[];
 }
 
 interface RodaGroup {
@@ -37,7 +37,7 @@ function Inner({ userId, onSuccess }: UserFormProps) {
 
   const [form, setForm] = useState({
     name: "",
-    fullname: "",
+    fullName: "",
     email: "",
     password: "",
     active: true,
@@ -53,7 +53,9 @@ function Inner({ userId, onSuccess }: UserFormProps) {
 
   const { data: allGroups } = useQuery({
     queryKey: ["groups-all"],
-    queryFn: () => apiPost<{ results: RodaGroup[] }>("/members/groups/find", {
+    queryFn: () => apiPost<{ results: RodaGroup[] }>("/members/find", {
+      filter: { parameters: [{ type: "SimpleFilterParameter", name: "isUser", value: "false" }] },
+      onlyActive: true,
       sublist: { firstElementIndex: 0, maximumElementCount: 200 },
     }).then((r) => r.results),
   });
@@ -62,7 +64,7 @@ function Inner({ userId, onSuccess }: UserFormProps) {
     if (user) {
       setForm({
         name: user.name,
-        fullname: user.fullname ?? "",
+        fullName: user.fullName ?? "",
         email: user.email ?? "",
         password: "",
         active: user.active ?? true,
@@ -74,7 +76,7 @@ function Inner({ userId, onSuccess }: UserFormProps) {
   const saveMutation = useMutation({
     mutationFn: (data: typeof form) => {
       const body = { ...data, password: data.password || undefined };
-      if (isEdit) return apiPut<RodaUser>(`/members/users/${userId}`, body);
+      if (isEdit) return apiPut<RodaUser>("/members/users", { ...body, id: userId, name: form.name });
       return apiPost<RodaUser>("/members/users", body);
     },
     onSuccess: (saved) => {
@@ -115,8 +117,8 @@ function Inner({ userId, onSuccess }: UserFormProps) {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Full name</label>
           <input
-            value={form.fullname}
-            onChange={(e) => setForm((p) => ({ ...p, fullname: e.target.value }))}
+            value={form.fullName}
+            onChange={(e) => setForm((p) => ({ ...p, fullName: e.target.value }))}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>

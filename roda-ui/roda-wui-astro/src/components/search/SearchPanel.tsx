@@ -7,7 +7,7 @@
 import { useState, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { apiFindRequest, type FindRequest, type FacetResult, type FacetValue } from "@/lib/api/client";
+import { apiFindRequest, type FindRequest, type FacetParameter, type FacetResult, type FacetValue } from "@/lib/api/client";
 
 const qc = new QueryClient({ defaultOptions: { queries: { retry: 1 } } });
 
@@ -49,21 +49,20 @@ const RESOURCE_LABELS: Record<SearchResourceType, string> = {
 };
 
 const FACET_FIELDS: Record<SearchResourceType, string[]> = {
-  aips: ["level", "state", "type", "has_representations"],
-  representations: ["type", "status", "original"],
-  files: ["formatDesignationName", "pronom"],
+  aips: ["level", "hasRepresentations"],
+  representations: ["type", "representationStates", "original"],
+  files: ["fileFormat", "formatPronom"],
   dips: [],
 };
 
 const FACET_LABELS: Record<string, string> = {
   level: "Level",
-  state: "State",
+  hasRepresentations: "Has representations",
   type: "Type",
-  has_representations: "Has representations",
-  status: "Status",
+  representationStates: "States",
   original: "Original",
-  formatDesignationName: "Format",
-  pronom: "PRONOM",
+  fileFormat: "Format",
+  formatPronom: "PRONOM",
 };
 
 function formatBytes(bytes: number): string {
@@ -132,7 +131,7 @@ function Inner({ defaultResource = "aips", showResourceToggle = true }: SearchPa
     };
   }, [submittedQuery, activeFacets, resource, page]);
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ["search", resource, submittedQuery, activeFacets, page],
     queryFn: () => apiFindRequest<SearchResultItem>(resource, buildFindRequest()),
     enabled: true,
@@ -256,7 +255,7 @@ function Inner({ defaultResource = "aips", showResourceToggle = true }: SearchPa
             {isLoading ? (
               <span>Searching…</span>
             ) : isError ? (
-              <span className="text-red-600">Search failed. Please try again.</span>
+              <span className="text-red-600">Search failed: {error instanceof Error ? error.message : String(error)}</span>
             ) : (
               <span>
                 {data?.totalCount ?? 0} result{(data?.totalCount ?? 0) !== 1 ? "s" : ""}

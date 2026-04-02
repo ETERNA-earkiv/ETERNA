@@ -13,17 +13,17 @@ const qc = new QueryClient();
 interface RodaUser {
   id: string;
   name: string;
-  fullname?: string;
+  fullName?: string;
   email?: string;
   active?: boolean;
-  isGuest?: boolean;
+  guest?: boolean;
   groups?: string[];
 }
 
 interface RodaGroup {
   id: string;
   name: string;
-  fullname?: string;
+  fullName?: string;
   users?: string[];
 }
 
@@ -39,8 +39,8 @@ const USER_COLUMNS: ColumnDef<RodaUser>[] = [
     ),
   },
   {
-    id: "fullname",
-    accessorKey: "fullname",
+    id: "fullName",
+    accessorKey: "fullName",
     header: "Full name",
     cell: (info) => <span className="text-sm text-gray-700">{(info.getValue() as string) || "—"}</span>,
   },
@@ -88,8 +88,8 @@ const GROUP_COLUMNS: ColumnDef<RodaGroup>[] = [
     ),
   },
   {
-    id: "fullname",
-    accessorKey: "fullname",
+    id: "fullName",
+    accessorKey: "fullName",
     header: "Description",
     cell: (info) => <span className="text-sm text-gray-600">{(info.getValue() as string) || "—"}</span>,
   },
@@ -138,16 +138,18 @@ function Inner() {
 
       {tab === "users" ? (
         <DataTable<RodaUser>
-          resource="members/users"
+          resource="members"
           columns={USER_COLUMNS}
           defaultPageSize={25}
+          filter={{ parameters: [{ type: "SimpleFilterParameter", name: "isUser", value: "true" }] }}
           emptyMessage="No users found."
         />
       ) : (
         <DataTable<RodaGroup>
-          resource="members/groups"
+          resource="members"
           columns={GROUP_COLUMNS}
           defaultPageSize={25}
+          filter={{ parameters: [{ type: "SimpleFilterParameter", name: "isUser", value: "false" }] }}
           emptyMessage="No groups found."
         />
       )}

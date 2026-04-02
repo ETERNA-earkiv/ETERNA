@@ -23,12 +23,14 @@ interface PluginInfo {
 }
 
 interface PluginParameter {
+  id: string;
   name: string;
   defaultValue?: string;
   description?: string;
   type?: string;
   mandatory?: boolean;
   possibleValues?: string[];
+  readonly?: boolean;
 }
 
 interface JobCreationWizardProps {
@@ -48,14 +50,17 @@ function Inner({ selectedIds = [], onSuccess }: JobCreationWizardProps) {
 
   const { data: plugins, isLoading: loadingPlugins, isError: pluginsError } = useQuery({
     queryKey: ["plugins", "INGEST"],
-    queryFn: () => apiGet<PluginInfo[]>("/configurations/plugins?type=INGEST"),
+    queryFn: () =>
+      apiGet<{ pluginInfoList: PluginInfo[] }>("/configurations/plugins?type=INGEST").then(
+        (r) => r.pluginInfoList ?? []
+      ),
   });
 
   useEffect(() => {
     if (selectedPlugin?.parameters) {
       const defaults: Record<string, string> = {};
       for (const p of selectedPlugin.parameters) {
-        defaults[p.name] = p.defaultValue ?? "";
+        defaults[p.id] = p.defaultValue ?? "";
       }
       setParamValues(defaults);
     }
@@ -75,11 +80,17 @@ function Inner({ selectedIds = [], onSuccess }: JobCreationWizardProps) {
   function handleSubmit() {
     if (!selectedPlugin) return;
     setError(null);
-    const pluginParams = Object.entries(paramValues).map(([name, value]) => ({ name, value }));
     createMutation.mutate({
-      pluginId: selectedPlugin.id,
-      pluginParameters: pluginParams,
-      sourceObjects: selectedIds.map((id) => ({ objectClass: "TransferredResource", objectUUID: id })),
+      name: selectedPlugin.name ?? selectedPlugin.id,
+      plugin: selectedPlugin.id,
+      pluginParameters: paramValues,
+      sourceObjects: {
+        "@type": "SelectedItemsListRequest",
+        ids: selectedIds,
+      },
+      sourceObjectsClass: "TransferredResource",
+      priority: "MEDIUM",
+      parallelism: "LIMITED",
     });
   }
 
@@ -149,9 +160,9 @@ function Inner({ selectedIds = [], onSuccess }: JobCreationWizardProps) {
           ) : (
             <div className="space-y-3">
               {selectedPlugin.parameters!.map((param) => (
-                <div key={param.name}>
+                <div key={param.id}>
                   <label className="block text-xs font-medium text-gray-700 mb-1">
-                    {param.name}
+                    {param.name || param.id}
                     {param.mandatory && <span className="text-red-500 ml-1">*</span>}
                   </label>
                   {param.description && (
@@ -159,8 +170,8 @@ function Inner({ selectedIds = [], onSuccess }: JobCreationWizardProps) {
                   )}
                   {param.possibleValues?.length ? (
                     <select
-                      value={paramValues[param.name] ?? ""}
-                      onChange={(e) => setParamValues((prev) => ({ ...prev, [param.name]: e.target.value }))}
+                      value={paramValues[param.id] ?? ""}
+                      onChange={(e) => setParamValues((prev) => ({ ...prev, [param.id]: e.target.value }))}
                       className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="">— Select —</option>
@@ -171,9 +182,10 @@ function Inner({ selectedIds = [], onSuccess }: JobCreationWizardProps) {
                   ) : (
                     <input
                       type="text"
-                      value={paramValues[param.name] ?? ""}
-                      onChange={(e) => setParamValues((prev) => ({ ...prev, [param.name]: e.target.value }))}
+                      value={paramValues[param.id] ?? ""}
+                      onChange={(e) => setParamValues((prev) => ({ ...prev, [param.id]: e.target.value }))}
                       className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      readOnly={param.readonly}
                     />
                   )}
                 </div>

@@ -13,8 +13,8 @@ const qc = new QueryClient();
 interface RodaGroup {
   id: string;
   name: string;
-  fullname?: string;
-  roles?: string[];
+  fullName?: string;
+  allRoles?: string[];
   users?: string[];
 }
 
@@ -26,7 +26,7 @@ interface GroupFormProps {
 function Inner({ groupId, onSuccess }: GroupFormProps) {
   const isEdit = !!groupId;
 
-  const [form, setForm] = useState({ name: "", fullname: "" });
+  const [form, setForm] = useState({ name: "", fullName: "" });
   const [error, setError] = useState<string | null>(null);
 
   const { data: group } = useQuery({
@@ -36,12 +36,12 @@ function Inner({ groupId, onSuccess }: GroupFormProps) {
   });
 
   useEffect(() => {
-    if (group) setForm({ name: group.name, fullname: group.fullname ?? "" });
+    if (group) setForm({ name: group.name, fullName: group.fullName ?? "" });
   }, [group]);
 
   const saveMutation = useMutation({
     mutationFn: (data: typeof form) => {
-      if (isEdit) return apiPut<RodaGroup>(`/members/groups/${groupId}`, data);
+      if (isEdit) return apiPut<RodaGroup>("/members/groups", { ...data, id: groupId, name: form.name });
       return apiPost<RodaGroup>("/members/groups", data);
     },
     onSuccess: (saved) => {
@@ -72,8 +72,8 @@ function Inner({ groupId, onSuccess }: GroupFormProps) {
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
         <input
-          value={form.fullname}
-          onChange={(e) => setForm((p) => ({ ...p, fullname: e.target.value }))}
+          value={form.fullName}
+          onChange={(e) => setForm((p) => ({ ...p, fullName: e.target.value }))}
           className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
