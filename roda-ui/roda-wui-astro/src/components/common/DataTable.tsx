@@ -49,12 +49,13 @@ function Inner<T extends object>({
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
 
   const findBody: FindRequest = {
-    filter,
+    filter: filter ?? { parameters: [{ type: "AllFilterParameter" }] },
+    onlyActive: true,
     sublist: {
       firstElementIndex: pageIndex * pageSize,
       maximumElementCount: pageSize,
     },
-    sortParameters: sorting.map((s) => ({ name: s.id, descending: s.desc })),
+    sorter: sorting.length ? { parameters: sorting.map((s) => ({ name: s.id, descending: s.desc })) } : undefined,
     facets,
   };
 

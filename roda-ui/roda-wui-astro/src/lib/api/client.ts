@@ -145,24 +145,29 @@ export async function apiDelete<T>(
 // ---------------------------------------------------------------------------
 
 export interface FindRequest {
-  filter?: {
+  /** filter.parameters is a list of FilterParameter (with Jackson @type discriminator) */
+  filter: {
     parameters: FilterParameter[];
   };
+  /** Required by the Java builder constructor */
+  onlyActive: boolean;
   sublist?: {
     firstElementIndex: number;
     maximumElementCount: number;
   };
-  sortParameters?: SortParameter[];
-  facets?: {
-    parameters: FacetParameter[];
+  sorter?: {
+    parameters: SortParameter[];
   };
-  onlyActive?: boolean;
-  justActive?: boolean;
+  /** facets.parameters is a Map<fieldName, FacetParameter> — NOT an array */
+  facets?: {
+    parameters: Record<string, FacetParameter>;
+  };
 }
 
 export interface FilterParameter {
-  name?: string;
+  /** Jackson @type discriminator, e.g. "AllFilterParameter", "BasicSearchFilterParameter", "SimpleFilterParameter" */
   type: string;
+  name?: string;
   value?: string;
   values?: string[];
   id?: string;
@@ -176,8 +181,9 @@ export interface SortParameter {
 }
 
 export interface FacetParameter {
-  name: string;
+  /** Jackson @type discriminator: "SimpleFacetParameter" or "RangeFacetParameter" */
   type: string;
+  name: string;
   limit?: number;
   minCount?: number;
 }

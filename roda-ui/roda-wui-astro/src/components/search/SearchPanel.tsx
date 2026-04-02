@@ -96,17 +96,19 @@ function Inner({ defaultResource = "aips", showResourceToggle = true }: SearchPa
   const PAGE_SIZE = 25;
 
   const buildFindRequest = useCallback((): FindRequest => {
-    const parameters: NonNullable<FindRequest["filter"]>["parameters"] = [];
+    const filterParameters: FindRequest["filter"]["parameters"] = [];
 
     if (submittedQuery.trim()) {
-      parameters.push({
+      filterParameters.push({
         type: "BasicSearchFilterParameter",
         value: submittedQuery.trim(),
       });
+    } else {
+      filterParameters.push({ type: "AllFilterParameter" });
     }
 
     for (const facet of activeFacets) {
-      parameters.push({
+      filterParameters.push({
         type: "SimpleFilterParameter",
         name: facet.field,
         value: facet.value,
@@ -114,16 +116,19 @@ function Inner({ defaultResource = "aips", showResourceToggle = true }: SearchPa
     }
 
     const facetFields = FACET_FIELDS[resource] ?? [];
+    const facetsMap: Record<string, import("@/lib/api/client").FacetParameter> = {};
+    for (const f of facetFields) {
+      facetsMap[f] = { type: "SimpleFacetParameter", name: f, limit: 10, minCount: 1 };
+    }
 
     return {
-      filter: { parameters },
+      filter: { parameters: filterParameters },
+      onlyActive: true,
       sublist: {
         firstElementIndex: page * PAGE_SIZE,
         maximumElementCount: PAGE_SIZE,
       },
-      facets: facetFields.length
-        ? { parameters: facetFields.map((f) => ({ name: f, type: "SimpleFacetParameter", limit: 10, minCount: 1 })) }
-        : undefined,
+      facets: facetFields.length ? { parameters: facetsMap } : undefined,
     };
   }, [submittedQuery, activeFacets, resource, page]);
 
