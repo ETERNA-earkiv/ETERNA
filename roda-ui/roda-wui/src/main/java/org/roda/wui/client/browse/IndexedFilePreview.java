@@ -52,8 +52,8 @@ public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
     ListBuilder<IndexedFile> folderListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
       new AsyncTableCellOptions<>(IndexedFile.class, "IndexedFilePreview_files").withFilter(filter)
         .withSummary(messages.representationListOfFiles()).withJustActive(getJustActive()).bindOpener()
-        .withActionable(FileSearchWrapperActions.get(getObject().getAipId(), getObject().getRepresentationId(), getState(),
-          getObject(), getPermissions())));
+        .withActionable(FileSearchWrapperActions.get(getObject().getAipId(), getObject().getRepresentationId(),
+          getState(), getObject(), getPermissions())));
 
     LastSelectedItemsSingleton.getInstance().setSelectedJustActive(getJustActive());
 
