@@ -188,6 +188,12 @@ public class PDFRedactor extends Composite {
     pdfRedactorPanel.setUrl(downloadUrl);
     pdfRedactorPanel.mount();
     pdfRedactorPanel.setSaveCallback((Blob pdfData) -> {
+      if (savedBlobUrl != null) {
+        revokeBlobUrl(savedBlobUrl);
+      }
+      savedBlobUrl = createBlobUrl(pdfData);
+      printButton.setVisible(true);
+
       getOrCreateRedactedRepresentation(aipId).then((representation) -> {
         List<String> path = new ArrayList<>(file.getPath());
 
@@ -203,11 +209,6 @@ public class PDFRedactor extends Composite {
         fetch(uploadUrl, requestInit).then(response -> {
           if (response.ok) {
             Toast.showInfo(messages.redactPdfToastTitle(), messages.redactPdfSaveSuccessDescription());
-            if (savedBlobUrl != null) {
-              revokeBlobUrl(savedBlobUrl);
-            }
-            savedBlobUrl = createBlobUrl(pdfData);
-            printButton.setVisible(true);
           } else if (response.status == RodaConstants.HTTP_RESPONSE_CODE_REQUEST_CONFLICT) {
             Toast.showError(messages.redactPdfToastTitle(), messages.fileAlreadyExists());
           } else {
