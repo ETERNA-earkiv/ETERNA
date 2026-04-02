@@ -9,68 +9,70 @@ interface NavItem {
   roles?: string[];
 }
 
+// Roles from roda-wui.properties (ui.menu.*.role)
 const NAV_ITEMS: NavItem[] = [
   {
     key: "browse",
     label: "Browse",
     href: "/browse",
-    roles: ["dissemination.browse"],
+    roles: ["aip.read"],
   },
   {
     key: "search",
     label: "Search",
     href: "/search",
-    roles: ["dissemination.metadata.read"],
+    roles: ["aip.read"],
   },
   {
     key: "ingest",
     label: "Ingest",
     children: [
-      { key: "ingest_pre", label: "Pre-ingest", href: "/ingest/pre", roles: ["ingest.pre.ingest"] },
-      { key: "ingest_transfer", label: "Transfer", href: "/ingest/transfer", roles: ["ingest.submission.upload"] },
-      { key: "ingest_process", label: "Process", href: "/ingest/process", roles: ["ingest.list"] },
-      { key: "ingest_appraisal", label: "Appraisal", href: "/ingest/appraisal", roles: ["ingest.appraisal.access"] },
+      { key: "ingest_pre", label: "Pre-ingest", href: "/ingest/pre", roles: ["transfer.read"] },
+      { key: "ingest_transfer", label: "Transfer", href: "/ingest/transfer", roles: ["transfer.read"] },
+      { key: "ingest_process", label: "Process", href: "/ingest/process", roles: ["job.read"] },
+      { key: "ingest_appraisal", label: "Appraisal", href: "/ingest/appraisal", roles: ["aip.appraisal"] },
     ],
-    roles: ["ingest.pre.ingest", "ingest.submission.upload", "ingest.list", "ingest.appraisal.access"],
+    roles: ["transfer.read", "job.read", "aip.appraisal"],
   },
   {
     key: "disposal",
     label: "Disposal",
     children: [
-      { key: "disposal_policy", label: "Policy", href: "/disposal/policy", roles: ["disposal.policy.read"] },
-      { key: "disposal_confirmations", label: "Confirmations", href: "/disposal/confirmations", roles: ["disposal.confirmation.read"] },
-      { key: "disposal_destroyed", label: "Destroyed records", href: "/disposal/destroyed", roles: ["disposal.confirmation.read"] },
+      { key: "disposal_policy", label: "Policy", href: "/disposal/policy", roles: ["disposal_rule.read", "disposal_schedule.read", "disposal_hold.read"] },
+      { key: "disposal_confirmations", label: "Confirmations", href: "/disposal/confirmations", roles: ["disposal_confirmation.read"] },
+      { key: "disposal_destroyed", label: "Destroyed records", href: "/disposal/destroyed", roles: ["disposal_schedule.manage"] },
     ],
-    roles: ["disposal.policy.read", "disposal.confirmation.read"],
+    roles: ["disposal_rule.read", "disposal_schedule.read", "disposal_hold.read", "disposal_confirmation.read", "disposal_schedule.manage"],
   },
   {
     key: "planning",
     label: "Planning",
     children: [
-      { key: "planning_representation_information", label: "Representation information", href: "/planning/representation-information", roles: ["representation.information.manage"] },
-      { key: "planning_risk", label: "Risk register", href: "/planning/risks", roles: ["risk.management.read"] },
-      { key: "planning_event", label: "Preservation events", href: "/planning/events", roles: ["preservation.events.read"] },
-      { key: "planning_agent", label: "Preservation agents", href: "/planning/agents", roles: ["preservation.events.read"] },
+      { key: "planning_representation_information", label: "Representation information", href: "/planning/representation-information", roles: ["ri.read"] },
+      { key: "planning_risk", label: "Risk register", href: "/planning/risks", roles: ["risk.read"] },
+      { key: "planning_event", label: "Preservation events", href: "/planning/events", roles: ["preservation_metadata.read"] },
+      { key: "planning_agent", label: "Preservation agents", href: "/planning/agents", roles: ["preservation_metadata.read"] },
     ],
-    roles: ["representation.information.manage", "risk.management.read", "preservation.events.read"],
+    roles: ["ri.read", "risk.read", "preservation_metadata.read"],
   },
   {
     key: "administration",
     label: "Administration",
     children: [
-      { key: "administration_actions", label: "Actions", href: "/management/actions", roles: ["process.run"] },
-      { key: "administration_internal_actions", label: "Internal actions", href: "/management/internal", roles: ["process.run.internal"] },
-      { key: "administration_user", label: "Users and groups", href: "/management/members", roles: ["user.management.read"] },
-      { key: "administration_log", label: "Audit logs", href: "/management/log", roles: ["log.view"] },
-      { key: "administration_notifications", label: "Notifications", href: "/management/notifications", roles: ["notification.view"] },
-      { key: "administration_statistics", label: "Statistics", href: "/management/statistics", roles: ["administration.reporting.access"] },
+      { key: "administration_actions", label: "Actions", href: "/management/actions", roles: ["job.read"] },
+      { key: "administration_internal_actions", label: "Internal actions", href: "/management/internal", roles: ["job.read"] },
+      { key: "administration_user", label: "Users and groups", href: "/management/members", roles: ["member.read"] },
+      { key: "administration_log", label: "Audit logs", href: "/management/log", roles: ["log_entry.read"] },
+      { key: "administration_notifications", label: "Notifications", href: "/management/notifications", roles: ["notification.read"] },
+      { key: "administration_statistics", label: "Statistics", href: "/management/statistics", roles: ["aip.read"] },
     ],
-    roles: ["process.run", "user.management.read", "log.view", "notification.view", "administration.reporting.access"],
+    roles: ["job.read", "member.read", "log_entry.read", "notification.read", "aip.read"],
   },
   {
     key: "help",
     label: "Help",
     href: "/help",
+    roles: ["aip.read"],
   },
 ];
 
@@ -209,7 +211,7 @@ function UserMenu({ user }: { user: AstroUser }) {
             Profile
           </a>
           <hr className="my-1 border-gray-100" />
-          <a href="/api/v2/members/users/logout" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+          <a href="/logout" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
             Sign out
           </a>
         </div>

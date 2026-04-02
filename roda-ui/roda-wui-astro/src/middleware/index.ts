@@ -48,9 +48,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
     const user = await apiGet<{
       id: string;
       name: string;
-      fullname: string;
+      fullName: string;
       email: string;
-      roles: string[];
+      allRoles: string[];
       groups: string[];
       active: boolean;
       guest: boolean;
@@ -65,9 +65,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
     context.locals.user = {
       id: user.id,
       name: user.name,
-      fullname: user.fullname,
+      fullname: user.fullName,
       email: user.email,
-      roles: user.roles ?? [],
+      roles: user.allRoles ?? [],
       groups: user.groups ?? [],
       isActive: user.active,
       isGuest: user.guest,
