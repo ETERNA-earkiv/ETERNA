@@ -36,13 +36,15 @@ a:hover {
   text-decoration: underline;
 }
 
-/* Nav links inside the header inherit white from the header element */
+/* Header bar links inherit white from the header background */
 header a {
   color: inherit;
+  text-decoration: none;
 }
 
-header a:hover {
-  text-decoration: none;
+/* Dropdown panels are white — reset link color to dark */
+header .absolute a {
+  color: var(--color-text);
 }
 
 /* ─── Layout helpers ──────────────────────────────────────────────────────── */
