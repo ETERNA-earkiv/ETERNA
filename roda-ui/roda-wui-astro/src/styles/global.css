@@ -36,6 +36,15 @@ a:hover {
   text-decoration: underline;
 }
 
+/* Nav links inside the header inherit white from the header element */
+header a {
+  color: inherit;
+}
+
+header a:hover {
+  text-decoration: none;
+}
+
 /* ─── Layout helpers ──────────────────────────────────────────────────────── */
 .page-content {
   max-width: 1400px;
