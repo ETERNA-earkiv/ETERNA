@@ -3,10 +3,13 @@ package org.roda.wui.client.redact;
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -111,6 +114,11 @@ public class PDFRedactor extends Composite {
   @UiField
   PDFRedactorPanel pdfRedactorPanel;
 
+  @UiField
+  Button printButton;
+
+  private String savedBlobUrl = null;
+
   private PDFRedactor() {
     initialized = false;
     initWidget(uiBinder.createAndBindUi(this));
@@ -172,6 +180,11 @@ public class PDFRedactor extends Composite {
   }
 
   private void initPdfRedactorPanel(final String aipId, final IndexedFile file, final String downloadUrl) {
+    printButton.setVisible(false);
+    if (savedBlobUrl != null) {
+      revokeBlobUrl(savedBlobUrl);
+      savedBlobUrl = null;
+    }
     pdfRedactorPanel.setUrl(downloadUrl);
     pdfRedactorPanel.mount();
     pdfRedactorPanel.setSaveCallback((Blob pdfData) -> {
@@ -190,6 +203,11 @@ public class PDFRedactor extends Composite {
         fetch(uploadUrl, requestInit).then(response -> {
           if (response.ok) {
             Toast.showInfo(messages.redactPdfToastTitle(), messages.redactPdfSaveSuccessDescription());
+            if (savedBlobUrl != null) {
+              revokeBlobUrl(savedBlobUrl);
+            }
+            savedBlobUrl = createBlobUrl(pdfData);
+            printButton.setVisible(true);
           } else if (response.status == RodaConstants.HTTP_RESPONSE_CODE_REQUEST_CONFLICT) {
             Toast.showError(messages.redactPdfToastTitle(), messages.fileAlreadyExists());
           } else {
@@ -302,6 +320,25 @@ public class PDFRedactor extends Composite {
 
     return changeRepTypeJobCallback.getPromise();
   }
+
+  @UiHandler("printButton")
+  void onPrintButtonClick(ClickEvent event) {
+    if (savedBlobUrl != null) {
+      openInNewTab(savedBlobUrl);
+    }
+  }
+
+  private static native String createBlobUrl(Blob blob) /*-{
+    return $wnd.URL.createObjectURL(blob);
+  }-*/;
+
+  private static native void revokeBlobUrl(String url) /*-{
+    $wnd.URL.revokeObjectURL(url);
+  }-*/;
+
+  private static native void openInNewTab(String url) /*-{
+    $wnd.open(url, '_blank');
+  }-*/;
 
   private void setupNavigation(IndexedFile indexedFile, IndexedAIP indexedAIP, IndexedRepresentation indexedRepresentation) {
     navigationToolbar.withObject(indexedFile)
