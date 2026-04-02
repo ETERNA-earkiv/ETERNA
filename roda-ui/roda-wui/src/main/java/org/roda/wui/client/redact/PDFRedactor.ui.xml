@@ -10,13 +10,13 @@
 	<wcag:AccessibleFocusPanel ui:field="keyboardFocus">
 		<g:FlowPanel styleName="pdf-redactor">
 			<common:NavigationToolbar ui:field="navigationToolbar" />
-			<g:FlowPanel addStyleNames="pdf-redactor-center" ui:field="center">
-				<redact:PDFRedactorPanel ui:field="pdfRedactorPanel" />
-			</g:FlowPanel>
-			<g:FlowPanel addStyleNames="pdf-redactor-actions">
+			<g:FlowPanel addStyleNames="pdf-redactor-toolbar">
 				<g:Button ui:field="printButton" addStyleNames="btn btn-default" visible="false">
 					<ui:text from='{messages.printButton}' />
 				</g:Button>
+			</g:FlowPanel>
+			<g:FlowPanel addStyleNames="pdf-redactor-center" ui:field="center">
+				<redact:PDFRedactorPanel ui:field="pdfRedactorPanel" />
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</wcag:AccessibleFocusPanel>
