@@ -7,6 +7,8 @@
  */
 package org.roda.wui.api.v2.utils;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -49,7 +51,7 @@ public class ApiUtils {
 
     responseHeaders.add("Content-Type", streamResponse.getStream().getMediaType());
     responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION,
-      "attachment; filename=\"" + streamResponse.getStream().getFileName() + "\"");
+      contentDispositionHeader("attachment", streamResponse.getStream().getFileName()));
     responseHeaders.add("Content-Length", String.valueOf(streamResponse.getStream().getSize()));
 
     Date lastModifiedDate = streamResponse.getStream().getLastModified();
@@ -72,7 +74,7 @@ public class ApiUtils {
       responseStream = consumesOutputStream::consumeOutputStream;
       responseHeaders.add("Content-Type", consumesOutputStream.getMediaType());
       responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION,
-        "attachment; filename=\"" + consumesOutputStream.getFileName() + "\"");
+        contentDispositionHeader("attachment", consumesOutputStream.getFileName()));
       responseHeaders.add("Content-Length", String.valueOf(consumesOutputStream.getSize()));
 
       return ResponseEntity.ok().headers(responseHeaders).body(responseStream);
@@ -86,7 +88,7 @@ public class ApiUtils {
     responseHeaders.add(HttpHeaders.CONTENT_TYPE, consumesOutputStream.getMediaType());
     responseHeaders.add(HttpHeaders.CONTENT_LENGTH, contentLength);
     responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION,
-      "inline; filename=\"" + consumesOutputStream.getFileName() + "\"");
+      contentDispositionHeader("inline", consumesOutputStream.getFileName()));
     responseHeaders.add(HttpHeaders.ACCEPT_RANGES, "bytes");
     responseHeaders.add(HttpHeaders.CONTENT_RANGE,
       "bytes" + " " + start + "-" + end + "/" + consumesOutputStream.getSize());
@@ -105,26 +107,26 @@ public class ApiUtils {
   }
 
   public static StreamResponse download(RequestContext requestContext, IsRODAObject object, String... pathPartials)
-      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     return download(requestContext, object, null, false, pathPartials);
   }
 
   public static StreamResponse download(RequestContext requestContext, LiteRODAObject lite, String... pathPartials)
-          throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    return download(requestContext,lite, null, false, pathPartials);
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    return download(requestContext, lite, null, false, pathPartials);
   }
 
-  public static StreamResponse download(RequestContext requestContext, IsRODAObject object, String fileName, boolean addTopDirectory,
-    String... pathPartials)
-      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+  public static StreamResponse download(RequestContext requestContext, IsRODAObject object, String fileName,
+    boolean addTopDirectory, String... pathPartials)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     ModelService model = requestContext.getModelService();
     ConsumesOutputStream download = model.exportObjectToStream(object, fileName, addTopDirectory, pathPartials);
     return new StreamResponse(download);
   }
 
-  public static StreamResponse download(RequestContext requestContext, LiteRODAObject lite, String fileName, boolean addTopDirectory,
-                                        String... pathPartials)
-          throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+  public static StreamResponse download(RequestContext requestContext, LiteRODAObject lite, String fileName,
+    boolean addTopDirectory, String... pathPartials)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     ModelService model = requestContext.getModelService();
     ConsumesOutputStream download = model.exportObjectToStream(lite, fileName, addTopDirectory, pathPartials);
     return new StreamResponse(download);
@@ -156,6 +158,16 @@ public class ApiUtils {
     }
 
     return Pair.of(startInteger, limitInteger);
+  }
+
+  /**
+   * Builds a Content-Disposition header value that supports non-ASCII filenames
+   * using RFC 5987 encoding (filename*=UTF-8''...) alongside an ASCII fallback.
+   */
+  static String contentDispositionHeader(String disposition, String filename) {
+    String asciiFilename = filename.replaceAll("[^\\x20-\\x7E]", "_");
+    String encodedFilename = URLEncoder.encode(filename, StandardCharsets.UTF_8).replace("+", "%20");
+    return disposition + "; filename=\"" + asciiFilename + "\"; filename*=UTF-8''" + encodedFilename;
   }
 
   private ApiUtils() {
