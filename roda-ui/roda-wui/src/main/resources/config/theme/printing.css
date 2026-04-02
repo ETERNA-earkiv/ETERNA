@@ -3,9 +3,9 @@
   	display: none;
   }
   .row {
-  	display: block;  	
+  	display: block;
   }
-  
+
   .row .col_1,
   .row .col_2,
   .row .col_3,
@@ -19,5 +19,18 @@
   .row .col_11,
   .row .col_12 {
   	width: 100%;
+  }
+
+  /* When printing from the PDF redactor, hide page chrome and show only the document */
+  body:has(.pdf-redactor) .header {
+    display: none;
+  }
+
+  body:has(.pdf-redactor) .navigationToolbar {
+    display: none;
+  }
+
+  body:has(.pdf-redactor) .pdf-redactor-center {
+    width: 100%;
   }
 }
