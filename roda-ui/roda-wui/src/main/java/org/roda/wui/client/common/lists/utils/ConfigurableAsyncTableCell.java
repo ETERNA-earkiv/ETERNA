@@ -12,8 +12,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.roda.core.data.common.RodaConstants;
@@ -33,6 +35,12 @@ import org.roda.wui.client.common.lists.utils.ColumnOptions.RenderingHint;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.StringUtils;
+import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
+import org.roda.core.data.v2.index.sublist.Sublist;
+import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.wui.client.browse.BrowserService;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
@@ -44,11 +52,15 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.i18n.client.LocaleInfo;
+
 
 import config.i18n.client.ClientMessages;
 
 public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableCell<T> {
 
+  private static final String DEFAULT_INDEXED_AIP_PATH = "default_IndexedAIP_path";
   private static final Map<String, Column<?, ?>> DEFAULT_COLUMNS = new HashMap<>();
   private static final Map<String, List<String>> DEFAULT_COLUMNS_FIELDS = new HashMap<>();
 
@@ -96,6 +108,8 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
     });
     DEFAULT_COLUMNS_FIELDS.put("default_IndexedAIP_hasrepresentations",
       Arrays.asList(RodaConstants.AIP_HAS_REPRESENTATIONS));
+
+    DEFAULT_COLUMNS_FIELDS.put(DEFAULT_INDEXED_AIP_PATH, Arrays.asList(RodaConstants.AIP_ANCESTORS, RodaConstants.AIP_TITLE));
 
     /********************************************
      * Representations
@@ -259,6 +273,7 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private final Map<Column<T, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
+  private long aipPathLookupGeneration = 0L;
 
   private static <T extends IsIndexed> List<String> calculateFieldsToReturn(AsyncTableCellOptions<T> options) {
     List<String> fieldsToReturn = new ArrayList<>();
@@ -317,6 +332,7 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
   protected void configureDisplay(CellTable<T> display) {
 
     List<ColumnOptions> columns = getOptions().getColumnOptions();
+    AipPathColumn pathColumn = null;
     columnSortingKeyMap.clear();
 
     for (final ColumnOptions c : columns) {
@@ -329,7 +345,12 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
 
       if (name.startsWith("default_")) {
         // is a default column
-        column = (Column<T, ?>) DEFAULT_COLUMNS.get(name);
+        if (DEFAULT_INDEXED_AIP_PATH.equals(name)) {
+          pathColumn = new AipPathColumn();
+          column = (Column<T, ?>) pathColumn;
+        } else {
+          column = (Column<T, ?>) DEFAULT_COLUMNS.get(name);
+        }
         htmlHeader = header.equals(name) ? messages.defaultColumnHeader(name) : SafeHtmlUtils.fromString(header);
         sortBy = c.getSortBy().equals(Collections.singletonList(name)) ? DEFAULT_COLUMNS_FIELDS.get(name) : sortBy;
       } else {
@@ -402,6 +423,94 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
     }
 
     addStyleName("my-collections-table");
+    final AipPathColumn finalPathColumn = pathColumn;
+    if (finalPathColumn != null) {
+      addValueChangeHandler(event -> {
+        final long lookupGeneration = ++aipPathLookupGeneration;
+        IndexResult<T> result = event.getValue();
+        if (result == null || result.getResults().isEmpty()) {
+          return;
+        }
+
+        // Collect all unique ancestor IDs across visible rows
+        Set<String> ancestorIds = new HashSet<>();
+        for (T item : result.getResults()) {
+          if (item instanceof IndexedAIP) {
+            List<String> anc = ((IndexedAIP) item).getAncestors();
+            if (anc != null) {
+              ancestorIds.addAll(anc);
+            }
+          }
+        }
+
+        if (ancestorIds.isEmpty()) {
+          return;
+        }
+
+        Filter batchFilter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, new ArrayList<>(ancestorIds)));
+        BrowserService.Util.getInstance().find(IndexedAIP.class.getName(), batchFilter, Sorter.NONE,
+            new Sublist(0, ancestorIds.size()), Facets.NONE, LocaleInfo.getCurrentLocale().getLocaleName(),
+            false, Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_TITLE),
+            new AsyncCallback<IndexResult<IsIndexed>>() {
+              @Override
+              public void onFailure(Throwable caught) {
+                if (lookupGeneration != aipPathLookupGeneration) {
+                  return;
+                }
+              }
+
+              @Override
+              public void onSuccess(IndexResult<IsIndexed> res) {
+                if (lookupGeneration != aipPathLookupGeneration) {
+                  return;
+                }
+                Map<String, String> titles = new HashMap<>();
+                for (IsIndexed r : res.getResults()) {
+                  IndexedAIP a = (IndexedAIP) r;
+                  String t = a.getTitle();
+                  titles.put(a.getUUID(), (t != null && !t.trim().isEmpty()) ? t : a.getUUID());
+                }
+                finalPathColumn.setAncestorTitles(titles);
+                redraw();
+              }
+            });
+      });
+    }
+  }
+
+  private static class AipPathColumn extends TextColumn<IndexedAIP> {
+    private Map<String, String> ancestorTitles = new HashMap<>();
+
+    @Override
+    public String getValue(IndexedAIP aip) {
+      if (aip == null) {
+        return null;
+      }
+      String rootLabel = messages.aipPathRootLabel();
+      List<String> ancestors = aip.getAncestors(); // ordered: closest parent first
+      String selfTitle = titleOrId(aip.getTitle(), aip.getId());
+      if (ancestors == null || ancestors.isEmpty()) {
+        return rootLabel + " / " + selfTitle;
+      }
+
+      List<String> parts = new ArrayList<>(ancestors.size() + 2);
+      parts.add(rootLabel);
+      // Show full path from top ancestor down to immediate parent.
+      for (int i = ancestors.size() - 1; i >= 0; i--) {
+        String id = ancestors.get(i);
+        parts.add(ancestorTitles.getOrDefault(id, id));
+      }
+      parts.add(selfTitle);
+      return StringUtils.join(parts, " / ");
+    }
+
+    private String titleOrId(String title, String id) {
+      return (title != null && !title.trim().isEmpty()) ? title : id;
+    }
+
+    public void setAncestorTitles(Map<String, String> titles) {
+      this.ancestorTitles = titles;
+    }
   }
 
   @Override
