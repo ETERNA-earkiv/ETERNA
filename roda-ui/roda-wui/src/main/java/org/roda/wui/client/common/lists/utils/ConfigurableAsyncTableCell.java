@@ -12,8 +12,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.roda.core.data.common.RodaConstants;
@@ -33,6 +35,12 @@ import org.roda.wui.client.common.lists.utils.ColumnOptions.RenderingHint;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.StringUtils;
+import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
+import org.roda.core.data.v2.index.sublist.Sublist;
+import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.wui.client.browse.BrowserService;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
@@ -46,15 +54,6 @@ import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.i18n.client.LocaleInfo;
-
-import java.util.HashSet;
-import java.util.Set;
-import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
-import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.wui.client.browse.BrowserService;
 
 
 import config.i18n.client.ClientMessages;
@@ -469,7 +468,7 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
                 for (IsIndexed r : res.getResults()) {
                   IndexedAIP a = (IndexedAIP) r;
                   String t = a.getTitle();
-                  titles.put(a.getId(), (t != null && !t.trim().isEmpty()) ? t : a.getId());
+                  titles.put(a.getUUID(), (t != null && !t.trim().isEmpty()) ? t : a.getUUID());
                 }
                 finalPathColumn.setAncestorTitles(titles);
                 redraw();
