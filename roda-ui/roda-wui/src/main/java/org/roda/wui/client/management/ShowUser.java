@@ -124,7 +124,7 @@ public class ShowUser extends Composite {
     stateValue.setHTML(HtmlSnippetUtils.getUserStateHtml(user));
 
     // Extra fields
-    loadExtraFields();
+//    loadExtraFields();
 
     if (!user.getExtra().isEmpty()) {
       HtmlSnippetUtils.createExtraShow(extraValue, user.getExtra(), false);
@@ -160,53 +160,53 @@ public class ShowUser extends Composite {
     actionsSidebar.setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(this.user)));
   }
 
-  private void loadExtraFields() {
-    UserManagementService.Util.getInstance().retrieveUserExtraBundle(user.getName(),
-      new AsyncCallback<UserExtraBundle>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          extraValue.add(new Label("Error loading extra fields"));
-        }
+//  private void loadExtraFields() {
+//    UserManagementService.Util.getInstance().retrieveUserExtraBundle(user.getName(),
+//      new AsyncCallback<UserExtraBundle>() {
+//        @Override
+//        public void onFailure(Throwable caught) {
+//          extraValue.add(new Label("Error loading extra fields"));
+//        }
+//
+//        @Override
+//        public void onSuccess(UserExtraBundle bundle) {
+//          displayExtraFields(bundle);
+//        }
+//      });
+//  }
 
-        @Override
-        public void onSuccess(UserExtraBundle bundle) {
-          displayExtraFields(bundle);
-        }
-      });
-  }
-
-  private void displayExtraFields(UserExtraBundle bundle) {
-    if (bundle != null && bundle.getValues() != null && !bundle.getValues().isEmpty()) {
-      for (MetadataValue mv : bundle.getValues()) {
-        String label = FormUtilities.getFieldLabel(mv);
-        String value = mv.get("value");
-
-        if (value != null && !value.trim().isEmpty()) {
-          // For list fields, convert stored value to localized display text
-          String displayValue = value;
-          String fieldType = mv.get("type");
-          if ("list".equals(fieldType)) {
-            displayValue = FormUtilities.getLocalizedListValue(mv, value);
-          }
-
-          FlowPanel fieldPanel = new FlowPanel();
-          fieldPanel.setStyleName("field");
-
-          Label labelWidget = new Label(label);
-          labelWidget.setStyleName("label");
-
-          Label valueWidget = new Label(displayValue);
-          valueWidget.setStyleName("value");
-
-          fieldPanel.add(labelWidget);
-          fieldPanel.add(valueWidget);
-
-          extraValue.add(fieldPanel);
-        }
-      }
-    }
-    // Don't show anything when there are no extra fields
-  }
+//  private void displayExtraFields(UserExtraBundle bundle) {
+//    if (bundle != null && bundle.getValues() != null && !bundle.getValues().isEmpty()) {
+//      for (MetadataValue mv : bundle.getValues()) {
+//        String label = FormUtilities.getFieldLabel(mv);
+//        String value = mv.get("value");
+//
+//        if (value != null && !value.trim().isEmpty()) {
+//          // For list fields, convert stored value to localized display text
+//          String displayValue = value;
+//          String fieldType = mv.get("type");
+//          if ("list".equals(fieldType)) {
+//            displayValue = FormUtilities.getLocalizedListValue(mv, value);
+//          }
+//
+//          FlowPanel fieldPanel = new FlowPanel();
+//          fieldPanel.setStyleName("field");
+//
+//          Label labelWidget = new Label(label);
+//          labelWidget.setStyleName("label");
+//
+//          Label valueWidget = new Label(displayValue);
+//          valueWidget.setStyleName("value");
+//
+//          fieldPanel.add(labelWidget);
+//          fieldPanel.add(valueWidget);
+//
+//          extraValue.add(fieldPanel);
+//        }
+//      }
+//    }
+//    // Don't show anything when there are no extra fields
+//  }
 
   private void buildPermissionList() {
     Set<String> allUserRoles = user.getAllRoles();
