@@ -240,8 +240,28 @@ public class ScheduleJobDialog extends DialogBox {
     confirmButton.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
+        String expr = buildScheduleExpression();
+        if (expr.startsWith(ONCE_PREFIX)) {
+          // Reject scheduling in the past
+          String datePart = expr.substring(ONCE_PREFIX.length()); // "YYYY-MM-DDTHH:MM"
+          // Parse into a Date using the deprecated but GWT-compatible approach
+          String[] dateTime = datePart.split("T");
+          String[] datePieces = dateTime[0].split("-");
+          String[] timePieces = dateTime[1].split(":");
+          @SuppressWarnings("deprecation")
+          Date selected = new Date(
+            Integer.parseInt(datePieces[0]) - 1900,
+            Integer.parseInt(datePieces[1]) - 1,
+            Integer.parseInt(datePieces[2]),
+            Integer.parseInt(timePieces[0]),
+            Integer.parseInt(timePieces[1]));
+          if (!selected.after(new Date())) {
+            previewLabel.setText(messages.scheduleDialogPastTimeError());
+            return;
+          }
+        }
         hide();
-        callback.onSchedule(buildScheduleExpression());
+        callback.onSchedule(expr);
       }
     });
 

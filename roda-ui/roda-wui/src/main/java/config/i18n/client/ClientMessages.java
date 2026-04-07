@@ -367,6 +367,8 @@ public interface ClientMessages extends Messages {
 
   String scheduleDialogConfirmButton();
 
+  String scheduleDialogPastTimeError();
+
   String createJobWorkflow();
 
   String createJobCategorySelect();
