@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.data.v2.jobs;
 
@@ -28,6 +28,7 @@ public class CreateJobRequest implements Serializable {
   private String sourceObjectsClass;
   private String priority;
   private String parallelism;
+  private String scheduleExpression;
 
   public CreateJobRequest() {
     // do nothing
@@ -87,5 +88,13 @@ public class CreateJobRequest implements Serializable {
 
   public void setSourceObjectsClass(String sourceObjectsClass) {
     this.sourceObjectsClass = sourceObjectsClass;
+  }
+
+  public String getScheduleExpression() {
+    return scheduleExpression;
+  }
+
+  public void setScheduleExpression(String scheduleExpression) {
+    this.scheduleExpression = scheduleExpression;
   }
 }

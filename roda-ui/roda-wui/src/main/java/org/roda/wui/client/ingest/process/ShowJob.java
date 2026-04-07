@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 /**
  *
@@ -595,25 +595,29 @@ public class ShowJob extends Composite {
     scheduleInfoLabel.setVisible(false);
     scheduleInfo.setVisible(false);
 
-    String distributedMode = ConfigurationManager.getStringWithDefault(
-      RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
-
-    if (distributedMode.equals(RodaConstants.DistributedModeType.LOCAL.name())
-      && Job.JOB_STATE.SCHEDULED.equals(job.getState())) {
-      Services services = new Services("Retrieve job schedule info", "retrieve");
-      services.configurationsResource(s -> s.retrieveCronValue(LocaleInfo.getCurrentLocale().getLocaleName()))
-        .whenComplete((stringResponse, throwable) -> {
-          if (throwable != null) {
-            AsyncCallbackUtils.defaultFailureTreatment(throwable);
-          } else {
-            String description = stringResponse.getValue();
-            if (StringUtils.isNotBlank(description)) {
+    if (Job.JOB_STATE.SCHEDULED.equals(job.getState())) {
+      String cronExpression = job.getFields() != null
+        ? (String) job.getFields().get(RodaConstants.JOB_SCHEDULE_INFO)
+        : null;
+      if (StringUtils.isNotBlank(cronExpression)) {
+        Services services = new Services("Retrieve job schedule description", "retrieve");
+        services
+          .configurationsResource(
+            s -> s.describeCronExpression(cronExpression, LocaleInfo.getCurrentLocale().getLocaleName()))
+          .whenComplete((stringResponse, throwable) -> {
+            if (throwable != null) {
+              // Fall back to displaying the raw expression
               scheduleInfoLabel.setVisible(true);
               scheduleInfo.setVisible(true);
-              scheduleInfo.setText(description);
+              scheduleInfo.setText(cronExpression);
+            } else {
+              String description = stringResponse.getValue();
+              scheduleInfoLabel.setVisible(true);
+              scheduleInfo.setVisible(true);
+              scheduleInfo.setText(StringUtils.isNotBlank(description) ? description : cronExpression);
             }
-          }
-        });
+          });
+      }
     }
 
     // set state details

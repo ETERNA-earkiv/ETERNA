@@ -1,0 +1,10 @@
+{
+  "properties": [
+    {
+      "name": "jobs.scheduler.interval.millis",
+      "type": "java.lang.Long",
+      "description": "Fixed delay in milliseconds between scheduled job execution checks.",
+      "defaultValue": 60000
+    }
+  ]
+}

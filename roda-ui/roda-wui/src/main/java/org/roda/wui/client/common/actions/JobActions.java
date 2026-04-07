@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.actions;
 
@@ -100,6 +100,9 @@ public class JobActions extends AbstractActionable<IndexedJob> {
     } else if (JobAction.INGEST_PROCESS.equals(action)) {
       return new CanActResult(PluginType.INGEST.equals(object.getPluginType()), CanActResult.Reason.CONTEXT,
         messages.reasonPluginIsNotIngest());
+    } else if (JobAction.UNSCHEDULE.equals(action)) {
+      return new CanActResult(Job.JOB_STATE.SCHEDULED.equals(object.getState()), CanActResult.Reason.CONTEXT,
+        messages.reasonJobNotPendingApproval());
     }
     return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonInvalidContext());
   }
@@ -139,6 +142,8 @@ public class JobActions extends AbstractActionable<IndexedJob> {
       approve(object, callback);
     } else if (JobAction.REJECT.equals(action)) {
       reject(object, callback);
+    } else if (JobAction.UNSCHEDULE.equals(action)) {
+      unschedule(object, callback);
     } else {
       unsupportedAction(action, callback);
     }
@@ -328,6 +333,29 @@ public class JobActions extends AbstractActionable<IndexedJob> {
     });
   }
 
+  private void unschedule(IndexedJob object, AsyncCallback<ActionImpact> callback) {
+    Dialogs.showConfirmDialog(messages.jobUnscheduleConfirmDialogTitle(), messages.jobUnscheduleConfirmDialogMessage(),
+      messages.dialogCancel(), messages.dialogYes(), new ActionAsyncCallback<Boolean>(callback) {
+
+        @Override
+        public void onSuccess(Boolean confirmed) {
+          if (confirmed) {
+            Services services = new Services("Unschedule job", "unschedule");
+            services.jobsResource(s -> s.unscheduleJob(object.getId())).whenComplete((value, error) -> {
+              if (error == null) {
+                doActionCallbackUpdated();
+              } else {
+                callback.onFailure(error);
+                doActionCallbackNone();
+              }
+            });
+          } else {
+            doActionCallbackNone();
+          }
+        }
+      });
+  }
+
   private void newProcess(AsyncCallback<ActionImpact> callback) {
     callback.onSuccess(ActionImpact.NONE);
     if (newProcessResolver != null) {
@@ -346,6 +374,7 @@ public class JobActions extends AbstractActionable<IndexedJob> {
     managementGroup.addButton(messages.stopButton(), JobAction.STOP, ActionImpact.DESTROYED, "btn-stop");
     managementGroup.addButton(messages.approveButton(), JobAction.APPROVE, ActionImpact.UPDATED, "btn-check");
     managementGroup.addButton(messages.rejectButton(), JobAction.REJECT, ActionImpact.DESTROYED, "btn-times");
+    managementGroup.addButton(messages.unscheduleButton(), JobAction.UNSCHEDULE, ActionImpact.UPDATED, "btn-times");
 
     // FIXME 20180731 bferreira: JobAction.INGEST_APPRAISAL button text should
     // be
@@ -365,7 +394,7 @@ public class JobActions extends AbstractActionable<IndexedJob> {
     NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB), STOP(RodaConstants.PERMISSION_METHOD_STOP_JOB),
     INGEST_APPRAISAL(RodaConstants.PERMISSION_METHOD_APPRAISAL),
     INGEST_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB), APPROVE(RodaConstants.PERMISSION_METHOD_APPROVE_JOB),
-    REJECT(RodaConstants.PERMISSION_METHOD_REJECT_JOB);
+    REJECT(RodaConstants.PERMISSION_METHOD_REJECT_JOB), UNSCHEDULE(RodaConstants.PERMISSION_METHOD_UNSCHEDULE_JOB);
 
     private List<String> methods;
 

@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.data.v2.jobs;
 
@@ -75,6 +75,9 @@ public class IndexedJob implements IsIndexed, HasId, HasInstanceID, HasInstanceN
   private List<String> attachmentsList = new ArrayList<>();
 
   private Map<String, Object> fields;
+
+  // next time this scheduled job should fire (null for non-scheduled jobs)
+  private Date nextScheduledRun = null;
 
   private JobPriority priority;
 
@@ -307,5 +310,13 @@ public class IndexedJob implements IsIndexed, HasId, HasInstanceID, HasInstanceN
    */
   public void setFields(Map<String, Object> fields) {
     this.fields = fields;
+  }
+
+  public Date getNextScheduledRun() {
+    return nextScheduledRun;
+  }
+
+  public void setNextScheduledRun(Date nextScheduledRun) {
+    this.nextScheduledRun = nextScheduledRun;
   }
 }

@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.api.v2.controller;
 
@@ -64,6 +64,16 @@ public class ConfigurationController implements ConfigurationRestService {
     if (StringUtils.isNotBlank(syncSchedule)) {
       CronExpressionDescriptor.setDefaultLocale(localeString.split("_")[0]);
       description = CronExpressionDescriptor.getDescription(syncSchedule);
+    }
+    return new StringResponse(description);
+  }
+
+  @Override
+  public StringResponse describeCronExpression(String cronExpression, String localeString) {
+    String description = null;
+    if (StringUtils.isNotBlank(cronExpression)) {
+      CronExpressionDescriptor.setDefaultLocale(localeString.split("_")[0]);
+      description = CronExpressionDescriptor.getDescription(cronExpression);
     }
     return new StringResponse(description);
   }

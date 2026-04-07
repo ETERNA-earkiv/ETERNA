@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.api.v2.services;
 
@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -62,6 +63,7 @@ import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v2.utils.ApiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.support.CronExpression;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -104,7 +106,14 @@ public class JobService {
     RequestNotValidException, AuthorizationDeniedException {
     Job updatedJob = new Job(job);
 
-    RodaCoreFactory.getPluginOrchestrator().createAndExecuteJobs(updatedJob, async);
+    String scheduleExpression = updatedJob.getScheduleExpression();
+    if (StringUtils.isNotBlank(scheduleExpression)) {
+      updatedJob.setState(Job.JOB_STATE.SCHEDULED);
+      updatedJob.setNextScheduledRun(computeNextRun(scheduleExpression));
+      RodaCoreFactory.getModelService().createOrUpdateJob(updatedJob);
+    } else {
+      RodaCoreFactory.getPluginOrchestrator().createAndExecuteJobs(updatedJob, async);
+    }
 
     // force commit
     RodaCoreFactory.getIndexService().commit(IndexedJob.class);
@@ -166,6 +175,35 @@ public class JobService {
     RodaCoreFactory.getModelService().createOrUpdateJob(job);
 
     return job;
+  }
+
+  public Job scheduleJob(String jobId, String cronExpression)
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    Job job = RodaCoreFactory.getModelService().retrieveJob(jobId);
+    job.setScheduleExpression(cronExpression);
+    job.setState(Job.JOB_STATE.SCHEDULED);
+    job.setNextScheduledRun(computeNextRun(cronExpression));
+    RodaCoreFactory.getModelService().createOrUpdateJob(job);
+    RodaCoreFactory.getIndexService().commit(IndexedJob.class);
+    return job;
+  }
+
+  public Job unscheduleJob(String jobId)
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    Job job = RodaCoreFactory.getModelService().retrieveJob(jobId);
+    job.setScheduleExpression(null);
+    job.setNextScheduledRun(null);
+    job.setState(Job.JOB_STATE.STOPPED);
+    job.setEndDate(new Date());
+    RodaCoreFactory.getModelService().createOrUpdateJob(job);
+    RodaCoreFactory.getIndexService().commit(IndexedJob.class);
+    return job;
+  }
+
+  public Date computeNextRun(String cronExpression) {
+    CronExpression cron = CronExpression.parse(cronExpression);
+    ZonedDateTime next = cron.next(ZonedDateTime.now());
+    return next != null ? Date.from(next.toInstant()) : null;
   }
 
   public void deleteJob(String jobId)

@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package config.i18n.client;
 
@@ -341,6 +341,28 @@ public interface ClientMessages extends Messages {
 
   String createJobCancelTitle();
 
+  String createJobScheduleTitle();
+
+  String scheduleDialogFrequencyLabel();
+
+  String scheduleDialogFrequencyHourly();
+
+  String scheduleDialogFrequencyDaily();
+
+  String scheduleDialogFrequencyWeekly();
+
+  String scheduleDialogFrequencyMonthly();
+
+  String scheduleDialogTimeLabel();
+
+  String scheduleDialogDayOfWeekLabel();
+
+  String scheduleDialogDayOfMonthLabel();
+
+  String scheduleDialogPreviewLabel();
+
+  String scheduleDialogConfirmButton();
+
   String createJobWorkflow();
 
   String createJobCategorySelect();
@@ -450,6 +472,8 @@ public interface ClientMessages extends Messages {
   String approveButton();
 
   String rejectButton();
+
+  String unscheduleButton();
 
   String listButton();
 
@@ -635,6 +659,10 @@ public interface ClientMessages extends Messages {
   String jobRejectConfirmDialogTitle();
 
   String jobRejectConfirmDialogMessage();
+
+  String jobUnscheduleConfirmDialogTitle();
+
+  String jobUnscheduleConfirmDialogMessage();
 
   String jobSelectedApproveConfirmDialogMessage(Long size);
 

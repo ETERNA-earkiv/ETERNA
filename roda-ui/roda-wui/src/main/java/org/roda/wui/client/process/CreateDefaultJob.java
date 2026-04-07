@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 /**
  *
@@ -160,6 +160,8 @@ public class CreateDefaultJob extends Composite {
   FlowPanel targetListPanel;
   @UiField
   Button buttonCreate;
+  @UiField
+  Button buttonSchedule;
   @UiField
   Button buttonObtainCommand;
   @UiField
@@ -683,6 +685,50 @@ public class CreateDefaultJob extends Composite {
         HistoryUtils.newHistory(ActionProcess.RESOLVER);
       }
     });
+  }
+
+  @SuppressWarnings("rawtypes")
+  @UiHandler("buttonSchedule")
+  public void buttonScheduleHandler(ClickEvent e) {
+    String jobName = getName().getText();
+    SelectedItems<? extends IsIndexed> selected = search.getSelectedItemsInCurrentList();
+    if (org.roda.core.data.v2.Void.class.getName().equals(targetList.getSelectedValue())) {
+      selected = new SelectedItemsNone<>();
+    } else if (isListEmpty) {
+      selected = SelectedItemsAll.create(targetList.getSelectedValue());
+    }
+
+    final SelectedItems<? extends IsIndexed> finalSelected = selected;
+    ScheduleJobDialog dialog = new ScheduleJobDialog(cronExpression -> {
+      if (cronExpression == null) {
+        return;
+      }
+      buttonSchedule.setEnabled(false);
+
+      CreateJobRequest jobRequest = new CreateJobRequest();
+      jobRequest.setName(jobName);
+      jobRequest.setPlugin(getSelectedPlugin().getId());
+      jobRequest.setPluginParameters(getWorkflowOptions().getValue());
+      SelectedItemsRequest selectedItemsRequest = SelectedItemsUtils.convertToRESTRequest(finalSelected);
+      jobRequest.setSourceObjects(selectedItemsRequest);
+      jobRequest.setPriority(priority.name());
+      jobRequest.setParallelism(parallelism.name());
+      jobRequest.setSourceObjectsClass(finalSelected.getSelectedClass());
+      jobRequest.setScheduleExpression(cronExpression);
+
+      Services services = new Services("Schedule job", "create");
+      services.jobsResource(s -> s.createJob(jobRequest)).whenComplete((job1, throwable) -> {
+        buttonSchedule.setEnabled(true);
+        if (throwable != null) {
+          Toast.showError(messages.dialogFailure(), throwable.getMessage());
+        } else {
+          Toast.showInfo(messages.dialogDone(), messages.processCreated());
+          HistoryUtils.newHistory(ActionProcess.RESOLVER);
+        }
+      });
+    });
+    dialog.center();
+    dialog.show();
   }
 
   @SuppressWarnings("rawtypes")

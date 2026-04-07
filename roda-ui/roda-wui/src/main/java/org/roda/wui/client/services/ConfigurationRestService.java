@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.services;
 
@@ -46,6 +46,13 @@ public interface ConfigurationRestService extends DirectRestService {
   @Operation(summary = "Retrieves the cron value", responses = {
     @ApiResponse(responseCode = "200", description = "Returns the cron value", content = @Content(schema = @Schema(implementation = StringResponse.class)))})
   StringResponse retrieveCronValue(
+    @Parameter(description = "The language to be used for internationalization", content = @Content(schema = @Schema(defaultValue = "en", implementation = String.class))) @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString);
+
+  @RequestMapping(method = RequestMethod.GET, path = "/cron/describe", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Describes a cron expression in human-readable form", responses = {
+    @ApiResponse(responseCode = "200", description = "Returns a human-readable description of the cron expression", content = @Content(schema = @Schema(implementation = StringResponse.class)))})
+  StringResponse describeCronExpression(
+    @Parameter(description = "The cron expression to describe") @RequestParam(name = "expression") String cronExpression,
     @Parameter(description = "The language to be used for internationalization", content = @Content(schema = @Schema(defaultValue = "en", implementation = String.class))) @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString);
 
   @RequestMapping(method = RequestMethod.GET, path = "/exports/limit", produces = MediaType.APPLICATION_JSON_VALUE)
