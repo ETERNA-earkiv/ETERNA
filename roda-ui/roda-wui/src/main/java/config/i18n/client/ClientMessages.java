@@ -2458,4 +2458,5 @@ public interface ClientMessages extends Messages {
 
   String conversionProfileDescription();
 
+  String noPluginsAvailable();
 }
