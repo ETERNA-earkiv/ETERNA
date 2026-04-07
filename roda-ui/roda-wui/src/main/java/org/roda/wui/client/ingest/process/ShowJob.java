@@ -586,17 +586,21 @@ public class ShowJob extends Composite {
 
   private void update() {
     boolean isScheduled = Job.JOB_STATE.SCHEDULED.equals(job.getState());
+    boolean isEmptyStopped = Job.JOB_STATE.STOPPED.equals(job.getState())
+      && job.getJobStats().getCompletionPercentage() == 0;
 
-    // set end date (hidden for scheduled jobs)
-    dateEndedLabel.setVisible(!isScheduled && job.getEndDate() != null);
-    dateEnded.setVisible(!isScheduled && job.getEndDate() != null);
-    if (!isScheduled && job.getEndDate() != null) {
+    // set end date (hidden for scheduled/empty-stopped jobs)
+    boolean showEndDate = !isScheduled && !isEmptyStopped && job.getEndDate() != null;
+    dateEndedLabel.setVisible(showEndDate);
+    dateEnded.setVisible(showEndDate);
+    if (showEndDate) {
       dateEnded.setText(Humanize.formatDateTime(job.getEndDate()));
     }
 
-    // duration panel hidden for scheduled jobs (no meaningful start/end)
-    durationPanel.setVisible(!isScheduled);
-    if (!isScheduled) {
+    // duration panel hidden for scheduled jobs and empty-stopped jobs (never ran)
+    boolean showDuration = !isScheduled && !isEmptyStopped;
+    durationPanel.setVisible(showDuration);
+    if (showDuration) {
       duration.setText(Humanize.durationInDHMS(job.getStartDate(), job.getEndDate(), DHMSFormat.LONG));
     }
 
