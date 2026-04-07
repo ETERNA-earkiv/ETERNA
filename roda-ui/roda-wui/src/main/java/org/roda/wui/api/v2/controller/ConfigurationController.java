@@ -72,8 +72,12 @@ public class ConfigurationController implements ConfigurationRestService {
   public StringResponse describeCronExpression(String cronExpression, String localeString) {
     String description = null;
     if (StringUtils.isNotBlank(cronExpression)) {
-      CronExpressionDescriptor.setDefaultLocale(localeString.split("_")[0]);
-      description = CronExpressionDescriptor.getDescription(cronExpression);
+      if (cronExpression.startsWith("@once:")) {
+        description = "Once on " + cronExpression.substring(6).replace("T", " at ");
+      } else {
+        CronExpressionDescriptor.setDefaultLocale(localeString.split("_")[0]);
+        description = CronExpressionDescriptor.getDescription(cronExpression);
+      }
     }
     return new StringResponse(description);
   }
