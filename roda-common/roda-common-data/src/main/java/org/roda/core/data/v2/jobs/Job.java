@@ -113,6 +113,8 @@ public class Job implements IsModelObject, HasId, HasInstanceID, HasInstanceName
     this.instanceName = job.getInstanceName();
     this.attachmentsList = job.getAttachmentsList();
     this.jobUsersDetails = job.getJobUsersDetails();
+    this.fields = job.getFields() != null ? new HashMap<>(job.getFields()) : null;
+    this.nextScheduledRun = job.getNextScheduledRun();
   }
 
   @JsonIgnore
