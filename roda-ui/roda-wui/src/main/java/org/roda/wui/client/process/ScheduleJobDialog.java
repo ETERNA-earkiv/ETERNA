@@ -145,10 +145,10 @@ public class ScheduleJobDialog extends DialogBox {
 
     FlowPanel timeInputsGroup = buildInlineGroup();
     for (int h = 0; h < 24; h++) {
-      hourList.addItem(String.format("%02d", h), String.valueOf(h));
+      hourList.addItem(pad2(h), String.valueOf(h));
     }
     for (int m = 0; m < 60; m += 5) {
-      minuteList.addItem(String.format("%02d", m), String.valueOf(m));
+      minuteList.addItem(pad2(m), String.valueOf(m));
     }
     hourList.setSelectedIndex(8); // default 08:00
     hourList.getElement().getStyle().setWidth(65, Style.Unit.PX);
