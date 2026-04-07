@@ -85,6 +85,7 @@ public class UpdateOriginalMETS {
             RodaConstants.CORE_PLUGINS_BASE_KEEP_ORIGINAL_METS,
             false
         );
+
         if (!keepOriginalMets) {
             return;
         }
@@ -168,10 +169,14 @@ public class UpdateOriginalMETS {
                 );
 
                 String fileName = "";
-                if (pm.getType().name().equals("FILE")) fileName =
-                    pm.getId() + PREMIS_FILE_TYPE;
-                if (pm.getType().name().equals("EVENT")) fileName =
-                    pm.getId() + "%3A" + pm.getFileId() + PREMIS_FILE_TYPE;
+                if (pm.getType().name().equals("FILE")) {
+                    fileName = pm.getId() + PREMIS_FILE_TYPE;
+                } else if (pm.getType().name().equals("EVENT")) {
+                    fileName =
+                        pm.getId() + "%3A" + pm.getFileId() + PREMIS_FILE_TYPE;
+                } else {
+                    return;
+                }
 
                 java.io.File file = modelService
                     .getStorage()
