@@ -201,6 +201,15 @@ public class JobService {
   }
 
   public Date computeNextRun(String cronExpression) {
+    if (cronExpression.startsWith("@once:")) {
+      try {
+        java.time.LocalDateTime ldt = java.time.LocalDateTime.parse(cronExpression.substring(6),
+          java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+        return Date.from(ldt.atZone(ZonedDateTime.now().getZone()).toInstant());
+      } catch (Exception e) {
+        return null;
+      }
+    }
     CronExpression cron = CronExpression.parse(cronExpression);
     ZonedDateTime next = cron.next(ZonedDateTime.now());
     return next != null ? Date.from(next.toInstant()) : null;

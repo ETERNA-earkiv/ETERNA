@@ -345,6 +345,8 @@ public interface ClientMessages extends Messages {
 
   String scheduleDialogFrequencyLabel();
 
+  String scheduleDialogFrequencyOnce();
+
   String scheduleDialogFrequencyHourly();
 
   String scheduleDialogFrequencyDaily();
@@ -352,6 +354,8 @@ public interface ClientMessages extends Messages {
   String scheduleDialogFrequencyWeekly();
 
   String scheduleDialogFrequencyMonthly();
+
+  String scheduleDialogDateLabel();
 
   String scheduleDialogTimeLabel();
 

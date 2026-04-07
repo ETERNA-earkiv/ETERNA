@@ -7,9 +7,12 @@
  */
 package org.roda.wui.client.process;
 
+import java.util.Date;
+
 import org.roda.wui.client.services.Services;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -23,34 +26,49 @@ import com.google.gwt.user.client.ui.ListBox;
 import config.i18n.client.ClientMessages;
 
 /**
- * A user-friendly dialog for selecting a recurring job schedule without
- * requiring knowledge of cron syntax.
+ * A user-friendly dialog for selecting a job schedule without requiring
+ * knowledge of cron syntax. Supports one-shot and recurring schedules.
  */
 public class ScheduleJobDialog extends DialogBox {
 
   public interface ScheduleCallback {
-    void onSchedule(String cronExpression);
+    void onSchedule(String scheduleExpression);
   }
+
+  /** Prefix for one-shot schedule expressions: {@code @once:YYYY-MM-DDTHH:MM} */
+  public static final String ONCE_PREFIX = "@once:";
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private static final int FREQ_HOURLY = 0;
-  private static final int FREQ_DAILY = 1;
-  private static final int FREQ_WEEKLY = 2;
-  private static final int FREQ_MONTHLY = 3;
+  private static final int FREQ_ONCE = 0;
+  private static final int FREQ_HOURLY = 1;
+  private static final int FREQ_DAILY = 2;
+  private static final int FREQ_WEEKLY = 3;
+  private static final int FREQ_MONTHLY = 4;
 
   private final ListBox frequencyList = new ListBox();
+
+  // Date selectors (shown for Once)
+  private final ListBox yearList = new ListBox();
+  private final ListBox monthList = new ListBox();
+  private final ListBox onceDayList = new ListBox();
+  private final FlowPanel dateRow = new FlowPanel();
+
+  // Time selectors (shown for everything except Hourly)
   private final ListBox hourList = new ListBox();
   private final ListBox minuteList = new ListBox();
+  private final FlowPanel timeRow = new FlowPanel();
+
+  // Recurring-only rows
   private final ListBox dayOfWeekList = new ListBox();
   private final ListBox dayOfMonthList = new ListBox();
-  private final Label previewLabel = new Label();
-  private final FlowPanel timeRow = new FlowPanel();
   private final FlowPanel dowRow = new FlowPanel();
   private final FlowPanel domRow = new FlowPanel();
 
+  private final Label previewLabel = new Label();
   private final ScheduleCallback callback;
 
+  @SuppressWarnings("deprecation")
   public ScheduleJobDialog(ScheduleCallback callback) {
     super(false, true);
     this.callback = callback;
@@ -68,6 +86,7 @@ public class ScheduleJobDialog extends DialogBox {
     Label freqLabel = new Label(messages.scheduleDialogFrequencyLabel());
     freqLabel.addStyleName("form-label");
     frequencyList.addStyleName("form-listbox");
+    frequencyList.addItem(messages.scheduleDialogFrequencyOnce());
     frequencyList.addItem(messages.scheduleDialogFrequencyHourly());
     frequencyList.addItem(messages.scheduleDialogFrequencyDaily());
     frequencyList.addItem(messages.scheduleDialogFrequencyWeekly());
@@ -77,25 +96,72 @@ public class ScheduleJobDialog extends DialogBox {
     freqRow.add(frequencyList);
     root.add(freqRow);
 
-    // --- Time row (hour + minute) ---
+    // --- Date row (Once only) ---
+    Date now = new Date();
+    int currentYear = 1900 + now.getYear();
+    int currentMonth = 1 + now.getMonth();
+    int currentDay = now.getDate();
+
+    dateRow.addStyleName("form-row");
+    Label dateLabel = new Label(messages.scheduleDialogDateLabel());
+    dateLabel.addStyleName("form-label");
+
+    FlowPanel dateInputsGroup = buildInlineGroup();
+    for (int y = currentYear; y <= currentYear + 5; y++) {
+      yearList.addItem(String.valueOf(y), String.valueOf(y));
+    }
+    String[] monthNames = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+    for (int m = 1; m <= 12; m++) {
+      monthList.addItem(monthNames[m - 1], String.valueOf(m));
+    }
+    for (int d = 1; d <= 31; d++) {
+      onceDayList.addItem(String.valueOf(d), String.valueOf(d));
+    }
+    monthList.setSelectedIndex(currentMonth - 1);
+    onceDayList.setSelectedIndex(currentDay - 1);
+    yearList.getElement().getStyle().setWidth(70, Style.Unit.PX);
+    monthList.getElement().getStyle().setWidth(60, Style.Unit.PX);
+    onceDayList.getElement().getStyle().setWidth(55, Style.Unit.PX);
+
+    dateInputsGroup.add(yearList);
+    Label dashM = new Label("-");
+    dashM.addStyleName("schedule-time-colon");
+    dateInputsGroup.add(dashM);
+    dateInputsGroup.add(monthList);
+    Label dashD = new Label("-");
+    dashD.addStyleName("schedule-time-colon");
+    dateInputsGroup.add(dashD);
+    dateInputsGroup.add(onceDayList);
+
+    dateRow.add(dateLabel);
+    dateRow.add(dateInputsGroup);
+    root.add(dateRow);
+
+    // --- Time row (hour : minute) ---
     timeRow.addStyleName("form-row");
     Label timeLabel = new Label(messages.scheduleDialogTimeLabel());
     timeLabel.addStyleName("form-label");
-    hourList.addStyleName("form-listbox schedule-time-select");
-    minuteList.addStyleName("form-listbox schedule-time-select");
+
+    FlowPanel timeInputsGroup = buildInlineGroup();
     for (int h = 0; h < 24; h++) {
       hourList.addItem(String.format("%02d", h), String.valueOf(h));
     }
     for (int m = 0; m < 60; m += 5) {
       minuteList.addItem(String.format("%02d", m), String.valueOf(m));
     }
-    hourList.setSelectedIndex(2); // default 02:00
-    timeRow.add(timeLabel);
-    timeRow.add(hourList);
+    hourList.setSelectedIndex(8); // default 08:00
+    hourList.getElement().getStyle().setWidth(65, Style.Unit.PX);
+    minuteList.getElement().getStyle().setWidth(65, Style.Unit.PX);
+
+    timeInputsGroup.add(hourList);
     Label colon = new Label(":");
     colon.addStyleName("schedule-time-colon");
-    timeRow.add(colon);
-    timeRow.add(minuteList);
+    timeInputsGroup.add(colon);
+    timeInputsGroup.add(minuteList);
+
+    timeRow.add(timeLabel);
+    timeRow.add(timeInputsGroup);
     root.add(timeRow);
 
     // --- Day of week row ---
@@ -104,13 +170,12 @@ public class ScheduleJobDialog extends DialogBox {
     dowLabel.addStyleName("form-label");
     dayOfWeekList.addStyleName("form-listbox");
     String[] weekdays = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
-    int[] weekdayCron = {1, 2, 3, 4, 5, 6, 0}; // cron: 0=Sun, 1=Mon, ..., 6=Sat
+    int[] weekdayCron = {1, 2, 3, 4, 5, 6, 0};
     for (int i = 0; i < weekdays.length; i++) {
       dayOfWeekList.addItem(weekdays[i], String.valueOf(weekdayCron[i]));
     }
     dowRow.add(dowLabel);
     dowRow.add(dayOfWeekList);
-    dowRow.setVisible(false);
     root.add(dowRow);
 
     // --- Day of month row ---
@@ -123,7 +188,6 @@ public class ScheduleJobDialog extends DialogBox {
     }
     domRow.add(domLabel);
     domRow.add(dayOfMonthList);
-    domRow.setVisible(false);
     root.add(domRow);
 
     // --- Preview row ---
@@ -136,7 +200,7 @@ public class ScheduleJobDialog extends DialogBox {
     previewRow.add(previewLabel);
     root.add(previewRow);
 
-    // --- Footer buttons ---
+    // --- Footer ---
     FlowPanel footer = new FlowPanel();
     footer.addStyleName("wui-dialog-footer");
     Button cancelButton = new Button(messages.cancelButton());
@@ -157,12 +221,14 @@ public class ScheduleJobDialog extends DialogBox {
         refreshPreview();
       }
     };
-
     frequencyList.addChangeHandler(updateHandler);
     hourList.addChangeHandler(updateHandler);
     minuteList.addChangeHandler(updateHandler);
     dayOfWeekList.addChangeHandler(updateHandler);
     dayOfMonthList.addChangeHandler(updateHandler);
+    yearList.addChangeHandler(updateHandler);
+    monthList.addChangeHandler(updateHandler);
+    onceDayList.addChangeHandler(updateHandler);
 
     cancelButton.addClickHandler(new ClickHandler() {
       @Override
@@ -171,32 +237,47 @@ public class ScheduleJobDialog extends DialogBox {
         callback.onSchedule(null);
       }
     });
-
     confirmButton.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
         hide();
-        callback.onSchedule(buildCronExpression());
+        callback.onSchedule(buildScheduleExpression());
       }
     });
 
-    // Initial state
     updateVisibility();
     refreshPreview();
   }
 
+  /** Creates an inline-flex container for grouping inputs on one line. */
+  private FlowPanel buildInlineGroup() {
+    FlowPanel panel = new FlowPanel();
+    panel.getElement().getStyle().setDisplay(Style.Display.INLINE_FLEX);
+    panel.getElement().getStyle().setProperty("alignItems", "center");
+    panel.getElement().getStyle().setProperty("gap", "4px");
+    return panel;
+  }
+
   private void updateVisibility() {
     int freq = frequencyList.getSelectedIndex();
+    dateRow.setVisible(freq == FREQ_ONCE);
     timeRow.setVisible(freq != FREQ_HOURLY);
     dowRow.setVisible(freq == FREQ_WEEKLY);
     domRow.setVisible(freq == FREQ_MONTHLY);
   }
 
-  private String buildCronExpression() {
+  private String buildScheduleExpression() {
     int freq = frequencyList.getSelectedIndex();
     String hour = hourList.getSelectedValue();
     String minute = minuteList.getSelectedValue();
     switch (freq) {
+      case FREQ_ONCE:
+        String year = yearList.getSelectedValue();
+        String month = pad2(Integer.parseInt(monthList.getSelectedValue()));
+        String day = pad2(Integer.parseInt(onceDayList.getSelectedValue()));
+        String hh = pad2(Integer.parseInt(hour));
+        String mm = pad2(Integer.parseInt(minute));
+        return ONCE_PREFIX + year + "-" + month + "-" + day + "T" + hh + ":" + mm;
       case FREQ_HOURLY:
         return "0 * * * *";
       case FREQ_DAILY:
@@ -211,7 +292,18 @@ public class ScheduleJobDialog extends DialogBox {
   }
 
   private void refreshPreview() {
-    String cron = buildCronExpression();
+    int freq = frequencyList.getSelectedIndex();
+    if (freq == FREQ_ONCE) {
+      // Build local description — no server round-trip needed
+      String year = yearList.getSelectedValue();
+      String month = pad2(Integer.parseInt(monthList.getSelectedValue()));
+      String day = pad2(Integer.parseInt(onceDayList.getSelectedValue()));
+      String hh = pad2(Integer.parseInt(hourList.getSelectedValue()));
+      String mm = pad2(Integer.parseInt(minuteList.getSelectedValue()));
+      previewLabel.setText("Once on " + year + "-" + month + "-" + day + " at " + hh + ":" + mm);
+      return;
+    }
+    String cron = buildScheduleExpression();
     Services services = new Services("Describe cron expression", "retrieve");
     services
       .configurationsResource(
@@ -223,5 +315,9 @@ public class ScheduleJobDialog extends DialogBox {
           previewLabel.setText(cron);
         }
       });
+  }
+
+  private static String pad2(int n) {
+    return (n < 10 ? "0" : "") + n;
   }
 }

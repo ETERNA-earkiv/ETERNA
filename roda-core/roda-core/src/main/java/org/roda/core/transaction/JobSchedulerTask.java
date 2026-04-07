@@ -104,10 +104,17 @@ public class JobSchedulerTask {
       RodaCoreFactory.getPluginOrchestrator().createAndExecuteJobs(execution, true);
       LOGGER.info("Fired scheduled execution {} from template job {}", execution.getId(), templateJobId);
 
-      // Advance the template's next run to the following cron occurrence
-      CronExpression cron = CronExpression.parse(cronExpression);
-      ZonedDateTime nextRun = cron.next(ZonedDateTime.now());
-      template.setNextScheduledRun(nextRun != null ? Date.from(nextRun.toInstant()) : null);
+      if (cronExpression.startsWith("@once:")) {
+        // One-shot: clear the schedule after firing
+        template.setState(Job.JOB_STATE.STOPPED);
+        template.setScheduleExpression(null);
+        template.setNextScheduledRun(null);
+      } else {
+        // Recurring: advance to next cron occurrence
+        CronExpression cron = CronExpression.parse(cronExpression);
+        ZonedDateTime nextRun = cron.next(ZonedDateTime.now());
+        template.setNextScheduledRun(nextRun != null ? Date.from(nextRun.toInstant()) : null);
+      }
       RodaCoreFactory.getModelService().createOrUpdateJob(template);
       RodaCoreFactory.getIndexService().commit(IndexedJob.class);
 
