@@ -137,6 +137,7 @@ public class JobsController implements JobsRestService, Exportable {
       Job job = JobUtils.createJob(jobRequest.getName(), JobPriority.valueOf(jobRequest.getPriority()),
         JobParallelism.valueOf(jobRequest.getParallelism()), sourceObjects, jobRequest.getPlugin(),
         jobRequest.getPluginParameters());
+      job.setScheduleExpression(jobRequest.getScheduleExpression());
       // validate input and set missing information when possible
       jobService.validateAndSetJobInformation(requestContext.getUser(), job);
       // check user permissions
