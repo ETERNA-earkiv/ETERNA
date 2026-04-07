@@ -106,6 +106,9 @@ public class JobList extends AsyncTableCell<IndexedJob> {
         if (job == null) {
           return null;
         }
+        if (org.roda.core.data.v2.jobs.Job.JOB_STATE.SCHEDULED.equals(job.getState())) {
+          return "";
+        }
         Date end = job.getEndDate() != null ? job.getEndDate() : getDate();
         return Humanize.durationInDHMS(job.getStartDate(), end, DHMSFormat.SHORT);
       }

@@ -1177,6 +1177,8 @@ public interface ClientMessages extends Messages {
 
   String jobDuration();
 
+  String jobNextScheduledRun();
+
   String jobStatus();
 
   String jobStateDetails();

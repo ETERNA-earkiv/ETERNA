@@ -191,6 +191,8 @@ public class ShowJob extends Composite {
   @UiField
   Label duration;
   @UiField
+  FlowPanel durationPanel;
+  @UiField
   HTML progress;
   @UiField
   HTML status;
@@ -198,6 +200,10 @@ public class ShowJob extends Composite {
   Label scheduleInfoLabel;
   @UiField
   Label scheduleInfo;
+  @UiField
+  FlowPanel nextRunPanel;
+  @UiField
+  Label nextRunLabel, nextRun;
   @UiField
   Label stateDetailsLabel, stateDetailsValue;
   @UiField
@@ -579,23 +585,29 @@ public class ShowJob extends Composite {
   }
 
   private void update() {
-    // set end date
-    dateEndedLabel.setVisible(job.getEndDate() != null);
-    dateEnded.setVisible(job.getEndDate() != null);
-    if (job.getEndDate() != null) {
+    boolean isScheduled = Job.JOB_STATE.SCHEDULED.equals(job.getState());
+
+    // set end date (hidden for scheduled jobs)
+    dateEndedLabel.setVisible(!isScheduled && job.getEndDate() != null);
+    dateEnded.setVisible(!isScheduled && job.getEndDate() != null);
+    if (!isScheduled && job.getEndDate() != null) {
       dateEnded.setText(Humanize.formatDateTime(job.getEndDate()));
     }
 
-    // set duration
-    duration.setText(Humanize.durationInDHMS(job.getStartDate(), job.getEndDate(), DHMSFormat.LONG));
+    // duration panel hidden for scheduled jobs (no meaningful start/end)
+    durationPanel.setVisible(!isScheduled);
+    if (!isScheduled) {
+      duration.setText(Humanize.durationInDHMS(job.getStartDate(), job.getEndDate(), DHMSFormat.LONG));
+    }
 
     // set state
     status.setHTML(HtmlSnippetUtils.getJobStateHtml(job.getState(), job.getJobStats()));
 
     scheduleInfoLabel.setVisible(false);
     scheduleInfo.setVisible(false);
+    nextRunPanel.setVisible(false);
 
-    if (Job.JOB_STATE.SCHEDULED.equals(job.getState())) {
+    if (isScheduled) {
       String cronExpression = job.getFields() != null
         ? (String) job.getFields().get(RodaConstants.JOB_SCHEDULE_INFO)
         : null;
@@ -606,7 +618,6 @@ public class ShowJob extends Composite {
             s -> s.describeCronExpression(cronExpression, LocaleInfo.getCurrentLocale().getLocaleName()))
           .whenComplete((stringResponse, throwable) -> {
             if (throwable != null) {
-              // Fall back to displaying the raw expression
               scheduleInfoLabel.setVisible(true);
               scheduleInfo.setVisible(true);
               scheduleInfo.setText(cronExpression);
@@ -617,6 +628,11 @@ public class ShowJob extends Composite {
               scheduleInfo.setText(StringUtils.isNotBlank(description) ? description : cronExpression);
             }
           });
+      }
+      // show next scheduled run time
+      if (job.getNextScheduledRun() != null) {
+        nextRunPanel.setVisible(true);
+        nextRun.setText(Humanize.formatDateTime(job.getNextScheduledRun()));
       }
     }
 
