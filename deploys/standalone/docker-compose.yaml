@@ -13,11 +13,11 @@ services:
     image: ghcr.io/eterna-earkiv/solr:9.10.1
     user: "8983"
     restart: unless-stopped
-    ports:
-      - "8983:8983"
     environment:
       SOLR_HEAP: 2g
       ZK_HOST: zoo:2181
+    depends_on:
+      - zoo
     command: -c
     volumes:
       - solr_data:/var/solr
@@ -40,7 +40,7 @@ services:
       - roda_data:/roda/data/
 
   swagger:
-    image: docker.io/swaggerapi/swagger-ui:v5.13.0
+    image: docker.io/swaggerapi/swagger-ui:latest
     restart: on-failure
     ports:
       - "8081:8080"
@@ -78,6 +78,12 @@ services:
     restart: unless-stopped
     ports:
       - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/openapi.json"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
     depends_on:
       - solr
       - clamd

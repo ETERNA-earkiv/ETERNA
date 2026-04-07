@@ -10,7 +10,7 @@ package org.roda.wui.servlets;
 import java.io.Serial;
 
 import jakarta.servlet.annotation.WebServlet;
-import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.model.utils.LdapUtility;
 import org.roda.wui.security.SecurityObserverImpl;

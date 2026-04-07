@@ -1,18 +1,22 @@
-FROM eclipse-temurin:21-jre-jammy
-LABEL maintainer="admin@keep.pt" vendor="KEEP SOLUTIONS"
+# SUSE BCI base with JRE 21
+FROM registry.suse.com/bci/bci-base:latest
+LABEL maintainer="info@whitered.se" vendor="WHITE RED CONSULTING AB"
 
-# Install dependencies & Remove python dependency
+# Install JRE 21 and system dependencies
 RUN set -ex; \
-    apt-get -qq update && \
-    apt-get -qq -y install software-properties-common && \
-    apt-get -qq -y --no-install-recommends install clamdscan jq rsync && \
-    apt-get clean && rm -rf /var/lib/apt/lists/* && \
-	DEBIAN_FRONTEND=noninteractive \
-	apt-get autoremove -y --purge "*python*"
+    zypper -n refresh && \
+    zypper -n update && \
+    zypper -n install --no-recommends \
+        java-21-openjdk-headless \
+        clamav \
+        curl \
+        jq \
+        rsync && \
+    zypper clean -a
 
 COPY ./docker/docker-files/clamd.conf /etc/clamav/clamd.conf
 
-# Copy the Roda WUI WAR file
+# Copy the Roda WUI JAR file
 COPY roda-ui/roda-wui/target/roda-wui-*.jar  /KEEPS/bin/
 
 ENV RODA_HOME=/roda \
@@ -30,16 +34,19 @@ COPY ./docker/docker-files/docker-entrypoint.sh /
 COPY ./docker/docker-files/docker-entrypoint.d/* /docker-entrypoint.d/
 
 RUN set -ex; \
-  groupadd -r --gid "$RODA_GID" "$RODA_GROUP"; \
-  useradd -r --uid "$RODA_UID" --gid "$RODA_GID" "$RODA_USER"; \
-  mkdir -p -m0770 "$RODA_HOME/data"; \
-  mkdir -p -m0770 "$RODA_HOME/config"; \
-  chown -R "$RODA_USER:0" "$RODA_HOME"
+    groupadd -g "$RODA_GID" "$RODA_GROUP" && \
+    useradd -u "$RODA_UID" -g "$RODA_GID" -m -d /home/roda "$RODA_USER" && \
+    mkdir -p -m0770 "$RODA_HOME/data" && \
+    mkdir -p -m0770 "$RODA_HOME/config" && \
+    chown -R "$RODA_USER:0" "$RODA_HOME"
 
 VOLUME "$RODA_HOME/data"
 
+WORKDIR "$RODA_HOME"
+
 USER "$RODA_UID"
 
-WORKDIR "$RODA_HOME"
+HEALTHCHECK --interval=30s --timeout=10s --retries=5 --start-period=60s \
+  CMD curl -f http://localhost:8080/api/openapi.json || exit 1
 
 ENTRYPOINT ["/docker-entrypoint.sh"]

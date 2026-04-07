@@ -142,7 +142,7 @@
         <testng.groups>all</testng.groups>
         <springboot.version>3.4.10</springboot.version>
         <scope.gwt-dev>provided</scope.gwt-dev>
-        <logback.version>1.5.18</logback.version>
+        <logback.version>1.5.25</logback.version>
     </properties>
     <profiles>
         <profile>
@@ -604,7 +604,7 @@
             <dependency>
                 <groupId>org.eclipse.angus</groupId>
                 <artifactId>angus-mail</artifactId>
-                <version>2.0.3</version>
+                <version>2.0.4</version>
             </dependency>
             <dependency>
                 <groupId>javax.transaction</groupId>
@@ -972,6 +972,34 @@
                 <groupId>com.ibm.icu</groupId>
                 <artifactId>icu4j</artifactId>
                 <version>63.2</version>
+            </dependency>
+            <!-- jerrymalmstrom: 2026-02-26 -->
+            <!-- Forcing transitive dependencies upgrade due to vulnerabilities -->
+            <dependency>
+                <groupId>org.apache.mina</groupId>
+                <artifactId>mina-core</artifactId>
+                <version>2.2.5</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper</artifactId>
+                <version>3.9.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper-jute</artifactId>
+                <version>3.9.4</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nimbusds</groupId>
+                <artifactId>nimbus-jose-jwt</artifactId>
+                <version>9.37.4</version>
+            </dependency>
+            <!-- Override commons-beanutils to fix GHSA-wxr5-93ph-8wr9 -->
+            <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>1.11.0</version>
             </dependency>
 
             <dependency>

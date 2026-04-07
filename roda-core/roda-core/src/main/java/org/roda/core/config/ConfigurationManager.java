@@ -25,13 +25,15 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-import org.apache.commons.configuration.CombinedConfiguration;
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.configuration.tree.MergeCombiner;
-import org.apache.commons.configuration.tree.NodeCombiner;
+import org.apache.commons.configuration2.CombinedConfiguration;
+import org.apache.commons.configuration2.CompositeConfiguration;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.convert.DisabledListDelimiterHandler;
+import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.configuration2.io.FileHandler;
+import org.apache.commons.configuration2.tree.MergeCombiner;
+import org.apache.commons.configuration2.tree.NodeCombiner;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaPropertiesReloadStrategy;
@@ -333,8 +335,7 @@ public class ConfigurationManager {
 
   private PropertiesConfiguration initConfiguration() {
     PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration();
-    propertiesConfiguration.setDelimiterParsingDisabled(true);
-    propertiesConfiguration.setEncoding(RodaConstants.DEFAULT_ENCODING);
+    propertiesConfiguration.setListDelimiterHandler(new DisabledListDelimiterHandler());
     return propertiesConfiguration;
   }
 
@@ -350,10 +351,10 @@ public class ConfigurationManager {
 
     cc.addConfiguration(getInternalConfiguration(configurationFile));
 
-    // do variable interpolation
-    Configuration configuration = cc.interpolatedConfiguration();
-
-    return configuration;
+    // In commons-configuration2, interpolation is lazy (resolved at read time),
+    // so we return the live CombinedConfiguration directly instead of a
+    // pre-resolved snapshot.
+    return cc;
   }
 
   private PropertiesConfiguration getInternalConfiguration(String configurationFile) throws ConfigurationException {
@@ -362,7 +363,9 @@ public class ConfigurationManager {
       .getResourceAsStream("/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + configurationFile);
     if (inputStream != null) {
       LOGGER.trace("Loading configuration from classpath {}", configurationFile);
-      propertiesConfiguration.load(inputStream);
+      FileHandler fileHandler = new FileHandler(propertiesConfiguration);
+      fileHandler.setEncoding(RodaConstants.DEFAULT_ENCODING);
+      fileHandler.load(inputStream);
 
     } else {
       LOGGER.trace("Configuration {} doesn't exist", configurationFile);
@@ -374,10 +377,10 @@ public class ConfigurationManager {
   private PropertiesConfiguration getExternalConfiguration(Path config) throws ConfigurationException {
     PropertiesConfiguration propertiesConfiguration = initConfiguration();
     LOGGER.trace("Loading configuration from file {}", config);
-    propertiesConfiguration.load(config.toFile());
-    RodaPropertiesReloadStrategy rodaPropertiesReloadStrategy = new RodaPropertiesReloadStrategy();
-    rodaPropertiesReloadStrategy.setRefreshDelay(5000);
-    propertiesConfiguration.setReloadingStrategy(rodaPropertiesReloadStrategy);
+    FileHandler fileHandler = new FileHandler(propertiesConfiguration);
+    fileHandler.setEncoding(RodaConstants.DEFAULT_ENCODING);
+    fileHandler.load(config.toFile());
+    new RodaPropertiesReloadStrategy().watch(propertiesConfiguration, config.toFile(), 5000);
 
     return propertiesConfiguration;
   }
