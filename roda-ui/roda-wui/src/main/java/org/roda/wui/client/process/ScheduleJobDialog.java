@@ -240,28 +240,15 @@ public class ScheduleJobDialog extends DialogBox {
     confirmButton.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        String expr = buildScheduleExpression();
-        if (expr.startsWith(ONCE_PREFIX)) {
-          // Reject scheduling in the past
-          String datePart = expr.substring(ONCE_PREFIX.length()); // "YYYY-MM-DDTHH:MM"
-          // Parse into a Date using the deprecated but GWT-compatible approach
-          String[] dateTime = datePart.split("T");
-          String[] datePieces = dateTime[0].split("-");
-          String[] timePieces = dateTime[1].split(":");
-          @SuppressWarnings("deprecation")
-          Date selected = new Date(
-            Integer.parseInt(datePieces[0]) - 1900,
-            Integer.parseInt(datePieces[1]) - 1,
-            Integer.parseInt(datePieces[2]),
-            Integer.parseInt(timePieces[0]),
-            Integer.parseInt(timePieces[1]));
+        if (frequencyList.getSelectedIndex() == FREQ_ONCE) {
+          Date selected = buildOnceDate();
           if (!selected.after(new Date())) {
             previewLabel.setText(messages.scheduleDialogPastTimeError());
             return;
           }
         }
         hide();
-        callback.onSchedule(expr);
+        callback.onSchedule(buildScheduleExpression());
       }
     });
 
@@ -286,35 +273,40 @@ public class ScheduleJobDialog extends DialogBox {
     domRow.setVisible(freq == FREQ_MONTHLY);
   }
 
+  @SuppressWarnings("deprecation")
+  private Date buildOnceDate() {
+    int year = Integer.parseInt(yearList.getSelectedValue());
+    int month = Integer.parseInt(monthList.getSelectedValue());
+    int day = Integer.parseInt(onceDayList.getSelectedValue());
+    int hour = Integer.parseInt(hourList.getSelectedValue());
+    int minute = Integer.parseInt(minuteList.getSelectedValue());
+    return new Date(year - 1900, month - 1, day, hour, minute, 0);
+  }
+
   private String buildScheduleExpression() {
     int freq = frequencyList.getSelectedIndex();
     String hour = hourList.getSelectedValue();
     String minute = minuteList.getSelectedValue();
     switch (freq) {
       case FREQ_ONCE:
-        String year = yearList.getSelectedValue();
-        String month = pad2(Integer.parseInt(monthList.getSelectedValue()));
-        String day = pad2(Integer.parseInt(onceDayList.getSelectedValue()));
-        String hh = pad2(Integer.parseInt(hour));
-        String mm = pad2(Integer.parseInt(minute));
-        return ONCE_PREFIX + year + "-" + month + "-" + day + "T" + hh + ":" + mm;
+        // Encode as UTC epoch millis to avoid server-side timezone ambiguity
+        return ONCE_PREFIX + buildOnceDate().getTime();
       case FREQ_HOURLY:
-        return "0 * * * *";
+        return "0 0 * * * *";
       case FREQ_DAILY:
-        return minute + " " + hour + " * * *";
+        return "0 " + minute + " " + hour + " * * *";
       case FREQ_WEEKLY:
-        return minute + " " + hour + " * * " + dayOfWeekList.getSelectedValue();
+        return "0 " + minute + " " + hour + " * * " + dayOfWeekList.getSelectedValue();
       case FREQ_MONTHLY:
-        return minute + " " + hour + " " + dayOfMonthList.getSelectedValue() + " * *";
+        return "0 " + minute + " " + hour + " " + dayOfMonthList.getSelectedValue() + " * *";
       default:
-        return "0 * * * *";
+        return "0 0 * * * *";
     }
   }
 
   private void refreshPreview() {
     int freq = frequencyList.getSelectedIndex();
     if (freq == FREQ_ONCE) {
-      // Build local description — no server round-trip needed
       String year = yearList.getSelectedValue();
       String month = pad2(Integer.parseInt(monthList.getSelectedValue()));
       String day = pad2(Integer.parseInt(onceDayList.getSelectedValue()));

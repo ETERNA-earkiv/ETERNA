@@ -73,7 +73,15 @@ public class ConfigurationController implements ConfigurationRestService {
     String description = null;
     if (StringUtils.isNotBlank(cronExpression)) {
       if (cronExpression.startsWith("@once:")) {
-        description = "Once on " + cronExpression.substring(6).replace("T", " at ");
+        try {
+          long millis = Long.parseLong(cronExpression.substring(6));
+          java.time.ZonedDateTime zdt = java.time.Instant.ofEpochMilli(millis)
+            .atZone(java.time.ZoneId.systemDefault());
+          description = "Once on " + zdt.toLocalDate() + " at "
+            + pad2(zdt.getHour()) + ":" + pad2(zdt.getMinute());
+        } catch (NumberFormatException e) {
+          description = cronExpression;
+        }
       } else {
         CronExpressionDescriptor.setDefaultLocale(localeString.split("_")[0]);
         description = CronExpressionDescriptor.getDescription(cronExpression);
@@ -232,5 +240,9 @@ public class ConfigurationController implements ConfigurationRestService {
     } finally {
       controllerAssistant.registerAction(requestContext, state);
     }
+  }
+
+  private static String pad2(int n) {
+    return (n < 10 ? "0" : "") + n;
   }
 }
