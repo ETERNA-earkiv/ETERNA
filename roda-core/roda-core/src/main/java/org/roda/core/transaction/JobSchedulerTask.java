@@ -21,6 +21,7 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.common.RodaConstants.DateGranularity;
 import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -68,7 +69,7 @@ public class JobSchedulerTask {
 
     Filter filter = new Filter(
       new SimpleFilterParameter(RodaConstants.JOB_STATE, Job.JOB_STATE.SCHEDULED.name()),
-      new DateRangeFilterParameter(RodaConstants.JOB_NEXT_SCHEDULED_RUN, null, new Date()));
+      new DateRangeFilterParameter(RodaConstants.JOB_NEXT_SCHEDULED_RUN, null, new Date(), DateGranularity.MILLISECOND));
 
     try {
       IndexResult<IndexedJob> dueJobs = RodaCoreFactory.getIndexService().find(IndexedJob.class, filter, Sorter.NONE,
@@ -132,7 +133,7 @@ public class JobSchedulerTask {
   List<IndexedJob> findDueJobs() throws GenericException, RequestNotValidException {
     Filter filter = new Filter(
       new SimpleFilterParameter(RodaConstants.JOB_STATE, Job.JOB_STATE.SCHEDULED.name()),
-      new DateRangeFilterParameter(RodaConstants.JOB_NEXT_SCHEDULED_RUN, null, new Date()));
+      new DateRangeFilterParameter(RodaConstants.JOB_NEXT_SCHEDULED_RUN, null, new Date(), DateGranularity.MILLISECOND));
 
     return RodaCoreFactory.getIndexService()
       .find(IndexedJob.class, filter, Sorter.NONE, new Sublist(0, RodaConstants.DEFAULT_PAGINATION_VALUE),
