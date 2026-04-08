@@ -149,13 +149,18 @@ public class ShowGroup extends Composite {
     permissionsPanel.init(new AsyncCallback<Boolean>() {
       @Override
       public void onFailure(Throwable caught) {
-        permissionList.add(new Label("Error loading permissions"));
+        permissionList.add(new Label(messages.permissionsLoadError()));
       }
 
       @Override
       public void onSuccess(Boolean result) {
 
         Set<String> groupRoles = group.getAllRoles();
+
+        if (groupRoles.isEmpty()) {
+          permissionList.add(new Label(messages.showGroupEmptyPermissions()));
+          return;
+        }
 
         permissionsPanel.checkPermissions(groupRoles, true);
 

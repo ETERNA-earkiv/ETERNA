@@ -159,11 +159,15 @@ public class ShowUser extends Composite {
     permissionsPanel.init(new AsyncCallback<Boolean>() {
       @Override
       public void onFailure(Throwable caught) {
-        permissionList.add(new Label("Error loading permissions"));
+        permissionList.add(new Label(messages.permissionsLoadError()));
       }
       @Override
       public void onSuccess(Boolean result) {
         Set<String> userRoles = user.getAllRoles();
+        if (userRoles.isEmpty()) {
+          permissionList.add(new Label(messages.showUserEmptyPermissions()));
+          return;
+        }
         permissionsPanel.checkPermissions(userRoles, true);
         permissionsPanel.setMode(PermissionsPanel.PermissionsMode.READ_ONLY);
         permissionList.add(permissionsPanel);
