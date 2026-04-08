@@ -194,9 +194,13 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
               ? role.substring(0, role.indexOf('.'))
               : "other";
       FlowPanel rolePanel = rolePanels.get(roleKey);
-      if (rolePanel != null) {
-        rolePanel.add(permission);
+      if (rolePanel == null) {
+        rolePanel = new FlowPanel();
+        rolePanel.addStyleName("permission-role-container");
+        rolePanels.put(roleKey, rolePanel);
+        this.add(rolePanel);
       }
+      rolePanel.add(permission);
       permissionGroups.computeIfAbsent(roleKey, k -> new ArrayList<>()).add(permission);
 
       permission.addValueChangeHandler(event -> {
@@ -213,13 +217,15 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
       });
     }
 
-    for (FlowPanel rolePanel : rolePanels.values()) {
-      this.add(rolePanel);
+    for (String key : roleTitleKeys) {
+      FlowPanel rp = rolePanels.get(key);
+      if (rp != null) this.add(rp);
     }
     for (Map.Entry<String, List<Permission>> entry : permissionGroups.entrySet()) {
       String roleKey = entry.getKey();
       List<Permission> groupPermissions = entry.getValue();
       CheckBox headerCheckbox = selectAllCheckboxes.get(roleKey);
+      if (headerCheckbox == null) continue;   // unknown group — no select-all header
 
       headerCheckbox.addValueChangeHandler(event -> {
         if (mode != PermissionsMode.EDIT) return;
