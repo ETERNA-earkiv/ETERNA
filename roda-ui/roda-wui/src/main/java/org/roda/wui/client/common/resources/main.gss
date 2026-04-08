@@ -9322,8 +9322,6 @@ wui-disposal-hold-data .form-textbox {
 
 .permission-select-all-checkbox {
     cursor: pointer;
-    transform: scale(1.05);
-    appearance: auto !important;
 }
 
 .permission-select-all-checkbox input[type="checkbox"] {

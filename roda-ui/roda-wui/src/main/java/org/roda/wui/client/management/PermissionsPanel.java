@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.Set;
 
 import org.roda.wui.common.client.ClientLogger;
@@ -168,7 +169,7 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
       String roleTitle;
       try {
         roleTitle = messages.roleTitle(roleKey);
-      } catch (Exception ignored) {
+      } catch (MissingResourceException e) {
         roleTitle = roleKey;
       }
 
@@ -194,7 +195,7 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
       String description;
       try {
         description = messages.role(role);
-      } catch (Exception e) {
+      } catch (MissingResourceException e) {
         description = role;
       }
 
@@ -275,7 +276,9 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
     boolean allLocked = group.stream().allMatch(Permission::isLocked);
     boolean allChecked = selected == total && total > 0;
 
-    InputElement input = headerCheckbox.getElement().getFirstChild().cast();
+    com.google.gwt.dom.client.Node firstChildNode = headerCheckbox.getElement().getFirstChild();
+    if (firstChildNode == null) return;
+    InputElement input = firstChildNode.cast();
     input.setPropertyBoolean("indeterminate", false);
 
     if (allChecked) {
