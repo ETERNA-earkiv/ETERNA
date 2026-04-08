@@ -301,7 +301,6 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
       p.setChecked(false);
       p.setLocked(false);
     }
-    userSelections.clear();
   }
 
   public Set<String> getDirectRoles() {
