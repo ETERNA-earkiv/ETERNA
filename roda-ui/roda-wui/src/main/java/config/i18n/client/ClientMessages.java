@@ -1716,6 +1716,10 @@ public interface ClientMessages extends Messages {
 
   String showGroupEmptyPermissions();
 
+  String permissionsLoadError();
+
+  String permissionsReadOnly();
+
   // Edit Group
   String editGroupTitle();
 
