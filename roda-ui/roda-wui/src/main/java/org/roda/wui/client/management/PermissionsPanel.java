@@ -126,22 +126,32 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
 
   private final List<String> userSelections = new ArrayList<>();
   private final LoadingPopup loading;
+  private final Label readOnlyBadge;
 
   public PermissionsPanel() {
     loading = new LoadingPopup(this);
     loading.show();
     this.addStyleName("permissions");
+    readOnlyBadge = new Label(messages.permissionsReadOnly());
+    readOnlyBadge.addStyleName("permissions-readonly-badge");
+    readOnlyBadge.setVisible(false);
+    this.add(readOnlyBadge);
   }
 
   public void setMode(PermissionsMode mode) {
     this.mode = mode;
-
+    boolean isReadOnly = (mode == PermissionsMode.READ_ONLY);
+    if (isReadOnly) {
+      this.addStyleName("permissions--readonly");
+    } else {
+      this.removeStyleName("permissions--readonly");
+    }
+    readOnlyBadge.setVisible(isReadOnly);
     for (Permission p : permissions) {
       p.updateEnabledState();
     }
-
     for (CheckBox cb : selectAllCheckboxes.values()) {
-      cb.setEnabled(mode == PermissionsMode.EDIT);
+      cb.setEnabled(!isReadOnly);
     }
   }
 
