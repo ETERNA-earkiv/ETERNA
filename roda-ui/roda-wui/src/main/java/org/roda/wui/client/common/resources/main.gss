@@ -9331,3 +9331,26 @@ wui-disposal-hold-data .form-textbox {
     -webkit-appearance: checkbox !important;
     -moz-appearance: checkbox !important;
 }
+
+.permissions--readonly {
+    cursor: default;
+}
+
+.permissions--readonly .permission {
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.permissions--readonly .permission-header-flex {
+    pointer-events: none;
+}
+
+.permissions-readonly-badge {
+    display: inline-block;
+    background-color: #e0e0e0;
+    color: #555555;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.85em;
+    margin-bottom: 0.5em;
+}
