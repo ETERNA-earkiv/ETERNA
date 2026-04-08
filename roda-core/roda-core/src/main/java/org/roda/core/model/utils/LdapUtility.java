@@ -270,7 +270,8 @@ public class LdapUtility {
 
     // Always run on startup: create any roles defined in config that are missing
     // from LDAP. Uses a single findAll() to diff, so existing roles are never
-    // touched (no destructive overwrites of role memberships).
+    // touched (no destructive overwrites of role memberships). Failures are
+    // non-fatal — a missing additive role is logged as a warning, not a crash.
     syncMissingRoles(configuration);
   }
 
@@ -278,13 +279,13 @@ public class LdapUtility {
    * Creates roles defined in roda-roles.properties that are missing from LDAP.
    * Runs on every startup. Uses a single findAll() to determine which roles are
    * missing, so existing roles are never overwritten (safe for role memberships).
+   * Failures are non-fatal: LDAP errors are logged as warnings so that a
+   * transient LDAP issue does not prevent the application from starting.
    *
    * @param configuration
    *          roda configuration
-   * @throws GenericException
-   *           if something unexpected happens creating roles.
    */
-  private void syncMissingRoles(final Configuration configuration) throws GenericException {
+  private void syncMissingRoles(final Configuration configuration) {
     final Iterator<String> keys = configuration.getKeys("core.roles");
     final Set<String> configuredRoles = new HashSet<>();
 
@@ -297,7 +298,8 @@ public class LdapUtility {
       final Set<String> existingRoles = getRoles();
       configuredRoles.removeAll(existingRoles);
     } catch (NamingException e) {
-      throw new GenericException("Error reading existing LDAP roles during startup sync", e);
+      LOGGER.warn("Could not read existing LDAP roles during startup sync — skipping role creation", e);
+      return;
     }
 
     for (final String role : configuredRoles) {
@@ -306,6 +308,8 @@ public class LdapUtility {
         LOGGER.info("Created missing LDAP role '{}' from configuration", role);
       } catch (final RoleAlreadyExistsException e) {
         LOGGER.trace("Role {} already exists (race condition on startup).", role, e);
+      } catch (final GenericException e) {
+        LOGGER.warn("Could not create LDAP role '{}' during startup sync", role, e);
       }
     }
   }
