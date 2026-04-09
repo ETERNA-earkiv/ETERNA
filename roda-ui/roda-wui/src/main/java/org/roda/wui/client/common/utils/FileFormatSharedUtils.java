@@ -5,6 +5,8 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 
 public class FileFormatSharedUtils {
+  public static final String MIMETYPE_PDF = "application/pdf";
+  public static final String EXTENSION_PDF = "pdf";
 
   private FileFormatSharedUtils() {}
 
