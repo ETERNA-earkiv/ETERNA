@@ -724,3 +724,18 @@ a.btn-hero:visited, a.btn-welcome:visited {
 .enterprise-editions {
     color: white;
 }
+
+.col-resize-handle {
+    position: absolute;
+    right: -4px;
+    top: 0;
+    width: 8px;
+    height: 100%;
+    cursor: col-resize;
+    z-index: 10;
+}
+
+.col-resize-handle:hover,
+.col-resize-handle:active {
+    background: rgba(0,0,0,0.2);
+}

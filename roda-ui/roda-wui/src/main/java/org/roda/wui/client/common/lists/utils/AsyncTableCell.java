@@ -66,6 +66,7 @@ import org.roda.wui.common.client.widgets.wcag.AcessibleCheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.shared.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
@@ -244,6 +245,11 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
     applySavedSortState(display);
     dataProvider.addDataDisplay(display);
+    display.addLoadingStateChangeHandler(event -> {
+      if (LoadingStateChangeEvent.LoadingState.LOADED.equals(event.getLoadingState())) {
+        Scheduler.get().scheduleDeferred(() -> makeColumnsResizable(display.getElement()));
+      }
+    });
 
     resultsPager = new AccessibleSimplePager(AccessibleSimplePager.TextLocation.CENTER,
       GWT.create(SimplePager.Resources.class), false, initialPageSize, false, false,
@@ -461,6 +467,46 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
     return this;
   }
+
+  private native void makeColumnsResizable(Element table) /*-{
+    var ths = table.querySelectorAll('th');
+    var cols = table.querySelectorAll('colgroup col');
+    for (var i = 0; i < ths.length; i++) {
+      (function(th, col) {
+        if (th.querySelector('.col-resize-handle')) return;
+        th.style.position = 'relative';
+        th.style.overflow = 'visible';
+        var handle = $doc.createElement('div');
+        handle.className = 'col-resize-handle';
+        th.appendChild(handle);
+        handle.addEventListener('click', function(e) {
+          e.stopPropagation();
+        });
+        handle.addEventListener('mousedown', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var startX = e.pageX;
+          var startWidth = th.offsetWidth;
+          $doc.body.style.userSelect = 'none';
+          $doc.body.style.cursor = 'col-resize';
+          function onMove(e) {
+            var w = Math.max(30, startWidth + e.pageX - startX);
+            if (col) col.style.width = w + 'px';
+            th.style.minWidth = w + 'px';
+          }
+          function onUp(e) {
+            e.stopPropagation();
+            $doc.body.style.userSelect = '';
+            $doc.body.style.cursor = '';
+            $doc.removeEventListener('mousemove', onMove);
+            $doc.removeEventListener('mouseup', onUp);
+          }
+          $doc.addEventListener('mousemove', onMove);
+          $doc.addEventListener('mouseup', onUp);
+        });
+      })(ths[i], cols[i] || null);
+    }
+  }-*/;
 
   protected void adjustOptions(AsyncTableCellOptions<T> options) {
     // override this to add defaults or enforce rules
@@ -762,6 +808,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
       resumeAutoUpdate();
     }
     super.onLoad();
+    Scheduler.get().scheduleDeferred(() -> makeColumnsResizable(display.getElement()));
   }
 
   public void redraw() {
