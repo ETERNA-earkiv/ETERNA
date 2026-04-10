@@ -195,12 +195,12 @@ public class PDFRedactor extends Composite {
             return Promise.resolve(response);
           } else if (response.status == RodaConstants.HTTP_RESPONSE_CODE_REQUEST_CONFLICT) {
             Toast.showError(messages.redactPdfToastTitle(), messages.fileAlreadyExists());
-            return Promise.resolve(response);
+            return Promise.reject(response);
           } else {
             Toast.showError(messages.redactPdfToastTitle(), messages.redactPdfSaveErrorDescription());
-                  return Promise.resolve(response);
-                }
-              });
+            return Promise.reject(response);
+          }
+        });
         }).catch_(error -> {
           Toast.showError(messages.redactPdfToastTitle(), messages.redactPdfSaveErrorDescription());
           return Promise.reject(error);
