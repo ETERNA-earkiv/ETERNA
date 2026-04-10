@@ -338,6 +338,11 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
       p.setChecked(false);
       p.setLocked(false);
     }
+
+    // Recompute header checkbox state for all groups
+    for (String roleKey : permissionGroups.keySet()) {
+      updateSelectAllCheckboxState(roleKey);
+    }
   }
 
   public Set<String> getDirectRoles() {
