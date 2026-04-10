@@ -306,7 +306,7 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
       if (roles.contains(p.getRole())) {
         p.setChecked(true);
         p.setLocked(lock);
-        if (!userSelections.contains(p.getRole())) {
+        if (!lock && !userSelections.contains(p.getRole())) {
           userSelections.add(p.getRole());
         }
       }
