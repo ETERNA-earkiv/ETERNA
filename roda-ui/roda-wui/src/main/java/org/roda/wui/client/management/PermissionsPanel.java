@@ -151,9 +151,26 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
     for (Permission p : permissions) {
       p.updateEnabledState();
     }
-    for (CheckBox cb : selectAllCheckboxes.values()) {
-      cb.setEnabled(!isReadOnly);
+    for (Map.Entry<String, CheckBox> entry : selectAllCheckboxes.entrySet()) {
+      updateHeaderCheckboxState(entry.getKey(), entry.getValue(), isReadOnly);
     }
+  }
+
+  private void updateHeaderCheckboxState(String roleKey, CheckBox cb, boolean isReadOnly) {
+    if (isReadOnly) {
+      cb.setEnabled(false);
+      return;
+    }
+
+    List<Permission> group = permissionGroups.get(roleKey);
+    if (group == null) {
+      cb.setEnabled(true);
+      return;
+    }
+    boolean allLocked = group.stream().allMatch(Permission::isLocked);
+    boolean allChecked = group.stream().allMatch(Permission::isChecked);
+    // Disable if fully locked + selected
+    cb.setEnabled(!(allLocked && allChecked));
   }
 
   public void init(final AsyncCallback<Boolean> callback) {
