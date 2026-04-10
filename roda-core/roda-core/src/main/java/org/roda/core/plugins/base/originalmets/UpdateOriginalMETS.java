@@ -122,7 +122,7 @@ public class UpdateOriginalMETS {
                         java.io.File.separator +
                         file.getName();
 
-                    checkAmdSec(metsWrapper, metsPath, true);
+                    checkAmdSec(metsWrapper);
 
                     Optional<MdSecType> fileInMets = metsWrapper
                         .getMets()
@@ -205,7 +205,7 @@ public class UpdateOriginalMETS {
                         java.io.File.separator +
                         file.getName();
 
-                    checkAmdSec(metsWrapper, metsPath, false);
+                    checkAmdSec(metsWrapper);
 
                     Optional<MdSecType> fileInMets = metsWrapper
                         .getMets()
@@ -239,6 +239,7 @@ public class UpdateOriginalMETS {
             | RequestNotValidException
             | SAXException e
         ) {
+            e.printStackTrace();
             LOG.error(
                 "Then update the original AIP {} METS file - Error: {}",
                 pm.getAipId(),
@@ -299,7 +300,7 @@ public class UpdateOriginalMETS {
                     java.io.File.separator +
                     file.getName();
 
-                checkAmdSec(metsWrapper, metsPath, false);
+                checkAmdSec(metsWrapper);
 
                 Optional<MdSecType> fileInMets = metsWrapper
                     .getMets()
@@ -332,6 +333,7 @@ public class UpdateOriginalMETS {
             | RequestNotValidException
             | SAXException e
         ) {
+            e.printStackTrace();
             LOG.error(
                 "Then update the original AIP {} representation {} METS file - Error: {}",
                 aipId,
@@ -617,18 +619,14 @@ public class UpdateOriginalMETS {
     }
 
     // Check if AMDSEC element is available
-    private static void checkAmdSec(
-        MetsWrapper metsWrapper,
-        Path metsPath,
-        boolean isRoot
-    ) throws IOException, IPException, JAXBException {
+    private static void checkAmdSec(MetsWrapper metsWrapper)
+        throws IOException, IPException, JAXBException {
         try {
             metsWrapper.getMets().getAmdSec().getFirst();
         } catch (java.util.NoSuchElementException e) {
             AmdSecType amdSec = new AmdSecType();
             amdSec.setID("uuid-" + UUID.randomUUID().toString());
             metsWrapper.getMets().getAmdSec().add(amdSec);
-            METSUtils.marshallMETS(metsWrapper.getMets(), metsPath, isRoot);
         }
     }
 }
