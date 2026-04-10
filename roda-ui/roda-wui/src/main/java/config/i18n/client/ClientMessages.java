@@ -2658,4 +2658,8 @@ public interface ClientMessages extends Messages {
   String reasonCantActOnUser();
 
   String reasonCantActOnGroup();
+
+  String redactPdfInvalidFormatMessage();
+
+  String redactPdfMissingIdentifiers();
 }
