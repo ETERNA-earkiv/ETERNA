@@ -69,7 +69,7 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
       FileAction.IDENTIFY_FORMATS));
 
   private static final Set<FileAction> POSSIBLE_ACTIONS_ON_SINGLE_FILE_BITSTREAM = new HashSet<>(Arrays.asList(
-    FileAction.DOWNLOAD, FileAction.MOVE, FileAction.REMOVE, FileAction.NEW_PROCESS, FileAction.IDENTIFY_FORMATS, FileAction.REDACT_PDF));
+    FileAction.DOWNLOAD, FileAction.MOVE, FileAction.REMOVE, FileAction.NEW_PROCESS, FileAction.IDENTIFY_FORMATS));
 
   private static final Set<FileAction> POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_THE_SAME_REPRESENTATION = new HashSet<>(
     Arrays.asList(FileAction.MOVE, FileAction.REMOVE, FileAction.NEW_PROCESS, FileAction.IDENTIFY_FORMATS));
@@ -148,6 +148,12 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
     if (AIPState.UNDER_APPRAISAL.equals(state)) {
       return new CanActResult(POSSIBLE_ACTIONS_ON_FILE_UNDER_APPRAISAL.contains(action),
               CanActResult.Reason.CONTEXT, messages.reasonAIPUnderAppraisal());
+    }
+
+    if (FileAction.REDACT_PDF.equals(action)) {
+      boolean canRedact = !file.isDirectory()
+              && FileFormatSharedUtils.hasFileFormat(file, FileFormatSharedUtils.MIMETYPE_PDF, FileFormatSharedUtils.EXTENSION_PDF);
+      return new CanActResult(canRedact, CanActResult.Reason.CONTEXT, messages.reasonCantActOnFileBitstream());
     }
 
     if (file.isDirectory()) {
@@ -248,10 +254,10 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
 
   // ACTIONS
     private void redactPdf(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
-    if (!FileFormatSharedUtils.hasFileFormat(file, "application/pdf", "pdf")) {
-      Dialogs.showInformationDialog(messages.redactPdfToastTitle(),
-        messages.redactPdfOnlyPdfDialogMessage(), messages.dialogOk(), false);
-      callback.onSuccess(ActionImpact.NONE);
+        if (!FileFormatSharedUtils.hasFileFormat(file, FileFormatSharedUtils.MIMETYPE_PDF, FileFormatSharedUtils.EXTENSION_PDF)) {
+            Dialogs.showInformationDialog(messages.redactPdfToastTitle(),
+                    messages.redactPdfOnlyPdfDialogMessage(), messages.dialogOk(), false);
+            callback.onSuccess(ActionImpact.NONE);
       return;
     }
 

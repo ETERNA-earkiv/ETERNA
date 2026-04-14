@@ -15,6 +15,7 @@ import org.roda.core.data.v2.index.IndexedRepresentationRequest;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.common.client.widgets.Toast;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
+import elemental2.dom.AbortSignal;
 import elemental2.dom.Blob;
 import elemental2.dom.FormData;
 import elemental2.dom.RequestInit;
@@ -60,8 +61,8 @@ public class PDFRedactor extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  public static final String JS_PATH = "webjars/pdf-redactor/1.0.1/pdf-redactor.js";
-  public static final String CSS_PATH = "webjars/pdf-redactor/1.0.1/pdf-redactor.css";
+  public static final String JS_PATH = "webjars/pdf-redactor/pdf-redactor.js";
+  public static final String CSS_PATH = "webjars/pdf-redactor/pdf-redactor.css";
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   public static String[] requiredRoles = new String[]{"representation.view", "representation.read", "representation.create", "representation.update"};
   private static PDFRedactor instance = null;
@@ -174,7 +175,7 @@ public class PDFRedactor extends Composite {
   private void initPdfRedactorPanel(final String aipId, final IndexedFile file, final String downloadUrl) {
     pdfRedactorPanel.setUrl(downloadUrl);
     pdfRedactorPanel.mount();
-    pdfRedactorPanel.setSaveCallback((Blob pdfData) -> {
+    pdfRedactorPanel.setSaveCallback((Blob pdfData, AbortSignal signal) ->
       getOrCreateRedactedRepresentation(aipId).then((representation) -> {
         List<String> path = new ArrayList<>(file.getPath());
 
@@ -186,25 +187,25 @@ public class PDFRedactor extends Composite {
         RequestInit requestInit = RequestInit.create();
         requestInit.setMethod("POST");
         requestInit.setBody(formData);
+        requestInit.setSignal(signal);
 
-        fetch(uploadUrl, requestInit).then(response -> {
+        return fetch(uploadUrl, requestInit).then(response -> {
           if (response.ok) {
             Toast.showInfo(messages.redactPdfToastTitle(), messages.redactPdfSaveSuccessDescription());
+            return Promise.resolve(response);
           } else if (response.status == RodaConstants.HTTP_RESPONSE_CODE_REQUEST_CONFLICT) {
             Toast.showError(messages.redactPdfToastTitle(), messages.fileAlreadyExists());
+            return Promise.reject(response);
           } else {
             Toast.showError(messages.redactPdfToastTitle(), messages.redactPdfSaveErrorDescription());
+            return Promise.reject(response);
           }
-          return null;
+        });
         }).catch_(error -> {
           Toast.showError(messages.redactPdfToastTitle(), messages.redactPdfSaveErrorDescription());
-          return null;
-        });
-        return null;
-      });
-
-      return true;
-    });
+          return Promise.reject(error);
+        })
+    );
   }
 
   private static Promise<IndexedRepresentation> getOrCreateRedactedRepresentation(String aipId) {

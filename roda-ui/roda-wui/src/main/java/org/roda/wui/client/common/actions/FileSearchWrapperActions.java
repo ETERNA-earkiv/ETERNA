@@ -66,7 +66,7 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
 
   private static final Set<Action<IndexedFile>> POSSIBLE_ACTIONS_ON_SINGLE_FILE_BITSTREAM = new HashSet<>(
     Arrays.asList(FileSearchWrapperAction.MOVE, FileSearchWrapperAction.REMOVE, FileSearchWrapperAction.NEW_PROCESS,
-      FileSearchWrapperAction.IDENTIFY_FORMATS,FileSearchWrapperAction.REDACT_PDF));
+      FileSearchWrapperAction.IDENTIFY_FORMATS));
 
   private static final Set<Action<IndexedFile>> POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_THE_SAME_REPRESENTATION = new HashSet<>(
     Arrays.asList(FileSearchWrapperAction.MOVE, FileSearchWrapperAction.REMOVE, FileSearchWrapperAction.NEW_PROCESS,
@@ -148,6 +148,12 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
     if (AIPState.UNDER_APPRAISAL.equals(state)) {
       return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_FILE_UNDER_APPRAISAL.contains(action),
         CanActResult.Reason.CONTEXT, messages.reasonAIPUnderAppraisal());
+    }
+
+    if (FileSearchWrapperAction.REDACT_PDF.equals(action)) {
+      boolean canRedact = !file.isDirectory()
+              && FileFormatSharedUtils.hasFileFormat(file, FileFormatSharedUtils.MIMETYPE_PDF, FileFormatSharedUtils.EXTENSION_PDF);
+      return new CanActResult(canRedact, CanActResult.Reason.CONTEXT, messages.reasonCantActOnFileBitstream());
     }
 
     if (file.isDirectory()) {
@@ -238,9 +244,13 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
 
   // ACTIONS
     private void redactPdf(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
-    if (!FileFormatSharedUtils.hasFileFormat(file, "application/pdf", "pdf")) {
-      Dialogs.showInformationDialog(messages.redactPdfToastTitle(),
-        messages.redactPdfOnlyPdfDialogMessage(), messages.dialogOk(), false);
+    if (!FileFormatSharedUtils.hasFileFormat(file, FileFormatSharedUtils.MIMETYPE_PDF, FileFormatSharedUtils.EXTENSION_PDF)) {
+      Dialogs.showInformationDialog(
+              messages.alertErrorTitle(),
+              messages.redactPdfInvalidFormatMessage(),// or a more specific key if available
+              messages.dialogOk(),
+              false
+      );
       callback.onSuccess(ActionImpact.NONE);
       return;
     }
@@ -251,7 +261,7 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
     List<String> path = file.getPath() != null ? file.getPath() : Collections.emptyList();
 
     if (aipId == null || representationId == null || fileId == null) {
-      Toast.showError("Cannot redact PDF: Missing required identifiers (AIP: " + aipId + ", Rep: " + representationId + ", File: " + fileId + ")");
+      Toast.showError(messages.redactPdfMissingIdentifiers());
       callback.onSuccess(ActionImpact.NONE);
       return;
     }

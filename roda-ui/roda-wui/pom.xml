@@ -13,6 +13,7 @@
     <properties>
         <gwt.module.main>org.roda.wui.RodaWUI</gwt.module.main>
         <gwt.module.portal>org.roda.wui.RodaWUIPortal</gwt.module.portal>
+        <pdf.redactor.version>1.0.3</pdf.redactor.version>
     </properties>
     <packaging>jar</packaging>
     <profiles>
@@ -701,7 +702,7 @@
         <dependency>
             <groupId>se.whitered.eterna</groupId>
             <artifactId>pdf-redactor</artifactId>
-            <version>1.0.1</version>
+            <version>${pdf.redactor.version}</version>
         </dependency>
         <!-- Spring boot -->
         <dependency>
