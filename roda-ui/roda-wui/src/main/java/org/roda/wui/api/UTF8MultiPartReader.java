@@ -38,8 +38,10 @@ import org.jvnet.mimepull.MIMEPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.annotation.Priority;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
@@ -52,6 +54,7 @@ import jakarta.ws.rs.ext.Providers;
 
 @Provider
 @Consumes("multipart/*")
+@Priority(Priorities.USER - 100)
 public class UTF8MultiPartReader implements MessageBodyReader<MultiPart> {
   private static final Logger LOGGER = LoggerFactory.getLogger(UTF8MultiPartReader.class);
 
