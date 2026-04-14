@@ -583,7 +583,11 @@ public class HtmlSnippetUtils {
       final Label mvText = new Label();
       mvText.setTitle(mvLabel.getText());
       mvText.addStyleName("value");
-      mvText.setText(mv.get("value"));
+      String displayValue = mv.get("value");
+      if ("list".equals(mv.get("type"))) {
+        displayValue = FormUtilities.getLocalizedListValue(mv, displayValue);
+      }
+      mvText.setText(displayValue);
 
       layout.add(mvLabel);
       layout.add(mvText);
