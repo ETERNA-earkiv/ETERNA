@@ -15,7 +15,8 @@ RUN set -ex; \
         zip \
         unzip \
         rsync \
-        jq && \
+        jq \
+        glibc-locale-base && \
     zypper clean -a && \
     chmod u-s /usr/bin/su && \
     chmod u-s /usr/bin/newgrp && \
@@ -42,7 +43,8 @@ COPY --from=tomcat /usr/local/tomcat $CATALINA_HOME
 # Point Tomcat to the BCI JRE instead of the Temurin JRE from the source image
 RUN set -ex; \
     JAVA_BIN=$(readlink -f /usr/bin/java) && \
-    echo "export JAVA_HOME=${JAVA_BIN%/bin/java}" > "$CATALINA_HOME/bin/setenv.sh"
+    echo "export JAVA_HOME=${JAVA_BIN%/bin/java}" > "$CATALINA_HOME/bin/setenv.sh" && \
+    echo 'export JAVA_OPTS="$JAVA_OPTS -Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8"' >> "$CATALINA_HOME/bin/setenv.sh"
 
 COPY ./docker-files/clamd.conf /etc/clamav/clamd.conf
 
@@ -69,7 +71,9 @@ RUN set -ex; \
     zypper clean -a && \
     rm -f /usr/bin/container-suseconnect
 
-ENV RODA_HOME=/roda \
+ENV LANG=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8 \
+    RODA_HOME=/roda \
     SIEGFRIED_MODE=server \
     SIEGFRIED_SERVER_URL=http://siegfried:5138 \
     RODA_USER="roda" \
