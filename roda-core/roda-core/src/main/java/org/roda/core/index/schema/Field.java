@@ -33,6 +33,8 @@ public class Field {
   public static final String TYPE_INT = "pint";
   public static final String TYPE_DATE = "pdate";
   public static final String TYPE_STRING = "string";
+  /** Natural sort order: digit sequences are treated as numbers (1, 2, 10 instead of 1, 10, 2). */
+  public static final String TYPE_SORT_STRING = "string_natural_sort";
 
   public static final String FIELD_SEARCH = RodaConstants.INDEX_SEARCH;
 
