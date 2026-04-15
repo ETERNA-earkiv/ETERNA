@@ -277,6 +277,13 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
     callback.onSuccess(true);
   }
 
+  private static InputElement getInputElement(CheckBox cb) {
+    com.google.gwt.dom.client.NodeList<com.google.gwt.dom.client.Element> inputs =
+      cb.getElement().getElementsByTagName("input");
+    if (inputs.getLength() == 0) return null;
+    return inputs.getItem(0).cast();
+  }
+
   private void updateSelectAllCheckboxState(String roleKey) {
 
     List<Permission> group = permissionGroups.get(roleKey);
@@ -290,9 +297,8 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
 
     boolean allChecked = editableTotal > 0 && editableSelected == editableTotal;
 
-    com.google.gwt.dom.client.Node firstChildNode = headerCheckbox.getElement().getFirstChild();
-    if (firstChildNode == null) return;
-    InputElement input = firstChildNode.cast();
+    InputElement input = getInputElement(headerCheckbox);
+    if (input == null) return;
     input.setPropertyBoolean("indeterminate", false);
 
     if (allChecked) {
