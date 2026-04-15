@@ -9,6 +9,7 @@ package org.roda.core.index.schema.collections;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,9 +107,7 @@ public class RepresentationCollection extends AbstractSolrCollection<IndexedRepr
 
   @Override
   public List<CopyField> getCopyFields() {
-    return Arrays.asList(SolrCollection.getCopyAllToSearchField(),
-      SolrCollection.getSortCopyFieldOf(RodaConstants.AIP_TITLE),
-      SolrCollection.getSortCopyFieldOf(RodaConstants.REPRESENTATION_TYPE));
+    return Arrays.asList(SolrCollection.getCopyAllToSearchField());
   }
 
   @Override
@@ -156,6 +155,25 @@ public class RepresentationCollection extends AbstractSolrCollection<IndexedRepr
 
     doc.addField(RodaConstants.REPRESENTATION_NUMBER_OF_DOCUMENTATION_FILES, numberOfDocumentationFiles);
     doc.addField(RodaConstants.REPRESENTATION_NUMBER_OF_SCHEMA_FILES, numberOfSchemaFiles);
+
+    // Set sort fields with natural sort values (numbers zero-padded for correct ordering)
+    Collection<Object> titleValues = doc.getFieldValues(RodaConstants.AIP_TITLE);
+    if (titleValues != null && !titleValues.isEmpty()) {
+      List<String> paddedTitles = titleValues.stream()
+        .filter(v -> v instanceof String)
+        .map(v -> SolrUtils.toNaturalSortValue((String) v))
+        .toList();
+      if (!paddedTitles.isEmpty()) {
+        doc.setField(RodaConstants.AIP_TITLE_SORT, paddedTitles);
+      }
+    }
+    Collection<Object> typeValues = doc.getFieldValues(RodaConstants.REPRESENTATION_TYPE);
+    if (typeValues != null && !typeValues.isEmpty()) {
+      typeValues.stream().filter(v -> v instanceof String).findFirst()
+        .ifPresent(v -> doc.setField(RodaConstants.REPRESENTATION_TYPE + "_sort",
+          SolrUtils.toNaturalSortValue((String) v)));
+    }
+
     return doc;
   }
 

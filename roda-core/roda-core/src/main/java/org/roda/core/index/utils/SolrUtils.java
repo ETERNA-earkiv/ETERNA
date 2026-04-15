@@ -17,6 +17,8 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
@@ -1634,6 +1636,30 @@ public class SolrUtils {
         LOGGER.error("Error processing descriptive metadata: {}", metadata, e);
       }
     }
+  }
+
+  private static final Pattern DIGITS_PATTERN = Pattern.compile("(\\d+)");
+
+  /**
+   * Converts a string to a natural sort value where digit sequences are
+   * zero-padded to 13 digits, enabling numeric ordering within string sort.
+   * Example: "Kapitel 2"  → "kapitel 0000000000002"
+   *          "Kapitel 10" → "kapitel 0000000000010"
+   *
+   * @param value the input string, may be null
+   * @return the natural sort value, or null if input is null
+   */
+  public static String toNaturalSortValue(String value) {
+    if (value == null) {
+      return null;
+    }
+    Matcher matcher = DIGITS_PATTERN.matcher(value.toLowerCase());
+    StringBuffer sb = new StringBuffer();
+    while (matcher.find()) {
+      matcher.appendReplacement(sb, String.format("%013d", Long.parseLong(matcher.group(1))));
+    }
+    matcher.appendTail(sb);
+    return sb.toString();
   }
 
   public static List<String> getFileAncestorsPath(String aipId, String representationId, List<String> path) {

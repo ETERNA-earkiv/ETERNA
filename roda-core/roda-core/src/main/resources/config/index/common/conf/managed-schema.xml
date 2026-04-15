@@ -204,10 +204,6 @@
     <fieldType name="string" class="solr.StrField" sortMissingLast="true" multiValued="false" docValues="true" />
     <fieldType name="strings" class="solr.StrField" sortMissingLast="true" multiValued="true" docValues="true" />
 
-    <!-- Natural sort order: treats digit sequences as numbers (1, 2, 10 instead of 1, 10, 2).
-         Used for sort fields to achieve human-friendly ordering. -->
-    <fieldType name="string_natural_sort" class="solr.ICUCollationField" locale="sv" numeric="true" strength="primary" sortMissingLast="true" />
-
     <!-- boolean type: "true" or "false" -->
     <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true"/>
     <fieldType name="booleans" class="solr.BoolField" sortMissingLast="true" multiValued="true"/>

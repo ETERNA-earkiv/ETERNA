@@ -9,6 +9,7 @@ package org.roda.core.index.schema.collections;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.solr.common.SolrDocument;
@@ -93,8 +94,7 @@ public class RepresentationInformationCollection
 
   @Override
   public List<CopyField> getCopyFields() {
-    return Arrays.asList(SolrCollection.getCopyAllToSearchField(),
-      SolrCollection.getSortCopyFieldOf(RodaConstants.REPRESENTATION_INFORMATION_NAME));
+    return Arrays.asList(SolrCollection.getCopyAllToSearchField());
   }
 
   @Override
@@ -141,6 +141,14 @@ public class RepresentationInformationCollection
     }
 
     doc.setField(RodaConstants.REPRESENTATION_INFORMATION_RELATIONS, children);
+
+    // Set name_sort with natural sort value (numbers zero-padded for correct ordering)
+    Collection<Object> nameValues = doc.getFieldValues(RodaConstants.REPRESENTATION_INFORMATION_NAME);
+    if (nameValues != null && !nameValues.isEmpty()) {
+      nameValues.stream().filter(v -> v instanceof String).findFirst()
+        .ifPresent(v -> doc.setField(RodaConstants.REPRESENTATION_INFORMATION_NAME_SORT,
+          SolrUtils.toNaturalSortValue((String) v)));
+    }
 
     return doc;
   }

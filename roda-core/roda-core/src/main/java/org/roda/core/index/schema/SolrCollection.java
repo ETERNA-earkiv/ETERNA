@@ -42,7 +42,7 @@ public interface SolrCollection<I extends IsIndexed, M extends IsModelObject> {
   }
 
   static Field getSortFieldOf(String field) {
-    return new Field(field + "_sort", Field.TYPE_SORT_STRING).setMultiValued(true);
+    return new Field(field + "_sort", Field.TYPE_STRING).setMultiValued(true);
   }
 
   static CopyField getSortCopyFieldOf(String field) {
