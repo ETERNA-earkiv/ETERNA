@@ -8,6 +8,7 @@
 package org.roda.core.index.utils;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.io.Reader;
 import java.io.Serializable;
 import java.text.ParseException;
@@ -1638,13 +1639,24 @@ public class SolrUtils {
     }
   }
 
-  private static final Pattern DIGITS_PATTERN = Pattern.compile("(\\d+)");
+  // Matches only ASCII digit sequences to avoid Unicode digit pitfalls (e.g.
+  // Arabic-Indic numerals) that Java's \d would match but Long/BigInteger cannot
+  // parse. Using [0-9]+ instead of \d+ is an intentional security decision.
+  private static final Pattern DIGITS_PATTERN = Pattern.compile("([0-9]+)");
+
+  // Numbers beyond 13 digits would produce sort keys longer than the standard
+  // 13-char padding, breaking sort consistency. Cap all numbers at this value.
+  private static final BigInteger NATURAL_SORT_MAX = new BigInteger("9999999999999");
 
   /**
-   * Converts a string to a natural sort value where digit sequences are
+   * Converts a string to a natural sort value where ASCII digit sequences are
    * zero-padded to 13 digits, enabling numeric ordering within string sort.
    * Example: "Kapitel 2"  → "kapitel 0000000000002"
    *          "Kapitel 10" → "kapitel 0000000000010"
+   *
+   * Numbers with more than 13 digits are capped at 9999999999999 to preserve
+   * consistent field width. Non-ASCII digit characters (e.g. Arabic-Indic
+   * numerals) are left untouched, never causing a parse exception.
    *
    * @param value the input string, may be null
    * @return the natural sort value, or null if input is null
@@ -1656,7 +1668,11 @@ public class SolrUtils {
     Matcher matcher = DIGITS_PATTERN.matcher(value.toLowerCase());
     StringBuffer sb = new StringBuffer();
     while (matcher.find()) {
-      matcher.appendReplacement(sb, String.format("%013d", Long.parseLong(matcher.group(1))));
+      BigInteger number = new BigInteger(matcher.group(1));
+      if (number.compareTo(NATURAL_SORT_MAX) > 0) {
+        number = NATURAL_SORT_MAX;
+      }
+      matcher.appendReplacement(sb, String.format("%013d", number));
     }
     matcher.appendTail(sb);
     return sb.toString();
