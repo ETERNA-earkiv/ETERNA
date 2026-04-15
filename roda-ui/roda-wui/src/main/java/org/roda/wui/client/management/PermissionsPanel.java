@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Set;
 
-import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.widgets.LoadingPopup;
 import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
@@ -119,8 +118,6 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
   }
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private final ClientLogger logger = new ClientLogger(getClass().getName());
-
   private final List<Permission> permissions = new ArrayList<>();
   private final Map<String, List<Permission>> permissionGroups = new LinkedHashMap<>();
   private final Map<String, CheckBox> selectAllCheckboxes = new LinkedHashMap<>();
