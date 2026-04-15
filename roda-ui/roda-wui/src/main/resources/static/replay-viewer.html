@@ -16,7 +16,8 @@
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistrations().then(function(registrations) {
         registrations.forEach(function(reg) {
-          if (reg.scope.includes('/replay') && reg.scope !== new URL(replayBase, window.location.origin).href) {
+          var canonicalReplayScope = new URL(replayBase, window.location.origin).href;
+          if (reg.scope.startsWith(canonicalReplayScope) && reg.scope !== canonicalReplayScope) {
             reg.unregister();
           }
         });
