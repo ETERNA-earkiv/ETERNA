@@ -287,11 +287,11 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
 
     if (group == null || headerCheckbox == null) return;
 
-    long total = group.size();
-    long selected = group.stream().filter(Permission::isChecked).count();
-
     boolean allLocked = group.stream().allMatch(Permission::isLocked);
-    boolean allChecked = selected == total && total > 0;
+    long editableTotal = group.stream().filter(p -> !p.isLocked()).count();
+    long editableSelected = group.stream().filter(p -> !p.isLocked() && p.isChecked()).count();
+
+    boolean allChecked = editableTotal > 0 && editableSelected == editableTotal;
 
     com.google.gwt.dom.client.Node firstChildNode = headerCheckbox.getElement().getFirstChild();
     if (firstChildNode == null) return;
@@ -300,14 +300,14 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
 
     if (allChecked) {
       headerCheckbox.setValue(true, false);
-    } else if (selected == 0) {
+    } else if (editableSelected == 0) {
       headerCheckbox.setValue(false, false);
     } else {
       headerCheckbox.setValue(false, false);
       input.setPropertyBoolean("indeterminate", true);
     }
 
-    if (allChecked && allLocked) {
+    if (allLocked || editableTotal == 0) {
       headerCheckbox.setEnabled(false);
     } else {
       headerCheckbox.setEnabled(mode == PermissionsMode.EDIT);
