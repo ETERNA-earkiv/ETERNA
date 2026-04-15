@@ -4,6 +4,9 @@
 #### WIP
 - Restored PDF redactor compatibility by realigning the integration with [`eterna-pdf-redactor@v1.0.1`](https://github.com/ETERNA-earkiv/eterna-pdf-redactor). [#142](https://github.com/ETERNA-earkiv/ETERNA/issues/142)
 
+#### Improvements
+- Improved sort order for search results from lexicographic (1, 10, 11, 2, 3) to natural numeric order (1, 2, 3, 10, 11) by padding digit sequences in sort fields (`title_sort`, `name_sort`, `type_sort`) before indexing to Solr. Affects AIP, Representation and Representation Information listings. Requires reindexing after upgrade. [#211](https://github.com/ETERNA-earkiv/ETERNA/issues/211)
+
 
 ## v0.5.0 (2025-12-16)
 #### Updates
