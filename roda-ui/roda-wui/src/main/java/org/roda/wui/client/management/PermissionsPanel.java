@@ -172,6 +172,7 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
 
   public void init(final AsyncCallback<Boolean> callback) {
     Map<String, FlowPanel> rolePanels = new LinkedHashMap<>();
+    List<FlowPanel> unknownPanels = new ArrayList<>();
     List<String> roleTitleKeys = ConfigurationManager.getStringList("ui.roleTitle");
     List<String> roles = ConfigurationManager.getStringList("ui.role");
 
@@ -224,7 +225,7 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
         rolePanel = new FlowPanel();
         rolePanel.addStyleName("permission-role-container");
         rolePanels.put(roleKey, rolePanel);
-        this.add(rolePanel);
+        unknownPanels.add(rolePanel);
       }
       rolePanel.add(permission);
       permissionGroups.computeIfAbsent(roleKey, k -> new ArrayList<>()).add(permission);
@@ -246,6 +247,9 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
     for (String key : roleTitleKeys) {
       FlowPanel rp = rolePanels.get(key);
       if (rp != null) this.add(rp);
+    }
+    for (FlowPanel unknownPanel : unknownPanels) {
+      this.add(unknownPanel);
     }
     for (Map.Entry<String, List<Permission>> entry : permissionGroups.entrySet()) {
       String roleKey = entry.getKey();
