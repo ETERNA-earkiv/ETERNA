@@ -1716,6 +1716,10 @@ public interface ClientMessages extends Messages {
 
   String showGroupEmptyPermissions();
 
+  String permissionsLoadError();
+
+  String permissionsReadOnly();
+
   // Edit Group
   String editGroupTitle();
 
@@ -1746,6 +1750,8 @@ public interface ClientMessages extends Messages {
   // Roles Title
 
   String roleTitle(@Select String role);
+
+  String permissionsSelectAll(String roleTitle);
 
   // Roles Description
 

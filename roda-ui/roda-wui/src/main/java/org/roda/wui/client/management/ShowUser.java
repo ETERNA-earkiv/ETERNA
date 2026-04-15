@@ -155,26 +155,25 @@ public class ShowUser extends Composite {
   }
 
   private void buildPermissionList() {
-    Set<String> allUserRoles = user.getAllRoles();
-
-    if (allUserRoles.isEmpty()) {
-      permissionList.add(new Label(messages.showUserEmptyPermissions()));
-    } else {
-      List<String> roles = ConfigurationManager.getStringList("ui.role");
-      for (String role : roles) {
-        String description;
-        try {
-          description = messages.role(role);
-        } catch (MissingResourceException e) {
-          description = role + " (needs translation)";
-        }
-        if (allUserRoles.contains(role)) {
-          permissionList.add(createListItem(description));
-        }
+    PermissionsPanel permissionsPanel = new PermissionsPanel();
+    permissionsPanel.init(new AsyncCallback<Boolean>() {
+      @Override
+      public void onFailure(Throwable caught) {
+        permissionList.add(new Label(messages.permissionsLoadError()));
       }
-    }
+      @Override
+      public void onSuccess(Boolean result) {
+        Set<String> userRoles = user.getAllRoles();
+        if (userRoles.isEmpty()) {
+          permissionList.add(new Label(messages.showUserEmptyPermissions()));
+          return;
+        }
+        permissionsPanel.checkPermissions(userRoles, true);
+        permissionsPanel.setMode(PermissionsPanel.PermissionsMode.READ_ONLY);
+        permissionList.add(permissionsPanel);
+      }
+    });
   }
-
   private FlowPanel createListItem(String item) {
     FlowPanel panel = new FlowPanel();
     InlineHTML bullet = new InlineHTML("&#8226;");
