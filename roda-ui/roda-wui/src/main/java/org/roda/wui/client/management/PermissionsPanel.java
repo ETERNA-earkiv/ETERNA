@@ -161,16 +161,13 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
       cb.setEnabled(false);
       return;
     }
-
     List<Permission> group = permissionGroups.get(roleKey);
-    if (group == null) {
-      cb.setEnabled(true);
+    if (group == null || group.isEmpty()) {
+      cb.setEnabled(false);
       return;
     }
-    boolean allLocked = group.stream().allMatch(Permission::isLocked);
-    boolean allChecked = group.stream().allMatch(Permission::isChecked);
-    // Disable if fully locked + selected
-    cb.setEnabled(!(allLocked && allChecked));
+    long editableTotal = group.stream().filter(p -> !p.isLocked()).count();
+    cb.setEnabled(editableTotal > 0);
   }
 
   public void init(final AsyncCallback<Boolean> callback) {
