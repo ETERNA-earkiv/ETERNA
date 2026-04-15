@@ -196,7 +196,7 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
 
       CheckBox selectAllCheckbox = new CheckBox();
       selectAllCheckbox.addStyleName("permission-select-all-checkbox");
-      WCAGUtilities.addTitleToCheckbox(selectAllCheckbox, roleTitle + " \u2013 select all");
+      WCAGUtilities.addTitleToCheckbox(selectAllCheckbox, messages.permissionsSelectAll(roleTitle));
 
       Label roleLabel = new Label(roleTitle);
 
