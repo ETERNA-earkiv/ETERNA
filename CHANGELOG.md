@@ -5,10 +5,11 @@
 - Restored PDF redactor compatibility by realigning the integration with [`eterna-pdf-redactor@v1.0.1`](https://github.com/ETERNA-earkiv/eterna-pdf-redactor). [#142](https://github.com/ETERNA-earkiv/ETERNA/issues/142)
 
 #### Security
-- Hardened `toNaturalSortValue()` against adversarial AIP titles: numbers exceeding 13 digits are now capped at `9999999999999` instead of throwing `NumberFormatException` (which previously aborted the entire document indexing operation). Unicode digit characters (Arabic-Indic, Devanagari, Thai, etc.) are now left untouched rather than causing a parse exception. [#211](https://github.com/ETERNA-earkiv/ETERNA/issues/211)
+- Hardened `toNaturalSortValue()` against adversarial AIP titles: numbers exceeding 13 digits are now capped at `9999999999999` instead of throwing `NumberFormatException` (which previously aborted the entire document indexing operation). Unicode digit characters (Arabic-Indic, Devanagari, Thai, etc.) are now left untouched rather than causing a parse exception. Digit sequences longer than 20 characters are truncated before parsing to prevent excessive memory allocation on pathological inputs. [#211](https://github.com/ETERNA-earkiv/ETERNA/issues/211)
 
 #### Improvements
 - Improved sort order for search results from lexicographic (1, 10, 11, 2, 3) to natural numeric order (1, 2, 3, 10, 11) by padding digit sequences in sort fields (`title_sort`, `name_sort`, `type_sort`) before indexing to Solr. Affects AIP, Representation and Representation Information listings. Requires reindexing after upgrade. [#211](https://github.com/ETERNA-earkiv/ETERNA/issues/211)
+- Added `RodaConstants.REPRESENTATION_TYPE_SORT` constant to replace hardcoded string concatenation in `RepresentationCollection`. [#211](https://github.com/ETERNA-earkiv/ETERNA/issues/211)
 
 
 ## v0.5.0 (2025-12-16)
