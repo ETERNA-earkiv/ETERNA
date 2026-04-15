@@ -1648,6 +1648,10 @@ public class SolrUtils {
   // 13-char padding, breaking sort consistency. Cap all numbers at this value.
   private static final BigInteger NATURAL_SORT_MAX = new BigInteger("9999999999999");
 
+  // Digit sequences longer than this are truncated before BigInteger parsing
+  // to prevent excessive memory allocation on pathological inputs.
+  private static final int NATURAL_SORT_MAX_DIGITS = 20;
+
   /**
    * Converts a string to a natural sort value where ASCII digit sequences are
    * zero-padded to 13 digits, enabling numeric ordering within string sort.
@@ -1655,20 +1659,26 @@ public class SolrUtils {
    *          "Kapitel 10" → "kapitel 0000000000010"
    *
    * Numbers with more than 13 digits are capped at 9999999999999 to preserve
-   * consistent field width. Non-ASCII digit characters (e.g. Arabic-Indic
-   * numerals) are left untouched, never causing a parse exception.
+   * consistent field width. Digit sequences longer than 20 chars are truncated
+   * before parsing to avoid excessive BigInteger allocation. Non-ASCII digit
+   * characters (e.g. Arabic-Indic numerals) are left untouched, never causing
+   * a parse exception. Input is lowercased for case-insensitive sort order.
    *
    * @param value the input string, may be null
-   * @return the natural sort value, or null if input is null
+   * @return the natural sort value (lowercase, numbers zero-padded), or null if input is null
    */
   public static String toNaturalSortValue(String value) {
     if (value == null) {
       return null;
     }
     Matcher matcher = DIGITS_PATTERN.matcher(value.toLowerCase());
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     while (matcher.find()) {
-      BigInteger number = new BigInteger(matcher.group(1));
+      String digits = matcher.group(1);
+      if (digits.length() > NATURAL_SORT_MAX_DIGITS) {
+        digits = digits.substring(0, NATURAL_SORT_MAX_DIGITS);
+      }
+      BigInteger number = new BigInteger(digits);
       if (number.compareTo(NATURAL_SORT_MAX) > 0) {
         number = NATURAL_SORT_MAX;
       }

@@ -235,6 +235,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
       List<String> paddedTitles = titleValues.stream()
         .filter(v -> v instanceof String)
         .map(v -> SolrUtils.toNaturalSortValue((String) v))
+        .filter(v -> v != null)
         .toList();
       if (!paddedTitles.isEmpty()) {
         doc.setField(RodaConstants.AIP_TITLE_SORT, paddedTitles);

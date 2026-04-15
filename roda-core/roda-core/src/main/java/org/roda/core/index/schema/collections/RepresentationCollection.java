@@ -162,6 +162,7 @@ public class RepresentationCollection extends AbstractSolrCollection<IndexedRepr
       List<String> paddedTitles = titleValues.stream()
         .filter(v -> v instanceof String)
         .map(v -> SolrUtils.toNaturalSortValue((String) v))
+        .filter(v -> v != null)
         .toList();
       if (!paddedTitles.isEmpty()) {
         doc.setField(RodaConstants.AIP_TITLE_SORT, paddedTitles);
@@ -170,7 +171,7 @@ public class RepresentationCollection extends AbstractSolrCollection<IndexedRepr
     Collection<Object> typeValues = doc.getFieldValues(RodaConstants.REPRESENTATION_TYPE);
     if (typeValues != null && !typeValues.isEmpty()) {
       typeValues.stream().filter(v -> v instanceof String).findFirst()
-        .ifPresent(v -> doc.setField(RodaConstants.REPRESENTATION_TYPE + "_sort",
+        .ifPresent(v -> doc.setField(RodaConstants.REPRESENTATION_TYPE_SORT,
           SolrUtils.toNaturalSortValue((String) v)));
     }
 
