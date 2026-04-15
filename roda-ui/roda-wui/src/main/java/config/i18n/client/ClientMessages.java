@@ -1751,6 +1751,8 @@ public interface ClientMessages extends Messages {
 
   String roleTitle(@Select String role);
 
+  String permissionsSelectAll(String roleTitle);
+
   // Roles Description
 
   String role(@Select String role);
