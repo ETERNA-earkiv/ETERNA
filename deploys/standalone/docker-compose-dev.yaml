@@ -36,8 +36,8 @@ services:
     volumes:
       - clam_data:/var/lib/clamav
       # Mapping $HOME/.roda to enable usage with spring-boot mode
-      - ./.roda/data/storage:$HOME/.roda/data/storage:ro
-      - ./.roda/data/staging-storage:$HOME/.roda/data/staging-storage:ro
+      - ${HOME}/.roda/data/storage:${HOME}/.roda/data/storage:ro
+      - ${HOME}/.roda/data/staging-storage:${HOME}/.roda/data/staging-storage:ro
       # Mapping /tmp to enable usage with local testing via mvn test
       - /tmp:/tmp
 
@@ -52,8 +52,8 @@ services:
     volumes:
       - siegfried_data:/root/siegfried/
       # Mapping $HOME/.roda to enable usage with spring-boot mode
-      - ./.roda/data/storage:$HOME/.roda/data/storage:ro
-      - ./.roda/data/staging-storage:$HOME/.roda/data/staging-storage:ro
+      - ${HOME}/.roda/data/storage:${HOME}/.roda/data/storage:ro
+      - ${HOME}/.roda/data/staging-storage:${HOME}/.roda/data/staging-storage:ro
       # Mapping /tmp to enable usage with local testing via mvn test
       - /tmp:/tmp:ro
 
