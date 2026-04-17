@@ -2668,4 +2668,14 @@ public interface ClientMessages extends Messages {
   String redactPdfInvalidFormatMessage();
 
   String redactPdfMissingIdentifiers();
+
+  String catalogTreeTitle();
+
+  String catalogTreeFilterPlaceholder();
+
+  String catalogTreeLoadingLabel();
+
+  String catalogTreeLoadError();
+
+  String catalogTreeRetry();
 }
