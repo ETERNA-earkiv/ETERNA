@@ -125,7 +125,12 @@ public class CatalogTreePanel extends Composite {
       selectNode(targetId);
       return;
     }
-    node.expand(() -> expandChain(ancestors, index + 1, targetId));
+    node.expand(new com.google.gwt.user.client.Command() {
+      @Override
+      public void execute() {
+        expandChain(ancestors, index + 1, targetId);
+      }
+    });
   }
 
   private void selectNode(String aipId) {

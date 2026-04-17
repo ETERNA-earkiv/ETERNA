@@ -18,7 +18,7 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.services.Services;
 
-import com.google.gwt.core.client.Command;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
