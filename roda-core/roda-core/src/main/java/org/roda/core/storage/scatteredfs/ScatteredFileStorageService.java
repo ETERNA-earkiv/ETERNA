@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -42,6 +43,7 @@ import org.roda.core.storage.ExternalFileManifestContentPayload;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceUtils;
+import org.roda.core.storage.StorageServiceWrapper;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
@@ -189,8 +191,10 @@ public class ScatteredFileStorageService extends FileStorageService  {
     Path path = ScatteredFSUtils.getEntityPath(basePath, storagePath);
     if (recursive) {
       return ScatteredFSUtils.recursivelyListPath(basePath, path);
+    } else if (storagePath.isFromAContainer()) {
+      return ScatteredFSUtils.listResourcesUnderContainer(basePath, storagePath.getContainerName());
     } else {
-      return ScatteredFSUtils.listResourcesUnderContainer(basePath, path.getFileName().toString());
+      return ScatteredFSUtils.listPath(basePath, path);
     }
   }
 
@@ -200,6 +204,19 @@ public class ScatteredFileStorageService extends FileStorageService  {
     Path path = ScatteredFSUtils.getEntityPath(basePath, storagePath);
     if (recursive) {
       return FSUtils.recursivelyCountPath(path);
+    } else if (storagePath.isFromAContainer()) {
+      try (CloseableIterable<Resource> resources =
+          ScatteredFSUtils.listResourcesUnderContainer(basePath, storagePath.getContainerName())) {
+        long count = 0;
+        Iterator<Resource> it = resources.iterator();
+        while (it.hasNext()) {
+          it.next();
+          count++;
+        }
+        return count;
+      } catch (IOException e) {
+        throw new GenericException("Could not count resources in container " + storagePath.getContainerName(), e);
+      }
     } else {
       return FSUtils.countPath(path);
     }
@@ -967,6 +984,47 @@ public class ScatteredFileStorageService extends FileStorageService  {
         return stats;
     }
 
+  @Override
+  public Date getCreationDate(StoragePath storagePath) throws GenericException {
+    try {
+      Path entityPath = ScatteredFSUtils.getEntityPath(basePath, storagePath);
+      BasicFileAttributes attr = Files.readAttributes(entityPath, BasicFileAttributes.class);
+      return new Date(attr.creationTime().toMillis());
+    } catch (IOException e) {
+      throw new GenericException("Could not get creation date", e);
+    }
+  }
 
+  @Override
+  public void importBinaryVersion(StorageService fromService, StoragePath storagePath, String version)
+    throws AlreadyExistsException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    FileStorageService sourceService;
+    if (fromService instanceof ScatteredFileStorageService scattered) {
+      sourceService = scattered;
+    } else if (fromService instanceof StorageServiceWrapper wrapper) {
+      sourceService = (FileStorageService) wrapper.getWrappedStorageService();
+    } else if (fromService instanceof FileStorageService fss) {
+      sourceService = fss;
+    } else {
+      throw new GenericException("Cannot import binary version from " + fromService.getClass().getName());
+    }
+
+    Path sourceDataPath = FSUtils.getEntityPath(sourceService.getHistoryDataPath(), storagePath, version);
+    Path targetDataPath = FSUtils.getEntityPath(historyDataPath, storagePath, version);
+    FSUtils.copy(sourceDataPath, targetDataPath, true);
+
+    Path sourceMetadataPath = FSUtils.getBinaryHistoryMetadataPath(sourceService.getHistoryDataPath(),
+      sourceService.getHistoryMetadataPath(), sourceDataPath);
+    Path targetMetadataPath = FSUtils.getBinaryHistoryMetadataPath(historyDataPath, historyMetadataPath,
+      targetDataPath);
+    FSUtils.copy(sourceMetadataPath, targetMetadataPath, true);
+  }
+
+  @Override
+  public String getStoragePathAsString(StoragePath storagePath, boolean skipStoragePathContainer,
+    StoragePath anotherStoragePath, boolean skipAnotherStoragePathContainer) {
+    return FSUtils.getStoragePathAsString(storagePath, skipStoragePathContainer, anotherStoragePath,
+      skipAnotherStoragePathContainer);
+  }
 
 }
