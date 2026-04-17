@@ -108,6 +108,12 @@ public class BrowseAIP extends Composite {
   @UiField
   SimplePanel aipChildrenCard;
 
+  // CATALOG TREE
+  @UiField
+  CatalogTreePanel catalogTreePanel;
+  @UiField
+  FlowPanel treeResizeHandle;
+
   // SIDEBAR
   @UiField
   FlowPanel sidePanel;
@@ -137,6 +143,8 @@ public class BrowseAIP extends Composite {
 
     // INIT
     initWidget(uiBinder.createAndBindUi(this));
+    catalogTreePanel.revealAip(aipId);
+    initTreeResize();
 
     AsyncCallback<Actionable.ActionImpact> listActionableCallback = new NoAsyncCallback<Actionable.ActionImpact>() {
       @Override
@@ -360,6 +368,36 @@ public class BrowseAIP extends Composite {
       HistoryUtils.newHistory(BrowseTop.RESOLVER, CreateDescriptiveMetadata.RESOLVER.getHistoryToken(),
         RodaConstants.RODA_OBJECT_AIP, aipId);
     }
+  }
+
+  private void initTreeResize() {
+    treeResizeHandle.addDomHandler(new com.google.gwt.event.dom.client.MouseDownHandler() {
+      @Override
+      public void onMouseDown(com.google.gwt.event.dom.client.MouseDownEvent event) {
+        event.preventDefault();
+        final int startX = event.getClientX();
+        final int startWidth = catalogTreePanel.getOffsetWidth();
+        com.google.gwt.user.client.Event.setCapture(treeResizeHandle.getElement());
+        treeResizeHandle.addStyleName("resizing");
+
+        com.google.gwt.user.client.DOM.setEventListener(treeResizeHandle.getElement(),
+          new com.google.gwt.user.client.EventListener() {
+            @Override
+            public void onBrowserEvent(com.google.gwt.user.client.Event nativeEvent) {
+              if (nativeEvent.getType().equals("mousemove")) {
+                int newWidth = Math.max(150, Math.min(480, startWidth + nativeEvent.getClientX() - startX));
+                catalogTreePanel.getElement().getStyle().setPropertyPx("width", newWidth);
+              } else if (nativeEvent.getType().equals("mouseup")) {
+                com.google.gwt.user.client.Event.releaseCapture(treeResizeHandle.getElement());
+                treeResizeHandle.removeStyleName("resizing");
+                com.google.gwt.user.client.DOM.setEventListener(treeResizeHandle.getElement(), null);
+              }
+            }
+          });
+        com.google.gwt.user.client.DOM.sinkEvents(treeResizeHandle.getElement(),
+          com.google.gwt.user.client.Event.ONMOUSEMOVE | com.google.gwt.user.client.Event.ONMOUSEUP);
+      }
+    }, com.google.gwt.event.dom.client.MouseDownEvent.getType());
   }
 
   interface MyUiBinder extends UiBinder<Widget, BrowseAIP> {
