@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
 package org.roda.wui.client.browse;
 
 import java.util.HashMap;
@@ -14,6 +21,7 @@ import org.roda.wui.client.services.Services;
 import com.google.gwt.core.client.Command;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
@@ -46,6 +54,7 @@ public class CatalogTreeNode extends Composite {
   private boolean expanded = false;
   private boolean loaded = false;
   private boolean isLeaf = false;
+  private Command pendingOnComplete = null;
 
   public CatalogTreeNode(String aipId, String title, int depth) {
     this.aipId = aipId;
@@ -75,7 +84,12 @@ public class CatalogTreeNode extends Composite {
     childrenPanel.setStyleName("catalogTreeNodeChildren");
     childrenPanel.setVisible(false);
 
-    rowPanel.addDomHandler(event -> toggle(), ClickEvent.getType());
+    rowPanel.addDomHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        toggle();
+      }
+    }, ClickEvent.getType());
 
     rootPanel.add(rowPanel);
     rootPanel.add(childrenPanel);
@@ -108,6 +122,7 @@ public class CatalogTreeNode extends Composite {
   }
 
   private void loadChildren(Command onComplete) {
+    this.pendingOnComplete = onComplete;
     toggleLabel.setText(TOGGLE_LOADING);
 
     FindRequest findRequest = new FindRequest.FindRequestBuilder(
@@ -153,10 +168,13 @@ public class CatalogTreeNode extends Composite {
     errorPanel.setStyleName("catalogTreeNodeError");
     Label errorLabel = new Label(messages.catalogTreeLoadError());
     Anchor retryLink = new Anchor(messages.catalogTreeRetry());
-    retryLink.addClickHandler(e -> {
-      errorPanel.removeFromParent();
-      loaded = false;
-      loadChildren(null);
+    retryLink.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        errorPanel.removeFromParent();
+        loaded = false;
+        loadChildren(pendingOnComplete);
+      }
     });
     errorPanel.add(errorLabel);
     errorPanel.add(retryLink);
