@@ -370,6 +370,8 @@ public class BrowseAIP extends Composite {
     }
   }
 
+  private com.google.gwt.event.shared.HandlerRegistration resizeHandlerReg;
+
   private void initTreeResize() {
     treeResizeHandle.addDomHandler(new com.google.gwt.event.dom.client.MouseDownHandler() {
       @Override
@@ -380,22 +382,24 @@ public class BrowseAIP extends Composite {
         com.google.gwt.user.client.Event.setCapture(treeResizeHandle.getElement());
         treeResizeHandle.addStyleName("resizing");
 
-        com.google.gwt.user.client.DOM.setEventListener(treeResizeHandle.getElement(),
-          new com.google.gwt.user.client.EventListener() {
+        resizeHandlerReg = com.google.gwt.user.client.Event.addNativePreviewHandler(
+          new com.google.gwt.user.client.Event.NativePreviewHandler() {
             @Override
-            public void onBrowserEvent(com.google.gwt.user.client.Event nativeEvent) {
-              if (nativeEvent.getType().equals("mousemove")) {
-                int newWidth = Math.max(150, Math.min(480, startWidth + nativeEvent.getClientX() - startX));
+            public void onPreviewNativeEvent(com.google.gwt.user.client.Event.NativePreviewEvent e) {
+              com.google.gwt.dom.client.NativeEvent ne = e.getNativeEvent();
+              if ("mousemove".equals(ne.getType())) {
+                int newWidth = Math.max(150, Math.min(480, startWidth + ne.getClientX() - startX));
                 catalogTreePanel.getElement().getStyle().setPropertyPx("width", newWidth);
-              } else if (nativeEvent.getType().equals("mouseup")) {
+              } else if ("mouseup".equals(ne.getType())) {
                 com.google.gwt.user.client.Event.releaseCapture(treeResizeHandle.getElement());
                 treeResizeHandle.removeStyleName("resizing");
-                com.google.gwt.user.client.DOM.setEventListener(treeResizeHandle.getElement(), null);
+                if (resizeHandlerReg != null) {
+                  resizeHandlerReg.removeHandler();
+                  resizeHandlerReg = null;
+                }
               }
             }
           });
-        com.google.gwt.user.client.DOM.sinkEvents(treeResizeHandle.getElement(),
-          com.google.gwt.user.client.Event.ONMOUSEMOVE | com.google.gwt.user.client.Event.ONMOUSEUP);
       }
     }, com.google.gwt.event.dom.client.MouseDownEvent.getType());
   }

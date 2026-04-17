@@ -7,6 +7,7 @@
  */
 package org.roda.wui.client.browse;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,6 +110,7 @@ public class CatalogTreePanel extends Composite {
           LOGGER.warn("Could not fetch ancestors for AIP {}, auto-sync skipped", aipId);
           return;
         }
+        Collections.reverse(ancestors);
         expandChain(ancestors, 0, aipId);
       });
   }
