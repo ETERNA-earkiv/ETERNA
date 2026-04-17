@@ -377,6 +377,10 @@ public class BrowseAIP extends Composite {
       @Override
       public void onMouseDown(com.google.gwt.event.dom.client.MouseDownEvent event) {
         event.preventDefault();
+        if (resizeHandlerReg != null) {
+          resizeHandlerReg.removeHandler();
+          resizeHandlerReg = null;
+        }
         final int startX = event.getClientX();
         final int startWidth = catalogTreePanel.getOffsetWidth();
         com.google.gwt.user.client.Event.setCapture(treeResizeHandle.getElement());
