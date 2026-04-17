@@ -70,7 +70,7 @@ public class CatalogTreePanel extends Composite {
   }
 
   private boolean applyFilter(CatalogTreeNode node, String query) {
-    boolean selfMatches = query.isEmpty() || node.getTitle().toLowerCase().contains(query);
+    boolean selfMatches = query.isEmpty() || (node.getTitle() != null && node.getTitle().toLowerCase().contains(query));
     boolean childMatches = false;
     for (CatalogTreeNode child : node.getChildNodes().values()) {
       if (applyFilter(child, query)) childMatches = true;
