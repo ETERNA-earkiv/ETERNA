@@ -3345,6 +3345,123 @@ td.datePickerMonth, td.datePickerYear {
     gap: 32px;
 }
 
+/* ── Catalog Tree Panel ── */
+.catalogTreePanel {
+    width: 260px;
+    min-width: 150px;
+    flex-shrink: 0;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.catalogTreeResizeHandle {
+    width: 3px;
+    background: COLOR_GREY_LIGHT;
+    cursor: col-resize;
+    flex-shrink: 0;
+    transition: background 0.15s;
+}
+
+.catalogTreeResizeHandle:hover,
+.catalogTreeResizeHandle.resizing {
+    background: COLOR_PRIMARY;
+}
+
+.catalogTreeFilter {
+    padding: 6px 8px;
+    border-bottom: 1px solid COLOR_GREY_VERYLIGHT;
+    flex-shrink: 0;
+    background: #fafafa;
+}
+
+.catalogTreeFilterInput {
+    width: 100%;
+    padding: 5px 8px;
+    border: 1px solid COLOR_GREY_LIGHT;
+    border-radius: 3px;
+    font-size: 12px;
+    background: white;
+    color: #333333;
+    box-sizing: border-box;
+}
+
+.catalogTreePanelHeader {
+    background: COLOR_GREY_DARK;
+    color: COLOR_GREY_LIGHT;
+    padding: 10px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    flex-shrink: 0;
+}
+
+.catalogTreeBodyScroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 0;
+}
+
+.catalogTreeNode {
+    display: flex;
+    align-items: center;
+    height: 27px;
+    cursor: pointer;
+    color: #333333;
+    padding-right: 8px;
+}
+
+.catalogTreeNode:hover {
+    background: COLOR_GREY_BGDARKER;
+}
+
+.catalogTreeNode.selected {
+    background: COLOR_PRIMARY;
+    color: white;
+}
+
+.catalogTreeNode.selected .catalogTreeToggle {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.catalogTreeIndent {
+    display: inline-block;
+    width: 16px;
+    flex-shrink: 0;
+}
+
+.catalogTreeToggle {
+    width: 16px;
+    text-align: center;
+    font-size: 9px;
+    color: #999999;
+    flex-shrink: 0;
+    margin-right: 2px;
+}
+
+.catalogTreeLabel {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12.5px;
+}
+
+.catalogTreeNodeChildren {
+    /* Synlighet styrs via setVisible() */
+}
+
+.catalogTreeNodeError {
+    padding: 4px 8px 4px 40px;
+    font-size: 11px;
+    color: COLOR_PRIMARY;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
 .browseSidePanel .actionable-menu {
     display: flex;
     flex-direction: column;
