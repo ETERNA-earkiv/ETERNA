@@ -46,7 +46,7 @@ public class CatalogTreeNode extends Composite {
   private static final String ICON_TOGGLE_LOADING = "<span class='fas fa-circle-notch fa-spin'></span>";
   private static final String ICON_FOLDER_CLOSED = "<span class='fas fa-folder'></span>";
   private static final String ICON_FOLDER_OPEN_STR = "<span class='fas fa-folder-open'></span>";
-  private static final String ICON_FILE_LEAF = "<span class='fas fa-file-alt'></span>";
+  private static final String ICON_FILE_LEAF = "<span class='fas fa-folder'></span>";
 
   private final String aipId;
   private final String title;
