@@ -18,8 +18,8 @@ import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.services.Services;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyUpEvent;
@@ -36,7 +36,7 @@ import config.i18n.client.ClientMessages;
 
 public class CatalogTreePanel extends Composite {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(CatalogTreePanel.class);
+  private static final ClientLogger LOGGER = new ClientLogger(CatalogTreePanel.class.getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
@@ -107,7 +107,7 @@ public class CatalogTreePanel extends Composite {
     service.aipResource(s -> s.getAncestors(aipId))
       .whenComplete((ancestors, error) -> {
         if (error != null) {
-          LOGGER.warn("Could not fetch ancestors for AIP {}, auto-sync skipped", aipId);
+          LOGGER.warn("Could not fetch ancestors for AIP " + aipId + ", auto-sync skipped");
           return;
         }
         Collections.reverse(ancestors);

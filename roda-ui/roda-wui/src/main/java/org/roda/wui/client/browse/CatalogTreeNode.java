@@ -27,14 +27,14 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.roda.wui.common.client.ClientLogger;
 
 import config.i18n.client.ClientMessages;
 
 public class CatalogTreeNode extends Composite {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(CatalogTreeNode.class);
+  private static final ClientLogger LOGGER = new ClientLogger(CatalogTreeNode.class.getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private static final String TOGGLE_COLLAPSED = "▶";
@@ -135,7 +135,7 @@ public class CatalogTreeNode extends Composite {
       IndexedAIP.class)
       .whenComplete((result, error) -> {
         if (error != null) {
-          LOGGER.error("Failed to load children for AIP {}", aipId, error);
+          LOGGER.error("Failed to load children for AIP " + aipId, error);
           toggleLabel.setText(TOGGLE_COLLAPSED);
           showLoadError();
           return;
