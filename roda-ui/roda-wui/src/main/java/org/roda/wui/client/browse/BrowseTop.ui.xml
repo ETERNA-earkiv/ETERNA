@@ -7,7 +7,7 @@
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<g:FlowPanel styleName="contentWithSidePanel">
-		<browse:CatalogTreePanel ui:field="catalogTreePanel" />
+		<g:FlowPanel ui:field="catalogTreeContainer" />
 		<g:FlowPanel ui:field="treeResizeHandle" styleName="catalogTreeResizeHandle" />
 		<g:FocusPanel addStyleNames="catalogTreeMainContent">
 			<g:FlowPanel styleName="browse" addStyleNames="wrapper skip_padding">

@@ -54,6 +54,7 @@ public class BrowseTop extends Composite {
         if (instance == null) {
           instance = new BrowseTop();
         }
+        instance.reattachTreePanel();
         callback.onSuccess(instance);
       } else if (historyTokens.size() > 1
         && historyTokens.get(0).equals(EditDescriptiveMetadata.RESOLVER.getHistoryToken())) {
@@ -113,8 +114,8 @@ public class BrowseTop extends Composite {
 
   private static BrowseTop instance = null;
 
-  @UiField(provided = true)
-  CatalogTreePanel catalogTreePanel = CatalogTreePanel.getInstance();
+  @UiField
+  FlowPanel catalogTreeContainer;
   @UiField
   FlowPanel treeResizeHandle;
   @UiField
@@ -151,6 +152,17 @@ public class BrowseTop extends Composite {
     initTreeResize();
   }
 
+  public void reattachTreePanel() {
+    catalogTreeContainer.clear();
+    catalogTreeContainer.add(CatalogTreePanel.getInstance());
+  }
+
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    reattachTreePanel();
+  }
+
   private void initTreeResize() {
     treeResizeHandle.addDomHandler(new com.google.gwt.event.dom.client.MouseDownHandler() {
       @Override
@@ -161,7 +173,7 @@ public class BrowseTop extends Composite {
           resizeHandlerReg = null;
         }
         final int startX = event.getClientX();
-        final int startWidth = catalogTreePanel.getOffsetWidth();
+        final int startWidth = CatalogTreePanel.getInstance().getOffsetWidth();
         com.google.gwt.user.client.Event.setCapture(treeResizeHandle.getElement());
         treeResizeHandle.addStyleName("resizing");
 
@@ -172,7 +184,7 @@ public class BrowseTop extends Composite {
               com.google.gwt.dom.client.NativeEvent ne = e.getNativeEvent();
               if ("mousemove".equals(ne.getType())) {
                 int newWidth = Math.max(150, Math.min(480, startWidth + ne.getClientX() - startX));
-                catalogTreePanel.getElement().getStyle().setPropertyPx("width", newWidth);
+                CatalogTreePanel.getInstance().getElement().getStyle().setPropertyPx("width", newWidth);
               } else if ("mouseup".equals(ne.getType())) {
                 com.google.gwt.user.client.Event.releaseCapture(treeResizeHandle.getElement());
                 treeResizeHandle.removeStyleName("resizing");

@@ -109,8 +109,8 @@ public class BrowseAIP extends Composite {
   SimplePanel aipChildrenCard;
 
   // CATALOG TREE
-  @UiField(provided = true)
-  CatalogTreePanel catalogTreePanel = CatalogTreePanel.getInstance();
+  @UiField
+  FlowPanel catalogTreeContainer;
   @UiField
   FlowPanel treeResizeHandle;
 
@@ -143,7 +143,6 @@ public class BrowseAIP extends Composite {
 
     // INIT
     initWidget(uiBinder.createAndBindUi(this));
-    catalogTreePanel.revealAip(aipId);
     initTreeResize();
 
     AsyncCallback<Actionable.ActionImpact> listActionableCallback = new NoAsyncCallback<Actionable.ActionImpact>() {
@@ -389,7 +388,7 @@ public class BrowseAIP extends Composite {
           resizeHandlerReg = null;
         }
         final int startX = event.getClientX();
-        final int startWidth = catalogTreePanel.getOffsetWidth();
+        final int startWidth = CatalogTreePanel.getInstance().getOffsetWidth();
         com.google.gwt.user.client.Event.setCapture(treeResizeHandle.getElement());
         treeResizeHandle.addStyleName("resizing");
 
@@ -400,7 +399,7 @@ public class BrowseAIP extends Composite {
               com.google.gwt.dom.client.NativeEvent ne = e.getNativeEvent();
               if ("mousemove".equals(ne.getType())) {
                 int newWidth = Math.max(150, Math.min(480, startWidth + ne.getClientX() - startX));
-                catalogTreePanel.getElement().getStyle().setPropertyPx("width", newWidth);
+                CatalogTreePanel.getInstance().getElement().getStyle().setPropertyPx("width", newWidth);
               } else if ("mouseup".equals(ne.getType())) {
                 com.google.gwt.user.client.Event.releaseCapture(treeResizeHandle.getElement());
                 treeResizeHandle.removeStyleName("resizing");
@@ -413,6 +412,15 @@ public class BrowseAIP extends Composite {
           });
       }
     }, com.google.gwt.event.dom.client.MouseDownEvent.getType());
+  }
+
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    catalogTreeContainer.clear();
+    CatalogTreePanel treePanel = CatalogTreePanel.getInstance();
+    catalogTreeContainer.add(treePanel);
+    treePanel.revealAip(aipId);
   }
 
   interface MyUiBinder extends UiBinder<Widget, BrowseAIP> {
