@@ -1,4 +1,12 @@
 # ETERNA Changelog
+## v0.6.1 (2026-04-20)
+#### Bug fixes
+- Fixed clamd.conf path from `/etc/clamav/clamd.conf` to `/etc/clamd.conf` for correct ClamAV detection
+- Fixed clamd.conf to be written from environment variables so clamdscan uses TCP socket
+- Ensured `UTF8MultiPartReader` takes priority over Jersey's built-in reader to handle multipart uploads correctly
+- Set UTF-8 locale in Docker image to handle Swedish filenames with special characters (å, ä, ö)
+- Fixed Solr container to run as `solr` user in docker-compose configurations
+
 ## v0.6.0 (2026-03-26)
 #### Bug fixes
 - Fixed null URL handling in Theme controller to return INITIAL_DATE when file is not found

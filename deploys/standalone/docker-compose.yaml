@@ -10,6 +10,7 @@ services:
   solr:
     image: ghcr.io/eterna-earkiv/solr:9.10.1
     restart: unless-stopped
+    user: solr
     environment:
       SOLR_HEAP: 2g
       ZK_HOST: zoo:2181
