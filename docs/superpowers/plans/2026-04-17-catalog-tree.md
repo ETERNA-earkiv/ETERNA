@@ -871,3 +871,21 @@ wsl -d Ubuntu -- bash -c "cd ~/ETERNA && git push -u origin feat/catalog-tree"
 **`revealAip` anropas innan rotnoder är laddade:** `loadRootNodes()` och `revealAip()` är båda asynkrona. Om ancestor-svaret kommer innan rotnoderna är renderade hittar inte `findNode` rätt nod och auto-synken uteblir tyst. I praktiken är detta osannolikt (ancestor-anropet är ett extra rundtrip), men om det är ett problem i produktion kan det lösas med en enkel `Scheduler.get().scheduleDeferred()` runt `expandChain`.
 
 **GWT-kompilering krävs för produktionsbuild:** `mvn -pl roda-ui/roda-wui -am gwt:compile -Pdebug-main -Dscope.gwt-dev=compile` — krävs inte för dev mode-test.
+
+---
+
+## PR-checklista
+
+Gås igenom innan varje pull request skapas. Automatiska kontroller görs av CodeRabbit eller likvärdigt verktyg vid PR-skapande.
+
+- [ ] **1. PR kopplad till issue #224** — Länka under "Development" i GitHub-sidopanelen
+- [ ] **2. Titel och beskrivning tydliga** — Titeln beskriver vad, beskrivningen beskriver varför och hur man testar
+- [ ] **3. Rätt taggar satta** — Sätt t.ex. `enhancement`, `frontend` på PR:en
+- [ ] **4. PR rimligt avgränsad** — Inga ovidkommande ändringar som borde vara egna PRs
+- [ ] **5. Automatiska tester/kontroller genomförda** — Kör `mvn -pl roda-core/roda-core-tests,roda-ui/roda-wui verify -Punit-tests` (eller motsv.) utan fel
+- [ ] **6. Kommentarer hanterade** — Inga TODO/FIXME kvar utan att de är motiverade
+- [ ] **7. Risker/beroenden/migrationer beskrivna** — Notera om Solr-index, konfiguration eller databas påverkas
+- [ ] **8. Nya beroenden säkerhetstestade** — Inga nya tredjepartsberoenden utan godkännande
+- [ ] **9. Dokumentation/konfiguration uppdaterad** — `roda-wui.properties`, `messages*.properties` och relevantkonfiguration dokumenterad
+- [ ] **10. Inga olösta konflikter** — `git merge-tree` eller rebase mot main utan konflikter
+- [ ] **11. Inget som blockerar merge** — Bygg ok, inga kända regressioner
