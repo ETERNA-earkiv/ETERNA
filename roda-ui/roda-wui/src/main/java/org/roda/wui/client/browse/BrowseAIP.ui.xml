@@ -10,7 +10,7 @@
 	<g:FlowPanel styleName="contentWithSidePanel">
 		<browse:CatalogTreePanel ui:field="catalogTreePanel" />
 		<g:FlowPanel ui:field="treeResizeHandle" styleName="catalogTreeResizeHandle" />
-		<g:FocusPanel ui:field="keyboardFocus">
+		<g:FocusPanel ui:field="keyboardFocus" addStyleNames="catalogTreeMainContent">
 			<g:FlowPanel styleName="browse" addStyleNames="wrapper skip_padding">
 				<common:NavigationToolbar ui:field="navigationToolbar" />
 				<common:BrowseAIPActionsToolbar ui:field="objectToolbar" label="{messages.catalogueItemTitle}"/>

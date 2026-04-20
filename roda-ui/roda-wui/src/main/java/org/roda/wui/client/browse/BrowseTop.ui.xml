@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search" xmlns:common="urn:import:org.roda.wui.client.common">
+	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search" xmlns:common="urn:import:org.roda.wui.client.common"
+	xmlns:browse="urn:import:org.roda.wui.client.browse">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
-	<g:FocusPanel>
-		<g:FlowPanel styleName="browse" addStyleNames="wrapper skip_padding">
-			<g:FlowPanel addStyleNames="row full_width skip_padding">
-				<g:FlowPanel addStyleNames="col_12 content">
-					<common:TitlePanel text="{messages.allCollectionsTitle}" ui:field="title" />
-					<g:FlowPanel addStyleNames="page-description" ui:field="browseDescription" />
-					<commonsearch:SearchWrapper ui:field="search" />
+	<g:FlowPanel styleName="contentWithSidePanel">
+		<browse:CatalogTreePanel ui:field="catalogTreePanel" />
+		<g:FlowPanel ui:field="treeResizeHandle" styleName="catalogTreeResizeHandle" />
+		<g:FocusPanel addStyleNames="catalogTreeMainContent">
+			<g:FlowPanel styleName="browse" addStyleNames="wrapper skip_padding">
+				<g:FlowPanel addStyleNames="row full_width skip_padding">
+					<g:FlowPanel addStyleNames="col_12 content">
+						<common:TitlePanel text="{messages.allCollectionsTitle}" ui:field="title" />
+						<g:FlowPanel addStyleNames="page-description" ui:field="browseDescription" />
+						<commonsearch:SearchWrapper ui:field="search" />
+					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>
-		</g:FlowPanel>
-	</g:FocusPanel>
+		</g:FocusPanel>
+	</g:FlowPanel>
 </ui:UiBinder>

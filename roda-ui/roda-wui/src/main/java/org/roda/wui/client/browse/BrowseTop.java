@@ -114,6 +114,10 @@ public class BrowseTop extends Composite {
   private static BrowseTop instance = null;
 
   @UiField
+  CatalogTreePanel catalogTreePanel;
+  @UiField
+  FlowPanel treeResizeHandle;
+  @UiField
   FlowPanel browseDescription;
 
   @UiField(provided = true)
@@ -121,6 +125,8 @@ public class BrowseTop extends Composite {
 
   @UiField
   TitlePanel title;
+
+  private com.google.gwt.event.shared.HandlerRegistration resizeHandlerReg;
 
   private BrowseTop() {
     // AIP LIST, it has the same id as the AIP children list because facets
@@ -142,13 +148,42 @@ public class BrowseTop extends Composite {
 
     browseDescription.add(new HTMLWidgetWrapper("BrowseDescription.html"));
 
-    // CSS
-    this.addStyleName("browse browse_top");
+    initTreeResize();
+  }
 
-    // make FocusPanel comply with WCAG
-    Element firstElement = this.getElement().getFirstChildElement();
-    if ("input".equalsIgnoreCase(firstElement.getTagName())) {
-      firstElement.setAttribute("title", "browse input");
-    }
+  private void initTreeResize() {
+    treeResizeHandle.addDomHandler(new com.google.gwt.event.dom.client.MouseDownHandler() {
+      @Override
+      public void onMouseDown(com.google.gwt.event.dom.client.MouseDownEvent event) {
+        event.preventDefault();
+        if (resizeHandlerReg != null) {
+          resizeHandlerReg.removeHandler();
+          resizeHandlerReg = null;
+        }
+        final int startX = event.getClientX();
+        final int startWidth = catalogTreePanel.getOffsetWidth();
+        com.google.gwt.user.client.Event.setCapture(treeResizeHandle.getElement());
+        treeResizeHandle.addStyleName("resizing");
+
+        resizeHandlerReg = com.google.gwt.user.client.Event.addNativePreviewHandler(
+          new com.google.gwt.user.client.Event.NativePreviewHandler() {
+            @Override
+            public void onPreviewNativeEvent(com.google.gwt.user.client.Event.NativePreviewEvent e) {
+              com.google.gwt.dom.client.NativeEvent ne = e.getNativeEvent();
+              if ("mousemove".equals(ne.getType())) {
+                int newWidth = Math.max(150, Math.min(480, startWidth + ne.getClientX() - startX));
+                catalogTreePanel.getElement().getStyle().setPropertyPx("width", newWidth);
+              } else if ("mouseup".equals(ne.getType())) {
+                com.google.gwt.user.client.Event.releaseCapture(treeResizeHandle.getElement());
+                treeResizeHandle.removeStyleName("resizing");
+                if (resizeHandlerReg != null) {
+                  resizeHandlerReg.removeHandler();
+                  resizeHandlerReg = null;
+                }
+              }
+            }
+          });
+      }
+    }, com.google.gwt.event.dom.client.MouseDownEvent.getType());
   }
 }

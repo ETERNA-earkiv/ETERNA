@@ -16,6 +16,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.services.Services;
 
@@ -82,7 +83,11 @@ public class CatalogTreePanel extends Composite {
 
   private void loadRootNodes() {
     FindRequest findRequest = new FindRequest.FindRequestBuilder(
-      new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID)), false)
+      new Filter(
+        new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID),
+        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file"),
+        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "item")),
+      false)
       .build();
 
     Services service = new Services(messages.catalogTreeLoadingLabel(), "get");

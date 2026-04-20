@@ -3435,10 +3435,24 @@ td.datePickerMonth, td.datePickerYear {
 .catalogTreeToggle {
     width: 16px;
     text-align: center;
-    font-size: 9px;
+    font-size: 10px;
     color: #999999;
     flex-shrink: 0;
     margin-right: 2px;
+    cursor: pointer;
+}
+
+.catalogTreeIcon {
+    width: 16px;
+    text-align: center;
+    font-size: 12px;
+    color: #666666;
+    flex-shrink: 0;
+    margin-right: 4px;
+}
+
+.catalogTreeNode.selected .catalogTreeIcon {
+    color: rgba(255, 255, 255, 0.85);
 }
 
 .catalogTreeLabel {
@@ -3451,6 +3465,21 @@ td.datePickerMonth, td.datePickerYear {
 
 .catalogTreeNodeChildren {
     /* Synlighet styrs via setVisible() */
+}
+
+.catalogTreeMainContent {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+@media (max-width: 900px) {
+    .catalogTreePanel {
+        display: none;
+    }
+    .catalogTreeResizeHandle {
+        display: none;
+    }
 }
 
 .catalogTreeNodeError {
