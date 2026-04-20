@@ -53,6 +53,8 @@ public class CatalogTreePanel extends Composite {
 
   private final Map<String, CatalogTreeNode> rootNodes = new HashMap<>();
   private CatalogTreeNode selectedNode = null;
+  private boolean rootsLoaded = false;
+  private String pendingRevealAipId = null;
 
   public CatalogTreePanel() {
     initWidget(uiBinder.createAndBindUi(this));
@@ -90,7 +92,7 @@ public class CatalogTreePanel extends Composite {
         new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file"),
         new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "item")),
       false)
-      .withSorter(new Sorter(new SortParameter(RodaConstants.AIP_TITLE, false)))
+      .withSorter(new Sorter(new SortParameter(RodaConstants.AIP_TITLE_SORT, false)))
       .build();
 
     Services service = new Services(messages.catalogTreeLoadingLabel(), "get");
@@ -107,10 +109,24 @@ public class CatalogTreePanel extends Composite {
           rootNodes.put(aip.getId(), node);
           treeBody.add(node);
         }
+        rootsLoaded = true;
+        if (pendingRevealAipId != null) {
+          String id = pendingRevealAipId;
+          pendingRevealAipId = null;
+          doRevealAip(id);
+        }
       });
   }
 
   public void revealAip(String aipId) {
+    if (!rootsLoaded) {
+      pendingRevealAipId = aipId;
+      return;
+    }
+    doRevealAip(aipId);
+  }
+
+  private void doRevealAip(String aipId) {
     Services service = new Services(messages.catalogTreeLoadingLabel(), "get");
     service.aipResource(s -> s.getAncestors(aipId))
       .whenComplete((ancestors, error) -> {

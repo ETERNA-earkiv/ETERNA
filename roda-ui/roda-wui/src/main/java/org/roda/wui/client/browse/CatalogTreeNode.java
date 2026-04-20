@@ -151,7 +151,7 @@ public class CatalogTreeNode extends Composite {
         new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file"),
         new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "item")),
       false)
-      .withSorter(new Sorter(new SortParameter(RodaConstants.AIP_TITLE, false)))
+      .withSorter(new Sorter(new SortParameter(RodaConstants.AIP_TITLE_SORT, false)))
       .build();
 
     Services service = new Services(messages.catalogTreeLoadingLabel(), "get");
