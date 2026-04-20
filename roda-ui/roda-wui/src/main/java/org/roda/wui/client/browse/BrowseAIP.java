@@ -109,8 +109,8 @@ public class BrowseAIP extends Composite {
   SimplePanel aipChildrenCard;
 
   // CATALOG TREE
-  @UiField
-  CatalogTreePanel catalogTreePanel;
+  @UiField(provided = true)
+  CatalogTreePanel catalogTreePanel = CatalogTreePanel.getInstance();
   @UiField
   FlowPanel treeResizeHandle;
 

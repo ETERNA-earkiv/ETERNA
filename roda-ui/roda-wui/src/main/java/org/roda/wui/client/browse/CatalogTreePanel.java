@@ -51,6 +51,15 @@ public class CatalogTreePanel extends Composite {
   @UiField
   TextBox filterInput;
 
+  private static CatalogTreePanel instance = null;
+
+  public static CatalogTreePanel getInstance() {
+    if (instance == null) {
+      instance = new CatalogTreePanel();
+    }
+    return instance;
+  }
+
   private final Map<String, CatalogTreeNode> rootNodes = new HashMap<>();
   private CatalogTreeNode selectedNode = null;
   private boolean rootsLoaded = false;

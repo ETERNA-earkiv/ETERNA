@@ -113,8 +113,8 @@ public class BrowseTop extends Composite {
 
   private static BrowseTop instance = null;
 
-  @UiField
-  CatalogTreePanel catalogTreePanel;
+  @UiField(provided = true)
+  CatalogTreePanel catalogTreePanel = CatalogTreePanel.getInstance();
   @UiField
   FlowPanel treeResizeHandle;
   @UiField
