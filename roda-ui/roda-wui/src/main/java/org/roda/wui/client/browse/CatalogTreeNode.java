@@ -16,6 +16,8 @@ import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.sort.SortParameter;
+import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.ClientLogger;
@@ -149,6 +151,7 @@ public class CatalogTreeNode extends Composite {
         new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file"),
         new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "item")),
       false)
+      .withSorter(new Sorter(new SortParameter(RodaConstants.AIP_TITLE, false)))
       .build();
 
     Services service = new Services(messages.catalogTreeLoadingLabel(), "get");
@@ -214,7 +217,6 @@ public class CatalogTreeNode extends Composite {
 
   public void select() {
     rowPanel.addStyleName("selected");
-    rowPanel.getElement().scrollIntoView();
   }
 
   public void deselect() {
