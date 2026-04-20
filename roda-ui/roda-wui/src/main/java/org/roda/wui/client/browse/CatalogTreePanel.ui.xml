@@ -7,7 +7,7 @@
 
     <g:FlowPanel styleName="catalogTreePanel">
         <g:FlowPanel styleName="catalogTreePanelHeader">
-            <g:Label>{messages.catalogTreeTitle}</g:Label>
+            <g:Label text="{messages.catalogTreeTitle}" />
         </g:FlowPanel>
         <g:FlowPanel styleName="catalogTreeFilter">
             <g:TextBox ui:field="filterInput" styleName="catalogTreeFilterInput" />
