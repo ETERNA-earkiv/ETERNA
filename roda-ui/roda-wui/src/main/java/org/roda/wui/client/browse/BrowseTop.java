@@ -154,7 +154,9 @@ public class BrowseTop extends Composite {
 
   public void reattachTreePanel() {
     catalogTreeContainer.clear();
-    catalogTreeContainer.add(CatalogTreePanel.getInstance());
+    CatalogTreePanel treePanel = CatalogTreePanel.getInstance();
+    catalogTreeContainer.add(treePanel);
+    treePanel.clearSelection();
   }
 
   @Override

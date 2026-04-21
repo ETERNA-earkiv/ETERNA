@@ -250,12 +250,13 @@ public class BrowseAIP extends Composite {
       this.sidePanel.setVisible(false);
     }
 
+    final int savedScrollLeft = com.google.gwt.user.client.Window.getScrollLeft();
     final int savedScrollTop = com.google.gwt.user.client.Window.getScrollTop();
     keyboardFocus.setFocus(true);
     com.google.gwt.core.client.Scheduler.get().scheduleDeferred(new com.google.gwt.core.client.Scheduler.ScheduledCommand() {
       @Override
       public void execute() {
-        com.google.gwt.user.client.Window.scrollTo(0, savedScrollTop);
+        com.google.gwt.user.client.Window.scrollTo(savedScrollLeft, savedScrollTop);
       }
     });
   }

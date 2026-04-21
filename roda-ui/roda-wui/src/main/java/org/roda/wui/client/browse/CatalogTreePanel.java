@@ -166,6 +166,13 @@ public class CatalogTreePanel extends Composite {
     });
   }
 
+  public void clearSelection() {
+    if (selectedNode != null) {
+      selectedNode.deselect();
+      selectedNode = null;
+    }
+  }
+
   private void selectNode(String aipId) {
     if (selectedNode != null) selectedNode.deselect();
     CatalogTreeNode node = findNode(aipId, rootNodes);

@@ -16,14 +16,14 @@ Lägga till en alltid synlig vänster sidopanel med en trädvy över AIP-hierark
 ## Scope
 
 - Trädet visar **enbart AIP-hierarkin** — representationer och filer visas inte
-- Trädet är synligt **i katalogvyn** (`BrowseAIP`); övriga browse-sidor läggs till senare
-- Arkitekturen ska göra det möjligt att senare aktivera trädet på andra sidor utan omskrivning
+- Trädet är synligt **i katalogstartsidan** (`BrowseTop`) och **AIP-sidan** (`BrowseAIP`)
+- Arkitekturen ska göra det möjligt att aktivera trädet på fler sidor utan omskrivning
 
 ## Layout
 
 Ny treledad layout i katalogvyn:
 
-```
+```text
 [ Katalogträd (vänster) | Huvudinnehåll (mitten) | Sidopanel (höger) ]
 ```
 
@@ -43,7 +43,7 @@ Toppnivå-widget. Ansvarar för:
 - Exponera `void revealAip(String aipId)` som anropas av `BrowseAIP` vid navigering
 
 Intern struktur:
-```
+```text
 CatalogTreePanel
 ├── Header ("Katalog")
 ├── Filterinput (lokal filtrering av laddade noder)
@@ -98,7 +98,7 @@ När `BrowseAIP` laddar ett AIP anropar den `CatalogTreePanel.revealAip(aipId)`:
 
 Vid initialisering anropar `CatalogTreePanel`:
 
-```
+```http
 GET /api/v2/aips?parentId=&fields=id,title,hasChildren
 ```
 
@@ -106,7 +106,7 @@ Tom `parentId` returnerar AIP:er utan förälder (rotnivån). Om det finns flera
 
 ### Befintlig endpoint (används för lazy loading av barn)
 
-```
+```http
 GET /api/v2/aips?parentId={id}&fields=id,title,hasChildren
 ```
 
@@ -114,7 +114,7 @@ Returnerar direkta barn. Används när en nod expanderas. **Obs:** Fältet `hasC
 
 ### Ny endpoint
 
-```
+```http
 GET /api/v2/aips/{id}/ancestors
 ```
 
@@ -145,10 +145,11 @@ Nya nycklar:
 
 | Nyckel | Värde (sv) |
 |---|---|
-| `catalogTree.header` | Katalog |
-| `catalogTree.filter.placeholder` | Filtrera... |
-| `catalogTree.node.loadError` | Kunde inte hämta innehåll |
-| `catalogTree.node.retry` | Försök igen |
+| `catalogTreeTitle` | Katalog |
+| `catalogTreeFilterPlaceholder` | Filtrera... |
+| `catalogTreeLoadingLabel` | Laddar... |
+| `catalogTreeLoadError` | Kunde inte hämta innehåll |
+| `catalogTreeRetry` | Försök igen |
 
 ## Felhantering (GWT AsyncCallback)
 
