@@ -9,7 +9,7 @@ package org.roda.wui.client.ingest.process;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -485,7 +485,7 @@ public class PluginParameterPanel extends Composite {
   }
 
   private void createConversionProfileLayout(FlowPanel result, String repOrDip, String pluginId) {
-    Set<ConversionProfile> treeSet = new HashSet<>();
+    Set<ConversionProfile> treeSet = new LinkedHashSet<>();
     Label parameterName = new Label(messages.conversionProfileTitle());
     final Label description = new Label();
     final ListBox dropdown = new ListBox();
