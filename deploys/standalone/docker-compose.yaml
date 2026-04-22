@@ -74,9 +74,7 @@ services:
       - ./ldap/ldif/pbkdf2.ldif:/opt/bitnami/openldap/etc/schema/pbkdf2.ldif
 
   unoserver:
-    build:
-      context: ./unoserver
-      dockerfile: Dockerfile
+    image: ghcr.io/eterna-earkiv/eterna-unoserver:latest
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 2003 || exit 1"]
