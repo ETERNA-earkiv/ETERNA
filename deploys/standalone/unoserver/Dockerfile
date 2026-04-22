@@ -5,4 +5,5 @@ RUN apt-get update && \
     apt-get clean && rm -rf /var/lib/apt/lists/* && \
     useradd -r -u 1001 unoserver
 USER unoserver
-CMD ["unoserver", "--interface", "0.0.0.0", "--port", "2003"]
+ENV UNOSERVER_CONVERSION_TIMEOUT=360
+CMD ["sh", "-c", "unoserver --interface 0.0.0.0 --port 2003 --conversion-timeout ${UNOSERVER_CONVERSION_TIMEOUT}"]
