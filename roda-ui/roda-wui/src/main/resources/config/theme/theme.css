@@ -431,6 +431,48 @@ textarea:focus-visible,
 .eterna-status-dot--warn { background: var(--eterna-warn); }
 .eterna-status-dot--err { background: var(--eterna-red); }
 
+/* === ETERNA error pages === */
+.eterna-error {
+  max-width: 520px;
+  margin: 80px auto;
+  padding: 48px 32px;
+  text-align: center;
+}
+.eterna-error__flag {
+  width: 72px;
+  height: 72px;
+  opacity: 0.9;
+  margin-bottom: 24px;
+}
+.eterna-error__code {
+  font-family: var(--eterna-font-display);
+  font-weight: 700;
+  font-size: 64px;
+  line-height: 1;
+  color: var(--eterna-red);
+  letter-spacing: 0.04em;
+  margin: 0 0 12px;
+}
+.eterna-error__title {
+  font-family: var(--eterna-font-display);
+  font-weight: 600;
+  font-size: 28px;
+  color: var(--eterna-ink);
+  margin: 0 0 12px;
+}
+.eterna-error__desc {
+  font-size: 15px;
+  color: var(--eterna-slate);
+  line-height: 1.55;
+  margin: 0;
+}
+.eterna-error__desc a {
+  color: var(--eterna-red);
+  text-decoration: none;
+  font-weight: 500;
+}
+.eterna-error__desc a:hover { text-decoration: underline; }
+
 /* === ETERNA section header === */
 .eterna-section-header {
   font-family: var(--eterna-font-display);
