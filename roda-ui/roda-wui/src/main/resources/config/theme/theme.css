@@ -145,6 +145,31 @@ textarea:focus-visible,
   border-radius: var(--eterna-radius-sm);
 }
 
+/* === ETERNA banner lockup === */
+.eterna-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+.eterna-banner__flag {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+.eterna-banner__wordmark {
+  font-family: var(--eterna-font-display);
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: 0.05em;
+  color: var(--eterna-ink);
+}
+.eterna-banner__byline {
+  font-family: var(--eterna-font-body);
+  font-size: 12px;
+  color: var(--eterna-muted);
+  letter-spacing: 0.02em;
+}
+
 /* === ETERNA section header === */
 .eterna-section-header {
   font-family: var(--eterna-font-display);
