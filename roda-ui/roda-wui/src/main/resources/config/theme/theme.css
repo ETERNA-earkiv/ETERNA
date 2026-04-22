@@ -26,6 +26,41 @@
   --eterna-focus-ring: 0 0 0 2px var(--eterna-paper), 0 0 0 4px var(--eterna-red);
 }
 
+/* === ETERNA typography === */
+body,
+.gwt-root,
+.wui-body {
+  font-family: var(--eterna-font-body);
+  color: var(--eterna-ink);
+}
+
+h1, h2, h3, h4, h5, h6,
+.eterna-display,
+.hero .title {
+  font-family: var(--eterna-font-display);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--eterna-ink);
+}
+
+/* 6 px röd topp-list — global */
+body::before {
+  content: '';
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: var(--eterna-red);
+  z-index: 9999;
+  pointer-events: none;
+}
+
+body {
+  padding-top: 6px;
+}
+
 .main .contentPanel {
   min-height: 767px !important;
 }
