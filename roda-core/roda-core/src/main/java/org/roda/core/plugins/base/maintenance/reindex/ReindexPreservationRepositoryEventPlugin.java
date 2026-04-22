@@ -71,14 +71,14 @@ public class ReindexPreservationRepositoryEventPlugin extends AbstractPlugin<Voi
 
   @Override
   public String getName() {
-    return "Rebuild preservation repository event index";
+    return "Återindexera bevarandehändelseindex för arkiv";
   }
 
   @Override
   public String getDescription() {
-    return "Clears the index and recreates it from actual physical data that exists on the storage. This task aims to fix inconsistencies "
-      + "between what is shown in the graphical user interface of the repository and what is actually kept at the storage layer. Such "
-      + "inconsistencies may occur for various reasons, e.g. index corruption, ungraceful shutdown of the repository, etc.";
+    return "Rensar indexet och återskapar det från faktisk fysisk data som finns i lagringen. Denna uppgift syftar till att åtgärda inkonsekvenser "
+      + "mellan vad som visas i arkivets grafiska gränssnitt och vad som faktiskt finns i lagringsskiktet. Sådana "
+      + "inkonsekvenser kan uppstå av olika anledningar, t.ex. indexkorruption, ovarsam avstängning av arkivet, etc.";
   }
 
   @Override

@@ -150,17 +150,17 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "Inventory Report Creator";
+    return "Inventeringsrapportgenerare";
   }
 
   @Override
   public String getDescription() {
-    return "The Inventory Report Creator plugin automates the generation of a detailed inventory report in CSV format for all AIPs and their corresponding "
-      + "files (both data and metadata) within a repository. The report includes technical information such as SIP ID, AIP ID, representation ID, "
-      + "file path, and cryptographic hash values such as SHA-256, MD5, and SHA-1. This information can be used to validate the completeness and correctness "
-      + "of the repository content by comparing it to previous inventory reports generated during pre-ingest.\nThe Inventory Report Comparator App is "
-      + "an optional tool that can be used to compare inventory reports from different time periods. This allows for easy identification of any changes "
-      + "or discrepancies in the repository's content over time. To learn more about the Inventory Report Comparator App or to request a demo, please contact sales@keep.pt.";
+    return "Inventeringsrapportgeneratorn automatiserar skapandet av en detaljerad inventeringsrapport i CSV-format för alla AIP:er och deras tillhörande "
+      + "filer (både data och metadata) i ett arkiv. Rapporten inkluderar teknisk information såsom SIP-ID, AIP-ID, representations-ID, "
+      + "filsökväg och kryptografiska hashvärden som SHA-256, MD5 och SHA-1. Denna information kan användas för att validera innehållets fullständighet och korrekthet "
+      + "i arkivet genom att jämföra med tidigare inventeringsrapporter som genererades vid pre-ingest.\nInventeringsrapportjämföraren är "
+      + "ett valfritt verktyg som kan användas för att jämföra inventeringsrapporter från olika tidsperioder. Detta möjliggör enkel identifiering av ändringar "
+      + "eller avvikelser i arkivets innehåll över tid. Kontakta sales@keep.pt för mer information om inventeringsrapportjämföraren eller för att begära en demo.";
   }
 
   @Override

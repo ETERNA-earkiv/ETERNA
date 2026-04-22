@@ -87,12 +87,12 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
   private List<Pair<String, String>> schemasInfo;
 
   public static String getStaticName() {
-    return "Metadata validation";
+    return "Metadatavalidering";
   }
 
   public static String getStaticDescription() {
-    return "Checks if the descriptive metadata included in the Information Package is present, and if it is valid according to the "
-      + "XML Schemas installed in the repository. A validation report is generated indicating which Information Packages have valid and invalid metadata.";
+    return "Kontrollerar om den beskrivande metadata som ingår i informationspaketet finns och om den är giltig enligt de "
+      + "XML-scheman som är installerade i arkivet. En valideringsrapport genereras som anger vilka informationspaket som har giltig respektive ogiltig metadata.";
   }
 
   @Override

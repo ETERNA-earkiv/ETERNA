@@ -166,16 +166,16 @@ public class LocalInstanceRegisterPlugin extends NoObjectsMultipleStepPlugin {
 
   @Override
   public String getName() {
-    return "RODA Object instance identifier";
+    return "RODA-objektets instansidentifierare";
   }
 
   @Override
   public String getDescription() {
-    return "Add the instance identifier on the data that exists on the storage as also on the index. "
-      + "If an object already has an instance identifier it will be updated by the new one. "
-      + "This task aims to help the synchronization between a RODA central instance and the RODA local instance, "
-      + "since when an local object is accessed in RODA Central it should have the instance identifier in order to "
-      + "inform from which source is it from.";
+    return "Lägger till instansidentifieraren på data som finns i lagringen samt i indexet. "
+      + "Om ett objekt redan har en instansidentifierare kommer den att uppdateras med den nya. "
+      + "Denna uppgift syftar till att underlätta synkroniseringen mellan en central RODA-instans och en lokal RODA-instans, "
+      + "eftersom ett lokalt objekt som nås i RODA Central ska ha instansidentifieraren för att "
+      + "ange varifrån det härstammar.";
   }
 
   @Override

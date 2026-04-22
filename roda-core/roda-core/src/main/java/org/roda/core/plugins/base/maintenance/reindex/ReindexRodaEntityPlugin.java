@@ -86,8 +86,8 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
 
   @Override
   public String getDescription() {
-    return "Rebuild indexed information from data kept in storage. All indexes can be rebuilt or refreshed from information persisted in storage. This may also be "
-      + "necessary when updating the indexing system. Additional options include clearing index before re-index (full re-index) and to optimize indexes.";
+    return "Bygger om indexerad information från data som finns i lagringen. Alla index kan byggas om eller uppdateras från information som sparats i lagringen. Detta kan även vara "
+      + "nödvändigt vid uppdatering av indexsystemet. Ytterligare alternativ inkluderar att rensa index före omindexering (fullständig omindexering) och att optimera index.";
   }
 
   @Override

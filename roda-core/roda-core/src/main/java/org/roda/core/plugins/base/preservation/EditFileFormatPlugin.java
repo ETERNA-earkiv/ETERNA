@@ -87,11 +87,11 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
   private boolean clearIncidences;
 
   public static String getStaticName() {
-    return "Edit File Format";
+    return "Redigera filformat";
   }
 
   public static String getStaticDescription() {
-    return "Overwrites the selected files' extension, MIME type, format and PRONOM identifier with provided values.";
+    return "Skriver över de valda filernas filändelse, MIME-typ, format och PRONOM-identifierare med angivna värden.";
   }
 
   @Override

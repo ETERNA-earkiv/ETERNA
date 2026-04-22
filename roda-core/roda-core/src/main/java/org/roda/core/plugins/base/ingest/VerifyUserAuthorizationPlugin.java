@@ -62,7 +62,7 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticName() {
-    return "Verify user authorization";
+    return "Verifiera användarbehörighet";
   }
 
   @Override
@@ -71,7 +71,7 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticDescription() {
-    return "Checks if the user has enough permissions to place the AIP under the desired node in the classification scheme";
+    return "Kontrollerar om användaren har tillräckliga behörigheter för att placera AIP:et under den önskade noden i klassificeringssystemet.";
   }
 
   @Override

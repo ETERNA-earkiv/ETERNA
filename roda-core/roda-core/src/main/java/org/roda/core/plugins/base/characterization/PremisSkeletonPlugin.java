@@ -56,14 +56,14 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
    */
 
   public static String getStaticName() {
-    return "File information computation";
+    return "Beräkning av filinformation";
   }
 
   public static String getStaticDescription() {
-    return "Computes file fixity information (also known as checksum) for all data files within an AIP, representation or file and stores this information in PREMIS objects "
-      + "within the corresponding entity. This task uses SHA-256 as the default checksum algorithm, however, other algorithms can be configured in “roda-core.properties”."
-      + "\nFile fixity is the property of a digital file being fixed, or unchanged. “AIP corruption risk assessment” is the process of validating that a file has not changed or been "
-      + "altered from a previous state. In order to validate the fixity of an AIP or file, fixity information has to be generated beforehand.";
+    return "Beräknar filens fixitetsinformation (även kallad kontrollsumma) för alla datafiler inom ett AIP, en representation eller en fil och lagrar denna information i PREMIS-objekt "
+      + "i motsvarande entitet. Denna uppgift använder SHA-256 som standardalgoritm för kontrollsummor, men andra algoritmer kan konfigureras i \"roda-core.properties\"."
+      + "\nFilfixitet är egenskapen att en digital fil är oförändrad. \"Riskbedömning av AIP-korruption\" är processen att validera att en fil inte har ändrats eller manipulerats sedan "
+      + "ett tidigare tillstånd. För att validera fixiteten hos ett AIP eller en fil måste fixitetsinformation ha genererats i förväg.";
   }
 
   @Override
