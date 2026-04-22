@@ -183,19 +183,26 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
       }
 
     } catch (IOException | GenericException | RequestNotValidException e) {
+      LOGGER.error("Error writing export CSV for job {}", jobId, e);
       throw new PluginException("Error writing export CSV", e);
     }
 
+    String attachmentName = exportFilename + ".csv";
+    Path namedFile = tempDir.resolve(attachmentName);
     try {
-      String attachmentName = exportFilename + ".csv";
-      Path namedFile = tempDir.resolve(attachmentName);
       Files.move(csvFile, namedFile);
       JobsHelper.createJobAttachment(jobId, namedFile);
-      Files.deleteIfExists(namedFile);
-      Files.deleteIfExists(tempDir);
     } catch (IOException | AuthorizationDeniedException | GenericException | NotFoundException
       | RequestNotValidException e) {
       throw new PluginException("Error creating job attachment for export", e);
+    } finally {
+      try {
+        Files.deleteIfExists(namedFile);
+        Files.deleteIfExists(csvFile);
+        Files.deleteIfExists(tempDir);
+      } catch (IOException e) {
+        LOGGER.warn("Could not clean up temp files for export job {}", jobId, e);
+      }
     }
 
     return new Report();
@@ -230,6 +237,9 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
         return aip.getCreatedOn() != null ? aip.getCreatedOn().toString() : "";
       case "updatedOn":
         return aip.getUpdatedOn() != null ? aip.getUpdatedOn().toString() : "";
+      case "security_level":
+        // RodaConstants.AIP_SECURITY_LEVEL tillkommer när feat/138 mergas
+        return "";
       default:
         return "";
     }
