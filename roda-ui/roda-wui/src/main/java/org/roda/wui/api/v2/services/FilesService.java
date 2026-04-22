@@ -7,9 +7,15 @@
  */
 package org.roda.wui.api.v2.services;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -76,10 +82,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import javax.imageio.ImageIO;
+
 @Service
 public class FilesService {
   private static final Logger LOGGER = LoggerFactory.getLogger(FilesService.class);
   private static final String HTML_EXT = ".html";
+  private static final String TIFF_MIME_TYPE = "image/tiff";
+  private static final String BIG_TIFF_MIME_TYPE = "image/x-tiff-big";
+  private static final String PNG_MIME_TYPE = "image/png";
 
   public IndexedFile renameFolder(RequestContext requestContext, IndexedFile indexedFolder, String newName,
     String details) throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
@@ -242,6 +253,94 @@ public class FilesService {
     } else {
       throw new RequestNotValidException("Range stream for directory unsupported");
     }
+  }
+
+  public boolean shouldRenderTiffPreview(IndexedFile indexedFile) {
+    if (indexedFile == null || indexedFile.isDirectory()) {
+      return false;
+    }
+
+    if (indexedFile.getFileFormat() != null && StringUtils.isNotBlank(indexedFile.getFileFormat().getMimeType())) {
+      String mimeType = indexedFile.getFileFormat().getMimeType();
+      if (TIFF_MIME_TYPE.equalsIgnoreCase(mimeType) || BIG_TIFF_MIME_TYPE.equalsIgnoreCase(mimeType)) {
+        return true;
+      }
+    }
+
+    String filename = indexedFile.getOriginalName() != null ? indexedFile.getOriginalName() : indexedFile.getId();
+    String lowerCaseFilename = filename.toLowerCase(Locale.ROOT);
+    return lowerCaseFilename.endsWith(".tif") || lowerCaseFilename.endsWith(".tiff");
+  }
+
+  public StreamResponse retrieveAIPRepresentationPreview(RequestContext requestContext, IndexedFile indexedFile)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    if (!shouldRenderTiffPreview(indexedFile)) {
+      return retrieveAIPRepresentationFile(requestContext, indexedFile);
+    }
+
+    ModelService model = requestContext.getModelService();
+    try (DirectResourceAccess directFileAccess = model.getDirectAccess(indexedFile)) {
+      Path sourcePath = directFileAccess.getPath();
+      byte[] previewBytes = renderTiffPreview(sourcePath, indexedFile.getId());
+      Date lastModified = new Date(Files.getLastModifiedTime(sourcePath).toMillis());
+      String previewFilename = buildTiffPreviewFilename(indexedFile);
+
+      ConsumesOutputStream stream = new ConsumesOutputStream() {
+        @Override
+        public void consumeOutputStream(java.io.OutputStream out) throws IOException {
+          out.write(previewBytes);
+        }
+
+        @Override
+        public long getSize() {
+          return previewBytes.length;
+        }
+
+        @Override
+        public Date getLastModified() {
+          return lastModified;
+        }
+
+        @Override
+        public String getFileName() {
+          return previewFilename;
+        }
+
+        @Override
+        public String getMediaType() {
+          return PNG_MIME_TYPE;
+        }
+      };
+
+      return new StreamResponse(stream);
+    } catch (IOException e) {
+      throw new GenericException("Could not render TIFF preview for file: " + indexedFile.getId(), e);
+    }
+  }
+
+  private byte[] renderTiffPreview(Path sourcePath, String fileId) throws IOException, GenericException {
+    BufferedImage image = ImageIO.read(sourcePath.toFile());
+    if (image == null) {
+      throw new GenericException("Could not decode TIFF preview for file: " + fileId);
+    }
+
+    try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+      if (!ImageIO.write(image, "png", outputStream)) {
+        throw new GenericException("Could not encode PNG preview for file: " + fileId);
+      }
+
+      return outputStream.toByteArray();
+    }
+  }
+
+  private String buildTiffPreviewFilename(IndexedFile indexedFile) {
+    String filename = indexedFile.getOriginalName() != null ? indexedFile.getOriginalName() : indexedFile.getId();
+    int extensionIndex = filename.lastIndexOf('.');
+    if (extensionIndex >= 0) {
+      return filename.substring(0, extensionIndex) + ".png";
+    }
+
+    return filename + ".png";
   }
 
   public StreamResponse retrieveAIPRepresentationFile(RequestContext requestContext, IndexedFile indexedFile)

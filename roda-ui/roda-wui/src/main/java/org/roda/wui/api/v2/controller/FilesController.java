@@ -94,7 +94,8 @@ public class FilesController implements FileRestService, Exportable {
   @Autowired
   RequestHandler requestHandler;
 
-  @RequestMapping(path = "{uuid}/preview", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  @RequestMapping(path = "{uuid}/preview", method = RequestMethod.GET, produces = {
+    MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.IMAGE_PNG_VALUE})
   @Operation(summary = "Previews a file", description = "Previews a particular file using streaming capabilities", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = StreamingResponseBody.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
@@ -113,9 +114,13 @@ public class FilesController implements FileRestService, Exportable {
         IndexedFile file = indexService.retrieve(IndexedFile.class, fileUUID, fileFields);
         controllerAssistant.checkObjectPermissions(requestContext.getUser(), file);
 
-        RangeConsumesOutputStream stream = filesService.retrieveAIPRepresentationRangeStream(requestContext, file);
-
-        return ApiUtils.rangeResponse(headers, stream);
+        if (filesService.shouldRenderTiffPreview(file)) {
+          StreamResponse response = filesService.retrieveAIPRepresentationPreview(requestContext, file);
+          return ApiUtils.okResponse(response);
+        } else {
+          RangeConsumesOutputStream stream = filesService.retrieveAIPRepresentationRangeStream(requestContext, file);
+          return ApiUtils.rangeResponse(headers, stream);
+        }
       }
     });
   }
