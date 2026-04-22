@@ -194,6 +194,7 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
       JobsHelper.createJobAttachment(jobId, namedFile);
     } catch (IOException | AuthorizationDeniedException | GenericException | NotFoundException
       | RequestNotValidException e) {
+      LOGGER.error("Error creating job attachment for export job {}", jobId, e);
       throw new PluginException("Error creating job attachment for export", e);
     } finally {
       try {
