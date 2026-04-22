@@ -1,0 +1,58 @@
+{
+  "name": "ETERNA Dev",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "remoteUser": "vscode",
+
+  // Pass GitHub PAT from host: export GITHUB_PAT=ghp_... in ~/.bashrc / ~/.zshrc
+  "remoteEnv": {
+    "GITHUB_PAT": "${localEnv:GITHUB_PAT}"
+  },
+
+  // Persist Maven cache and share .roda data so ClamAV/Siegfried paths align
+  "mounts": [
+    "source=${localEnv:HOME}/.m2,target=/home/vscode/.m2,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.roda,target=/home/vscode/.roda,type=bind,consistency=cached",
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+  ],
+
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+
+  "forwardPorts": [8080, 8983, 8025, 5432, 3000, 9876],
+  "portsAttributes": {
+    "8080": { "label": "ETERNA",      "onAutoForward": "silent" },
+    "8983": { "label": "Solr Admin",  "onAutoForward": "silent" },
+    "8025": { "label": "Mailpit",     "onAutoForward": "silent" },
+    "3000": { "label": "Portal",      "onAutoForward": "silent" },
+    "9876": { "label": "GWT Server",  "onAutoForward": "silent" }
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "vmware.vscode-spring-boot",
+        "redhat.java",
+        "vscjava.vscode-maven",
+        "biomejs.biome",
+        "ms-vscode.vscode-typescript-next",
+        "bradlc.vscode-tailwindcss"
+      ],
+      "settings": {
+        "java.jdt.ls.java.home": "/usr/lib/jvm/temurin-21-amd64",
+        "java.configuration.runtimes": [
+          {
+            "name": "JavaSE-21",
+            "path": "/usr/lib/jvm/temurin-21-amd64",
+            "default": true
+          }
+        ],
+        "maven.executable.path": "/opt/maven/bin/mvn",
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "editor.formatOnSave": false
+      }
+    }
+  }
+}
