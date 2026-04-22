@@ -1,3 +1,31 @@
+/* === ETERNA brand tokens (facelift 2026-04) === */
+:root {
+  --eterna-red: #E2001A;
+  --eterna-red-deep: #B8001A;
+  --eterna-red-soft: #FEE2E5;
+  --eterna-ink: #1F2937;
+  --eterna-slate: #4B5563;
+  --eterna-muted: #6B7280;
+  --eterna-brand-gray: #9C9E9F;
+  --eterna-border: #E5E7EB;
+  --eterna-surface: #F9FAFB;
+  --eterna-paper: #FFFFFF;
+  --eterna-dark: #111827;
+  --eterna-ok: #059669;
+  --eterna-warn: #D97706;
+
+  --eterna-font-display: 'Barlow Condensed', 'Arial Narrow', 'Helvetica Neue', Arial, sans-serif;
+  --eterna-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+
+  --eterna-radius-sm: 4px;
+  --eterna-radius-md: 6px;
+  --eterna-radius-lg: 10px;
+  --eterna-shadow-card: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --eterna-shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.06);
+
+  --eterna-focus-ring: 0 0 0 2px var(--eterna-paper), 0 0 0 4px var(--eterna-red);
+}
+
 .main .contentPanel {
   min-height: 767px !important;
 }
