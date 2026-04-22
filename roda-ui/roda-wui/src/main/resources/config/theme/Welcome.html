@@ -1,352 +1,124 @@
-<div class="background-footer">
-    <div class="background-very-dark-grey">
-        <div class="background-primary">
-            <div class="background-dark-grey">
-                <div class="background-grey">
-                    <div class="background-white">
-                        <div class="background-grey">
-                            <div class="background-white">
+<div class="eterna-welcome">
+  <section class="eterna-welcome__hero">
+    <p class="eterna-welcome__greeting-label">Good day</p>
+    <h1 class="eterna-welcome__greeting">Welcome to ETERNA</h1>
+    <p class="eterna-welcome__lead">
+      An open-source Swedish e-archive for long-term digital preservation. Built on
+      OAIS, E-ARK, FGS, PREMIS and METS.
+    </p>
+    <form class="eterna-welcome__search" action="#search" method="get">
+      <label class="eterna-welcome__search-scope" for="eterna-welcome-scope">
+        <span>In the archive</span>
+        <select id="eterna-welcome-scope" name="scope">
+          <option value="all">All</option>
+          <option value="catalogue">Catalogue</option>
+          <option value="deliveries">Deliveries</option>
+        </select>
+      </label>
+      <input class="eterna-welcome__search-input" type="search" name="q"
+             placeholder="Search the archive…" aria-label="Search" />
+      <button class="btn-eterna-primary" type="submit">Search</button>
+    </form>
+  </section>
 
-                                <div class="flex-align-center">
-                                    <div class="circular-bg background-black hero-bg">
-                                        <div class="padding-lg hero">
-                                            <div class="column-split">
-                                                <div class="first-column">
-                                                    <div class="hero-elements">
-                                                        <img
-                                                                src="api/v2/themes?resource-id=eterna-logo.svg"
-                                                                alt="ETERNA Logo"
-                                                                class="hero-logo"
-                                                        />
-                                                        <h1 class="title">
-                                                            Open-Source Digital Repository Designed for Preservation
-                                                        </h1>
-                                                        <hr class="hero-separator"/>
-                                                        <p>
-                                                            <b>ETERNA (Repository of Authentic Digital Records)</b> is a
-                                                            long-term digital repository solution that delivers
-                                                            functionalities for all the main functional units of the
-                                                            OAIS reference model.
-                                                        </p>
-                                                        <p>
-                                                            <b>ETERNA</b> is capable of <span
-                                                                class="keyword">ingesting</span>,
-                                                            <span class="keyword">managing</span>, and <span
-                                                                class="keyword">providing access</span>
-                                                            to various types of digital content produced by large
-                                                            corporations and public bodies. <b>ETERNA</b> was developed
-                                                            using open-source technologies, and it's supported by the
-                                                            following standards:
-                                                        </p>
-                                                        <div class="hero-tags">
-                                                            <div class="standard-tag">
-                                                                <div class="standard-inner-tag">OAIS</div>
-                                                                Open Archival Information System
-                                                            </div>
-                                                            <div class="standard-tag">
-                                                                <div class="standard-inner-tag">EAD</div>
-                                                                Encoded Archival Description
-                                                            </div>
-                                                            <div class="standard-tag">
-                                                                <div class="standard-inner-tag">METS</div>
-                                                                Metadata Encoding and Transmission Standard
-                                                            </div>
-                                                            <div class="standard-tag">
-                                                                <div class="standard-inner-tag">DC</div>
-                                                                Dublin Core
-                                                            </div>
-                                                            <div class="standard-tag">
-                                                                <div class="standard-inner-tag">PREMIS</div>
-                                                                Preservation metadata
-                                                            </div>
-                                                            <div class="standard-tag">
-                                                                <div class="standard-inner-tag">E-ARK IP</div>
-                                                                eArchiving standards for SIP, AIP and DIP packages
-                                                            </div>
-                                                        </div>
-                                                        <div class="btn-row">
-                                                            <a
-                                                                    class="btn-hero more-info-btn"
-                                                                    role="button"
-                                                                    href="https://github.com/ETERNA-earkiv/ETERNA"
-                                                            >More info</a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+  <div class="eterna-welcome__grid">
+    <section class="eterna-welcome__main">
+      <h2 class="eterna-section-header">Quick actions</h2>
+      <div class="eterna-actions">
+        <a class="eterna-action" href="#ingest">
+          <span class="eterna-action__icon" aria-hidden="true">↥</span>
+          <span class="eterna-action__title">Deliver material</span>
+          <span class="eterna-action__desc">Create a new delivery to the archive</span>
+        </a>
+        <a class="eterna-action" href="#ingest/transfer">
+          <span class="eterna-action__icon" aria-hidden="true">⎘</span>
+          <span class="eterna-action__title">Review deliveries</span>
+          <span class="eterna-action__desc">Ongoing and pending deliveries</span>
+        </a>
+        <a class="eterna-action" href="#search">
+          <span class="eterna-action__icon" aria-hidden="true">⌕</span>
+          <span class="eterna-action__title">Search the catalogue</span>
+          <span class="eterna-action__desc">Find archival packages and descriptions</span>
+        </a>
+        <a class="eterna-action" href="#administration">
+          <span class="eterna-action__icon" aria-hidden="true">⚙</span>
+          <span class="eterna-action__title">Manage access</span>
+          <span class="eterna-action__desc">Users, groups and permissions</span>
+        </a>
+      </div>
 
-                            </div>
+      <h2 class="eterna-section-header">Recent activity</h2>
+      <ul class="eterna-activity">
+        <li class="eterna-activity__item">
+          <span class="eterna-status-dot eterna-status-dot--ok" aria-hidden="true"></span>
+          <div class="eterna-activity__body">
+            <p class="eterna-activity__title">Delivery accepted</p>
+            <p class="eterna-activity__desc">Archival package from Region East validated without errors.</p>
+          </div>
+          <span class="eterna-activity__time">—</span>
+        </li>
+        <li class="eterna-activity__item">
+          <span class="eterna-status-dot eterna-status-dot--warn" aria-hidden="true"></span>
+          <div class="eterna-activity__body">
+            <p class="eterna-activity__title">Preservation job pending</p>
+            <p class="eterna-activity__desc">Format check awaiting manual review.</p>
+          </div>
+          <span class="eterna-activity__time">—</span>
+        </li>
+        <li class="eterna-activity__item">
+          <span class="eterna-status-dot eterna-status-dot--err" aria-hidden="true"></span>
+          <div class="eterna-activity__body">
+            <p class="eterna-activity__title">Delivery rejected</p>
+            <p class="eterna-activity__desc">SIP package is missing METS manifest.</p>
+          </div>
+          <span class="eterna-activity__time">—</span>
+        </li>
+      </ul>
+      <p class="eterna-activity__note">
+        Shows recent activity once the log integration is enabled. Sample data until then.
+      </p>
+    </section>
 
-                            <div class="flex-align-center">
-                                <div class="circular-bg background-white">
-                                    <div class="padding-lg tutorial-roda-community">
-                                        <div class="column-split">
-                                            <div class="first-column">
-                                                <div class="hero-elements">
-                                                    <h2>Local instance</h2>
-                                                    <hr class="hero-separator"/>
-                                                    <p>Welcome to your local instance of ETERNA.
-                                                    </p>
-                                                    <p>
-                                                        Should you have any questions or require further information,
-                                                        please do not hesitate to <a
-                                                            href="https://github.com/ETERNA-earkiv/ETERNA/discussions"
-                                                            target="_blank" title="ETERNA Discussions">contact
-                                                        us</a>.
-                                                    </p>
-                                                    <p>
-                                                        Enjoy exploring ETERNA.
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div class="second-column">
-                                                <div class="grey-card credentials-card">
-                                                    <div class="card-header">
-                                                        <h3>TEST CREDENTIALS</h3>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <div class="credentials-card-elements">
-                                                            <p class="small-text">
-                                                                By default you have an administrative user account. This
-                                                                will allow you full access to all functionalities of the
-                                                                software. Please ensure that you <b>change the
-                                                                administrator user account password</b> before
-                                                                publishing this instance.
-                                                            </p>
-
-                                                            <div class="white-card">
-                                                                <div class="field">
-                                                                    <div class="field-label">
-                                                                        USERNAME
-                                                                    </div>
-                                                                    <div class="field-faux-input">
-                                                                        admin
-                                                                    </div>
-                                                                </div>
-                                                                <div class="field">
-                                                                    <div class="field-label">
-                                                                        PASSWORD
-                                                                    </div>
-                                                                    <div class="field-faux-input">
-                                                                        eterna
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            <a class="hero-button button-with-icon btn-enter"
-                                                               href="#login">
-                                                                Go to Login
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <div class="flex-align-center">
-                            <div class="circular-bg background-grey">
-                                <div class="padding-lg authenticity">
-                                    <div class="column-split">
-                                        <div class="first-column">
-                                            <div class="hero-elements">
-                                                <h2>Authenticity</h2>
-                                                <hr class="hero-separator"/>
-                                                <p>
-                                                    ETERNA uses PREMIS preservation metadata to create a trust chain
-                                                    between all generations of digital assets.
-                                                </p>
-                                                <p>
-                                                    Preservation metadata, together with the establishment of trust of
-                                                    its surrounding environment (ISO 16363 and ISO 14721) ensures that
-                                                    the repository service is reliable, and digital assets remain
-                                                    authentic over time.
-                                                </p>
-                                                <p>
-                                                    ETERNA also supports plugins that assess the validity of digital
-                                                    signatures and re-sign archived PDFs when the lifetime of digital
-                                                    signatures is coming to an end.
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div class="second-column">
-                                            <div class="highlight-image">
-                                                <img src="api/v2/themes?resource-id=images/authenticity.svg"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div class="flex-align-center">
-                        <div class="circular-bg background-white">
-                            <div class="padding-lg vendor">
-                                <div class="column-split">
-                                    <div class="first-column">
-                                        <div class="hero-elements">
-                                            <h2>Vendor independent</h2>
-                                            <hr class="hero-separator"/>
-                                            <p>ETERNA is built on top of enduring open-source technologies.</p>
-                                            <p>
-                                                The entire infrastructure required to support ETERNA is also vendor
-                                                independent. This means that you may use the hardware and the Linux
-                                                distribution that best fit your institutional needs.
-                                            </p>
-                                            <p>
-                                                Because the product itself is open source, you don't have to rely on a
-                                                single vendor for support. The entire source code of the system is
-                                                available on GitHub for inspection.
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="second-column">
-                                        <div class="highlight-image">
-                                            <img src="api/v2/themes?resource-id=images/vendor-independent.svg"/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="flex-align-center">
-                    <div class="circular-bg background-grey">
-                        <div class="features padding-lg">
-                            <div class="row-feature-details">
-                                <div class="column-feature-details">
-                                    <div class="component-row">
-                                        <div class="component-column">
-                                            <img
-                                                    src="api/v2/themes?resource-id=images/conforms-open-standards.svg"
-                                                    alt="Image 1"
-                                            />
-                                        </div>
-                                        <div class="component-column">
-                                            <h6>Standards conformance</h6>
-                                            <hr class="separator-sm"/>
-                                            <p>
-                                                ETERNA is compliant with several open descriptive metadata standards
-                                                such as EAD, and Dublin Core, PREMIS for preservation metadata and
-                                                METS for structural metadata.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="column-feature-details">
-                                    <div class="component-row">
-                                        <div class="component-column">
-                                            <img
-                                                    src="api/v2/themes?resource-id=images/embedded-preservation-actions.svg"
-                                                    alt="Image 2"
-                                            />
-                                        </div>
-                                        <div class="component-column">
-                                            <h6>Preservation actions</h6>
-                                            <hr class="separator-sm"/>
-                                            <p>
-                                                Preservation actions can be executed right from the user interface
-                                                over any selection of digital objects in the repository.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="column-feature-details">
-                                    <div class="component-row">
-                                        <div class="component-column">
-                                            <img
-                                                    src="api/v2/themes?resource-id=images/retention-and-disposal.svg"
-                                                    alt="Image 3"
-                                            />
-                                        </div>
-                                        <div class="component-column">
-                                            <h6>Retention and disposal</h6>
-                                            <hr class="separator-sm"/>
-                                            <p>
-                                                ETERNA incorporates robust and comprehensive functionality for the
-                                                definition and implementation of retention and disposal policies.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row-feature-details">
-                                <div class="column-feature-details">
-                                    <div class="component-row">
-                                        <div class="component-column">
-                                            <img
-                                                    src="api/v2/themes?resource-id=images/scalable.svg"
-                                                    alt="Image 4"
-                                            />
-                                        </div>
-                                        <div class="component-column">
-                                            <h6>Scalability</h6>
-                                            <hr class="separator-sm"/>
-                                            <p>
-                                                ETERNA is ideal for large organisations with millions of digital
-                                                objects. It's service-oriented nature allows it to be highly
-                                                scalable, enabling the distribution of load between several servers.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="column-feature-details">
-                                    <div class="component-row">
-                                        <div class="component-column">
-                                            <img
-                                                    src="api/v2/themes?resource-id=images/advanced-ingest-workflows.svg"
-                                                    alt="Image 5"
-                                            />
-                                        </div>
-                                        <div class="component-column">
-                                            <h6>Ingest workflows</h6>
-                                            <hr class="separator-sm"/>
-                                            <p>
-                                                Ingest workflows can be customised by the user to implement
-                                                institutional policies and handle special collections of data.
-                                                Ingest workflows can be enhanced via the use of open source or
-                                                commercial plugins.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="column-feature-details">
-                                    <div class="component-row">
-                                        <div class="component-column">
-                                            <img
-                                                    src="api/v2/themes?resource-id=images/rapid-changes.svg"
-                                                    alt="Image 6"
-                                            />
-                                        </div>
-                                        <div class="component-column">
-                                            <h6>Adaptability</h6>
-                                            <hr class="separator-sm"/>
-                                            <p>
-                                                The pluggable architecture of ETERNA makes it easy to add more
-                                                functionality to the system without affecting its core
-                                                functionality.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-    </div>
+    <aside class="eterna-welcome__aside">
+      <div class="eterna-card eterna-card--dark">
+        <h3 class="eterna-aside__title">Archive in numbers</h3>
+        <dl class="eterna-stats">
+          <div class="eterna-stat">
+            <dt>Archival packages</dt>
+            <dd>—</dd>
+          </div>
+          <div class="eterna-stat">
+            <dt>Delivered this month</dt>
+            <dd class="eterna-stat--accent">—</dd>
+          </div>
+          <div class="eterna-stat">
+            <dt>Total storage</dt>
+            <dd>—</dd>
+          </div>
+          <div class="eterna-stat">
+            <dt>Active preservation jobs</dt>
+            <dd>—</dd>
+          </div>
+        </dl>
+      </div>
+      <div class="eterna-card eterna-card--dark">
+        <h3 class="eterna-aside__title">Standards compliance</h3>
+        <ul class="eterna-standards">
+          <li>OAIS — ISO 14721</li>
+          <li>E-ARK CSIP 2.2</li>
+          <li>FGS 2.1</li>
+          <li>PREMIS 3.0</li>
+          <li>METS 1.12</li>
+          <li>EAD 3</li>
+        </ul>
+      </div>
+      <div class="eterna-card">
+        <h3 class="eterna-aside__title">Documentation</h3>
+        <p>
+          Handbooks, standards and developer documentation are available on
+          <a href="https://github.com/ETERNA-earkiv/ETERNA">GitHub</a>.
+        </p>
+      </div>
+    </aside>
+  </div>
 </div>
