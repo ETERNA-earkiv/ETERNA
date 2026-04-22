@@ -170,6 +170,241 @@ textarea:focus-visible,
   letter-spacing: 0.02em;
 }
 
+/* === ETERNA Welcome (facelift 2026-04) === */
+.eterna-welcome {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 40px 32px 72px;
+}
+.eterna-welcome__hero {
+  padding: 32px 0 48px;
+  border-bottom: 1px solid var(--eterna-border);
+  margin-bottom: 40px;
+}
+.eterna-welcome__greeting-label {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--eterna-muted);
+  margin: 0 0 8px;
+}
+.eterna-welcome__greeting {
+  font-family: var(--eterna-font-display);
+  font-weight: 600;
+  font-size: 44px;
+  line-height: 1.1;
+  color: var(--eterna-ink);
+  margin: 0 0 12px;
+}
+.eterna-welcome__lead {
+  font-size: 15px;
+  color: var(--eterna-slate);
+  max-width: 56ch;
+  line-height: 1.55;
+  margin: 0 0 28px;
+}
+.eterna-welcome__search {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  max-width: 640px;
+  border: 1px solid var(--eterna-border);
+  border-radius: var(--eterna-radius-md);
+  padding: 4px;
+  background: var(--eterna-paper);
+}
+.eterna-welcome__search-scope {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 10px;
+  border-right: 1px solid var(--eterna-border);
+  font-size: 13px;
+  color: var(--eterna-slate);
+  gap: 6px;
+}
+.eterna-welcome__search-scope select {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+}
+.eterna-welcome__search-input {
+  flex: 1;
+  border: 0;
+  padding: 10px 12px;
+  font: inherit;
+  background: transparent;
+  color: var(--eterna-ink);
+}
+.eterna-welcome__search-input:focus-visible {
+  outline: none;
+  box-shadow: var(--eterna-focus-ring);
+  border-radius: var(--eterna-radius-sm);
+}
+
+.eterna-welcome__grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 40px;
+}
+@media (max-width: 900px) {
+  .eterna-welcome__grid { grid-template-columns: 1fr; }
+}
+
+.eterna-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 600px) {
+  .eterna-actions { grid-template-columns: 1fr; }
+}
+.eterna-action {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: 8px;
+  padding: 20px;
+  border: 1px solid var(--eterna-border);
+  border-radius: var(--eterna-radius-lg);
+  text-decoration: none;
+  color: inherit;
+  background: var(--eterna-paper);
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+.eterna-action:hover {
+  border-color: var(--eterna-red);
+  box-shadow: var(--eterna-shadow-elevated);
+}
+.eterna-action__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: var(--eterna-red-soft);
+  color: var(--eterna-red);
+  font-size: 20px;
+}
+.eterna-action__title {
+  font-family: var(--eterna-font-display);
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--eterna-ink);
+}
+.eterna-action__desc {
+  font-size: 13px;
+  color: var(--eterna-slate);
+}
+
+.eterna-welcome__aside {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+.eterna-aside__title {
+  font-family: var(--eterna-font-display);
+  font-weight: 600;
+  font-size: 18px;
+  margin: 0 0 12px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.eterna-standards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.85);
+}
+.eterna-card--dark::before {
+  content: '';
+  position: absolute;
+  right: -80px;
+  top: -80px;
+  width: 240px;
+  height: 240px;
+  border: 40px solid rgba(226, 0, 26, 0.12);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* === ETERNA aktivitetsström === */
+.eterna-activity {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+  border: 1px solid var(--eterna-border);
+  border-radius: var(--eterna-radius-lg);
+  overflow: hidden;
+  background: var(--eterna-paper);
+}
+.eterna-activity__item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: start;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--eterna-border);
+}
+.eterna-activity__item:last-child { border-bottom: 0; }
+.eterna-activity__item .eterna-status-dot { margin-top: 7px; }
+.eterna-activity__body { min-width: 0; }
+.eterna-activity__title {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--eterna-ink);
+  margin: 0 0 2px;
+}
+.eterna-activity__desc {
+  font-size: 13px;
+  color: var(--eterna-slate);
+  margin: 0;
+}
+.eterna-activity__time {
+  font-size: 12px;
+  color: var(--eterna-muted);
+  font-variant-numeric: tabular-nums;
+}
+.eterna-activity__note {
+  font-size: 12px;
+  color: var(--eterna-muted);
+  margin: 10px 0 0;
+  font-style: italic;
+}
+
+/* === ETERNA statistik ("Arkivet i siffror") === */
+.eterna-stats {
+  display: grid;
+  gap: 18px;
+  margin: 0;
+}
+.eterna-stat {
+  display: grid;
+  gap: 4px;
+}
+.eterna-stat dt {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+.eterna-stat dd {
+  font-family: var(--eterna-font-display);
+  font-weight: 600;
+  font-size: 28px;
+  color: var(--eterna-paper);
+  margin: 0;
+  line-height: 1;
+}
+.eterna-stat--accent { color: var(--eterna-red) !important; }
+
 /* === ETERNA section header === */
 .eterna-section-header {
   font-family: var(--eterna-font-display);
