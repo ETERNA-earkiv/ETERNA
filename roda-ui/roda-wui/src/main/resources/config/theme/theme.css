@@ -61,6 +61,103 @@ body {
   padding-top: 6px;
 }
 
+/* === ETERNA buttons === */
+.btn-eterna-primary,
+button.btn-primary,
+.gwt-Button.btn-primary {
+  background: var(--eterna-red);
+  color: var(--eterna-paper);
+  border: 0;
+  padding: 12px 20px;
+  border-radius: var(--eterna-radius-md);
+  font-family: var(--eterna-font-body);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+.btn-eterna-primary:hover,
+button.btn-primary:hover,
+.gwt-Button.btn-primary:hover {
+  background: var(--eterna-red-deep);
+}
+.btn-eterna-secondary {
+  background: transparent;
+  color: var(--eterna-ink);
+  border: 1px solid var(--eterna-border);
+  padding: 11px 19px;
+  border-radius: var(--eterna-radius-md);
+  font-family: var(--eterna-font-body);
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* === ETERNA inputs === */
+.form-eterna-input,
+input.gwt-TextBox,
+input.gwt-PasswordTextBox {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1px solid var(--eterna-border);
+  border-radius: var(--eterna-radius-md);
+  font-family: inherit;
+  font-size: 14px;
+  box-sizing: border-box;
+  background: var(--eterna-paper);
+  color: var(--eterna-ink);
+}
+.form-eterna-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--eterna-slate);
+  margin: 18px 0 6px;
+}
+
+/* === ETERNA cards === */
+.eterna-card {
+  background: var(--eterna-paper);
+  border: 1px solid var(--eterna-border);
+  border-radius: var(--eterna-radius-lg);
+  padding: 24px;
+  box-shadow: var(--eterna-shadow-card);
+}
+.eterna-card--dark {
+  background: var(--eterna-dark);
+  color: var(--eterna-paper);
+  border: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* === ETERNA focus ring (WCAG 2.4.7) === */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: none;
+  box-shadow: var(--eterna-focus-ring);
+  border-radius: var(--eterna-radius-sm);
+}
+
+/* === ETERNA section header === */
+.eterna-section-header {
+  font-family: var(--eterna-font-display);
+  font-size: 22px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--eterna-ink);
+  padding-left: 12px;
+  border-left: 3px solid var(--eterna-red);
+  margin: 32px 0 16px;
+}
+
 .main .contentPanel {
   min-height: 767px !important;
 }
