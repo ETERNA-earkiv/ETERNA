@@ -405,6 +405,32 @@ textarea:focus-visible,
 }
 .eterna-stat--accent { color: var(--eterna-red) !important; }
 
+/* === ETERNA footer === */
+.eterna-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 32px;
+  border-top: 1px solid var(--eterna-border);
+  background: var(--eterna-surface);
+  font-size: 13px;
+  color: var(--eterna-slate);
+}
+.eterna-footer__sep { opacity: 0.5; margin: 0 4px; }
+.eterna-footer a { color: var(--eterna-red); text-decoration: none; }
+.eterna-footer a:hover { text-decoration: underline; }
+.eterna-status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+.eterna-status-dot--ok { background: var(--eterna-ok); }
+.eterna-status-dot--warn { background: var(--eterna-warn); }
+.eterna-status-dot--err { background: var(--eterna-red); }
+
 /* === ETERNA section header === */
 .eterna-section-header {
   font-family: var(--eterna-font-display);
