@@ -551,6 +551,33 @@ textarea:focus-visible,
   justify-content: center;
 }
 
+/* === ETERNA empty state === */
+.eterna-empty {
+  text-align: center;
+  padding: 64px 24px;
+  color: var(--eterna-muted);
+}
+.eterna-empty::before {
+  content: '';
+  display: block;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+  background: url('api/v2/themes?resource-id=eterna-flag.svg') center/contain no-repeat;
+  opacity: 0.35;
+}
+.eterna-empty__title {
+  font-family: var(--eterna-font-display);
+  font-weight: 600;
+  font-size: 20px;
+  color: var(--eterna-slate);
+  margin: 0 0 6px;
+}
+.eterna-empty__desc {
+  font-size: 14px;
+  margin: 0;
+}
+
 /* === ETERNA section header === */
 .eterna-section-header {
   font-family: var(--eterna-font-display);
