@@ -6,12 +6,12 @@
 
 ## Bakgrund
 
-ETERNA har en svensk språkfil men 126 nycklar saknar svenska översättningar, vilket gör att engelska texter visas i gränssnittet. Målet är att inga engelska texter ska synas i ETERNAs ordinarie gränssnitt (loggar undantagna).
+ETERNA har en svensk språkfil men 26 nycklar saknar svenska översättningar, vilket gör att engelska texter visas i gränssnittet. Målet är att inga engelska texter ska synas i ETERNA:s ordinarie gränssnitt (loggar undantagna).
 
 ## Scope
 
 ### Filer som ändras
-1. `roda-ui/roda-wui/src/main/resources/config/i18n/client/ClientMessages_sv_SE.properties` — 102 nycklar
+1. `roda-ui/roda-wui/src/main/resources/config/i18n/client/ClientMessages_sv_SE.properties` — 2 nycklar
 2. `roda-ui/roda-wui/src/main/resources/config/i18n/ServerMessages_sv_SE.properties` — 24 nycklar
 
 ### Avgränsning
@@ -47,7 +47,7 @@ Varje commit är en självständig enhet som kan återrullas med `git revert` ut
 
 ## Definition of Done
 
-- Inga engelska texter syns i ETERNAs ordinarie gränssnitt när språket är inställt på svenska
+- Inga engelska texter syns i ETERNA:s ordinarie gränssnitt när språket är inställt på svenska
 - Loggar är undantagna från kravet
-- Alla 126 nycklar är tillagda i rätt filer
+- Alla 26 nycklar är tillagda i rätt filer
 - Varje commit är reversibel

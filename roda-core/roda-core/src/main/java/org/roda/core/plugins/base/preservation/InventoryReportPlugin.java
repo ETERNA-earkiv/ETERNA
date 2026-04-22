@@ -130,12 +130,11 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
         .withDescription(
           "Include in the inventory report information about descriptive metadata files that exist inside AIPs.")
         .build());
-    pluginParameters.put(CSV_FILE_OTHER_METADATA_TYPES,
-      PluginParameter
-        .getBuilder(CSV_FILE_OTHER_METADATA_TYPES, "Include other metadata files", PluginParameterType.STRING)
-        .withDefaultValue(CSV_DEFAULT_OTHER_METADATA).withDescription(
-          "Include in the inventory report information about other metadata files that exist inside AIPs.")
-        .build());
+    pluginParameters.put(CSV_FILE_OTHER_METADATA_TYPES, PluginParameter
+      .getBuilder(CSV_FILE_OTHER_METADATA_TYPES, "Include other metadata files", PluginParameterType.STRING)
+      .withDefaultValue(CSV_DEFAULT_OTHER_METADATA)
+      .withDescription("Include in the inventory report information about other metadata files that exist inside AIPs.")
+      .build());
   }
 
   @Override
@@ -150,7 +149,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "Inventeringsrapportgenerare";
+    return "Inventeringsrapportgenerator";
   }
 
   @Override
@@ -222,8 +221,8 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> liteList)
+    throws PluginException {
 
     Path jobCSVTempFolder = getJobCSVTempFolder();
     Path csvTempFile = jobCSVTempFolder.resolve(IdUtils.createUUID() + ".csv");
@@ -234,8 +233,8 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
       return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
         @Override
 
-        public void process(IndexService index, ModelService model, Report report,
-          Job cachedJob, JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
+        public void process(IndexService index, ModelService model, Report report, Job cachedJob,
+          JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
           processAIP(model, jobPluginInfo, csvFilePrinter, object);
         }
       }, index, model, liteList);
@@ -244,8 +243,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
     }
   }
 
-  private void processAIP(ModelService model, JobPluginInfo jobPluginInfo,
-    CSVPrinter csvFilePrinter, AIP aip) {
+  private void processAIP(ModelService model, JobPluginInfo jobPluginInfo, CSVPrinter csvFilePrinter, AIP aip) {
     if (csvFilePrinter == null) {
       LOGGER.warn("CSVPrinter is NULL! Skipping...");
       return;
@@ -276,8 +274,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     try {
       Path jobCSVTempFolder = getJobCSVTempFolder();
       Files.createDirectories(jobCSVTempFolder);

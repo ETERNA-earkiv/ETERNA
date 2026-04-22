@@ -44,9 +44,11 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
 
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS,
-      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS,
-        "Delete older than X days", PluginParameterType.INTEGER).withDefaultValue("90").isMandatory(false)
-        .isReadOnly(false).withDescription("The plugin will delete all logs older than the specified number of days.")
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS, "Radera äldre än X dagar",
+          PluginParameterType.INTEGER)
+        .withDefaultValue("90").isMandatory(false).isReadOnly(false)
+        .withDescription("Insticksprogrammet raderar alla loggposter som är äldre än det angivna antalet dagar.")
         .build());
   }
 
@@ -102,8 +104,8 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model,
-    List<LiteOptionalWithCause> entries) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> entries)
+    throws PluginException {
 
     Report report = PluginHelper.initPluginReportItem(this, Report.NO_OUTCOME_OBJECT_ID, Report.NO_SOURCE_OBJECT_ID);
     report.setPluginState(PluginState.SUCCESS);
@@ -127,8 +129,7 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }

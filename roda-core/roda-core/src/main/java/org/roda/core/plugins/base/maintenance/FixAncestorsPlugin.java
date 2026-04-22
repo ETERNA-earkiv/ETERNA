@@ -52,10 +52,10 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
 
   private static final Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID,
-      PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID, "Ingest job identifier", PluginParameterType.STRING)
-        .withDescription("The identifier of the job responsible to ingest the information package to fix.").build());
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID, PluginParameter
+      .getBuilder(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID, "Identifierare för ingest-jobb", PluginParameterType.STRING)
+      .withDescription("Identifieraren för jobbet som ansvarar för att ingestera informationspaketet som ska åtgärdas.")
+      .build());
   }
 
   @Override
@@ -112,8 +112,8 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model,
-    List<LiteOptionalWithCause> list) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> list)
+    throws PluginException {
 
     final int counter = calculateSourceObjectsCount(index);
     return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
@@ -200,8 +200,7 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }

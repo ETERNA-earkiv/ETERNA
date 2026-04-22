@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Mål:** Lägga till 154 saknade svenska översättningar i ETERNAs i18n-filer så att inget engelskt syns i det ordinarie gränssnittet.
+**Mål:** Lägga till 26 saknade svenska översättningar i ETERNA:s i18n-filer så att inget engelskt syns i det ordinarie gränssnittet.
 
 **Arkitektur:** Alla ändringar görs uteslutande i properties-filer. Inga Java-, GWT- eller konfigurationsfiler ändras. Varje commit innehåller en logiskt sammanhållen grupp nycklar och kan återrullas självständigt.
 
@@ -39,8 +39,8 @@ git show --stat HEAD
 
 | Fil | Antal nycklar |
 |-----|---------------|
-| `roda-ui/roda-wui/src/main/resources/config/i18n/client/ClientMessages_sv_SE.properties` | 101 |
-| `roda-ui/roda-wui/src/main/resources/config/i18n/ServerMessages_sv_SE.properties` | 53 |
+| `roda-ui/roda-wui/src/main/resources/config/i18n/client/ClientMessages_sv_SE.properties` | 2 |
+| `roda-ui/roda-wui/src/main/resources/config/i18n/ServerMessages_sv_SE.properties` | 24 |
 
 ---
 
@@ -370,7 +370,7 @@ ui.facets.LogEntry.actionComponent.org.roda.wui.security.SecurityObserverImpl = 
 grep -c "^lists.label\|^ui.facets.LogEntry.actionComponent.org.roda.wui.api.v2\|^email.setpassword" \
   roda-ui/roda-wui/src/main/resources/config/i18n/ServerMessages_sv_SE.properties
 ```
-Förväntat utfall: `53` (28 lists.label + 24 ui.facets.v2/security + 1 email)
+Förväntat utfall: `24` (24 nycklar tillagda i ServerMessages)
 
 - [ ] **Steg 3: Committa**
 

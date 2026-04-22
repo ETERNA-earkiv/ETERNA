@@ -66,20 +66,20 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_ID,
-      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_RISK_ID, "Risks", PluginParameterType.RISK_ID)
-        .isMandatory(false).withDescription("Add the risks that will be associated with the objects above.").build());
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_RISK_ID, "Risker", PluginParameterType.RISK_ID)
+        .isMandatory(false).withDescription("Lägg till de risker som ska kopplas till objekten ovan.").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_DESCRIPTION,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_DESCRIPTION, "Incidence description",
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_DESCRIPTION, "Beskrivning av incident",
           PluginParameterType.STRING)
-        .isMandatory(false).withDescription("Associate a description to the incidence(s) created").build());
+        .isMandatory(false).withDescription("Koppla en beskrivning till den eller de skapade incidenterna.").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY, "Incidence severity",
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY, "Incidentens allvarlighetsgrad",
           PluginParameterType.SEVERITY)
-        .isMandatory(false).withDescription("Associate a severity to the incidence").build());
+        .isMandatory(false).withDescription("Koppla en allvarlighetsgrad till incidenten.").build());
   }
 
   @Override
@@ -133,15 +133,14 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> liteList)
+    throws PluginException {
     LOGGER.debug("Creating risk incidences");
     Report pluginReport = PluginHelper.initPluginReport(this);
 

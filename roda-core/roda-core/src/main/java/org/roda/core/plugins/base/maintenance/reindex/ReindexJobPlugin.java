@@ -18,9 +18,13 @@ import java.util.List;
 
 public class ReindexJobPlugin extends ReindexRodaEntityPlugin<Job> {
 
+  public static String getStaticName() {
+    return "Återindexera jobbindex";
+  }
+
   @Override
   public String getName() {
-    return "Återindexera jobbindex";
+    return getStaticName();
   }
 
   @Override

@@ -56,10 +56,12 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
   private boolean overwriteManual;
 
   static {
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_SIEGFRIED_OVERWRITE_MANUAL, PluginParameter
-      .getBuilder(RodaConstants.PLUGIN_PARAMS_SIEGFRIED_OVERWRITE_MANUAL, "Overwrite manually assigned fields",
-        PluginParameter.PluginParameterType.BOOLEAN)
-      .withDescription("Force the plugin to overwrite file format metadata that has been manually assigned.").build());
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_SIEGFRIED_OVERWRITE_MANUAL,
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_SIEGFRIED_OVERWRITE_MANUAL, "Skriv över manuellt tilldelade fält",
+          PluginParameter.PluginParameterType.BOOLEAN)
+        .withDescription("Tvingar insticksprogrammet att skriva över filformatmetadata som har tilldelats manuellt.")
+        .build());
   }
 
   /*
