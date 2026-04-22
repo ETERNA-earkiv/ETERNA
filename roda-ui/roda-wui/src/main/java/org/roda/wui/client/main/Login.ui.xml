@@ -5,7 +5,20 @@
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
-	<g:FlowPanel>
+	<g:FlowPanel addStyleNames="eterna-login">
+		<g:HTML addStyleNames="eterna-login__brand-side">
+			<![CDATA[
+			<img src="api/v2/themes?resource-id=eterna-logo-reversed.svg"
+			     alt="ETERNA" class="eterna-login__logo" />
+			<p class="eterna-login__byline">ett e-arkiv från WhiteRed</p>
+			<div>
+			<p class="eterna-login__tagline">Digitalt bevarande som <span class="eterna-accent">står sig</span> över tid.</p>
+			<p class="eterna-login__lead">Öppen källkod, svensk dokumentation, byggd på internationella standarder för arkivering.</p>
+			</div>
+			<p class="eterna-login__standards">OAIS · E-ARK · FGS · PREMIS · METS</p>
+			]]>
+		</g:HTML>
+		<g:FlowPanel addStyleNames="eterna-login__form-side">
 		<g:FlowPanel addStyleNames="loginPanel" ui:field="loginPanel">
 			<g:HTML>
 				<h1>
@@ -57,6 +70,7 @@
 					<ui:text from='{messages.loginLogout}' />
 				</g:Button>
 			</g:FlowPanel>
+		</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>
 

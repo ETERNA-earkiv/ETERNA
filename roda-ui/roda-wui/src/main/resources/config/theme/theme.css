@@ -473,6 +473,84 @@ textarea:focus-visible,
 }
 .eterna-error__desc a:hover { text-decoration: underline; }
 
+/* === ETERNA login (facelift 2026-04) === */
+.eterna-login {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+}
+@media (max-width: 780px) {
+  .eterna-login { grid-template-columns: 1fr; }
+  .eterna-login__brand-side { min-height: 240px; }
+}
+.eterna-login__brand-side {
+  background: var(--eterna-dark);
+  color: var(--eterna-paper);
+  padding: 64px 48px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.eterna-login__brand-side::before {
+  content: '';
+  position: absolute;
+  right: -140px;
+  top: -140px;
+  width: 420px;
+  height: 420px;
+  border: 60px solid rgba(226, 0, 26, 0.10);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.eterna-login__logo {
+  width: 240px;
+  height: auto;
+  display: block;
+  margin-bottom: 24px;
+}
+.eterna-login__byline {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 32px;
+}
+.eterna-login__tagline {
+  font-family: var(--eterna-font-display);
+  font-weight: 500;
+  font-size: 34px;
+  line-height: 1.15;
+  max-width: 340px;
+  color: var(--eterna-paper);
+  margin: 0 0 14px;
+}
+.eterna-login__tagline .eterna-accent { color: var(--eterna-red); }
+.eterna-login__lead {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  max-width: 360px;
+  line-height: 1.55;
+  margin: 0 0 24px;
+}
+.eterna-login__standards {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+.eterna-login__form-side {
+  background: var(--eterna-paper);
+  padding: 64px 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 /* === ETERNA section header === */
 .eterna-section-header {
   font-family: var(--eterna-font-display);
