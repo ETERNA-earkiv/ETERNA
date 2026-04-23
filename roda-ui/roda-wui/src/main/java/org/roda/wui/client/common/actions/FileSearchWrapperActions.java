@@ -39,8 +39,10 @@ import org.roda.wui.client.common.utils.FileFormatSharedUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
+import org.roda.core.data.v2.ip.redaction.StartRedactionRequest;
 import org.roda.wui.client.redact.PDFRedactor;
 import org.roda.wui.client.services.Services;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
@@ -267,10 +269,36 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
     }
 
     List<String> historyItems = ListUtils.concat(
-            ListUtils.concat(Arrays.asList(aipId, representationId), path), fileId);
+        ListUtils.concat(Arrays.asList(aipId, representationId), path), fileId);
 
-    callback.onSuccess(ActionImpact.NONE);
-    HistoryUtils.newHistory(PDFRedactor.RESOLVER, historyItems.toArray(new String[0]));
+    boolean mandatory = ConfigurationManager.getBoolean(false, RodaConstants.UI_REDACTION_REASON_MANDATORY);
+
+    Dialogs.showPromptDialog(messages.redactPdfReasonTitle(), null, null,
+        messages.redactPdfReasonPlaceholder(), RegExp.compile(".*"), messages.cancelButton(),
+        messages.confirmButton(), mandatory, true,
+        new ActionNoAsyncCallback<String>(callback) {
+          @Override
+          public void onFailure(Throwable caught) {
+            callback.onSuccess(ActionImpact.NONE);
+          }
+
+          @Override
+          public void onSuccess(String details) {
+            StartRedactionRequest request = new StartRedactionRequest(aipId, representationId, fileId, details);
+            Services services = new Services("Log redaction start", "post");
+            services.redactionResource(s -> s.logRedactionStart(request))
+                .whenComplete((result, throwable) -> {
+                  if (throwable != null) {
+                    Dialogs.showInformationDialog(messages.redactPdfToastTitle(),
+                        messages.alertErrorTitle(), messages.dialogOk(), false);
+                  } else {
+                    HistoryUtils.newHistory(PDFRedactor.RESOLVER,
+                        historyItems.toArray(new String[0]));
+                  }
+                  callback.onSuccess(ActionImpact.NONE);
+                });
+          }
+        });
   }
 
   private void move(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
