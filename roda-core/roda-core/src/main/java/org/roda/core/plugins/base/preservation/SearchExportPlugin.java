@@ -194,7 +194,8 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
       throw new PluginException("Error writing export CSV", e);
     }
 
-    String attachmentName = exportFilename + ".csv";
+    String safeFilename = exportFilename.replaceAll("[/\\\\:*?\"<>|]", "_");
+    String attachmentName = safeFilename + ".csv";
     Path namedFile = tempDir.resolve(attachmentName);
     try {
       Files.move(csvFile, namedFile);
