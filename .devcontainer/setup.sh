@@ -3,6 +3,11 @@ set -euo pipefail
 
 echo "==> Setting up ETERNA dev environment..."
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+SOURCE_COMPOSE_FILE="$REPO_ROOT/deploys/standalone/docker-compose-dev.yaml"
+GENERATED_COMPOSE_FILE="$SCRIPT_DIR/docker-compose-devcontainer.yaml"
+
 # ── Maven settings.xml with GitHub PAT ────────────────────────────────────────
 mkdir -p "$HOME/.m2"
 
@@ -22,7 +27,7 @@ if [ -n "${GITHUB_PAT:-}" ]; then
   </servers>
 </settings>
 EOF
-  echo "    Maven settings.xml written."
+  echo "    Container-local Maven settings.xml written."
 else
   echo "    WARNING: GITHUB_PAT not set — Maven will fail to resolve GitHub Packages."
   echo "    Set it on your host: export GITHUB_PAT=ghp_... (then rebuild container)"
@@ -42,11 +47,26 @@ if [ -n "$DOCKER_SOCK_GID" ] && [ "$DOCKER_SOCK_GID" != "0" ]; then
   fi
 fi
 
+# ── Devcontainer-specific Compose file ────────────────────────────────────────
+if [ -n "${HOST_HOME:-}" ]; then
+  sed \
+    -e "s|\${HOME}|$HOST_HOME|g" \
+    -e "s|\$HOME|$HOST_HOME|g" \
+    "$SOURCE_COMPOSE_FILE" > "$GENERATED_COMPOSE_FILE"
+  echo "    Generated $GENERATED_COMPOSE_FILE with host paths."
+else
+  echo "    WARNING: HOST_HOME not set — using the raw compose file may break bind mounts."
+fi
+
 echo ""
 echo "==> Setup complete. Next steps:"
 echo ""
 echo "  1. Start infrastructure:"
-echo "     docker compose -f deploys/standalone/docker-compose-dev.yaml up -d"
+if [ -n "${HOST_HOME:-}" ]; then
+  echo "     docker compose -f .devcontainer/docker-compose-devcontainer.yaml up -d"
+else
+  echo "     docker compose -f deploys/standalone/docker-compose-dev.yaml up -d"
+fi
 echo ""
 echo "  2. Build ETERNA core:"
 echo "     mvn install -Pcore -DskipTests"

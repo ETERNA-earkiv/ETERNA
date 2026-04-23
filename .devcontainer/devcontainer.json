@@ -8,12 +8,14 @@
 
   // Pass GitHub PAT from host: export GITHUB_PAT=ghp_... in ~/.bashrc / ~/.zshrc
   "remoteEnv": {
-    "GITHUB_PAT": "${localEnv:GITHUB_PAT}"
+    "GITHUB_PAT": "${localEnv:GITHUB_PAT}",
+    "HOST_HOME": "${localEnv:HOME}"
   },
 
-  // Persist Maven cache and share .roda data so ClamAV/Siegfried paths align
+  // Persist Maven cache and share .roda data so container and host use the same files.
+  // Only mount the Maven repository cache so the container can keep its own settings.xml.
   "mounts": [
-    "source=${localEnv:HOME}/.m2,target=/home/vscode/.m2,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.m2/repository,target=/home/vscode/.m2/repository,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.roda,target=/home/vscode/.roda,type=bind,consistency=cached",
     "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
   ],
