@@ -57,9 +57,9 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
 
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_SIEGFRIED_OVERWRITE_MANUAL, PluginParameter
-      .getBuilder(RodaConstants.PLUGIN_PARAMS_SIEGFRIED_OVERWRITE_MANUAL, "Overwrite manually assigned fields",
+      .getBuilder(RodaConstants.PLUGIN_PARAMS_SIEGFRIED_OVERWRITE_MANUAL, "Skriv över manuellt tilldelade fält",
         PluginParameter.PluginParameterType.BOOLEAN)
-      .withDescription("Force the plugin to overwrite file format metadata that has been manually assigned.").build());
+      .withDescription("Tvingar insticksprogrammet att skriva över filformatmetadata som har tilldelats manuellt.").build());
   }
 
   /*
@@ -160,14 +160,14 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
                   if (sources.isEmpty()) {
                     jobPluginInfo.incrementObjectsProcessedWithSkipped();
                     reportItem.setPluginState(PluginState.SKIPPED)
-                      .setPluginDetails("Skipped to prevent overwriting manual values.");
+                      .setPluginDetails("Hoppades över för att undvika överskrivning av manuellt tilldelade värden.");
                   } else {
                     jobPluginInfo.incrementObjectsProcessedWithSuccess();
                     reportItem.setPluginState(PluginState.SUCCESS);
                   }
                 } else {
                   reportItem.setPluginState(PluginState.SKIPPED)
-                    .setPluginDetails("Skipped because no representation was found for this AIP.");
+                    .setPluginDetails("Hoppades över eftersom ingen representation hittades för detta AIP.");
                   jobPluginInfo.incrementObjectsProcessed(PluginState.SKIPPED);
                 }
               } else {
@@ -394,17 +394,17 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
 
   @Override
   public String getPreservationEventDescription() {
-    return "Identified the object's file formats and versions using Siegfried.";
+    return "Identifierade objektets filformat och versioner med Siegfried.";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "File formats were identified and recorded in PREMIS objects.";
+    return "Filformat identifierades och registrerades i PREMIS-objekt.";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Failed to identify file formats in the package.";
+    return "Misslyckades med att identifiera filformat i paketet.";
   }
 
   @Override
