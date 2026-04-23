@@ -55,7 +55,7 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticName() {
-    return "Auto accept";
+    return "Automatiskt godkännande";
   }
 
   @Override
@@ -64,8 +64,8 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticDescription() {
-    return "Adds information package to the inventory without any human appraisal. After this point, the responsibility for the digital content’s "
-      + "preservation is passed on to the repository.";
+    return "Lägger till informationspaketet i arkivförteckningen utan mänsklig granskning. Från och med denna punkt övergår ansvaret "
+      + "för det digitala innehållets bevarande till arkivet.";
   }
 
   @Override

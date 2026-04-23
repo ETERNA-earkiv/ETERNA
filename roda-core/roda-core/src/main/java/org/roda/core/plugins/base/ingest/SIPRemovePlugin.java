@@ -48,7 +48,7 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
   }
 
   public static String getStaticName() {
-    return "Delete SIP from transfer";
+    return "Radera SIP från överföringsyta";
   }
 
   @Override
@@ -57,7 +57,7 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
   }
 
   public static String getStaticDescription() {
-    return "Deletes SIP from the transfer area if the ingest process is successful.";
+    return "Raderar SIP:et från överföringsytan om inleveransprocessen lyckades.";
   }
 
   @Override

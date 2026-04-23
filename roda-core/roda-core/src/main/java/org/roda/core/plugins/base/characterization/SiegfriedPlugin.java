@@ -68,13 +68,13 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
    */
 
   public static String getStaticName() {
-    return "File Format Detector";
+    return "Filformatsdetektor";
   }
 
   public static String getStaticDescription() {
-    return "The File Format Detector plugin is an essential tool for identifying and analyzing various file formats.\nIt provides comprehensive information "
-      + "about each file, including its name, designation, version, MIME type, and PRONOM identifier.\nThis information can be used to determine the appropriate "
-      + "software to open and manipulate the file, as well as to ensure compatibility with different systems and applications.";
+    return "Insticksprogrammet Filformatsdetektor är ett viktigt verktyg för att identifiera och analysera olika filformat.\nDet ger omfattande information "
+      + "om varje fil, inklusive dess namn, beteckning, version, MIME-typ och PRONOM-identifierare.\nDenna information kan användas för att avgöra lämplig "
+      + "programvara för att öppna och hantera filen samt för att säkerställa kompatibilitet med olika system och applikationer.";
   }
 
   @Override

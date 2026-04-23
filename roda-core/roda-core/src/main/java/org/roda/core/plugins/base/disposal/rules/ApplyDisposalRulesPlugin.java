@@ -62,11 +62,11 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
   private boolean overrideManualAssociations = false;
 
   public static String getStaticName() {
-    return "Disposal schedule association via disposal rule";
+    return "Koppling av gallringsplan via gallringsregel";
   }
 
   public static String getStaticDescription() {
-    return "Associates a disposal schedule to an AIP via rules previously defined for the repository.";
+    return "Kopplar en gallringsplan till ett AIP via regler som tidigare definierats för arkivet.";
   }
 
   @Override

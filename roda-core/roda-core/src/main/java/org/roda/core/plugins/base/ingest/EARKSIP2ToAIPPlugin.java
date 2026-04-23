@@ -84,7 +84,7 @@ public class EARKSIP2ToAIPPlugin extends SIPToAIPPlugin {
 
   @Override
   public String getDescription() {
-    return "E-ARK SIP 2 as a zip file.";
+    return "E-ARK SIP 2 som en zip-fil.";
   }
 
   @Override
