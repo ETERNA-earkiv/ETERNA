@@ -41,7 +41,6 @@ import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
 import org.roda.core.data.v2.ip.redaction.StartRedactionRequest;
-import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.redact.PDFRedactor;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.ConfigurationManager;
@@ -270,7 +269,7 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
     List<String> path = file.getPath() != null ? file.getPath() : Collections.emptyList();
 
     if (aipId == null || representationId == null || fileId == null) {
-      Toast.showError("Cannot redact PDF: Missing required identifiers (AIP: " + aipId + ", Rep: " + representationId + ", File: " + fileId + ")");
+      Toast.showError(messages.redactPdfMissingIdentifiers());
       callback.onSuccess(ActionImpact.NONE);
       return;
     }
