@@ -9,17 +9,20 @@ package org.roda.wui.client.services;
 
 import org.fusesource.restygwt.client.DirectRestService;
 import org.roda.core.data.v2.ip.redaction.StartRedactionRequest;
+import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
- * @author Redaction team
+ * @author Tomas Fridekrans <tomas.fridekrans@whitered.se>
  */
 
 @Tag(name = "Redaction")
@@ -27,9 +30,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public interface RedactionRestService extends DirectRestService {
 
   @RequestMapping(method = RequestMethod.POST, path = "/log", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Log redaction session start", responses = {
-    @ApiResponse(responseCode = "200", description = "Redaction start logged"),
-    @ApiResponse(responseCode = "401", description = "Unauthorized"),
-    @ApiResponse(responseCode = "403", description = "Forbidden")})
-  Void logRedactionStart(@RequestBody StartRedactionRequest request);
+  @Operation(summary = "Log redaction session start", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = StartRedactionRequest.class))), responses = {
+    @ApiResponse(responseCode = "200", description = "Redaction start logged", content = @Content()),
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  Void logRedactionStart(@org.springframework.web.bind.annotation.RequestBody StartRedactionRequest request);
 }
