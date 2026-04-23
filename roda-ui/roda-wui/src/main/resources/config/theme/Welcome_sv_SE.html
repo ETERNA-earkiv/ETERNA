@@ -1,275 +1,122 @@
 <div class="eterna-welcome">
 
-  <!-- VY: EJ INLOGGAD (visas tills auth-check svarat) -->
-  <div id="eterna-anon" style="display:none">
-    <section class="eterna-welcome__hero">
-      <p class="eterna-welcome__greeting-label">Välkommen</p>
-      <h1 class="eterna-welcome__greeting">ETERNA e-arkiv</h1>
-      <p class="eterna-welcome__lead">
-        Sveriges öppna e-arkivtjänst för långsiktigt digitalt bevarande —
-        byggt på öppen källkod, svenska standarder och internationella specifikationer.
+  <section class="eterna-welcome__hero">
+    <p class="eterna-welcome__greeting-label">God dag</p>
+    <h1 class="eterna-welcome__greeting">Välkommen till ETERNA</h1>
+    <p class="eterna-welcome__lead">
+      Ett öppet svenskt e-arkiv för långsiktigt digitalt bevarande. Byggt på OAIS,
+      E-ARK, FGS, PREMIS och METS.
+    </p>
+    <form class="eterna-welcome__search" action="#search" method="get">
+      <label class="eterna-welcome__search-scope" for="eterna-welcome-scope">
+        <span>I arkivet</span>
+        <select id="eterna-welcome-scope" name="scope">
+          <option value="all">Allt</option>
+          <option value="catalogue">Katalog</option>
+          <option value="deliveries">Leveranser</option>
+        </select>
+      </label>
+      <input class="eterna-welcome__search-input" type="search" name="q"
+             placeholder="Sök i arkivet…" aria-label="Sök" />
+      <button class="btn-eterna-primary" type="submit">Sök</button>
+    </form>
+  </section>
+
+  <div class="eterna-welcome__grid">
+    <section class="eterna-welcome__main">
+      <h2 class="eterna-section-header">Snabbåtgärder</h2>
+      <div class="eterna-actions">
+        <a class="eterna-action" href="#ingest">
+          <span class="eterna-action__icon" aria-hidden="true">↥</span>
+          <span class="eterna-action__title">Lämna in material</span>
+          <span class="eterna-action__desc">Skapa en ny leverans till arkivet</span>
+        </a>
+        <a class="eterna-action" href="#ingest/transfer">
+          <span class="eterna-action__icon" aria-hidden="true">⎘</span>
+          <span class="eterna-action__title">Granska leveranser</span>
+          <span class="eterna-action__desc">Pågående och väntande leveranser</span>
+        </a>
+        <a class="eterna-action" href="#search">
+          <span class="eterna-action__icon" aria-hidden="true">⌕</span>
+          <span class="eterna-action__title">Sök i katalogen</span>
+          <span class="eterna-action__desc">Hitta arkivpaket och beskrivningar</span>
+        </a>
+        <a class="eterna-action" href="#administration">
+          <span class="eterna-action__icon" aria-hidden="true">⚙</span>
+          <span class="eterna-action__title">Administrera åtkomst</span>
+          <span class="eterna-action__desc">Användare, grupper och behörigheter</span>
+        </a>
+      </div>
+
+      <h2 class="eterna-section-header">Senaste händelser</h2>
+      <ul class="eterna-activity">
+        <li class="eterna-activity__item">
+          <span class="eterna-status-dot eterna-status-dot--ok" aria-hidden="true"></span>
+          <div class="eterna-activity__body">
+            <p class="eterna-activity__title">Leverans godkänd</p>
+            <p class="eterna-activity__desc">Arkivpaket från Region Öst validerades utan fel.</p>
+          </div>
+          <span class="eterna-activity__time">—</span>
+        </li>
+        <li class="eterna-activity__item">
+          <span class="eterna-status-dot eterna-status-dot--warn" aria-hidden="true"></span>
+          <div class="eterna-activity__body">
+            <p class="eterna-activity__title">Bevarandejobb väntar</p>
+            <p class="eterna-activity__desc">Formatkontroll avvaktar manuell granskning.</p>
+          </div>
+          <span class="eterna-activity__time">—</span>
+        </li>
+        <li class="eterna-activity__item">
+          <span class="eterna-status-dot eterna-status-dot--err" aria-hidden="true"></span>
+          <div class="eterna-activity__body">
+            <p class="eterna-activity__title">Leverans avvisad</p>
+            <p class="eterna-activity__desc">SIP-paket saknar METS-manifest.</p>
+          </div>
+          <span class="eterna-activity__time">—</span>
+        </li>
+      </ul>
+      <p class="eterna-activity__note">
+        Händelseloggen kopplas upp mot live-data i kommande version.
       </p>
     </section>
 
-    <div class="eterna-welcome__grid">
-      <section class="eterna-welcome__main">
-        <h2 class="eterna-section-header">Information</h2>
-        <div class="eterna-actions">
-          <a class="eterna-action" href="https://github.com/ETERNA-earkiv/ETERNA" target="_blank" rel="noopener noreferrer">
-            <span class="eterna-action__icon" aria-hidden="true">📖</span>
-            <span class="eterna-action__title">Vad är ETERNA?</span>
-            <span class="eterna-action__desc">Läs om systemet, arkitektur och öppen källkod på GitHub</span>
-          </a>
-          <a class="eterna-action" href="mailto:info@whitered.se">
-            <span class="eterna-action__icon" aria-hidden="true">👤</span>
-            <span class="eterna-action__title">Beställa konto</span>
-            <span class="eterna-action__desc">Kontakta WhiteRed för att beställa ett arkivkonto</span>
-          </a>
-          <a class="eterna-action" href="mailto:support@whitered.se">
-            <span class="eterna-action__icon" aria-hidden="true">💬</span>
-            <span class="eterna-action__title">Support och hjälp</span>
-            <span class="eterna-action__desc">Teknisk support och frågor till WhiteRed</span>
-          </a>
-          <a class="eterna-action" href="https://github.com/ETERNA-earkiv/ETERNA" target="_blank" rel="noopener noreferrer">
-            <span class="eterna-action__icon" aria-hidden="true">📋</span>
-            <span class="eterna-action__title">Dokumentation</span>
-            <span class="eterna-action__desc">Handböcker, API-referens och standard­specifikationer</span>
-          </a>
-        </div>
-
-        <h2 class="eterna-section-header">Om systemet</h2>
-        <div class="eterna-card" style="padding:24px 28px; line-height:1.65; color:var(--eterna-slate);">
-          <p style="margin:0 0 12px">
-            <strong>ETERNA</strong> är ett e-arkivsystem för långsiktigt digitalt bevarande, utvecklat av
-            <a href="https://whitered.se" target="_blank" rel="noopener noreferrer" style="color:var(--eterna-red)">WhiteRed</a>
-            som en öppen svensk anpassning av <a href="https://github.com/keeps/roda" target="_blank" rel="noopener noreferrer" style="color:var(--eterna-red)">RODA</a>.
-          </p>
-          <p style="margin:0">
-            Systemet följer internationella standarder för arkivering — OAIS, E-ARK, FGS, PREMIS och METS —
-            och stödjer hela bevarandekedjan från leverans till tillhandahållande.
-          </p>
-        </div>
-      </section>
-
-      <aside class="eterna-welcome__aside">
-        <div class="eterna-card eterna-card--dark">
-          <h3 class="eterna-aside__title">Arkivet uppfyller</h3>
-          <ul class="eterna-standards">
-            <li>OAIS — ISO 14721</li>
-            <li>E-ARK CSIP 2.2</li>
-            <li>FGS 2.1</li>
-            <li>PREMIS 3.0</li>
-            <li>METS 1.12</li>
-            <li>EAD 3</li>
-          </ul>
-        </div>
-        <div class="eterna-card">
-          <h3 class="eterna-aside__title">Kontakta oss</h3>
-          <p style="margin:0; line-height:1.7; font-size:14px; color:var(--eterna-slate)">
-            WhiteRed AB<br>
-            <a href="mailto:info@whitered.se" style="color:var(--eterna-red)">info@whitered.se</a><br>
-            <a href="https://whitered.se" target="_blank" rel="noopener noreferrer" style="color:var(--eterna-red)">whitered.se</a>
-          </p>
-        </div>
-        <div class="eterna-card">
-          <h3 class="eterna-aside__title">Logga in</h3>
-          <p style="margin:0 0 14px; font-size:14px; color:var(--eterna-slate)">
-            Har du ett konto? Logga in för att komma åt arkivet.
-          </p>
-          <a href="#login" class="btn btn-play" style="display:inline-block; text-decoration:none; font-size:14px">Logga in</a>
-        </div>
-      </aside>
-    </div>
-  </div>
-
-  <!-- VY: INLOGGAD -->
-  <div id="eterna-auth" style="display:none">
-    <section class="eterna-welcome__hero">
-      <p class="eterna-welcome__greeting-label">God dag</p>
-      <h1 class="eterna-welcome__greeting">Välkommen till ETERNA</h1>
-      <p class="eterna-welcome__lead">
-        Ett öppet svenskt e-arkiv för långsiktigt digitalt bevarande. Byggt på OAIS,
-        E-ARK, FGS, PREMIS och METS.
-      </p>
-      <form class="eterna-welcome__search" action="#search" method="get">
-        <label class="eterna-welcome__search-scope" for="eterna-welcome-scope">
-          <span>I arkivet</span>
-          <select id="eterna-welcome-scope" name="scope">
-            <option value="all">Allt</option>
-            <option value="catalogue">Katalog</option>
-            <option value="deliveries">Leveranser</option>
-          </select>
-        </label>
-        <input class="eterna-welcome__search-input" type="search" name="q"
-               placeholder="Sök i arkivet…" aria-label="Sök" />
-        <button class="btn-eterna-primary" type="submit">Sök</button>
-      </form>
-    </section>
-
-    <div class="eterna-welcome__grid">
-      <section class="eterna-welcome__main">
-        <h2 class="eterna-section-header">Snabbåtgärder</h2>
-        <div class="eterna-actions">
-          <a class="eterna-action" href="#ingest">
-            <span class="eterna-action__icon" aria-hidden="true">↥</span>
-            <span class="eterna-action__title">Lämna in material</span>
-            <span class="eterna-action__desc">Skapa en ny leverans till arkivet</span>
-          </a>
-          <a class="eterna-action" href="#ingest/transfer">
-            <span class="eterna-action__icon" aria-hidden="true">⎘</span>
-            <span class="eterna-action__title">Granska leveranser</span>
-            <span class="eterna-action__desc">Pågående och väntande leveranser</span>
-          </a>
-          <a class="eterna-action" href="#search">
-            <span class="eterna-action__icon" aria-hidden="true">⌕</span>
-            <span class="eterna-action__title">Sök i katalogen</span>
-            <span class="eterna-action__desc">Hitta arkivpaket och beskrivningar</span>
-          </a>
-          <a class="eterna-action" href="#administration">
-            <span class="eterna-action__icon" aria-hidden="true">⚙</span>
-            <span class="eterna-action__title">Administrera åtkomst</span>
-            <span class="eterna-action__desc">Användare, grupper och behörigheter</span>
-          </a>
-        </div>
-
-        <h2 class="eterna-section-header">Senaste händelser</h2>
-        <ul class="eterna-activity">
-          <li class="eterna-activity__item">
-            <span class="eterna-status-dot eterna-status-dot--ok" aria-hidden="true"></span>
-            <div class="eterna-activity__body">
-              <p class="eterna-activity__title">Leverans godkänd</p>
-              <p class="eterna-activity__desc">Arkivpaket från Region Öst validerades utan fel.</p>
-            </div>
-            <span class="eterna-activity__time">—</span>
-          </li>
-          <li class="eterna-activity__item">
-            <span class="eterna-status-dot eterna-status-dot--warn" aria-hidden="true"></span>
-            <div class="eterna-activity__body">
-              <p class="eterna-activity__title">Bevarandejobb väntar</p>
-              <p class="eterna-activity__desc">Formatkontroll avvaktar manuell granskning.</p>
-            </div>
-            <span class="eterna-activity__time">—</span>
-          </li>
-          <li class="eterna-activity__item">
-            <span class="eterna-status-dot eterna-status-dot--err" aria-hidden="true"></span>
-            <div class="eterna-activity__body">
-              <p class="eterna-activity__title">Leverans avvisad</p>
-              <p class="eterna-activity__desc">SIP-paket saknar METS-manifest.</p>
-            </div>
-            <span class="eterna-activity__time">—</span>
-          </li>
+    <aside class="eterna-welcome__aside">
+      <div class="eterna-card eterna-card--dark">
+        <h3 class="eterna-aside__title">Arkivet i siffror</h3>
+        <dl class="eterna-stats">
+          <div class="eterna-stat">
+            <dt>Arkivpaket (AIP)</dt>
+            <dd>—</dd>
+          </div>
+          <div class="eterna-stat">
+            <dt>Representationer</dt>
+            <dd>—</dd>
+          </div>
+          <div class="eterna-stat">
+            <dt>Filer</dt>
+            <dd>—</dd>
+          </div>
+        </dl>
+      </div>
+      <div class="eterna-card eterna-card--dark">
+        <h3 class="eterna-aside__title">Arkivet uppfyller</h3>
+        <ul class="eterna-standards">
+          <li>OAIS — ISO 14721</li>
+          <li>E-ARK CSIP 2.2</li>
+          <li>FGS 2.1</li>
+          <li>PREMIS 3.0</li>
+          <li>METS 1.12</li>
+          <li>EAD 3</li>
         </ul>
-        <p class="eterna-activity__note">
-          Händelseloggen kopplas upp mot live-data i kommande version.
+      </div>
+      <div class="eterna-card">
+        <h3 class="eterna-aside__title">Dokumentation</h3>
+        <p style="font-size:14px; color:var(--eterna-slate); margin:0">
+          Handböcker, standarder och utvecklardokumentation finns på
+          <a href="https://github.com/ETERNA-earkiv/ETERNA" target="_blank" rel="noopener noreferrer">GitHub</a>.
         </p>
-      </section>
-
-      <aside class="eterna-welcome__aside">
-        <div class="eterna-card eterna-card--dark">
-          <h3 class="eterna-aside__title">Arkivet i siffror</h3>
-          <dl class="eterna-stats">
-            <div class="eterna-stat">
-              <dt>Arkivpaket (AIP)</dt>
-              <dd id="eterna-stat-aips">—</dd>
-            </div>
-            <div class="eterna-stat">
-              <dt>Representationer</dt>
-              <dd id="eterna-stat-reps">—</dd>
-            </div>
-            <div class="eterna-stat">
-              <dt>Filer</dt>
-              <dd id="eterna-stat-files">—</dd>
-            </div>
-          </dl>
-        </div>
-        <div class="eterna-card eterna-card--dark">
-          <h3 class="eterna-aside__title">Arkivet uppfyller</h3>
-          <ul class="eterna-standards">
-            <li>OAIS — ISO 14721</li>
-            <li>E-ARK CSIP 2.2</li>
-            <li>FGS 2.1</li>
-            <li>PREMIS 3.0</li>
-            <li>METS 1.12</li>
-            <li>EAD 3</li>
-          </ul>
-        </div>
-        <div class="eterna-card">
-          <h3 class="eterna-aside__title">Dokumentation</h3>
-          <p style="font-size:14px; color:var(--eterna-slate); margin:0">
-            Handböcker, standarder och utvecklardokumentation finns på
-            <a href="https://github.com/ETERNA-earkiv/ETERNA" target="_blank" rel="noopener noreferrer">GitHub</a>.
-          </p>
-        </div>
-      </aside>
-    </div>
+      </div>
+    </aside>
   </div>
 
 </div>
-
-<script>
-(function () {
-  'use strict';
-
-  var anon = document.getElementById('eterna-anon');
-  var auth = document.getElementById('eterna-auth');
-
-  function showAnon() {
-    if (anon) anon.style.display = 'block';
-    if (auth) auth.style.display = 'none';
-  }
-
-  function showAuth() {
-    if (anon) anon.style.display = 'none';
-    if (auth) auth.style.display = 'block';
-    loadStats();
-  }
-
-  function loadStats() {
-    var body = JSON.stringify({ filter: { rules: [] } });
-    var headers = { 'Content-Type': 'application/json' };
-
-    function count(path) {
-      return fetch(path, { method: 'POST', headers: headers, body: body })
-        .then(function (r) { return r.json(); })
-        .then(function (d) { return d.result >= 0 ? d.result : null; })
-        .catch(function () { return null; });
-    }
-
-    function setStat(id, value) {
-      var el = document.getElementById(id);
-      if (!el) return;
-      if (value !== null) {
-        el.textContent = value.toLocaleString('sv-SE');
-      }
-    }
-
-    Promise.all([
-      count('/api/v2/aips/count'),
-      count('/api/v2/representations/count'),
-      count('/api/v2/files/count')
-    ]).then(function (results) {
-      setStat('eterna-stat-aips',  results[0]);
-      setStat('eterna-stat-reps',  results[1]);
-      setStat('eterna-stat-files', results[2]);
-    });
-  }
-
-  // Auth-detektion: AIP count returnerar -1 för obehöriga, >= 0 för inloggade
-  fetch('/api/v2/aips/count', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ filter: { rules: [] } })
-  })
-    .then(function (r) { return r.json(); })
-    .then(function (data) {
-      if (data.result >= 0) {
-        showAuth();
-      } else {
-        showAnon();
-      }
-    })
-    .catch(function () {
-      showAnon();
-    });
-})();
-</script>

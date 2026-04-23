@@ -13,6 +13,9 @@ package org.roda.wui.client.welcome;
 import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.data.v2.user.User;
+import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.main.Login;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -81,8 +84,24 @@ public class Welcome {
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.isEmpty()) {
-      init();
-      callback.onSuccess(layout);
+      UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<User>() {
+        @Override
+        public void onFailure(Throwable caught) {
+          HistoryUtils.newHistory(Login.RESOLVER);
+          callback.onSuccess(null);
+        }
+
+        @Override
+        public void onSuccess(User user) {
+          if (user.isGuest()) {
+            HistoryUtils.newHistory(Login.RESOLVER);
+            callback.onSuccess(null);
+          } else {
+            init();
+            callback.onSuccess(layout);
+          }
+        }
+      });
     } else {
       HistoryUtils.newHistory(Welcome.RESOLVER);
       callback.onSuccess(null);
