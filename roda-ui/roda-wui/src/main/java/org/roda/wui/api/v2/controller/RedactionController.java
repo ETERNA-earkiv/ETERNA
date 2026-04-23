@@ -48,6 +48,7 @@ public class RedactionController implements RedactionRestService {
           RodaConstants.CONTROLLER_FILE_ID_PARAM, request.getFileId(),
           RodaConstants.CONTROLLER_DETAILS_PARAM, request.getDetails()
         );
+        controllerAssistant.setRelatedObjectId(request.getAipId());
         redactionService.logRedactionStart(requestContext.getUser(), request);
         return null;
       }
