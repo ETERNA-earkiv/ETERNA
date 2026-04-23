@@ -247,12 +247,8 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
   // ACTIONS
     private void redactPdf(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     if (!FileFormatSharedUtils.hasFileFormat(file, FileFormatSharedUtils.MIMETYPE_PDF, FileFormatSharedUtils.EXTENSION_PDF)) {
-      Dialogs.showInformationDialog(
-              messages.alertErrorTitle(),
-              messages.redactPdfInvalidFormatMessage(),// or a more specific key if available
-              messages.dialogOk(),
-              false
-      );
+      Dialogs.showInformationDialog(messages.redactPdfToastTitle(),
+          messages.redactPdfOnlyPdfDialogMessage(), messages.dialogOk(), false);
       callback.onSuccess(ActionImpact.NONE);
       return;
     }
