@@ -7,19 +7,31 @@
       Ett öppet svenskt e-arkiv för långsiktigt digitalt bevarande. Byggt på OAIS,
       E-ARK, FGS, PREMIS och METS.
     </p>
-    <form class="eterna-welcome__search" action="#search" method="get">
-      <label class="eterna-welcome__search-scope" for="eterna-welcome-scope">
+    <div class="eterna-welcome__search" role="search">
+      <div class="eterna-welcome__search-scope">
         <span>I arkivet</span>
-        <select id="eterna-welcome-scope" name="scope">
+        <select id="eterna-welcome-scope">
           <option value="all">Allt</option>
           <option value="catalogue">Katalog</option>
           <option value="deliveries">Leveranser</option>
         </select>
-      </label>
-      <input class="eterna-welcome__search-input" type="search" name="q"
+      </div>
+      <input class="eterna-welcome__search-input" type="search" id="eterna-welcome-q"
              placeholder="Sök i arkivet…" aria-label="Sök" />
-      <button class="btn-eterna-primary" type="submit">Sök</button>
-    </form>
+      <a class="btn-eterna-primary" href="#search" id="eterna-welcome-submit">Sök</a>
+    </div>
+    <script>
+    (function(){
+      var btn = document.getElementById('eterna-welcome-submit');
+      var inp = document.getElementById('eterna-welcome-q');
+      if(btn && inp) {
+        btn.addEventListener('click', function(e){
+          var q = inp.value.trim();
+          if(q) { e.preventDefault(); window.location.hash = 'search?query=' + encodeURIComponent(q); }
+        });
+      }
+    })();
+    </script>
   </section>
 
   <div class="eterna-welcome__grid">

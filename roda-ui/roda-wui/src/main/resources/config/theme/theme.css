@@ -222,14 +222,15 @@ textarea:focus-visible,
   margin: 0 0 28px;
 }
 .eterna-welcome__search {
-  display: flex;
+  display: flex !important;
   gap: 8px;
-  align-items: stretch;
+  align-items: center;
   max-width: 640px;
   border: 1px solid var(--eterna-border);
   border-radius: var(--eterna-radius-md);
   padding: 4px;
   background: var(--eterna-paper);
+  margin-top: 20px;
 }
 .eterna-welcome__search-scope {
   display: inline-flex;
