@@ -35,15 +35,35 @@ public class StartRedactionRequest implements Serializable {
     this.details = details;
   }
 
-  public String getAipId() { return aipId; }
-  public void setAipId(String aipId) { this.aipId = aipId; }
+  public String getAipId() {
+    return aipId;
+  }
 
-  public String getRepresentationId() { return representationId; }
-  public void setRepresentationId(String representationId) { this.representationId = representationId; }
+  public void setAipId(String aipId) {
+    this.aipId = aipId;
+  }
 
-  public String getFileId() { return fileId; }
-  public void setFileId(String fileId) { this.fileId = fileId; }
+  public String getRepresentationId() {
+    return representationId;
+  }
 
-  public String getDetails() { return details; }
-  public void setDetails(String details) { this.details = details; }
+  public void setRepresentationId(String representationId) {
+    this.representationId = representationId;
+  }
+
+  public String getFileId() {
+    return fileId;
+  }
+
+  public void setFileId(String fileId) {
+    this.fileId = fileId;
+  }
+
+  public String getDetails() {
+    return details;
+  }
+
+  public void setDetails(String details) {
+    this.details = details;
+  }
 }
