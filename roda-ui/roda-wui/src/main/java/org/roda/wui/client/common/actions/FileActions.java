@@ -147,6 +147,12 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
   @Override
   public CanActResult contextCanAct(Action<IndexedFile> action, IndexedFile file) {
+    if (FileAction.REDACT_PDF.equals(action)) {
+      boolean canRedact = !file.isDirectory()
+              && FileFormatSharedUtils.hasFileFormat(file, FileFormatSharedUtils.MIMETYPE_PDF, FileFormatSharedUtils.EXTENSION_PDF);
+      return new CanActResult(canRedact, CanActResult.Reason.CONTEXT, messages.reasonCantActOnFileBitstream());
+    }
+
     if (file.isDirectory()) {
       return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_FILE_DIRECTORY.contains(action), CanActResult.Reason.CONTEXT,
         messages.reasonCantActOnFileDirectory());
@@ -610,8 +616,8 @@ public class FileActions extends AbstractActionable<IndexedFile> {
             services.redactionResource(s -> s.logRedactionStart(request))
                 .whenComplete((result, throwable) -> {
                   if (throwable != null) {
-                    Dialogs.showInformationDialog(messages.redactPdfToastTitle(),
-                        messages.alertErrorTitle(), messages.dialogOk(), false);
+                    Dialogs.showInformationDialog(messages.alertErrorTitle(),
+                        messages.redactPdfLogErrorDescription(), messages.dialogOk(), false);
                   } else {
                     HistoryUtils.newHistory(PDFRedactor.RESOLVER,
                         historyItems.toArray(new String[0]));

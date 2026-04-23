@@ -285,8 +285,8 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
             services.redactionResource(s -> s.logRedactionStart(request))
                 .whenComplete((result, throwable) -> {
                   if (throwable != null) {
-                    Dialogs.showInformationDialog(messages.redactPdfToastTitle(),
-                        messages.alertErrorTitle(), messages.dialogOk(), false);
+                    Dialogs.showInformationDialog(messages.alertErrorTitle(),
+                        messages.redactPdfLogErrorDescription(), messages.dialogOk(), false);
                   } else {
                     HistoryUtils.newHistory(PDFRedactor.RESOLVER,
                         historyItems.toArray(new String[0]));

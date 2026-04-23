@@ -493,6 +493,8 @@ public interface ClientMessages extends Messages {
 
   String redactPdfOnlyPdfDialogMessage();
 
+  String redactPdfLogErrorDescription();
+
   String redactPdfReasonTitle();
 
   String redactPdfReasonPlaceholder();
