@@ -246,9 +246,6 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
         return aip.getCreatedOn() != null ? aip.getCreatedOn().toString() : "";
       case "updatedOn":
         return aip.getUpdatedOn() != null ? aip.getUpdatedOn().toString() : "";
-      case "security_level":
-        // RodaConstants.AIP_SECURITY_LEVEL tillkommer när feat/138 mergas
-        return "";
       default:
         return "";
     }
