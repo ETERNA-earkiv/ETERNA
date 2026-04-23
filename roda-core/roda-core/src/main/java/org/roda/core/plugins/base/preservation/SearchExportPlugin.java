@@ -1,15 +1,22 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
 package org.roda.core.plugins.base.preservation;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,9 +64,9 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
 
   private String filterJson = "{\"filterParameters\":[]}";
   private List<String> exportFields = Arrays.asList("uuid", "title", "level", "dateInitial", "dateFinal");
-  private String exportFilename = "export_" + new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+  private String exportFilename = "export_" + LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
 
-  private static final Map<String, PluginParameter> PLUGIN_PARAMETERS = new HashMap<>();
+  private static final Map<String, PluginParameter> PLUGIN_PARAMETERS = new LinkedHashMap<>();
 
   static {
     PLUGIN_PARAMETERS.put(PARAM_FILTER,
@@ -114,7 +121,7 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
     if (parameters.containsKey(PARAM_FILENAME) && parameters.get(PARAM_FILENAME) != null) {
       String fn = parameters.get(PARAM_FILENAME).trim();
       exportFilename = fn.isEmpty()
-        ? "export_" + new SimpleDateFormat("yyyy-MM-dd").format(new Date())
+        ? "export_" + LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
         : fn;
     }
   }
@@ -124,7 +131,7 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
   }
 
   public List<String> getExportFields() {
-    return exportFields;
+    return Collections.unmodifiableList(exportFields);
   }
 
   @Override
