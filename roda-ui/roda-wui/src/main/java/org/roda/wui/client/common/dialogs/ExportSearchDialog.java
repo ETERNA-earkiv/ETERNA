@@ -53,6 +53,7 @@ public class ExportSearchDialog {
   private final List<CheckBox> fieldCheckboxes = new ArrayList<>();
   private final Map<CheckBox, String> checkboxFieldMap = new HashMap<>();
   private Button startButton;
+  private boolean exportInProgress = false;
 
   public ExportSearchDialog(Filter filter, long totalCount, String exportFilename, String configKeyPrefix,
     String exportClass) {
@@ -66,7 +67,7 @@ public class ExportSearchDialog {
     content.addStyleName("export-search-dialog");
 
     // Hit count label
-    Label hitCountLabel = new Label(messages.exportSearchDialogHitCount((int) totalCount));
+    Label hitCountLabel = new Label(messages.exportSearchDialogHitCount(totalCount));
     hitCountLabel.addStyleName("export-search-dialog-hitcount");
     content.add(hitCountLabel);
 
@@ -135,6 +136,12 @@ public class ExportSearchDialog {
   }
 
   private void onStartExport(Filter filter, String exportFilename, String exportClass) {
+    if (exportInProgress) {
+      return;
+    }
+    exportInProgress = true;
+    startButton.setEnabled(false);
+
     // Collect selected fields as comma-separated string
     List<String> selectedFields = new ArrayList<>();
     for (CheckBox cb : fieldCheckboxes) {
@@ -166,6 +173,8 @@ public class ExportSearchDialog {
 
     Services services = new Services("Create export search job", "create");
     services.jobsResource(s -> s.createJob(jobRequest)).whenComplete((job, throwable) -> {
+      exportInProgress = false;
+      startButton.setEnabled(true);
       if (throwable != null) {
         AsyncCallbackUtils.defaultFailureTreatment(throwable);
       } else {

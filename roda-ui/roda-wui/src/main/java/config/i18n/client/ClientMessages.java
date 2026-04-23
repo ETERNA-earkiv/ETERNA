@@ -1994,7 +1994,7 @@ public interface ClientMessages extends Messages {
   String exportSearchDialogTitle();
 
   @DefaultMessage("Your search returned {0} items. All will be exported as CSV.")
-  String exportSearchDialogHitCount(int count);
+  String exportSearchDialogHitCount(long count);
 
   @DefaultMessage("Select fields to include:")
   String exportSearchDialogFieldsLabel();

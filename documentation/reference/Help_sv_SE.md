@@ -25,7 +25,7 @@ Steg-för-steg guider för att använda ETERNA effektivt.
 - **[Vanliga Frågor](usage/FAQ_sv_SE.md)** - Svar på ofta ställda frågor
 - **[README](usage/README.md)** - Övergripande information om ETERNA
 - **[Felsökning](usage/Troubleshooting_sv_SE.md)** - Felsökning
-- **[Exportkonfiguration](administration/Export_Configuration_sv_SE.md)** - Konfigurera fält för export av sökresultat
+- **[Konfigurera fält för export av sökresultat](administration/Export_Configuration_sv_SE.md)** - Konfigurera fält för export av sökresultat
 
 ### Administrationsguider
 Guider för systemadministratörer och ansvariga för arkivet.
