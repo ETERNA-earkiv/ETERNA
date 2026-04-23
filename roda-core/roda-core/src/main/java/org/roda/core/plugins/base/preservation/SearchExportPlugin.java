@@ -34,6 +34,9 @@ import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.jobs.IndexedJob;
+import org.roda.core.data.v2.jobs.IndexedReport;
+import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
@@ -59,12 +62,14 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
   public static final String PARAM_FILTER = "exportFilter";
   public static final String PARAM_FIELDS = "exportFields";
   public static final String PARAM_FILENAME = "exportFilename";
+  public static final String PARAM_CLASS = "exportClass";
 
   private static final String EXPORT_TEMP_FOLDER = "SearchExportCSV";
 
   private String filterJson = "{\"filterParameters\":[]}";
   private List<String> exportFields = Arrays.asList("uuid", "title", "level", "dateInitial", "dateFinal");
   private String exportFilename = "export_" + LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
+  private String exportClass = "org.roda.core.data.v2.ip.IndexedAIP";
 
   private static final Map<String, PluginParameter> PLUGIN_PARAMETERS = new LinkedHashMap<>();
 
@@ -78,6 +83,9 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
     PLUGIN_PARAMETERS.put(PARAM_FILENAME,
       PluginParameter.getBuilder(PARAM_FILENAME, "Export filename (without extension)", PluginParameterType.STRING)
         .withDefaultValue("export").build());
+    PLUGIN_PARAMETERS.put(PARAM_CLASS,
+      PluginParameter.getBuilder(PARAM_CLASS, "Class to export", PluginParameterType.STRING)
+        .withDefaultValue("org.roda.core.data.v2.ip.IndexedAIP").build());
   }
 
   @Override
@@ -123,6 +131,12 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
       exportFilename = fn.isEmpty()
         ? "export_" + LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
         : fn;
+    }
+    if (parameters.containsKey(PARAM_CLASS) && parameters.get(PARAM_CLASS) != null) {
+      String cls = parameters.get(PARAM_CLASS).trim();
+      if (!cls.isEmpty()) {
+        exportClass = cls;
+      }
     }
   }
 
@@ -180,13 +194,43 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
     CSVFormat csvFormat = CSVFormat.DEFAULT.withDelimiter(csvDelimiter.charAt(0)).withRecordSeparator("\n");
 
     try (BufferedWriter writer = Files.newBufferedWriter(csvFile);
-      CSVPrinter printer = new CSVPrinter(writer, csvFormat);
-      IterableIndexResult<IndexedAIP> results = index.findAll(IndexedAIP.class, filter, user, true, exportFields)) {
+      CSVPrinter printer = new CSVPrinter(writer, csvFormat)) {
 
       printer.printRecord(exportFields);
 
-      for (IndexedAIP aip : results) {
-        printer.printRecord(buildCsvRow(aip, exportFields));
+      switch (exportClass) {
+        case "org.roda.core.data.v2.jobs.IndexedJob":
+          try (IterableIndexResult<IndexedJob> results = index.findAll(IndexedJob.class, filter, user, true,
+            exportFields)) {
+            for (IndexedJob job : results) {
+              printer.printRecord(buildCsvRowJob(job, exportFields));
+            }
+          }
+          break;
+        case "org.roda.core.data.v2.jobs.IndexedReport":
+          try (IterableIndexResult<IndexedReport> results = index.findAll(IndexedReport.class, filter, user, true,
+            exportFields)) {
+            for (IndexedReport report : results) {
+              printer.printRecord(buildCsvRowReport(report, exportFields));
+            }
+          }
+          break;
+        case "org.roda.core.data.v2.log.LogEntry":
+          try (IterableIndexResult<LogEntry> results = index.findAll(LogEntry.class, filter, user, true,
+            exportFields)) {
+            for (LogEntry entry : results) {
+              printer.printRecord(buildCsvRowLogEntry(entry, exportFields));
+            }
+          }
+          break;
+        default:
+          try (IterableIndexResult<IndexedAIP> results = index.findAll(IndexedAIP.class, filter, user, true,
+            exportFields)) {
+            for (IndexedAIP aip : results) {
+              printer.printRecord(buildCsvRow(aip, exportFields));
+            }
+          }
+          break;
       }
 
     } catch (IOException | GenericException | RequestNotValidException e) {
@@ -248,6 +292,81 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
         return aip.getUpdatedOn() != null ? aip.getUpdatedOn().toString() : "";
       default:
         return "";
+    }
+  }
+
+  public static List<String> buildCsvRowJob(IndexedJob job, List<String> fields) {
+    List<String> row = new ArrayList<>();
+    for (String field : fields) {
+      row.add(getFieldValueJob(job, field));
+    }
+    return row;
+  }
+
+  private static String getFieldValueJob(IndexedJob job, String field) {
+    if (field == null) return "";
+    switch (field.trim()) {
+      case "id": return nullToEmpty(job.getId());
+      case "name": return nullToEmpty(job.getName());
+      case "username": return nullToEmpty(job.getUsername());
+      case "startDate": return job.getStartDate() != null ? job.getStartDate().toString() : "";
+      case "endDate": return job.getEndDate() != null ? job.getEndDate().toString() : "";
+      case "state": return job.getState() != null ? job.getState().toString() : "";
+      case "priority": return job.getPriority() != null ? job.getPriority().toString() : "";
+      case "pluginType": return job.getPluginType() != null ? job.getPluginType().toString() : "";
+      case "plugin": return nullToEmpty(job.getPlugin());
+      default: return "";
+    }
+  }
+
+  public static List<String> buildCsvRowReport(IndexedReport report, List<String> fields) {
+    List<String> row = new ArrayList<>();
+    for (String field : fields) {
+      row.add(getFieldValueReport(report, field));
+    }
+    return row;
+  }
+
+  private static String getFieldValueReport(IndexedReport report, String field) {
+    if (field == null) return "";
+    switch (field.trim()) {
+      case "id": return nullToEmpty(report.getId());
+      case "jobId": return nullToEmpty(report.getJobId());
+      case "jobName": return nullToEmpty(report.getJobName());
+      case "sourceObjectId": return nullToEmpty(report.getSourceObjectId());
+      case "sourceObjectOriginalName": return nullToEmpty(report.getSourceObjectOriginalName());
+      case "outcomeObjectId": return nullToEmpty(report.getOutcomeObjectId());
+      case "pluginState": return report.getPluginState() != null ? report.getPluginState().toString() : "";
+      case "dateCreated": return report.getDateCreated() != null ? report.getDateCreated().toString() : "";
+      case "dateUpdated": return report.getDateUpdated() != null ? report.getDateUpdated().toString() : "";
+      case "pluginDetails": return nullToEmpty(report.getPluginDetails());
+      case "plugin": return nullToEmpty(report.getPlugin());
+      case "pluginName": return nullToEmpty(report.getPluginName());
+      default: return "";
+    }
+  }
+
+  public static List<String> buildCsvRowLogEntry(LogEntry entry, List<String> fields) {
+    List<String> row = new ArrayList<>();
+    for (String field : fields) {
+      row.add(getFieldValueLogEntry(entry, field));
+    }
+    return row;
+  }
+
+  private static String getFieldValueLogEntry(LogEntry entry, String field) {
+    if (field == null) return "";
+    switch (field.trim()) {
+      case "uuid": return nullToEmpty(entry.getUUID());
+      case "datetime": return entry.getDatetime() != null ? entry.getDatetime().toString() : "";
+      case "username": return nullToEmpty(entry.getUsername());
+      case "actionComponent": return nullToEmpty(entry.getActionComponent());
+      case "actionMethod": return nullToEmpty(entry.getActionMethod());
+      case "address": return nullToEmpty(entry.getAddress());
+      case "relatedObjectID": return nullToEmpty(entry.getRelatedObjectID());
+      case "duration": return String.valueOf(entry.getDuration());
+      case "state": return entry.getState() != null ? entry.getState().toString() : "";
+      default: return "";
     }
   }
 

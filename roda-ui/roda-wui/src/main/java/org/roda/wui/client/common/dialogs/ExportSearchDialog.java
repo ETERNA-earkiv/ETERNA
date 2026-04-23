@@ -47,16 +47,15 @@ public class ExportSearchDialog {
   private static final String PARAM_FILTER = "exportFilter";
   private static final String PARAM_FIELDS = "exportFields";
   private static final String PARAM_FILENAME = "exportFilename";
-
-  private static final List<String> DEFAULT_CHECKED_FIELDS = Arrays.asList("uuid", "title", "level", "dateInitial",
-    "dateFinal");
+  private static final String PARAM_CLASS = "exportClass";
 
   private final DialogBox dialogBox;
   private final List<CheckBox> fieldCheckboxes = new ArrayList<>();
   private final Map<CheckBox, String> checkboxFieldMap = new HashMap<>();
   private Button startButton;
 
-  public ExportSearchDialog(Filter filter, long totalCount, String exportFilename) {
+  public ExportSearchDialog(Filter filter, long totalCount, String exportFilename, String configKeyPrefix,
+    String exportClass) {
     dialogBox = new DialogBox(false, true);
     dialogBox.setText(messages.exportSearchDialogTitle());
     dialogBox.setGlassEnabled(true);
@@ -80,7 +79,12 @@ public class ExportSearchDialog {
     FlowPanel fieldsPanel = new FlowPanel();
     fieldsPanel.addStyleName("export-search-dialog-fields");
 
-    String fieldsConfig = ConfigurationManager.getString("ui.export.aip.fields");
+    String defaultCheckedConfig = ConfigurationManager.getString(configKeyPrefix + ".defaultCheckedFields");
+    List<String> defaultCheckedFields = (defaultCheckedConfig != null && !defaultCheckedConfig.trim().isEmpty())
+      ? Arrays.asList(defaultCheckedConfig.split(","))
+      : Arrays.asList("uuid");
+
+    String fieldsConfig = ConfigurationManager.getString(configKeyPrefix + ".fields");
     if (fieldsConfig != null && !fieldsConfig.trim().isEmpty()) {
       String[] fields = fieldsConfig.split(",");
       for (String rawField : fields) {
@@ -88,9 +92,10 @@ public class ExportSearchDialog {
         if (field.isEmpty()) {
           continue;
         }
-        String labelText = ConfigurationManager.getStringWithDefault(field, "ui.export.aip.fields." + field + ".label");
+        String labelText = ConfigurationManager.getStringWithDefault(field,
+          configKeyPrefix + ".fields." + field + ".label");
         CheckBox cb = new CheckBox(labelText);
-        cb.setValue(DEFAULT_CHECKED_FIELDS.contains(field));
+        cb.setValue(defaultCheckedFields.contains(field));
         cb.addValueChangeHandler(event -> updateStartButtonState());
         fieldCheckboxes.add(cb);
         checkboxFieldMap.put(cb, field);
@@ -105,7 +110,7 @@ public class ExportSearchDialog {
 
     startButton = new Button(messages.exportSearchDialogStartButton());
     startButton.addStyleName("btn btn-primary");
-    startButton.addClickHandler(event -> onStartExport(filter, exportFilename));
+    startButton.addClickHandler(event -> onStartExport(filter, exportFilename, exportClass));
     updateStartButtonState();
     buttonsPanel.add(startButton);
 
@@ -129,7 +134,7 @@ public class ExportSearchDialog {
     startButton.setEnabled(anySelected);
   }
 
-  private void onStartExport(Filter filter, String exportFilename) {
+  private void onStartExport(Filter filter, String exportFilename, String exportClass) {
     // Collect selected fields as comma-separated string
     List<String> selectedFields = new ArrayList<>();
     for (CheckBox cb : fieldCheckboxes) {
@@ -148,6 +153,7 @@ public class ExportSearchDialog {
     pluginParameters.put(PARAM_FILTER, filterJson);
     pluginParameters.put(PARAM_FIELDS, fieldsParam);
     pluginParameters.put(PARAM_FILENAME, exportFilename);
+    pluginParameters.put(PARAM_CLASS, exportClass);
 
     CreateJobRequest jobRequest = new CreateJobRequest();
     jobRequest.setName(messages.exportSearchDialogTitle());

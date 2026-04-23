@@ -36,6 +36,7 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
@@ -394,9 +395,26 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     toggleFacetsPanel(createAndBindFacets(facetsPanel));
 
     csvDownloadButton.addClickHandler(event -> {
-      if (IndexedAIP.class.equals(getClassToReturn())) {
+      Class<?> clazz = getClassToReturn();
+      String configKeyPrefix = null;
+      String exportClass = null;
+      if (IndexedAIP.class.equals(clazz)) {
+        configKeyPrefix = "ui.export.aip";
+        exportClass = "org.roda.core.data.v2.ip.IndexedAIP";
+      } else if (IndexedJob.class.equals(clazz)) {
+        configKeyPrefix = "ui.export.job";
+        exportClass = "org.roda.core.data.v2.jobs.IndexedJob";
+      } else if (IndexedReport.class.equals(clazz)) {
+        configKeyPrefix = "ui.export.report";
+        exportClass = "org.roda.core.data.v2.jobs.IndexedReport";
+      } else if (LogEntry.class.equals(clazz)) {
+        configKeyPrefix = "ui.export.logentry";
+        exportClass = "org.roda.core.data.v2.log.LogEntry";
+      }
+      if (configKeyPrefix != null) {
         long total = (getResult() != null && getResult().getTotalCount() > 0) ? getResult().getTotalCount() : 0;
-        ExportSearchDialog dialog = new ExportSearchDialog(getFilter(), total, notNullSummary);
+        ExportSearchDialog dialog = new ExportSearchDialog(getFilter(), total, notNullSummary, configKeyPrefix,
+          exportClass);
         dialog.show();
       } else {
         Services services = new Services("Retrieve export limit", "get");
