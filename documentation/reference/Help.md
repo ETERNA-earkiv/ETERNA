@@ -25,6 +25,7 @@ Step-by-step guides for using ETERNA effectively.
 - **[Troubleshooting](usage/Troubleshooting.md)** - Solutions to common problems
 - **[FAQ](usage/FAQ.md)** - Answers to frequently asked questions
 - **[README](usage/README.md)** - General information about ETERNA
+- **[Export Configuration](administration/Export_Configuration.md)** - How to configure fields for search result export
 
 ### Administration Guides
 Guides for system administrators and archive managers.
@@ -35,7 +36,6 @@ Guides for system administrators and archive managers.
 - **[Disposal](administration/Disposal.md)** - Processes for data management
 - **[Permissions](administration/Permissions.md)** - Managing user permissions
 - **[Risk Assessment](administration/Risk_Assessment.md)** - Evaluation of archiving risks
-- **[Export Configuration](administration/Export_Configuration.md)** - Configuring fields for search result export
 
 ### Developer Resources
 Documentation for developers who want to contribute to or extend ETERNA.
