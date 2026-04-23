@@ -69,7 +69,7 @@ ui.export.aip.fields=uuid,title,level,dateInitial,dateFinal,parentId,ingestSIPId
 ui.export.aip.fields.my_custom_field.label=My Custom Field
 ```
 
-**Step 3** — restart RODA (or reload the configuration if hot-reload is supported).
+**Step 3** — restart ETERNA (or reload the configuration if hot-reload is supported).
 
 The new field will now appear in the export dialog as an unchecked option.
 

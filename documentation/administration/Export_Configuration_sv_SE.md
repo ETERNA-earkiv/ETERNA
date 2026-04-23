@@ -69,7 +69,7 @@ ui.export.aip.fields=uuid,title,level,dateInitial,dateFinal,parentId,ingestSIPId
 ui.export.aip.fields.mitt_eget_falt.label=Mitt eget fält
 ```
 
-**Steg 3** — starta om RODA (eller ladda om konfigurationen om hot-reload stöds).
+**Steg 3** — starta om ETERNA (eller ladda om konfigurationen om hot-reload stöds).
 
 Det nya fältet visas nu i exportdialogen som ett avkryssat alternativ.
 
