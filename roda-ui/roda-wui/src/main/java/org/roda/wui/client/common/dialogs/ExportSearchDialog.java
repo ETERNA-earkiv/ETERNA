@@ -155,6 +155,8 @@ public class ExportSearchDialog {
     jobRequest.setPluginParameters(pluginParameters);
     jobRequest.setSourceObjects(new SelectedItemsNoneRequest());
     jobRequest.setSourceObjectsClass("org.roda.core.data.v2.Void");
+    jobRequest.setPriority("MEDIUM");
+    jobRequest.setParallelism("NORMAL");
 
     Services services = new Services("Create export search job", "create");
     services.jobsResource(s -> s.createJob(jobRequest)).whenComplete((job, throwable) -> {
