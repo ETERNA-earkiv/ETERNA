@@ -146,8 +146,13 @@ textarea:focus-visible,
 }
 
 /* === ETERNA banner lockup === */
+/* Fix: centrera logotyp + text vertikalt i headerfältet */
+.bannerLogoContainer {
+  align-items: center !important;
+  padding: 0 0 0 20px !important;
+}
 .eterna-banner {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 12px;
 }
@@ -576,6 +581,93 @@ textarea:focus-visible,
 .eterna-empty__desc {
   font-size: 14px;
   margin: 0;
+}
+
+/* === ETERNA responsiv layout (facelift 2026-04) === */
+
+/* Tablet: ≤ 900px */
+@media (max-width: 900px) {
+  .eterna-welcome {
+    padding: 32px 24px 56px;
+  }
+  .eterna-welcome__search {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .eterna-footer {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 24px;
+  }
+}
+
+/* Mobil: ≤ 600px */
+@media (max-width: 600px) {
+  .eterna-welcome {
+    padding: 20px 16px 40px;
+  }
+  .eterna-welcome__greeting-label {
+    font-size: 11px;
+  }
+  .eterna-welcome__greeting {
+    font-size: clamp(1.6rem, 7vw, 2.8rem);
+  }
+  .eterna-welcome__lead {
+    font-size: 14px;
+  }
+  .eterna-welcome__search {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .eterna-welcome__search-scope {
+    width: 100%;
+    border-right: 1px solid var(--eterna-border);
+    border-radius: 4px 4px 0 0;
+    border-bottom: none;
+    padding: 10px 12px;
+  }
+  .eterna-welcome__search-input {
+    border-radius: 0;
+    border-top: none;
+    padding: 10px 12px;
+  }
+  .btn-eterna-primary {
+    border-radius: 0 0 4px 4px;
+    width: 100%;
+    padding: 10px;
+  }
+  .eterna-footer {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+    padding: 12px 16px;
+    font-size: 12px;
+  }
+  .eterna-footer__left,
+  .eterna-footer__right {
+    width: 100%;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .eterna-error {
+    padding: 40px 20px;
+    margin: 40px auto;
+  }
+  .eterna-error__code { font-size: 48px; }
+  .eterna-error__title { font-size: 22px; }
+  .eterna-login__form-side { padding: 40px 28px; }
+  .eterna-login__brand-side { padding: 40px 28px; }
+  .eterna-login__tagline { font-size: 26px; }
+  .eterna-login__logo { width: 180px; }
+}
+
+/* Mycket litet: ≤ 400px */
+@media (max-width: 400px) {
+  .eterna-banner__byline { display: none; }
+  .eterna-welcome__greeting { font-size: 1.5rem; }
+  .eterna-section-header { font-size: 13px; }
 }
 
 /* === ETERNA section header === */
