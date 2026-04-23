@@ -73,17 +73,6 @@ ui.export.aip.fields.my_custom_field.label=My Custom Field
 
 The new field will now appear in the export dialog as an unchecked option.
 
-### Example: Adding a custom security level field
-
-If your installation indexes a field called `security_level` on `IndexedAIP`, add:
-
-```properties
-ui.export.aip.fields=uuid,title,level,dateInitial,dateFinal,parentId,ingestSIPIds,createdOn,updatedOn,security_level
-
-ui.export.aip.fields.security_level.label=Security Level
-```
-
-You also need to add a handler for the field in `SearchExportPlugin.getFieldValue()` in the backend, otherwise the field will export as an empty string. Contact a developer to add support for new custom fields in the plugin.
 
 ## Changing the Default Checked Fields
 

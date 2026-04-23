@@ -73,17 +73,6 @@ ui.export.aip.fields.mitt_eget_falt.label=Mitt eget fält
 
 Det nya fältet visas nu i exportdialogen som ett avkryssat alternativ.
 
-### Exempel: Lägga till ett sekretessnivå-fält
-
-Om din installation indexerar ett fält som heter `security_level` på `IndexedAIP`, lägg till:
-
-```properties
-ui.export.aip.fields=uuid,title,level,dateInitial,dateFinal,parentId,ingestSIPIds,createdOn,updatedOn,security_level
-
-ui.export.aip.fields.security_level.label=Sekretessnivå
-```
-
-Du behöver även lägga till en hanterare för fältet i `SearchExportPlugin.getFieldValue()` i backend, annars exporteras fältet som en tom sträng. Kontakta en utvecklare för att lägga till stöd för nya egna fält i plugin-modulen.
 
 ## Ändra vilka fält som är förkryssade som standard
 
