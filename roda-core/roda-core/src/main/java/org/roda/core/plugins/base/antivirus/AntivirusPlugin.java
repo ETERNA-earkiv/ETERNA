@@ -245,17 +245,17 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Scanned package for malicious programs using ClamAV.";
+    return "Sökte igenom paketet efter skadliga program med ClamAV.";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "The package does not contain any known malicious programs.";
+    return "Paketet innehåller inga kända skadliga program.";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "A malicious program was detected inside the package.";
+    return "Ett skadligt program hittades i paketet.";
   }
 
   @Override

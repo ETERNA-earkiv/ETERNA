@@ -59,7 +59,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class EARKSIP2ToAIPPlugin extends SIPToAIPPlugin {
-  public static final String UNPACK_DESCRIPTION = "Extracted objects from package in E-ARK SIP 2 format.";
+  public static final String UNPACK_DESCRIPTION = "Extraherade objekt från paket i E-ARK SIP 2-format.";
   private static final Logger LOGGER = LoggerFactory.getLogger(EARKSIP2ToAIPPlugin.class);
   private boolean createSubmission = false;
 
