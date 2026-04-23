@@ -642,7 +642,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
       "fileRemoveButton");
 
     // REDACTION
-    managementGroup.addButton(messages.redactPdfButton(), FileAction.REDACT_PDF, ActionImpact.UPDATED, "btn-eraser", "fileRedactButton");
+    managementGroup.addButton(messages.redactPdfButton(), FileAction.REDACT_PDF, ActionImpact.NONE, "btn-eraser", "fileRedactButton");
 
     // PRESERVATION
     ActionableGroup<IndexedFile> preservationGroup = new ActionableGroup<>(messages.preservationTitle());
