@@ -16,6 +16,7 @@ import java.util.Map;
 import org.roda.core.data.v2.generics.select.SelectedItemsNoneRequest;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.jobs.CreateJobRequest;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.widgets.Toast;
@@ -52,12 +53,15 @@ public class ExportSearchDialog {
 
   private final DialogBox dialogBox;
   private final List<CheckBox> fieldCheckboxes = new ArrayList<>();
+  private final Map<CheckBox, String> checkboxFieldMap = new HashMap<>();
   private Button startButton;
 
   public ExportSearchDialog(Filter filter, long totalCount, String exportFilename) {
     dialogBox = new DialogBox(false, true);
     dialogBox.setText(messages.exportSearchDialogTitle());
     dialogBox.setGlassEnabled(true);
+    dialogBox.setAnimationEnabled(false);
+    dialogBox.addStyleName("wui-dialog-information");
 
     FlowPanel content = new FlowPanel();
     content.addStyleName("export-search-dialog");
@@ -87,9 +91,9 @@ public class ExportSearchDialog {
         String labelText = ConfigurationManager.getStringWithDefault(field, "ui.export.aip.fields." + field + ".label");
         CheckBox cb = new CheckBox(labelText);
         cb.setValue(DEFAULT_CHECKED_FIELDS.contains(field));
-        cb.getElement().setPropertyString("data-field", field);
         cb.addValueChangeHandler(event -> updateStartButtonState());
         fieldCheckboxes.add(cb);
+        checkboxFieldMap.put(cb, field);
         fieldsPanel.add(cb);
       }
     }
@@ -130,7 +134,7 @@ public class ExportSearchDialog {
     List<String> selectedFields = new ArrayList<>();
     for (CheckBox cb : fieldCheckboxes) {
       if (Boolean.TRUE.equals(cb.getValue())) {
-        selectedFields.add(cb.getElement().getPropertyString("data-field"));
+        selectedFields.add(checkboxFieldMap.get(cb));
       }
     }
     String fieldsParam = String.join(",", selectedFields);
@@ -155,7 +159,7 @@ public class ExportSearchDialog {
     Services services = new Services("Create export search job", "create");
     services.jobsResource(s -> s.createJob(jobRequest)).whenComplete((job, throwable) -> {
       if (throwable != null) {
-        Toast.showError(messages.exportSearchDialogTitle(), throwable.getMessage());
+        AsyncCallbackUtils.defaultFailureTreatment(throwable);
       } else {
         Toast.showInfo(messages.exportListTitle(), messages.exportSearchJobStarted());
         dialogBox.hide();
