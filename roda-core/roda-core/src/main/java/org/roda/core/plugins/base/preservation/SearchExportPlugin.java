@@ -36,9 +36,9 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.IndexedReport;
-import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -101,7 +101,7 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getDescription() {
-    return "Exports AIP search results to a CSV file. The result is available as a job attachment in Internal Actions.";
+    return "Exports search results to a CSV file. Supports AIP, job, report, and log entry lists. The result is available as a job attachment in Internal Actions.";
   }
 
   @Override
