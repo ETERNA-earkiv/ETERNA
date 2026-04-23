@@ -35,6 +35,7 @@ Guides for system administrators and archive managers.
 - **[Disposal](administration/Disposal.md)** - Processes for data management
 - **[Permissions](administration/Permissions.md)** - Managing user permissions
 - **[Risk Assessment](administration/Risk_Assessment.md)** - Evaluation of archiving risks
+- **[Export Configuration](administration/Export_Configuration.md)** - Configuring fields for search result export
 
 ### Developer Resources
 Documentation for developers who want to contribute to or extend ETERNA.
