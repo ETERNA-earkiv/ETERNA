@@ -145,6 +145,19 @@ textarea:focus-visible,
   border-radius: var(--eterna-radius-sm);
 }
 
+/* Undvik oönskad fokus-ring på GWT:s navigationsmenyraden
+   (AcessibleMenuBar sätter tabindex för tangentbordsnavigering) */
+.bannerHeader .gwt-MenuBar,
+.bannerHeader .gwt-MenuBar:focus,
+.bannerHeader .gwt-MenuBar:focus-visible,
+.bannerHeader table,
+.bannerHeader table:focus,
+.bannerHeader table:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
 /* === ETERNA banner lockup === */
 /* Fix: centrera logotyp + text vertikalt i headerfältet */
 .bannerLogoContainer {
