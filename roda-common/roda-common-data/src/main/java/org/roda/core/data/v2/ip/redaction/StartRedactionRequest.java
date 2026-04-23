@@ -1,12 +1,23 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
 package org.roda.core.data.v2.ip.redaction;
 
 import java.io.Serial;
 import java.io.Serializable;
 
+/**
+ * @author Miguel Guimarães <mguimaraes@keep.pt>
+ */
+
 public class StartRedactionRequest implements Serializable {
 
   @Serial
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 4891623758294756821L;
 
   private String aipId;
   private String representationId;
@@ -14,6 +25,7 @@ public class StartRedactionRequest implements Serializable {
   private String details;
 
   public StartRedactionRequest() {
+    // empty constructor
   }
 
   public StartRedactionRequest(String aipId, String representationId, String fileId, String details) {
