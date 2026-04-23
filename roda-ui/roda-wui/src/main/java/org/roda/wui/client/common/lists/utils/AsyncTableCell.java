@@ -46,6 +46,7 @@ import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.pagination.ListSelectionState;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
+import org.roda.wui.client.common.dialogs.ExportSearchDialog;
 import org.roda.wui.client.common.popup.CalloutPopup;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
@@ -393,18 +394,24 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     toggleFacetsPanel(createAndBindFacets(facetsPanel));
 
     csvDownloadButton.addClickHandler(event -> {
-      Services services = new Services("Retrieve export limit", "get");
-      services.configurationsResource(ConfigurationRestService::retrieveExportLimit)
-        .whenComplete((limit, throwable) -> {
-          if (throwable != null) {
-            AsyncCallbackUtils.defaultFailureTreatment(throwable);
-          } else {
-            Toast.showInfo(messages.exportListTitle(), messages.exportListMessage(limit.getResult().intValue()));
-            RestUtils.requestCSVExport(getClassToReturn(), getFilter(), dataProvider.getSorter(),
-              new Sublist(0, limit.getResult().intValue()), getFacets(), getJustActive(), false,
-              notNullSummary + ".csv");
-          }
-        });
+      if (IndexedAIP.class.equals(getClassToReturn())) {
+        long total = (getResult() != null && getResult().getTotalCount() > 0) ? getResult().getTotalCount() : 0;
+        ExportSearchDialog dialog = new ExportSearchDialog(getFilter(), total, notNullSummary);
+        dialog.show();
+      } else {
+        Services services = new Services("Retrieve export limit", "get");
+        services.configurationsResource(ConfigurationRestService::retrieveExportLimit)
+          .whenComplete((limit, throwable) -> {
+            if (throwable != null) {
+              AsyncCallbackUtils.defaultFailureTreatment(throwable);
+            } else {
+              Toast.showInfo(messages.exportListTitle(), messages.exportListMessage(limit.getResult().intValue()));
+              RestUtils.requestCSVExport(getClassToReturn(), getFilter(), dataProvider.getSorter(),
+                new Sublist(0, limit.getResult().intValue()), getFacets(), getJustActive(), false,
+                notNullSummary + ".csv");
+            }
+          });
+      }
     });
 
     selectionModel = new SingleSelectionModel<>(getKeyProvider());
