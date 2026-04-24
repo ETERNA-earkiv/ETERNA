@@ -44,7 +44,7 @@ import java.util.List;
 
 public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(VerifyUserAuthorizationPlugin.class);
-  private static final String PARENT_AIP_NOT_FOUND = "AIP:ets överordnade objekt hittades inte";
+  private static final String PARENT_AIP_NOT_FOUND = "Föräldern till AIP:et hittades inte";
 
   private static final List<String> userFieldsToReturn = Arrays.asList(RodaConstants.MEMBERS_GROUPS,
     RodaConstants.MEMBERS_ID);
@@ -71,7 +71,7 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticDescription() {
-    return "Kontrollerar om användaren har tillräckliga behörigheter för att placera AIP:et under önskad nod i klassificeringsschemat.";
+    return "Kontrollerar om användaren har tillräckliga behörigheter för att placera AIP:et under den önskade noden i klassificeringssystemet.";
   }
 
   @Override
@@ -104,12 +104,12 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
 
     reportItem.setPluginState(PluginState.SUCCESS)
-      .setPluginDetails(String.format("Användarbehörighet för AIP %s har kontrollerats", aip.getId()));
+      .setPluginDetails(String.format("Done with checking user authorization for AIP %s", aip.getId()));
 
     if (cachedJob != null) {
       processAIPPermissions(index, cachedJob, aip, reportItem);
     } else {
-      reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Kunde inte fastställa jobb.");
+      reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Unable to determine Job.");
     }
 
     try {
@@ -149,7 +149,7 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
         } catch (AuthorizationDeniedException e) {
           LOGGER.debug("User '{}' doesn't have CREATE permission on parent... Error...", jobCreatorUsername);
           reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(
-            "Användaren " + jobCreatorUsername + " saknar behörighet att skapa under AIP " + aip.getId());
+            "The user " + jobCreatorUsername + " doesn't have permission to create under AIP " + aip.getId());
         }
       } else {
         RODAMember member = index.retrieve(RODAMember.class, IdUtils.getUserId(jobCreatorUsername),
@@ -158,7 +158,7 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
           LOGGER.debug("User have CREATE_TOP_LEVEL_AIP_PERMISSION permission.");
         } else {
           reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(
-            "Användaren " + jobCreatorUsername + " saknar behörigheten CREATE_TOP_LEVEL_AIP_PERMISSION");
+            "The user " + jobCreatorUsername + " doesn't have CREATE_TOP_LEVEL_AIP_PERMISSION permission");
           LOGGER.debug("User doesn't have CREATE_TOP_LEVEL_AIP_PERMISSION permission...");
         }
       }
@@ -190,11 +190,10 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    String description = "Användarens behörigheter har kontrollerats för att säkerställa att användaren har tillräcklig behörighet att lagra AIP:et under önskad "
-      + "nod i klassificeringsschemat.";
+    String description = "Användarbehörigheter har kontrollerats för att säkerställa att användaren har tillräcklig behörighet att lagra AIP:et under den önskade noden i klassificeringssystemet.";
 
     if (hasFreeAccess) {
-      description += " Gruppen användare fick läsbehörighet enligt den beskrivande metadatan.";
+      description += " Läsbehörighet gavs till användargruppen enligt beskrivande metadata.";
     }
 
     return description;
@@ -202,12 +201,12 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Användaren har tillräcklig behörighet för att deponera AIP:et under angiven nod i klassificeringsschemat";
+    return "Användaren har tillräckliga behörigheter för att deponera AIP:et under den angivna noden i klassificeringssystemet.";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Användaren saknar tillräcklig behörighet för att deponera AIP:et under angiven nod i klassificeringsschemat";
+    return "Användaren har inte tillräckliga behörigheter för att deponera AIP:et under den angivna noden i klassificeringssystemet.";
   }
 
   @Override

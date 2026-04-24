@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 
 public class BagitToAIPPlugin extends SIPToAIPPlugin {
   private static final Logger LOGGER = LoggerFactory.getLogger(BagitToAIPPlugin.class);
-  private static final String UNPACK_DESCRIPTION = "Extracted objects from package in BagIt format.";
+  private static final String UNPACK_DESCRIPTION = "Extraherade objekt från paketet i BagIt-format.";
   private static final String METADATA_FILE = "metadata.xml";
 
   private boolean createSubmission = false;
@@ -64,7 +64,7 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
 
   @Override
   public String getDescription() {
-    return "BagIt as a zip file";
+    return "BagIt som en zip-fil";
   }
 
   @Override

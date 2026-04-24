@@ -43,12 +43,12 @@ public class CleanUnfinishedJobsPlugin extends AbstractPlugin<Job> {
 
   @Override
   public String getName() {
-    return "Clean unfinished jobs";
+    return "Rensa oavslutade jobb";
   }
 
   @Override
   public String getDescription() {
-    return "Cleans unfinished jobs (and the data they have created)";
+    return "Rensar oavslutade jobb (och data de har skapat)";
   }
 
   @Override

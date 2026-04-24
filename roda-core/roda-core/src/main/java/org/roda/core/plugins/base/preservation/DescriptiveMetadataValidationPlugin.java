@@ -51,7 +51,7 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
         PluginParameterType.BOOLEAN)
       .withDefaultValue("true")
       .withDescription(
-        "Om aktiverad kontrollerar åtgärden om den beskrivande metadatan är giltig enligt de scheman som är installerade i arkivet.")
+        "Om sant kontrollerar åtgärden om den beskrivande metadatan är giltig enligt de scheman som är installerade i arkivet.")
       .build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_TYPE, PluginParameter
@@ -59,7 +59,7 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
         PluginParameterType.STRING)
       .isMandatory(false)
       .withDescription(
-        "Format för beskrivande metadata som används som reserv om informationspaketet inte anger metadataformat eller om åtgärden är inställd på FORCE.")
+        "Format för beskrivande metadata som används som reserv om informationspaketet inte anger metadataformatet eller om åtgärden är inställd på TVINGA.")
       .build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_VERSION, PluginParameter
@@ -67,7 +67,7 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
         PluginParameterType.STRING)
       .isMandatory(false)
       .withDescription(
-        "Version av beskrivande metadata som används som reserv om informationspaketet inte anger metadataversion eller om åtgärden är inställd på FORCE.")
+        "Version av beskrivande metadata som används som reserv om informationspaketet inte anger metadataversionen eller om åtgärden är inställd på TVINGA.")
       .build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_FORCE_TYPE, PluginParameter
@@ -75,7 +75,7 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
         PluginParameterType.BOOLEAN)
       .withDefaultValue("false")
       .withDescription(
-        "Om aktiverad åsidosätts metadataformat och version från informationspaketet och de format och versioner som anges som parametrar används istället (se ovan).")
+        "Om sant, förbigås metadataformatet och versionen som anges i informationspaketet och metadataformatet och versionen som anges som parametrar används istället (se ovan).")
       .build());
   }
 
@@ -91,8 +91,8 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticDescription() {
-    return "Kontrollerar om den beskrivande metadata som ingår i informationspaketet finns och om den är giltig enligt de XML-scheman som är installerade i arkivet. "
-      + "En valideringsrapport skapas som anger vilka informationspaket som har giltig respektive ogiltig metadata.";
+    return "Kontrollerar om den beskrivande metadata som ingår i informationspaketet finns och om den är giltig enligt de "
+      + "XML-scheman som är installerade i arkivet. En valideringsrapport genereras som anger vilka informationspaket som har giltig respektive ogiltig metadata.";
   }
 
   @Override
@@ -234,24 +234,24 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Kontrollerade om den beskrivande metadatan finns i SIP:et och om den är giltig enligt fastställd policy.";
+    return "Checked whether the descriptive metadata is included in the SIP and if this metadata is valid according to the established policy.";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return addSchemaToBuilder("Beskrivande metadata är välformad och fullständig.");
+    return addSchemaToBuilder("Descriptive metadata is well formed and complete.");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
     return addSchemaToBuilder(
-      "Beskrivande metadata var inte välformad eller uppfyllde inte den fastställda inleveranspolicyn.");
+      "Descriptive metadata was not well formed or failed to meet the established ingest policy.");
   }
 
   private String addSchemaToBuilder(String eventMessage) {
     if (!schemasInfo.isEmpty()) {
       StringBuilder builder = new StringBuilder(eventMessage);
-      builder.append("\nScheman som användes vid validering: ");
+      builder.append("\nSchemas used on validation: ");
 
       Pair<String, String> firstSchema = schemasInfo.get(0);
       builder.append(firstSchema.getFirst());

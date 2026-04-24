@@ -60,15 +60,13 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Clear indexes", PluginParameterType.BOOLEAN)
-        .withDefaultValue("false").isMandatory(false).withDescription("Clear all indexes before reindexing them.")
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Rensa index", PluginParameterType.BOOLEAN)
+        .withDefaultValue("false").isMandatory(false).withDescription("Rensar alla index innan återindexering.")
         .build());
 
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES,
-      PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES, "Optimize indexes", PluginParameterType.BOOLEAN)
-        .withDefaultValue("true").isMandatory(false).withDescription("Optimize indexes after reindexing them.")
-        .build());
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES, PluginParameter
+      .getBuilder(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES, "Optimera index", PluginParameterType.BOOLEAN)
+      .withDefaultValue("true").isMandatory(false).withDescription("Optimerar index efter återindexering.").build());
   }
 
   @Override
@@ -86,8 +84,8 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
 
   @Override
   public String getDescription() {
-    return "Rebuild indexed information from data kept in storage. All indexes can be rebuilt or refreshed from information persisted in storage. This may also be "
-      + "necessary when updating the indexing system. Additional options include clearing index before re-index (full re-index) and to optimize indexes.";
+    return "Bygger om indexerad information från data som finns i lagringen. Alla index kan byggas om eller uppdateras från information som sparats i lagringen. Detta kan även vara "
+      + "nödvändigt vid uppdatering av indexsystemet. Ytterligare alternativ inkluderar att rensa index före återindexering (fullständig återindexering) och att optimera index.";
   }
 
   @Override
@@ -114,8 +112,8 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> liteList)
+    throws PluginException {
     return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<T>() {
       @Override
       public void process(IndexService index, ModelService model, Report report, Job cachedJob,
@@ -173,8 +171,7 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     if (clearIndexes) {
       LOGGER.debug("Clearing indexes");
       try {
