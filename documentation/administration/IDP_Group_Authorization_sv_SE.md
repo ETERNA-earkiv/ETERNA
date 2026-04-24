@@ -47,16 +47,16 @@ core.authorization.external.mapping.map_users.external.group = f390adab-5c81-4a8
 core.authorization.external.mapping.map_users.internal.groups[] = users
 ```
 
-Värdet för `external.group` matchas som ett reguljärt uttryck mot det grupp-ID som returneras av IDP:n. För andra IDP:er kan grupp-ID:t vara ett namn, ett DN (LDAP-format) eller en annan sträng — se din IDP:s dokumentation.
+Värdet för `external.group` matchas som ett reguljärt uttryck mot det grupp-ID som returneras av IDP:n. För att undvika oavsiktliga delsträngsmatchningar bör mönstret förankras med `^` och `$` (t.ex. `^bbc466f2-55f4-4ca2-8303-d4238b8884d5$`). För andra IDP:er kan grupp-ID:t vara ett namn, ett DN (LDAP-format) eller en annan sträng — se din IDP:s dokumentation.
 
 ## Begränsningar
 
 ### Inget stöd för nästlat (rekursivt) gruppmedlemskap
 
-ETERNA kontrollerar enbart de grupper som returneras direkt i `memberOf`-attributet från IDP:n. Om en användare är medlem i Grupp A, och Grupp A är medlem i Grupp B, tilldelas **inte** de interna roller som är mappade mot Grupp B.
+ETERNA kontrollerar enbart grupper som returneras direkt i det konfigurerade externa attributet (`core.authorization.external.attribute`, ofta `memberOf`). Om en användare är medlem i Grupp A, och Grupp A är medlem i Grupp B, tilldelas **inte** de interna roller som är mappade mot Grupp B.
 
 **Exempel på vad som inte fungerar:**
-```
+```text
 Användare → Grupp A (direkt medlem) → Grupp B (nästlad) → mappad till intern grupp
 ```
 Användaren får inte den interna gruppen som är mappad mot Grupp B eftersom tillhörigheten är indirekt.

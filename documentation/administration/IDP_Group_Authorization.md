@@ -47,16 +47,16 @@ core.authorization.external.mapping.map_users.external.group = f390adab-5c81-4a8
 core.authorization.external.mapping.map_users.internal.groups[] = users
 ```
 
-The `external.group` value is matched as a regular expression against the group identifier returned by the IDP. For other IDPs the group identifier may be a name, a DN (LDAP-style), or some other string — consult your IDP's documentation.
+The `external.group` value is matched as a regular expression against the group identifier returned by the IDP. To avoid accidental partial matches, prefer anchoring patterns with `^` and `$` (for example `^bbc466f2-55f4-4ca2-8303-d4238b8884d5$`). For other IDPs the group identifier may be a name, a DN (LDAP-style), or some other string — consult your IDP's documentation.
 
 ## Limitations
 
 ### No support for nested (recursive) group membership
 
-ETERNA only evaluates the groups returned directly in the `memberOf` attribute from the IDP. If a user is a member of Group A, and Group A is a member of Group B, the internal roles mapped to Group B are **not** assigned to the user.
+ETERNA only evaluates groups returned directly in the attribute configured via `core.authorization.external.attribute` (commonly `memberOf`). If a user is a member of Group A, and Group A is a member of Group B, the internal roles mapped to Group B are **not** assigned to the user.
 
 **Example of what does not work:**
-```
+```text
 User → Group A (direct member) → Group B (nested) → mapped to internal group
 ```
 The user will not receive the internal group mapped to Group B because the membership is indirect.
