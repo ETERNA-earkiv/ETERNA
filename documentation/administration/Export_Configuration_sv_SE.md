@@ -115,7 +115,7 @@ ui.export.job.fields=id,name,username,startDate,endDate,state,priority,pluginTyp
 ui.export.job.fields.mitt_eget_falt.label=Mitt eget fält
 ```
 
-Det nya fältet visas nu i exportdialogen som ett avkryssat alternativ.
+Det nya fältet visas nu i exportdialogen som ett oförkryssat alternativ.
 
 ## Ändra vilka fält som är förkryssade som standard
 
