@@ -17,6 +17,7 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -67,6 +68,7 @@ public class ScheduleJobDialog extends DialogBox {
 
   private final Label previewLabel = new Label();
   private final ScheduleCallback callback;
+  private int previewSequence = 0;
 
   @SuppressWarnings("deprecation")
   public ScheduleJobDialog(ScheduleCallback callback) {
@@ -110,10 +112,11 @@ public class ScheduleJobDialog extends DialogBox {
     for (int y = currentYear; y <= currentYear + 5; y++) {
       yearList.addItem(String.valueOf(y), String.valueOf(y));
     }
-    String[] monthNames = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+    DateTimeFormat monthFmt = DateTimeFormat.getFormat("MMM");
+    Date monthRef = new Date(2000 - 1900, 0, 1, 12, 0, 0);
     for (int m = 1; m <= 12; m++) {
-      monthList.addItem(monthNames[m - 1], String.valueOf(m));
+      monthRef.setMonth(m - 1);
+      monthList.addItem(monthFmt.format(monthRef), String.valueOf(m));
     }
     for (int d = 1; d <= 31; d++) {
       onceDayList.addItem(String.valueOf(d), String.valueOf(d));
@@ -169,10 +172,13 @@ public class ScheduleJobDialog extends DialogBox {
     Label dowLabel = new Label(messages.scheduleDialogDayOfWeekLabel());
     dowLabel.addStyleName("form-label");
     dayOfWeekList.addStyleName("form-listbox");
-    String[] weekdays = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+    DateTimeFormat dowFmt = DateTimeFormat.getFormat("EEEE");
     int[] weekdayCron = {1, 2, 3, 4, 5, 6, 0};
-    for (int i = 0; i < weekdays.length; i++) {
-      dayOfWeekList.addItem(weekdays[i], String.valueOf(weekdayCron[i]));
+    // Jan 3, 2000 is a Monday; iterate Mon–Sun using epoch offsets
+    Date monday = new Date(2000 - 1900, 0, 3, 12, 0, 0);
+    for (int i = 0; i < 7; i++) {
+      Date weekday = new Date(monday.getTime() + (long) i * 86400000L);
+      dayOfWeekList.addItem(dowFmt.format(weekday), String.valueOf(weekdayCron[i]));
     }
     dowRow.add(dowLabel);
     dowRow.add(dayOfWeekList);
@@ -242,7 +248,7 @@ public class ScheduleJobDialog extends DialogBox {
       public void onClick(ClickEvent event) {
         if (frequencyList.getSelectedIndex() == FREQ_ONCE) {
           Date selected = buildOnceDate();
-          if (!selected.after(new Date())) {
+          if (selected == null || !selected.after(new Date())) {
             previewLabel.setText(messages.scheduleDialogPastTimeError());
             return;
           }
@@ -280,7 +286,13 @@ public class ScheduleJobDialog extends DialogBox {
     int day = Integer.parseInt(onceDayList.getSelectedValue());
     int hour = Integer.parseInt(hourList.getSelectedValue());
     int minute = Integer.parseInt(minuteList.getSelectedValue());
-    return new Date(year - 1900, month - 1, day, hour, minute, 0);
+    Date d = new Date(year - 1900, month - 1, day, hour, minute, 0);
+    // JS Date normalizes out-of-range values (e.g. Feb 31 → Mar 3).
+    // Return null to signal an invalid day selection.
+    if (d.getYear() + 1900 != year || d.getMonth() + 1 != month || d.getDate() != day) {
+      return null;
+    }
+    return d;
   }
 
   private String buildScheduleExpression() {
@@ -289,8 +301,11 @@ public class ScheduleJobDialog extends DialogBox {
     String minute = minuteList.getSelectedValue();
     switch (freq) {
       case FREQ_ONCE:
-        // Encode as UTC epoch millis to avoid server-side timezone ambiguity
-        return ONCE_PREFIX + buildOnceDate().getTime();
+        Date onceDate = buildOnceDate();
+        if (onceDate == null) {
+          return "";
+        }
+        return ONCE_PREFIX + onceDate.getTime();
       case FREQ_HOURLY:
         return "0 0 * * * *";
       case FREQ_DAILY:
@@ -312,15 +327,19 @@ public class ScheduleJobDialog extends DialogBox {
       String day = pad2(Integer.parseInt(onceDayList.getSelectedValue()));
       String hh = pad2(Integer.parseInt(hourList.getSelectedValue()));
       String mm = pad2(Integer.parseInt(minuteList.getSelectedValue()));
-      previewLabel.setText("Once on " + year + "-" + month + "-" + day + " at " + hh + ":" + mm);
+      previewLabel.setText(messages.scheduleDialogOnceSummary(year + "-" + month + "-" + day, hh + ":" + mm));
       return;
     }
     String cron = buildScheduleExpression();
+    final int seq = ++previewSequence;
     Services services = new Services("Describe cron expression", "retrieve");
     services
       .configurationsResource(
         s -> s.describeCronExpression(cron, com.google.gwt.i18n.client.LocaleInfo.getCurrentLocale().getLocaleName()))
       .whenComplete((response, error) -> {
+        if (seq != previewSequence) {
+          return; // a newer request is already in flight; discard this stale response
+        }
         if (error == null && response != null && response.getValue() != null) {
           previewLabel.setText(response.getValue());
         } else {

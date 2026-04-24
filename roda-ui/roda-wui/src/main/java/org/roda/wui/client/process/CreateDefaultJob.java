@@ -690,6 +690,9 @@ public class CreateDefaultJob extends Composite {
   @SuppressWarnings("rawtypes")
   @UiHandler("buttonSchedule")
   public void buttonScheduleHandler(ClickEvent e) {
+    if (!shouldEnableCreateButton()) {
+      return;
+    }
     String jobName = getName().getText();
     SelectedItems<? extends IsIndexed> selected = search.getSelectedItemsInCurrentList();
     if (org.roda.core.data.v2.Void.class.getName().equals(targetList.getSelectedValue())) {

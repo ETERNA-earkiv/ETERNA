@@ -76,9 +76,9 @@ public class ConfigurationController implements ConfigurationRestService {
         try {
           long millis = Long.parseLong(cronExpression.substring(6));
           java.time.ZonedDateTime zdt = java.time.Instant.ofEpochMilli(millis)
-            .atZone(java.time.ZoneId.systemDefault());
+            .atZone(java.time.ZoneId.of("UTC"));
           description = "Once on " + zdt.toLocalDate() + " at "
-            + pad2(zdt.getHour()) + ":" + pad2(zdt.getMinute());
+            + pad2(zdt.getHour()) + ":" + pad2(zdt.getMinute()) + " UTC";
         } catch (NumberFormatException e) {
           description = cronExpression;
         }

@@ -8,6 +8,7 @@
 package org.roda.core.transaction;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -72,11 +73,24 @@ public class JobSchedulerTask {
       new DateRangeFilterParameter(RodaConstants.JOB_NEXT_SCHEDULED_RUN, null, new Date(), DateGranularity.MILLISECOND));
 
     try {
-      IndexResult<IndexedJob> dueJobs = RodaCoreFactory.getIndexService().find(IndexedJob.class, filter, Sorter.NONE,
-        new Sublist(0, RodaConstants.DEFAULT_PAGINATION_VALUE), Collections.emptyList());
+      int offset = 0;
+      int pageSize = RodaConstants.DEFAULT_PAGINATION_VALUE;
+      List<String> jobIds = new ArrayList<>();
 
-      for (IndexedJob indexedJob : dueJobs.getResults()) {
-        fireScheduledJob(indexedJob.getId());
+      // Collect all due job IDs before firing to avoid pagination drift caused by
+      // state changes mid-loop.
+      IndexResult<IndexedJob> page;
+      do {
+        page = RodaCoreFactory.getIndexService().find(IndexedJob.class, filter, Sorter.NONE,
+          new Sublist(offset, pageSize), Collections.emptyList());
+        for (IndexedJob indexedJob : page.getResults()) {
+          jobIds.add(indexedJob.getId());
+        }
+        offset += pageSize;
+      } while (page.getResults().size() == pageSize);
+
+      for (String jobId : jobIds) {
+        fireScheduledJob(jobId);
       }
     } catch (GenericException | RequestNotValidException e) {
       LOGGER.error("Error querying scheduled jobs", e);
@@ -93,6 +107,21 @@ public class JobSchedulerTask {
         return;
       }
 
+      // Advance the template BEFORE creating the execution to prevent duplicate
+      // firings if two pollers race or if the execution write succeeds but the
+      // template update later fails.
+      if (cronExpression.startsWith("@once:")) {
+        template.setState(Job.JOB_STATE.STOPPED);
+        template.setScheduleExpression(null);
+        template.setNextScheduledRun(null);
+      } else {
+        CronExpression cron = CronExpression.parse(cronExpression);
+        ZonedDateTime nextRun = cron.next(ZonedDateTime.now());
+        template.setNextScheduledRun(nextRun != null ? Date.from(nextRun.toInstant()) : null);
+      }
+      RodaCoreFactory.getModelService().createOrUpdateJob(template);
+      RodaCoreFactory.getIndexService().commit(IndexedJob.class);
+
       // Build an execution clone: new id, reset state and timing, no schedule info
       Job execution = template.clone();
       execution.setId(IdUtils.createUUID());
@@ -104,20 +133,6 @@ public class JobSchedulerTask {
 
       RodaCoreFactory.getPluginOrchestrator().createAndExecuteJobs(execution, true);
       LOGGER.info("Fired scheduled execution {} from template job {}", execution.getId(), templateJobId);
-
-      if (cronExpression.startsWith("@once:")) {
-        // One-shot: clear the schedule after firing
-        template.setState(Job.JOB_STATE.STOPPED);
-        template.setScheduleExpression(null);
-        template.setNextScheduledRun(null);
-      } else {
-        // Recurring: advance to next cron occurrence
-        CronExpression cron = CronExpression.parse(cronExpression);
-        ZonedDateTime nextRun = cron.next(ZonedDateTime.now());
-        template.setNextScheduledRun(nextRun != null ? Date.from(nextRun.toInstant()) : null);
-      }
-      RodaCoreFactory.getModelService().createOrUpdateJob(template);
-      RodaCoreFactory.getIndexService().commit(IndexedJob.class);
 
     } catch (NotFoundException e) {
       LOGGER.warn("Scheduled job {} no longer exists; skipping", templateJobId);

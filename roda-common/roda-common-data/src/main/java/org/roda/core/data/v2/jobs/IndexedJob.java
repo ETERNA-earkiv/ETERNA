@@ -105,6 +105,8 @@ public class IndexedJob implements IsIndexed, HasId, HasInstanceID, HasInstanceN
     this.instanceName = indexedJob.getInstanceName();
     this.attachmentsList = indexedJob.getAttachmentsList();
     this.jobUsersDetails = indexedJob.getJobUsersDetails();
+    this.nextScheduledRun = indexedJob.getNextScheduledRun();
+    this.fields = indexedJob.getFields() != null ? new HashMap<>(indexedJob.getFields()) : null;
   }
 
   @Override

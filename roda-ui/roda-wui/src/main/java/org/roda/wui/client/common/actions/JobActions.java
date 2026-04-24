@@ -102,7 +102,7 @@ public class JobActions extends AbstractActionable<IndexedJob> {
         messages.reasonPluginIsNotIngest());
     } else if (JobAction.UNSCHEDULE.equals(action)) {
       return new CanActResult(Job.JOB_STATE.SCHEDULED.equals(object.getState()), CanActResult.Reason.CONTEXT,
-        messages.reasonJobNotPendingApproval());
+        messages.reasonJobNotScheduled());
     }
     return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonInvalidContext());
   }

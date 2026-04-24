@@ -369,6 +369,8 @@ public interface ClientMessages extends Messages {
 
   String scheduleDialogPastTimeError();
 
+  String scheduleDialogOnceSummary(String date, String time);
+
   String createJobWorkflow();
 
   String createJobCategorySelect();
@@ -2690,6 +2692,8 @@ public interface ClientMessages extends Messages {
   String reasonJobIsFinishedOrStopping();
 
   String reasonJobNotPendingApproval();
+
+  String reasonJobNotScheduled();
 
   String reasonJobDoesNotNeedAppraisal();
 

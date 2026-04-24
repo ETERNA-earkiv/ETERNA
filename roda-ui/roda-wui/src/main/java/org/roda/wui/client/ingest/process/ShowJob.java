@@ -586,8 +586,14 @@ public class ShowJob extends Composite {
 
   private void update() {
     boolean isScheduled = Job.JOB_STATE.SCHEDULED.equals(job.getState());
+    // A template job that was never executed: STOPPED with no objects touched at all.
+    // Using multiple counters avoids false positives for jobs stopped early after
+    // actually starting (which may also have completionPercentage == 0).
     boolean isEmptyStopped = Job.JOB_STATE.STOPPED.equals(job.getState())
-      && job.getJobStats().getCompletionPercentage() == 0;
+      && job.getJobStats().getCompletionPercentage() == 0
+      && job.getJobStats().getSourceObjectsBeingProcessed() == 0
+      && job.getJobStats().getSourceObjectsProcessed() == 0
+      && job.getJobStats().getSourceObjectsWithErrors() == 0;
 
     // set end date (hidden for scheduled/empty-stopped jobs)
     boolean showEndDate = !isScheduled && !isEmptyStopped && job.getEndDate() != null;

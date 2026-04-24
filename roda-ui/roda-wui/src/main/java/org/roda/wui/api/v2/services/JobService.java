@@ -98,6 +98,7 @@ public class JobService {
     createJobRequest.setSourceObjectsClass(job.getSourceObjects().getSelectedClass());
     createJobRequest.setPriority(job.getPriority().toString());
     createJobRequest.setParallelism(job.getParallelism().toString());
+    createJobRequest.setScheduleExpression(job.getScheduleExpression());
 
     return createJobRequest;
   }
@@ -108,8 +109,12 @@ public class JobService {
 
     String scheduleExpression = updatedJob.getScheduleExpression();
     if (StringUtils.isNotBlank(scheduleExpression)) {
+      Date nextRun = computeNextRun(scheduleExpression);
+      if (nextRun == null || !nextRun.after(new Date())) {
+        throw new RequestNotValidException("Schedule expression is invalid or resolves to a past date: " + scheduleExpression);
+      }
       updatedJob.setState(Job.JOB_STATE.SCHEDULED);
-      updatedJob.setNextScheduledRun(computeNextRun(scheduleExpression));
+      updatedJob.setNextScheduledRun(nextRun);
       RodaCoreFactory.getModelService().createOrUpdateJob(updatedJob);
     } else {
       RodaCoreFactory.getPluginOrchestrator().createAndExecuteJobs(updatedJob, async);
@@ -179,10 +184,15 @@ public class JobService {
 
   public Job scheduleJob(String jobId, String cronExpression)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    Date nextRun = computeNextRun(cronExpression);
+    if (nextRun == null || !nextRun.after(new Date())) {
+      throw new RequestNotValidException("Schedule expression is invalid or resolves to a past date: " + cronExpression);
+    }
     Job job = RodaCoreFactory.getModelService().retrieveJob(jobId);
     job.setScheduleExpression(cronExpression);
     job.setState(Job.JOB_STATE.SCHEDULED);
-    job.setNextScheduledRun(computeNextRun(cronExpression));
+    job.setEndDate(null);
+    job.setNextScheduledRun(nextRun);
     RodaCoreFactory.getModelService().createOrUpdateJob(job);
     RodaCoreFactory.getIndexService().commit(IndexedJob.class);
     return job;
