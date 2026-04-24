@@ -57,4 +57,6 @@ Varje gång maskeringsredigeraren öppnas skapas en post i granskningsloggen som
 - datum och tidpunkt
 - det angivna skälet
 
+Varje sparning loggas dessutom som en separat post med åtgärden **Upload File Resource**. För att hitta alla maskeringssparningar i granskningsloggen, skriv in `Maskerad PDF sparad` i sökrutan eller filtrera på det värdet i den högra sidopanelen. Statusfältet på posten visar om sparningen lyckades eller misslyckades.
+
 Detta säkerställer att all maskeringsaktivitet är spårbar och kan granskas i efterhand.

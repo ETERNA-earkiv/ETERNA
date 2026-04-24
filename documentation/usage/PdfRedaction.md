@@ -57,4 +57,6 @@ Every time the redaction editor is opened, an entry is created in the audit log 
 - the date and time
 - the reason provided
 
+Each save is also recorded as a separate entry with the action **Upload File Resource**. To find all redaction saves in the audit log, type `Maskerad PDF sparad` in the search box or filter on that value in the right sidebar. The status field on the entry shows whether the save succeeded or failed.
+
 This ensures that all redaction activity is traceable and can be reviewed later.
