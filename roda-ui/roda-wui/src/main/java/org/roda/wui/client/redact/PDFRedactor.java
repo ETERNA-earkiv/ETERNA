@@ -179,7 +179,7 @@ public class PDFRedactor extends Composite {
       getOrCreateRedactedRepresentation(aipId).then((representation) -> {
         List<String> path = new ArrayList<>(file.getPath());
 
-        String uploadUrl = RestUtils.createFileUploadUri(aipId, representation.getId(), path, "Saved redacted version");
+        String uploadUrl = RestUtils.createFileUploadUri(aipId, representation.getId(), path, "Maskerad PDF sparad");
 
         FormData formData = new FormData();
         formData.append("resource", pdfData, file.getId());
