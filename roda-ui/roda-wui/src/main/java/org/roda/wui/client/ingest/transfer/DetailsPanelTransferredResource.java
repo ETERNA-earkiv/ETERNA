@@ -34,10 +34,10 @@ public class DetailsPanelTransferredResource extends Composite {
   public void init(TransferredResource resource) {
 
     if (resource.isFile()) {
-      details.add(buildField("Size", new InlineHTML(Humanize.readableFileSize(resource.getSize()))));
+      details.add(buildField("Storlek", new InlineHTML(Humanize.readableFileSize(resource.getSize()))));
     }
-    details.add(buildField("Created at", new InlineHTML(Humanize.formatDateTime(resource.getCreationDate()))));
-    details.add(buildField("Last scanned at", new InlineHTML(Humanize.formatDateTime(resource.getLastScanDate()))));
+    details.add(buildField("Skapad", new InlineHTML(Humanize.formatDateTime(resource.getCreationDate()))));
+    details.add(buildField("Senast skannad", new InlineHTML(Humanize.formatDateTime(resource.getLastScanDate()))));
   }
 
   private FlowPanel buildField(String label, InlineHTML html) {

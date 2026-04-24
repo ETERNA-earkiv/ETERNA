@@ -47,35 +47,35 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
 
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_VALIDATE_DESCRIPTIVE_METADATA, PluginParameter
-      .getBuilder(RodaConstants.PLUGIN_PARAMS_VALIDATE_DESCRIPTIVE_METADATA, "Validate descriptive metadata",
+      .getBuilder(RodaConstants.PLUGIN_PARAMS_VALIDATE_DESCRIPTIVE_METADATA, "Validera beskrivande metadata",
         PluginParameterType.BOOLEAN)
       .withDefaultValue("true")
       .withDescription(
-        "If true, the action will check if the descriptive metadata is valid according to the schemas installed in the repository.")
+        "Om aktiverad kontrollerar åtgärden om den beskrivande metadatan är giltig enligt de scheman som är installerade i arkivet.")
       .build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_TYPE, PluginParameter
-      .getBuilder(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_TYPE, "Descriptive metadata format",
+      .getBuilder(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_TYPE, "Format för beskrivande metadata",
         PluginParameterType.STRING)
       .isMandatory(false)
       .withDescription(
-        "Descriptive metadata format to be used as fallback if the information package does not specify the metadata format or if the action is set to FORCE.")
+        "Format för beskrivande metadata som används som reserv om informationspaketet inte anger metadataformat eller om åtgärden är inställd på FORCE.")
       .build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_VERSION, PluginParameter
-      .getBuilder(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_VERSION, "Descriptive metadata version",
+      .getBuilder(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_VERSION, "Version av beskrivande metadata",
         PluginParameterType.STRING)
       .isMandatory(false)
       .withDescription(
-        "Descriptive metadata version to be used as fallback if the information package does not specify the metadata version or if the action is set to FORCE.")
+        "Version av beskrivande metadata som används som reserv om informationspaketet inte anger metadataversion eller om åtgärden är inställd på FORCE.")
       .build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_FORCE_TYPE, PluginParameter
-      .getBuilder(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_FORCE_TYPE, "Force metadata format and version",
+      .getBuilder(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_FORCE_TYPE, "Tvinga metadataformat och version",
         PluginParameterType.BOOLEAN)
       .withDefaultValue("false")
       .withDescription(
-        "If true, bypass the metadata format and version set in the information package and use the metadata format and version passed as parameters (see above).")
+        "Om aktiverad åsidosätts metadataformat och version från informationspaketet och de format och versioner som anges som parametrar används istället (se ovan).")
       .build());
   }
 
@@ -87,12 +87,12 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
   private List<Pair<String, String>> schemasInfo;
 
   public static String getStaticName() {
-    return "Metadata validation";
+    return "Metadatavalidering";
   }
 
   public static String getStaticDescription() {
-    return "Checks if the descriptive metadata included in the Information Package is present, and if it is valid according to the "
-      + "XML Schemas installed in the repository. A validation report is generated indicating which Information Packages have valid and invalid metadata.";
+    return "Kontrollerar om den beskrivande metadata som ingår i informationspaketet finns och om den är giltig enligt de XML-scheman som är installerade i arkivet. "
+      + "En valideringsrapport skapas som anger vilka informationspaket som har giltig respektive ogiltig metadata.";
   }
 
   @Override
@@ -234,24 +234,24 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Checked whether the descriptive metadata is included in the SIP and if this metadata is valid according to the established policy.";
+    return "Kontrollerade om den beskrivande metadatan finns i SIP:et och om den är giltig enligt fastställd policy.";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return addSchemaToBuilder("Descriptive metadata is well formed and complete.");
+    return addSchemaToBuilder("Beskrivande metadata är välformad och fullständig.");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
     return addSchemaToBuilder(
-      "Descriptive metadata was not well formed or failed to meet the established ingest policy.");
+      "Beskrivande metadata var inte välformad eller uppfyllde inte den fastställda inleveranspolicyn.");
   }
 
   private String addSchemaToBuilder(String eventMessage) {
     if (!schemasInfo.isEmpty()) {
       StringBuilder builder = new StringBuilder(eventMessage);
-      builder.append("\nSchemas used on validation: ");
+      builder.append("\nScheman som användes vid validering: ");
 
       Pair<String, String> firstSchema = schemasInfo.get(0);
       builder.append(firstSchema.getFirst());
