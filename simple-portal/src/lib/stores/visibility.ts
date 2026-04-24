@@ -4,7 +4,7 @@
 
 import { map, computed } from 'nanostores';
 import { $visibilityConfig } from './config';
-import type { SimpleFilterParameter, FilterParameter } from '../types/api';
+import type { SimpleFilterParameter, FilterParameter, OrFiltersParameters } from '../types/api';
 import type { XpathRule } from '../api/config';
 
 export type VisibilityLevel = 'full' | 'title-only' | 'hidden';
@@ -34,12 +34,12 @@ export function buildLevelFilter(): FilterParameter | null {
 
   return {
     type: 'OrFiltersParameters',
-    operands: levels.map((level) => ({
+    values: levels.map((level) => ({
       type: 'SimpleFilterParameter',
       name: 'level',
       value: level,
-    })),
-  } as FilterParameter;
+    } as SimpleFilterParameter)),
+  } as OrFiltersParameters;
 }
 
 /**

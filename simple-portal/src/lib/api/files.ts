@@ -18,7 +18,8 @@ type FileIndexResult = {
   offset: number;
   limit: number;
   totalCount: number;
-  results: IndexedFile[];
+  // RODA kan returnera resultat antingen direkt som IndexedFile eller i wrapper { file: IndexedFile }
+  results: Array<IndexedFile | { file: IndexedFile }>;
 };
 
 export async function getFilesForRepresentation(
@@ -38,7 +39,9 @@ export async function getFilesForRepresentation(
     };
 
     const result = await apiPost<FileIndexResult>('/api/v2/files/find', request);
-    return result?.results || [];
+    return (result?.results || []).map((item) =>
+      'file' in item ? item.file : item,
+    );
   });
 }
 

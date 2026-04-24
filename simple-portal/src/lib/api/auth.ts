@@ -73,7 +73,9 @@ export async function validateSession(): Promise<boolean> {
  * Logout — clear user state and expire cookie.
  */
 export function logout(): void {
-  document.cookie = 'JSESSIONID=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Strict';
+  // Secure-flag aktiveras på HTTPS — lämnas bort på localhost/HTTP för att kakan ska kunna rensas
+  const secure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : '';
+  document.cookie = `JSESSIONID=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Strict${secure}`;
   clearUser();
   sessionChecked = false;
 }

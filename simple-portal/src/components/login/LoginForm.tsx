@@ -6,6 +6,32 @@ import { PortalAlert } from '../portal-ui/PortalAlert';
 import { PortalLink } from '../portal-ui/PortalLink';
 import './LoginForm.css';
 
+/**
+ * Validera returnUrl mot open redirect.
+ * Accepterar bara relativa sökvägar inom portalen (t.ex. "/admin/metadata").
+ * Avvisar protokoll-relativa ("//evil.com"), absoluta ("https://evil.com"),
+ * javascript:-scheman, backslash-varianter och null-bytes.
+ */
+function safeReturnUrl(raw: string | null): string {
+  const fallback = '/sok';
+  if (!raw) return fallback;
+
+  // Snabbfilter: måste börja med / men inte // eller /\
+  if (!raw.startsWith('/')) return fallback;
+  if (raw.startsWith('//') || raw.startsWith('/\\')) return fallback;
+  if (raw.includes('\0')) return fallback;
+
+  // Parsa som URL mot aktuell origin — kasta om den resulterande origin inte matchar
+  try {
+    const url = new URL(raw, window.location.origin);
+    if (url.origin !== window.location.origin) return fallback;
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return fallback;
+    return url.pathname + url.search + url.hash;
+  } catch {
+    return fallback;
+  }
+}
+
 export function LoginForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -15,7 +41,7 @@ export function LoginForm() {
 
   const params = new URLSearchParams(window.location.search);
   const sessionExpired = params.get('expired') === '1';
-  const returnUrl = params.get('returnUrl') || '/sok';
+  const returnUrl = safeReturnUrl(params.get('returnUrl'));
 
   async function handleLogin() {
     if (!username || !password) {
@@ -30,8 +56,7 @@ export function LoginForm() {
       const success = await login(username, password);
       setPassword('');
       if (success) {
-        const safe = returnUrl.startsWith('/') && !returnUrl.startsWith('//') ? returnUrl : '/sok';
-        window.location.href = safe;
+        window.location.href = returnUrl;
       } else {
         setErrorMessage('Fel användarnamn eller lösenord.');
       }

@@ -78,6 +78,7 @@ export async function saveTheme(theme: SiteTheme): Promise<{ theme: SiteTheme; s
   try {
     const res = await fetch('/api/config', {
       method: 'PUT',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ siteConfig: normalized }),
     });
