@@ -67,7 +67,7 @@ The user will not receive the internal group mapped to Group B because the membe
 - Create an additional mapping targeting the intermediate group.
 - **Configure your IDP to include transitive group memberships in the token claim.** Most modern IDPs support this natively and it requires no changes to ETERNA. See the IDP-specific notes below.
 
-### Azure AD behavior
+#### Azure AD behavior
 
 By default, Azure AD only includes direct group memberships in the `memberOf` claim via OIDC. To include transitive (nested) memberships, change the `groupMembershipClaims` setting in the application registration manifest from `"SecurityGroup"` to `"All"`:
 

@@ -67,7 +67,7 @@ Användaren får inte den interna gruppen som är mappad mot Grupp B eftersom ti
 - Skapa en extra mappning mot den mellanliggande gruppen.
 - **Konfigurera din IDP att inkludera transitiva gruppmedlemskap i token-attributet.** De flesta moderna IDP:er stödjer detta nativt och kräver inga ändringar i ETERNA. Se IDP-specifika noteringar nedan.
 
-### Azure AD-beteende
+#### Azure AD-beteende
 
 Azure AD returnerar som standard bara direkta gruppmedlemskap i `memberOf`-attributet via OIDC. För att inkludera transitiva (nästlade) medlemskap, ändra inställningen `groupMembershipClaims` i appregistreringens manifest från `"SecurityGroup"` till `"All"`:
 
