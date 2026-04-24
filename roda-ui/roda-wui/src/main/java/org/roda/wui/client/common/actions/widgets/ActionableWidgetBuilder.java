@@ -22,7 +22,6 @@ import org.roda.wui.client.common.actions.model.ActionableButton;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.model.ActionableTitle;
-import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 
 import com.google.gwt.core.shared.GWT;
@@ -35,7 +34,6 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
-import org.roda.wui.common.client.tools.HistoryUtils;
 
 public class ActionableWidgetBuilder<T extends IsIndexed> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
@@ -175,8 +173,7 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
     if (includeBackButton) {
       ActionButton<T> backButton = new ActionButton<>(
         new ActionableButton<>(messages.backButton(), null, ActionImpact.NONE, "fas fa-arrow-circle-left"));
-      backButton.addClickHandler(event ->
-        History.back());
+      backButton.addClickHandler(event -> History.back());
       backButton.addStyleName("actionable-button-back");
       panel.add(backButton);
       addedButtonCount++;

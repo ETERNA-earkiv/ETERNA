@@ -1,6 +1,6 @@
 services:
   zoo:
-    image: docker.io/zookeeper:3.9.4-jre-17
+    image: ghcr.io/eterna-earkiv/zookeeper:3.9.5
     restart: unless-stopped
     ports:
       - "2181:2181"
@@ -10,7 +10,7 @@ services:
       - zookeeper_data:/data
       - zookeeper_datalog:/datalog
   solr:
-    image: docker.io/solr:9.9
+    image: ghcr.io/eterna-earkiv/solr:9.10.1
     restart: unless-stopped
     ports:
       - "8983:8983"
@@ -38,7 +38,7 @@ services:
       - /tmp:/tmp
 
   siegfried:
-    image: ghcr.io/keeps/siegfried:v1.11.4
+    image: ghcr.io/eterna-earkiv/siegfried:v1.11.4
     restart: unless-stopped
     ports:
       - "5138:5138"
@@ -52,7 +52,7 @@ services:
       # Mapping /tmp to enable usage with local testing via mvn test
       - /tmp:/tmp:ro
   swagger:
-    image: docker.io/swaggerapi/swagger-ui:v5.32.0
+    image: docker.io/swaggerapi/swagger-ui:latest
     restart: on-failure
     ports:
       - "8081:8080"

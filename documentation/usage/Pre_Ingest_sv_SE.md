@@ -8,6 +8,12 @@ Leveransförberedelserna omfattar vanligtvis följande aktiviteter:
 
 Denna aktivitet består av att definiera villkoren, förutsättningar och krav för innehållet och för åtföljande information (t.ex. metadata, dokument, kontrakt etc.), som kommer att levereras till systemet av arkivbildaren. Det skapas en skriftlig överenskommelse mellan arkivbildare och systemet som specificerar typ av innehåll och juridiska- samt tekniska krav som båda parter förväntas följa.
 
+## Klassificering
+
+ETERNA använder strukturen som byggs under katalogen för att skapa ett klassificeringsschema som kan laddas ner på den här sidan i ett maskinläsbart format. Den nedladdade filen kan läsas in i RODA-in för att på ett bättre sätt kunna förbereda SIP:arna inför inläsning i systemet.
+
+[Ladda ner klassificeringsstruktur](/api/v1/classification_plans) (notera: för att ladda ner klassificeringsstrukturen krävs en ETERNA instans)
+
 ## Submission Information Packages (SIP)
 
 Denna aktivitet består av att förbereda ett eller flera Submission Information Package (SIP) enligt de tekniska och icke-tekniska krav som definierats i inlämningskontraktet. För att underlätta skapandet av SIP:ar kan verktyget RODA-in användas. 

@@ -1,9 +1,52 @@
 # ETERNA Changelog
-## v0.6.0-SNAPSHOT (2026-02-10)
+## v0.7.0-SNAPSHOT (TBD)
+#### Cleanup
+- Removed Pre-ingest menu option from the UI and cleaned up associated i18n keys
+
+#### Documentation
+- Restored classification plan section to Pre-Ingest documentation in English and Swedish, describing how ETERNA's catalog structure is used to generate a downloadable classification scheme for use with RODA-in
+
+## v0.6.0 (2026-03-26)
 #### Bug fixes
+- Fixed null URL handling in Theme controller to return INITIAL_DATE when file is not found
+- Fixed malformed UTF-8 encoding in file uploads and improved filename validation in TransferredResource
+- Fixed Jersey classpath conflict between versions 3.1.6 and 4.0.2
 - Fixed compilation warnings regarding plural i18n by updating pluralization rule syntax from `[one]` to `[=1]` for single items
 - Added missing `[one]` pluralization keys in Swedish localization file and corrected a typo
 - Replaced Unicode escapes with literal HTML tags in Swedish client messages
+- Fixed incorrect process name display and improved UI handling when no plugin/action is available on the New Process screen
+
+#### Improvements
+- Added healthcheck to Dockerfile and docker-compose for improved service reliability
+- Hardened Docker image security: pinned base images to specific digest hashes and adjusted permissions on critical binaries
+- Migrated from `commons-configuration` to `commons-configuration2`
+- Bumped container image versions and updated ZooKeeper dependency
+- Fixed version display by adding `version.json` resource files and updating build configurations
+- Fixed dependency scope for `jakarta.servlet-api` and excluded conflicting Jackson dependencies
+
+#### Infrastructure
+- Added GitHub Actions workflows for development builds on AMD64 and ARM64 architectures
+- Added OpenSSF Best Practices badge to README
+- Refactored GitHub Actions workflows for issue labeling
+
+#### Security
+- Upgraded Spring Framework 6.1.12 → 7.0.5
+- Upgraded Spring Boot 3.4.0 → 4.0.3
+- Upgraded Jersey (JAX-RS) 3.1.6 → 4.0.2
+- Upgraded Jackson 2.17.0 → 2.18.6
+- Upgraded Apache Pekko 1.0.2 → 1.1.4
+- Upgraded Apache Solr client 9.7.0 → 9.10.1
+- Upgraded GWT 2.11.0 → 2.13.0
+- Upgraded Logback 1.5.13 → 1.5.25
+- Upgraded commons-lang3 3.14.0 → 3.18.0
+- Upgraded commons-fileupload 1.5 → 1.6.0
+- Upgraded angus-mail 2.0.3 → 2.0.4
+- Upgraded BouncyCastle (bcprov/bcpkix/bcutil) 1.70 (jdk15on) → 1.79 (jdk18on)
+- Upgraded ZooKeeper 3.9.3 → 3.9.5
+- Pinned nimbus-jose-jwt transitive dependency to 9.37.4
+- Pinned protobuf-java transitive dependency to 3.25.5
+- Pinned mina-core transitive dependency to 2.2.5
+- Pinned Jetty http2-common transitive dependency to 10.0.26
 
 ## v0.5.0 (2025-12-16)
 #### Updates
