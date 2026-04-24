@@ -14,7 +14,39 @@ Ange skälet och klicka på **Bekräfta** för att öppna redigeraren. Klicka p�
 
 ## Använda maskeringsredigeraren
 
-I redigeraren markerar du de områden du vill maskera genom att rita rektanglar över det känsliga innehållet. När du är nöjd med dina markeringar sparar du filen för att tillämpa maskeringarna permanent.
+Redigerarens verktygsfält innehåller alla verktyg du behöver för att markera, applicera och spara maskeringar.
+
+### Navigering
+
+Använd knapparna **Föregående sida** och **Nästa sida**, eller skriv ett sidnummer direkt i sidfältet, för att bläddra mellan sidorna. Sidopanelen visar miniatyrbilder av alla sidor och kan visas eller döljas med sidopanelsknappen. Använd zoomväljaren för att justera vyn: välj anpassa till sida, anpassa till bredd eller en fast procentnivå.
+
+### Markera innehåll för maskning
+
+Det finns två verktyg för att markera innehåll:
+
+- **Maskera text** — välj det här verktyget och klicka och dra sedan över text i dokumentet för att markera den för maskning. Angränsande textrader slås automatiskt ihop till en enda markering.
+- **Maskera område** — välj det här verktyget och klicka och dra sedan var som helst på sidan för att rita en rektangel över det innehåll du vill maskera.
+
+Markerade områden visas med en färgad överlagring. Markeringarna är inte permanenta i det här skedet.
+
+### Applicera markeringar
+
+Klicka på **Applicera** för att permanent bekräfta de aktuella markeringarna som maskeringar. Applicerade maskeringar visas som solida svarta rektanglar i redigeraren.
+
+Du kan fortsätta markera och applicera på andra sidor innan du sparar.
+
+### Ångra och göra om
+
+- **Ångra** — går tillbaka ett steg i historiken för applicerade maskeringsgrupper.
+- **Gör om** — återapplicerar tidigare ångrade maskeringsgrupper.
+
+### Rensa alla maskeringar
+
+Klicka på knappen **Rensa alla maskeringar** (cirkulär pil) för att ta bort alla markeringar och applicerade maskeringar. En bekräftelsedialog visas innan något tas bort.
+
+### Spara
+
+När du är klar klickar du på **Spara**. En dialog ber dig bekräfta innan exporten påbörjas. Redigeraren renderar varje sida och ersätter de maskerade områdena med solida svarta rektanglar i den exporterade filen. En förloppsindikator visar hur många sidor som har bearbetats. När exporten är klar sparas den maskerade filen tillbaka till arkivet.
 
 ## Granskningslogg
 
