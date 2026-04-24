@@ -31,9 +31,16 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.event.dom.client.MouseDownEvent;
+import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.Event.NativePreviewEvent;
+import com.google.gwt.user.client.Event.NativePreviewHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -114,6 +121,10 @@ public class BrowseTop extends Composite {
   private static BrowseTop instance = null;
 
   @UiField
+  FlowPanel catalogTreeContainer;
+  @UiField
+  FlowPanel treeResizeHandle;
+  @UiField
   FlowPanel browseDescription;
 
   @UiField(provided = true)
@@ -121,6 +132,8 @@ public class BrowseTop extends Composite {
 
   @UiField
   TitlePanel title;
+
+  private com.google.gwt.event.shared.HandlerRegistration resizeHandlerReg;
 
   private BrowseTop() {
     // AIP LIST, it has the same id as the AIP children list because facets
@@ -142,13 +155,54 @@ public class BrowseTop extends Composite {
 
     browseDescription.add(new HTMLWidgetWrapper("BrowseDescription.html"));
 
-    // CSS
-    this.addStyleName("browse browse_top");
+    initTreeResize();
+  }
 
-    // make FocusPanel comply with WCAG
-    Element firstElement = this.getElement().getFirstChildElement();
-    if ("input".equalsIgnoreCase(firstElement.getTagName())) {
-      firstElement.setAttribute("title", "browse input");
-    }
+  public void reattachTreePanel() {
+    catalogTreeContainer.clear();
+    CatalogTreePanel treePanel = CatalogTreePanel.getInstance();
+    catalogTreeContainer.add(treePanel);
+    treePanel.clearSelection();
+  }
+
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    reattachTreePanel();
+  }
+
+  private void initTreeResize() {
+    treeResizeHandle.addDomHandler(new MouseDownHandler() {
+      @Override
+      public void onMouseDown(MouseDownEvent event) {
+        event.preventDefault();
+        if (resizeHandlerReg != null) {
+          resizeHandlerReg.removeHandler();
+          resizeHandlerReg = null;
+        }
+        final int startX = event.getClientX();
+        final int startWidth = CatalogTreePanel.getInstance().getOffsetWidth();
+        Event.setCapture(treeResizeHandle.getElement());
+        Document.get().getBody().addClassName("catalogTreeResizing");
+
+        resizeHandlerReg = Event.addNativePreviewHandler(new NativePreviewHandler() {
+          @Override
+          public void onPreviewNativeEvent(NativePreviewEvent e) {
+            NativeEvent ne = e.getNativeEvent();
+            if ("mousemove".equals(ne.getType())) {
+              int newWidth = Math.max(150, Math.min(480, startWidth + ne.getClientX() - startX));
+              CatalogTreePanel.getInstance().getElement().getStyle().setPropertyPx("width", newWidth);
+            } else if ("mouseup".equals(ne.getType())) {
+              Event.releaseCapture(treeResizeHandle.getElement());
+              Document.get().getBody().removeClassName("catalogTreeResizing");
+              if (resizeHandlerReg != null) {
+                resizeHandlerReg.removeHandler();
+                resizeHandlerReg = null;
+              }
+            }
+          }
+        });
+      }
+    }, MouseDownEvent.getType());
   }
 }
