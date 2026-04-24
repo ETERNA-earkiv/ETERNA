@@ -12,6 +12,7 @@ package org.roda.wui.client.management;
 
 import java.util.List;
 
+import com.google.gwt.user.client.History;
 import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -244,7 +245,7 @@ public class EditUser extends Composite {
   }
 
   private void cancel() {
-    HistoryUtils.newHistory(ShowUser.RESOLVER, user.getId());
+    History.back();
   }
 
   private void errorMessage(Throwable caught, User modifiedUser) {

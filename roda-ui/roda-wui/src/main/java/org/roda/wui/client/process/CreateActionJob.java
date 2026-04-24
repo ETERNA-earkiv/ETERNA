@@ -12,6 +12,7 @@ package org.roda.wui.client.process;
 
 import java.util.List;
 
+import com.google.gwt.user.client.History;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.AllFilterParameter;
@@ -138,7 +139,7 @@ public class CreateActionJob extends CreateSelectedJob<IsIndexed> {
     if (selectedItems.getLastHistory().isEmpty()) {
       HistoryUtils.newHistory(Search.RESOLVER);
     } else {
-      HistoryUtils.newHistory(selectedItems.getLastHistory());
+      History.back();
     }
   }
 }

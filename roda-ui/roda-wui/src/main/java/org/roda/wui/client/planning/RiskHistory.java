@@ -16,6 +16,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import com.google.gwt.user.client.History;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.browse.BrowserService;
@@ -258,7 +259,7 @@ public class RiskHistory extends Composite {
   }
 
   private void cancel() {
-    HistoryUtils.newHistory(ShowRisk.RESOLVER, riskId);
+    History.back();
   }
 
 }

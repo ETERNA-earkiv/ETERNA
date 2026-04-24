@@ -12,6 +12,7 @@ package org.roda.wui.client.management;
 
 import java.util.List;
 
+import com.google.gwt.user.client.History;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.user.Group;
 import org.roda.wui.client.common.UserLogin;
@@ -166,7 +167,7 @@ public class EditGroup extends Composite {
   }
 
   private void cancel() {
-    HistoryUtils.newHistory(ShowGroup.RESOLVER, group.getId());
+    History.back();
   }
 
   private void errorMessage(Throwable caught) {
