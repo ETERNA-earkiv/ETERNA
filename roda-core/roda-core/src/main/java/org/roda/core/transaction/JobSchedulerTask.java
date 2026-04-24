@@ -115,9 +115,18 @@ public class JobSchedulerTask {
         template.setScheduleExpression(null);
         template.setNextScheduledRun(null);
       } else {
-        CronExpression cron = CronExpression.parse(cronExpression);
-        ZonedDateTime nextRun = cron.next(ZonedDateTime.now());
-        template.setNextScheduledRun(nextRun != null ? Date.from(nextRun.toInstant()) : null);
+        try {
+          CronExpression cron = CronExpression.parse(cronExpression);
+          ZonedDateTime nextRun = cron.next(ZonedDateTime.now());
+          template.setNextScheduledRun(nextRun != null ? Date.from(nextRun.toInstant()) : null);
+        } catch (IllegalArgumentException e) {
+          LOGGER.error("Invalid cron expression on scheduled job {}; disabling it: {}", templateJobId, cronExpression, e);
+          template.setState(Job.JOB_STATE.STOPPED);
+          template.setScheduleExpression(null);
+          template.setNextScheduledRun(null);
+          RodaCoreFactory.getModelService().createOrUpdateJob(template);
+          return;
+        }
       }
       RodaCoreFactory.getModelService().createOrUpdateJob(template);
       RodaCoreFactory.getIndexService().commit(IndexedJob.class);
