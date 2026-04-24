@@ -112,10 +112,10 @@ public class LocalInstanceRegisterPlugin extends NoObjectsMultipleStepPlugin {
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, "Instance Identifier",
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, "Instansidentifierare",
           PluginParameter.PluginParameterType.STRING)
         .withDefaultValue(RODAInstanceUtils.retrieveLocalInstanceIdentifierToPlugin()).isReadOnly(true)
-        .withDescription("Identifier from the RODA local instance").build());
+        .withDescription("Identifierare från den lokala RODA-instansen").build());
 
     steps.add(new Step(InstanceIdentifierAIPPlugin.class.getName(),
       RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_AIP_PLUGIN, true, true));
@@ -185,17 +185,17 @@ public class LocalInstanceRegisterPlugin extends NoObjectsMultipleStepPlugin {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Updated the instance identifier";
+    return "Uppdaterade instansidentifieraren";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "The instance identifier was updated successfully";
+    return "Instansidentifieraren uppdaterades.";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Could not update the instance identifier";
+    return "Kunde inte uppdatera instansidentifieraren.";
   }
 
   @Override

@@ -104,36 +104,36 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
 
   static {
     pluginParameters.put(CSV_FILE_FIELDS, PluginParameter
-      .getBuilder(CSV_FILE_FIELDS, "Attributes to include in the report", PluginParameterType.STRING)
+      .getBuilder(CSV_FILE_FIELDS, "Attribut att inkludera i rapporten", PluginParameterType.STRING)
       .withDefaultValue(CSV_DEFAULT_FIELDS)
       .withDescription(
-        "List of file attributes to include in the inventory export. The example includes all the possible options. Remove attributes as necessary.")
+        "Lista med filattribut att inkludera i inventeringsexporten. Exemplet inkluderar alla möjliga alternativ. Ta bort attribut efter behov.")
       .build());
     pluginParameters.put(CSV_FILE_OUTPUT,
-      PluginParameter.getBuilder(CSV_FILE_OUTPUT, "Report file path", PluginParameterType.STRING)
+      PluginParameter.getBuilder(CSV_FILE_OUTPUT, "Sökväg till rapportfilen", PluginParameterType.STRING)
         .withDefaultValue(CSV_DEFAULT_OUTPUT)
-        .withDescription("The full path and file name on the server where the inventory report file should be created.")
+        .withDescription("Den fullständiga sökvägen och filnamnet på servern där inventeringsrapporten ska skapas.")
         .build());
     pluginParameters.put(CSV_FILE_HEADERS,
-      PluginParameter.getBuilder(CSV_FILE_HEADERS, "Include header line", PluginParameterType.BOOLEAN)
-        .withDefaultValue(CSV_DEFAULT_HEADERS).withDescription("Include a header line in the CSV inventory report.")
+      PluginParameter.getBuilder(CSV_FILE_HEADERS, "Inkludera rubrikrad", PluginParameterType.BOOLEAN)
+        .withDefaultValue(CSV_DEFAULT_HEADERS).withDescription("Inkludera en rubrikrad i CSV-inventeringsrapporten.")
         .build());
     pluginParameters.put(CSV_FILE_OUTPUT_DATA,
-      PluginParameter.getBuilder(CSV_FILE_OUTPUT_DATA, "Include data files", PluginParameterType.BOOLEAN)
+      PluginParameter.getBuilder(CSV_FILE_OUTPUT_DATA, "Inkludera datafiler", PluginParameterType.BOOLEAN)
         .withDefaultValue(CSV_DEFAULT_HEADERS)
-        .withDescription("Include in the inventory report information about data files that exist inside AIPs.")
+        .withDescription("Inkludera information om datafiler som finns i AIP:er i inventeringsrapporten.")
         .build());
     pluginParameters.put(CSV_FILE_OUTPUT_DESCRIPTIVE,
       PluginParameter
-        .getBuilder(CSV_FILE_OUTPUT_DESCRIPTIVE, "Include descriptive metadata files", PluginParameterType.BOOLEAN)
+        .getBuilder(CSV_FILE_OUTPUT_DESCRIPTIVE, "Inkludera beskrivande metadatafiler", PluginParameterType.BOOLEAN)
         .withDefaultValue(CSV_DEFAULT_HEADERS)
         .withDescription(
-          "Include in the inventory report information about descriptive metadata files that exist inside AIPs.")
+          "Inkludera information om beskrivande metadatafiler som finns i AIP:er i inventeringsrapporten.")
         .build());
     pluginParameters.put(CSV_FILE_OTHER_METADATA_TYPES, PluginParameter
-      .getBuilder(CSV_FILE_OTHER_METADATA_TYPES, "Include other metadata files", PluginParameterType.STRING)
+      .getBuilder(CSV_FILE_OTHER_METADATA_TYPES, "Inkludera andra metadatafiler", PluginParameterType.STRING)
       .withDefaultValue(CSV_DEFAULT_OTHER_METADATA)
-      .withDescription("Include in the inventory report information about other metadata files that exist inside AIPs.")
+      .withDescription("Inkludera information om andra metadatafiler som finns i AIP:er i inventeringsrapporten.")
       .build());
   }
 

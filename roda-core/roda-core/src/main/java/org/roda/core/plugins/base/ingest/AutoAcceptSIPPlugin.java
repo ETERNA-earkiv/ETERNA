@@ -40,9 +40,9 @@ import org.slf4j.LoggerFactory;
 public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(AutoAcceptSIPPlugin.class);
 
-  public static final String FAILURE_MESSAGE = "Misslyckades med att lägga till AIP:et i arkivförteckningen.";
-  public static final String SUCCESS_MESSAGE = "AIP:et lades till i arkivförteckningen.";
-  public static final String DESCRIPTION = "Lade till paketet i arkivförteckningen. Från och med denna punkt övergår ansvaret för det digitala innehållets bevarande till arkivet.";
+  public static final String FAILURE_MESSAGE = "Det gick inte att lägga till AIP:et i arkivets inventarieförteckning.";
+  public static final String SUCCESS_MESSAGE = "AIP:et lades till i arkivets inventarieförteckning.";
+  public static final String DESCRIPTION = "Paketet lades till i inventarieförteckningen. Från och med nu övergår ansvaret för det digitala innehållets bevarande till arkivet.";
 
   @Override
   public void init() throws PluginException {
@@ -55,7 +55,7 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticName() {
-    return "Automatiskt godkännande";
+    return "Automatisk acceptans";
   }
 
   @Override
@@ -64,8 +64,7 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticDescription() {
-    return "Lägger till informationspaketet i arkivförteckningen utan mänsklig granskning. Från och med denna punkt övergår ansvaret "
-      + "för det digitala innehållets bevarande till arkivet.";
+    return "Lägger till informationspaketet i inventarieförteckningen utan mänsklig prövning. Från och med nu övergår ansvaret för det digitala innehållets bevarande till arkivet.";
   }
 
   @Override

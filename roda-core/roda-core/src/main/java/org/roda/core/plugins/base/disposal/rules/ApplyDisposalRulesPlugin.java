@@ -107,22 +107,22 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Apply the disposal rules to AIPs in the repository";
+    return "Tillämpade gallringsregler på AIP:er i arkivet";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Disposal schedule successfully associated to AIP via disposal rule";
+    return "Gallringsplan kopplades till AIP:et via gallringsregel";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Failed to associate disposal schedule to AIP via disposal rule";
+    return "Det gick inte att koppla gallringsplan till AIP:et via gallringsregel";
   }
 
   @Override
   public String getPreservationEventSkippedMessage() {
-    return "Skipped disposal schedule association to AIP via disposal rule";
+    return "Hoppade över koppling av gallringsplan till AIP:et via gallringsregel";
   }
 
   @Override
