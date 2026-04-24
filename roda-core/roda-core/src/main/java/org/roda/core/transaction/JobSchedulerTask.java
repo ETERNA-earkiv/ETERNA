@@ -107,6 +107,10 @@ public class JobSchedulerTask {
         return;
       }
 
+      // Snapshot original schedule so we can roll back if execution fails.
+      Job.JOB_STATE originalState = template.getState();
+      Date originalNextRun = template.getNextScheduledRun();
+
       // Advance the template BEFORE creating the execution to prevent duplicate
       // firings if two pollers race or if the execution write succeeds but the
       // template update later fails.
@@ -140,8 +144,26 @@ public class JobSchedulerTask {
       execution.setScheduleExpression(null);
       execution.setNextScheduledRun(null);
 
-      RodaCoreFactory.getPluginOrchestrator().createAndExecuteJobs(execution, true);
-      LOGGER.info("Fired scheduled execution {} from template job {}", execution.getId(), templateJobId);
+      try {
+        RodaCoreFactory.getPluginOrchestrator().createAndExecuteJobs(execution, true);
+        LOGGER.info("Fired scheduled execution {} from template job {}", execution.getId(), templateJobId);
+      } catch (JobAlreadyStartedException | AuthorizationDeniedException | GenericException
+        | RequestNotValidException e) {
+        LOGGER.error("Failed to start execution for scheduled job {}", templateJobId, e);
+        // Roll back the @once template so the next poll can retry it. For recurring
+        // jobs the template already has nextScheduledRun advanced to the next
+        // occurrence, so we skip without rolling back to avoid an immediate retry loop.
+        if (cronExpression.startsWith("@once:")) {
+          template.setState(originalState);
+          template.setScheduleExpression(cronExpression);
+          template.setNextScheduledRun(originalNextRun);
+          try {
+            RodaCoreFactory.getModelService().createOrUpdateJob(template);
+          } catch (Exception rollbackEx) {
+            LOGGER.error("Rollback failed for @once template job {}", templateJobId, rollbackEx);
+          }
+        }
+      }
 
     } catch (NotFoundException e) {
       LOGGER.warn("Scheduled job {} no longer exists; skipping", templateJobId);
