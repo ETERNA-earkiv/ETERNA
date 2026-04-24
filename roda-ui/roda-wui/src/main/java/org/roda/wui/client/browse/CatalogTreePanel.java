@@ -111,6 +111,14 @@ public class CatalogTreePanel extends Composite {
       .whenComplete((result, error) -> {
         if (error != null) {
           LOGGER.error("Failed to load catalog tree root nodes", error);
+          treeBody.clear();
+          FlowPanel errorPanel = new FlowPanel();
+          errorPanel.addStyleName("catalogTreeNodeError");
+          errorPanel.add(new com.google.gwt.user.client.ui.Label(messages.catalogTreeLoadError()));
+          com.google.gwt.user.client.ui.Anchor retry = new com.google.gwt.user.client.ui.Anchor(messages.catalogTreeRetry());
+          retry.addClickHandler(event -> loadRootNodes());
+          errorPanel.add(retry);
+          treeBody.add(errorPanel);
           return;
         }
         for (IndexedAIP aip : result.getResults()) {
