@@ -61,10 +61,22 @@ Användare → Grupp A (direkt medlem) → Grupp B (nästlad) → mappad till in
 ```
 Användaren får inte den interna gruppen som är mappad mot Grupp B eftersom tillhörigheten är indirekt.
 
-**Workaround:** Lägg till användare direkt i den IDP-grupp som är mappad i `roda-core.properties`, eller skapa en extra mappning mot den mellanliggande gruppen.
+**Lösningar:**
+
+- Lägg till användare direkt i den IDP-grupp som är mappad i `roda-core.properties`.
+- Skapa en extra mappning mot den mellanliggande gruppen.
+- **Konfigurera din IDP att inkludera transitiva gruppmedlemskap i token-attributet.** De flesta moderna IDP:er stödjer detta nativt och kräver inga ändringar i ETERNA. Se IDP-specifika noteringar nedan.
 
 ### Azure AD-beteende
 
-Azure AD returnerar som standard bara direkta gruppmedlemskap i `memberOf`-attributet via OIDC. Transitiva (nästlade) medlemskap kräver ytterligare Graph API-anrop eller specifika appregistreringsinställningar som för närvarande inte hanteras av ETERNAs CAS-integration.
+Azure AD returnerar som standard bara direkta gruppmedlemskap i `memberOf`-attributet via OIDC. För att inkludera transitiva (nästlade) medlemskap, ändra inställningen `groupMembershipClaims` i appregistreringens manifest från `"SecurityGroup"` till `"All"`:
+
+```json
+"groupMembershipClaims": "All"
+```
+
+Detta gör att Azure AD inkluderar alla transitiva gruppmedlemskap i token, vilka ETERNA sedan behandlar som om de vore direkta medlemskap.
+
+För andra IDP:er, se respektive dokumentation för hur transitiva gruppmedlemskap inkluderas i OIDC/SAML-attributet (t.ex. Keycloaks group mapper, Oktas group claim filter).
 
 

@@ -61,8 +61,20 @@ User → Group A (direct member) → Group B (nested) → mapped to internal gro
 ```
 The user will not receive the internal group mapped to Group B because the membership is indirect.
 
-**Workaround:** Add users directly to the IDP group that is mapped in `roda-core.properties`, or create an additional mapping targeting the intermediate group.
+**Workarounds:**
+
+- Add users directly to the IDP group that is mapped in `roda-core.properties`.
+- Create an additional mapping targeting the intermediate group.
+- **Configure your IDP to include transitive group memberships in the token claim.** Most modern IDPs support this natively and it requires no changes to ETERNA. See the IDP-specific notes below.
 
 ### Azure AD behavior
 
-By default, Azure AD only includes direct group memberships in the `memberOf` claim via OIDC. Transitive (nested) memberships require additional Graph API calls or specific application registration settings that are not currently handled by ETERNA's CAS integration.
+By default, Azure AD only includes direct group memberships in the `memberOf` claim via OIDC. To include transitive (nested) memberships, change the `groupMembershipClaims` setting in the application registration manifest from `"SecurityGroup"` to `"All"`:
+
+```json
+"groupMembershipClaims": "All"
+```
+
+This causes Azure AD to include all transitive group memberships in the token, which ETERNA then processes as if they were direct memberships.
+
+For other IDPs, consult their documentation on how to include transitive group memberships in the OIDC/SAML group claim (e.g. Keycloak's group mapper, Okta's group claim filter).
