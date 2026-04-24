@@ -31,9 +31,16 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.event.dom.client.MouseDownEvent;
+import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.Event.NativePreviewEvent;
+import com.google.gwt.user.client.Event.NativePreviewHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -54,7 +61,6 @@ public class BrowseTop extends Composite {
         if (instance == null) {
           instance = new BrowseTop();
         }
-        instance.reattachTreePanel();
         callback.onSuccess(instance);
       } else if (historyTokens.size() > 1
         && historyTokens.get(0).equals(EditDescriptiveMetadata.RESOLVER.getHistoryToken())) {
@@ -166,9 +172,9 @@ public class BrowseTop extends Composite {
   }
 
   private void initTreeResize() {
-    treeResizeHandle.addDomHandler(new com.google.gwt.event.dom.client.MouseDownHandler() {
+    treeResizeHandle.addDomHandler(new MouseDownHandler() {
       @Override
-      public void onMouseDown(com.google.gwt.event.dom.client.MouseDownEvent event) {
+      public void onMouseDown(MouseDownEvent event) {
         event.preventDefault();
         if (resizeHandlerReg != null) {
           resizeHandlerReg.removeHandler();
@@ -176,28 +182,27 @@ public class BrowseTop extends Composite {
         }
         final int startX = event.getClientX();
         final int startWidth = CatalogTreePanel.getInstance().getOffsetWidth();
-        com.google.gwt.user.client.Event.setCapture(treeResizeHandle.getElement());
-        treeResizeHandle.addStyleName("resizing");
+        Event.setCapture(treeResizeHandle.getElement());
+        Document.get().getBody().addClassName("catalogTreeResizing");
 
-        resizeHandlerReg = com.google.gwt.user.client.Event.addNativePreviewHandler(
-          new com.google.gwt.user.client.Event.NativePreviewHandler() {
-            @Override
-            public void onPreviewNativeEvent(com.google.gwt.user.client.Event.NativePreviewEvent e) {
-              com.google.gwt.dom.client.NativeEvent ne = e.getNativeEvent();
-              if ("mousemove".equals(ne.getType())) {
-                int newWidth = Math.max(150, Math.min(480, startWidth + ne.getClientX() - startX));
-                CatalogTreePanel.getInstance().getElement().getStyle().setPropertyPx("width", newWidth);
-              } else if ("mouseup".equals(ne.getType())) {
-                com.google.gwt.user.client.Event.releaseCapture(treeResizeHandle.getElement());
-                treeResizeHandle.removeStyleName("resizing");
-                if (resizeHandlerReg != null) {
-                  resizeHandlerReg.removeHandler();
-                  resizeHandlerReg = null;
-                }
+        resizeHandlerReg = Event.addNativePreviewHandler(new NativePreviewHandler() {
+          @Override
+          public void onPreviewNativeEvent(NativePreviewEvent e) {
+            NativeEvent ne = e.getNativeEvent();
+            if ("mousemove".equals(ne.getType())) {
+              int newWidth = Math.max(150, Math.min(480, startWidth + ne.getClientX() - startX));
+              CatalogTreePanel.getInstance().getElement().getStyle().setPropertyPx("width", newWidth);
+            } else if ("mouseup".equals(ne.getType())) {
+              Event.releaseCapture(treeResizeHandle.getElement());
+              Document.get().getBody().removeClassName("catalogTreeResizing");
+              if (resizeHandlerReg != null) {
+                resizeHandlerReg.removeHandler();
+                resizeHandlerReg = null;
               }
             }
-          });
+          }
+        });
       }
-    }, com.google.gwt.event.dom.client.MouseDownEvent.getType());
+    }, MouseDownEvent.getType());
   }
 }

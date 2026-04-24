@@ -3364,9 +3364,13 @@ td.datePickerMonth, td.datePickerYear {
     transition: background 0.15s;
 }
 
-.catalogTreeResizeHandle:hover,
-.catalogTreeResizeHandle.resizing {
+.catalogTreeResizeHandle:hover {
     background: COLOR_PRIMARY;
+}
+
+body.catalogTreeResizing,
+body.catalogTreeResizing * {
+    cursor: col-resize !important;
 }
 
 .catalogTreeFilter {
