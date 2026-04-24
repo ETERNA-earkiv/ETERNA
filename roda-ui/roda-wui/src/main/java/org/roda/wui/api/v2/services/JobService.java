@@ -210,7 +210,7 @@ public class JobService {
     return job;
   }
 
-  public Date computeNextRun(String cronExpression) {
+  public Date computeNextRun(String cronExpression) throws RequestNotValidException {
     if (cronExpression.startsWith("@once:")) {
       try {
         long millis = Long.parseLong(cronExpression.substring(6));
@@ -219,9 +219,13 @@ public class JobService {
         return null;
       }
     }
-    CronExpression cron = CronExpression.parse(cronExpression);
-    ZonedDateTime next = cron.next(ZonedDateTime.now());
-    return next != null ? Date.from(next.toInstant()) : null;
+    try {
+      CronExpression cron = CronExpression.parse(cronExpression);
+      ZonedDateTime next = cron.next(ZonedDateTime.now());
+      return next != null ? Date.from(next.toInstant()) : null;
+    } catch (IllegalArgumentException e) {
+      throw new RequestNotValidException("Invalid cron expression: " + cronExpression);
+    }
   }
 
   public void deleteJob(String jobId)
