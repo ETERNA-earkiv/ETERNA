@@ -60,10 +60,10 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
   }
 
   public static String getStaticDescription() {
-    return "Beräknar filens fixitetsinformation (även kallad kontrollsumma) för alla datafiler inom ett AIP, en representation eller en fil och lagrar denna information i PREMIS-objekt "
-      + "i motsvarande entitet. Denna uppgift använder SHA-256 som standardalgoritm för kontrollsummor, men andra algoritmer kan konfigureras i \"roda-core.properties\"."
-      + "\nFilfixitet är egenskapen att en digital fil är oförändrad. \"Riskbedömning av AIP-korruption\" är processen att validera att en fil inte har ändrats eller manipulerats sedan "
-      + "ett tidigare tillstånd. För att validera fixiteten hos ett AIP eller en fil måste fixitetsinformation ha genererats i förväg.";
+    return "Beräknar filintegritetsinformation (även känd som kontrollsumma) för alla datafiler i ett AIP, en representation eller en fil och lagrar denna information i PREMIS-objekt "
+      + "i motsvarande entitet. Uppgiften använder SHA-256 som standardalgoritm för kontrollsumma, men andra algoritmer kan konfigureras i \"roda-core.properties\"."
+      + "\nFilintegritet är egenskapen att en digital fil är fixerad, eller oförändrad. \"Riskbedömning för AIP-korruption\" är processen att validera att en fil inte har förändrats "
+      + "eller manipulerats från ett tidigare tillstånd. För att validera integriteten hos ett AIP eller en fil måste integritetsinformation ha genererats i förväg.";
   }
 
   @Override

@@ -48,7 +48,7 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
   }
 
   public static String getStaticName() {
-    return "Delete SIP from transfer";
+    return "Radera SIP från överföringsyta";
   }
 
   @Override
@@ -57,7 +57,7 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
   }
 
   public static String getStaticDescription() {
-    return "Deletes SIP from the transfer area if the ingest process is successful.";
+    return "Raderar SIP:et från överföringsytan om inleveransprocessen lyckades.";
   }
 
   @Override
@@ -94,8 +94,8 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
 
       if (createEvent) {
         model.createRepositoryEvent(PreservationEventType.DELETION,
-          "The process of deleting an object of the repository", PluginState.SUCCESS,
-          "The transferred resource " + transferredResource.getId() + " has been deleted.", "", job.getUsername(),
+          "Processen att radera ett objekt från arkivet", PluginState.SUCCESS,
+          "Den överförda resursen " + transferredResource.getId() + " har raderats.", "", job.getUsername(),
           true, null);
       }
 
@@ -103,8 +103,8 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
     } catch (RuntimeException | GenericException | AuthorizationDeniedException e) {
       if (createEvent) {
         model.createRepositoryEvent(PreservationEventType.DELETION,
-          "The process of deleting an object of the repository", PluginState.SUCCESS,
-          "The transferred resource " + transferredResource.getId() + " has not been deleted.", "", job.getUsername(),
+          "Processen att radera ett objekt från arkivet", PluginState.SUCCESS,
+          "Den överförda resursen " + transferredResource.getId() + " har inte raderats.", "", job.getUsername(),
           true, null);
       }
 
@@ -139,17 +139,17 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Deleted SIP from the transfer area.";
+    return "Raderade SIP från överföringsytan.";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "The original SIP has been deleted from the transfer area.";
+    return "Det ursprungliga SIP:et har raderats från överföringsytan.";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Failed to delete the original SIP from the transfer area.";
+    return "Misslyckades med att radera det ursprungliga SIP:et från överföringsytan.";
   }
 
   @Override

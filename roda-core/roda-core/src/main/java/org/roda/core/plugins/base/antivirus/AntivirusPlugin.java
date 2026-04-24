@@ -78,7 +78,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticName() {
-    return "Skadeprogramsdetekterare";
+    return "Detektering av skadlig kod";
   }
 
   @Override
@@ -87,9 +87,9 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticDescription() {
-    return "Detta plugin tillhandahåller robusta säkerhetsfunktioner genom att använda ClamAV-antivirusmotorn för att söka igenom filer efter potentiella hot, inklusive trojaner, "
-      + "virus, skadlig programvara och annat skadligt innehåll.\nClamAV är en pålitlig antivirusmotor med öppen källkod (GPL) som är allmänt använd i branschen för sin "
-      + "exceptionella noggrannhet och effektivitet i att upptäcka hot.";
+    return "Detta insticksprogram erbjuder robusta säkerhetsfunktioner genom att använda ClamAV-antivirusmotorn för att söka igenom filer efter potentiella hot, "
+      + "inklusive trojaner, virus, skadlig kod och annat skadligt innehåll.\nClamAV är en betrodd antivirusmotor med öppen källkod (GPL) som används brett i "
+      + "branschen tack vare sin träffsäkerhet och effektivitet i att upptäcka hot.";
   }
 
   @Override
@@ -245,17 +245,17 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Scanned package for malicious programs using ClamAV.";
+    return "Sökte igenom paketet efter skadliga program med ClamAV.";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "The package does not contain any known malicious programs.";
+    return "Paketet innehåller inga kända skadliga program.";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "A malicious program was detected inside the package.";
+    return "Ett skadligt program hittades i paketet.";
   }
 
   @Override
