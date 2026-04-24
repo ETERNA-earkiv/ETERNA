@@ -1,0 +1,38 @@
+.level-selector h3 {
+  margin: 0 0 4px;
+}
+
+.level-selector__help {
+  margin: 0 0 12px;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.level-selector__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 6px;
+}
+
+.level-selector__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.level-selector__item:hover {
+  border-color: #9ca3af;
+  background: #f9fafb;
+}
+
+.level-selector__item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--brand1);
+}

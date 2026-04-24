@@ -1,0 +1,154 @@
+.search-page {
+  max-width: 52rem;
+  margin: 0 auto;
+}
+
+.search-header {
+  margin-bottom: 24px;
+}
+
+.search-header h2 {
+  margin: 0 0 16px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #202124;
+}
+
+.search-form {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.search-input-wrapper {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input-icon {
+  position: absolute;
+  left: 14px;
+  color: #5f6368;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 40px 12px 44px;
+  border: 1px solid #333;
+  border-radius: 0;
+  font-size: 1rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+  background: white;
+}
+
+.search-input:focus {
+  border-color: var(--brand1);
+  border-width: 2px;
+  padding: 11px 39px 11px 43px;
+}
+
+.search-clear-btn {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  color: #5f6368;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-clear-btn:hover {
+  background: #f3f4f6;
+}
+
+.search-advanced-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px;
+  background: white;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.search-advanced-btn:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.search-advanced-btn--active {
+  background: #f0f0f0;
+  border-color: var(--brand1);
+  color: var(--brand1);
+}
+
+.search-advanced-btn:focus-visible {
+  outline: 3px solid var(--brand1);
+  outline-offset: 2px;
+}
+.search-submit-btn {
+  padding: 12px 24px;
+  background: var(--brand1);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s;
+}
+
+.search-submit-btn:hover {
+  filter: brightness(0.9);
+}
+
+.search-submit-btn:focus-visible {
+  outline: 3px solid var(--brand1);
+  outline-offset: 2px;
+}
+
+.search-help {
+  margin: 8px 0 0;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.search-results-list {
+  display: grid;
+  gap: 12px;
+}
+
+@media (max-width: 600px) {
+  .search-form {
+    flex-direction: column;
+  }
+
+  .search-submit-btn {
+    width: 100%;
+  }
+}
+
+.search-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.search-advanced-btn svg {
+  pointer-events: none;
+}

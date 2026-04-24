@@ -1,0 +1,8 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { MetadataConfig } from '../../components/admin/MetadataConfig';
+---
+
+<AdminLayout title="Metadata - E-Arkiv Portal">
+  <MetadataConfig client:only="react" />
+</AdminLayout>

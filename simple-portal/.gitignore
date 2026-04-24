@@ -1,0 +1,76 @@
+# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/bazel-out
+
+# Node / Bun
+/node_modules
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/mcp.json
+.history/*
+
+# Environment variables (credentials)
+.env
+.env.local
+!.env.example
+
+# Miscellaneous
+/.angular/cache
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
+__screenshots__/
+docs/
+
+# Astro
+.astro/
+
+# Codex temp
+.codex-temp/
+
+# Claude — local AI assistant state (CLAUDE.md tracked separately)
+.claude/settings.local.json
+.mcp.json
+
+# Digi CSS (kopierad från node_modules, behövs inte i repo)
+public/digi/digi-arbetsformedlingen.css
+
+# Debug/temp filer
+public/proof.html
+public/reset-browser-state.html
+public/debug.html
+sokdump.html
+
+# Angular referens (inte del av portalen)
+_angular-ref/
+
+# Server referens (inte del av portalen)
+/server/
+
+# System files
+.DS_Store
+Thumbs.db

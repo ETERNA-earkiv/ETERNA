@@ -1,0 +1,236 @@
+.file-viewer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.file-viewer {
+  background: #323639;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  width: 90vw;
+  max-width: 1000px;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.file-viewer--maximized {
+  width: 100vw;
+  max-width: 100vw;
+  height: 100vh;
+  border-radius: 0;
+  border: none;
+}
+
+.file-viewer__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.file-viewer__title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: white;
+  font-size: 0.9rem;
+  min-width: 0;
+}
+
+.file-viewer__title strong {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-viewer__title span {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.file-viewer__actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.file-viewer__download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--brand1);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+
+.file-viewer__download-btn:hover {
+  filter: brightness(1.1);
+  text-decoration: none;
+  color: white;
+}
+
+.file-viewer__download-btn:focus-visible {
+  outline: 3px solid white;
+  outline-offset: 2px;
+}
+
+.file-viewer__btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 6px;
+  padding: 8px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.file-viewer__btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.file-viewer__content {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+}
+
+.file-viewer__nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  z-index: 1;
+  transition: background 0.15s;
+}
+
+.file-viewer__nav:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.file-viewer__nav--prev { left: 16px; }
+.file-viewer__nav--next { right: 16px; }
+
+.file-viewer__image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.file-viewer__iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: white;
+}
+
+.file-viewer__text {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  padding: 16px;
+}
+
+.file-viewer__text pre {
+  color: #e0e0e0;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+}
+
+.file-viewer__error {
+  color: #ef9a9a;
+}
+
+.file-viewer__error-box {
+  color: #ef9a9a;
+  padding: 2rem;
+  text-align: center;
+  display: grid;
+  gap: 1rem;
+  justify-items: center;
+}
+
+.file-viewer__error-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.file-viewer__retry-btn {
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+.file-viewer__retry-btn:hover { background: rgba(255, 255, 255, 0.25); }
+.file-viewer__retry-btn:focus-visible { outline: 3px solid white; outline-offset: 2px; }
+
+.file-viewer__video,
+.file-viewer__audio {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.file-viewer__unknown {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  padding: 48px;
+}
+
+.file-viewer__download-link {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 10px 24px;
+  background: var(--brand1);
+  color: white;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.file-viewer__download-link:hover {
+  filter: brightness(1.1);
+  text-decoration: none;
+  color: white;
+}

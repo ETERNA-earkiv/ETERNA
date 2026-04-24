@@ -1,0 +1,41 @@
+{
+  "siteConfig": {
+    "siteName": "E-Arkiv Portal",
+    "primaryColor": "#C4122A",
+    "secondaryColor": "#424242"
+  },
+  "searchConfig": {
+    "mainSearchField": {
+      "fieldName": "search",
+      "label": "Sok i arkivet",
+      "type": "text",
+      "placeholder": "Skriv ett sokord..."
+    },
+    "advancedFields": [
+      {
+        "fieldName": "level",
+        "label": "Beskrivningsniva",
+        "type": "select",
+        "enabled": true
+      },
+      {
+        "fieldName": "type",
+        "label": "Typ",
+        "type": "select",
+        "enabled": true
+      },
+      {
+        "fieldName": "createdOn",
+        "label": "Skapad",
+        "type": "date-range",
+        "enabled": false
+      }
+    ],
+    "resultsPerPage": 10
+  },
+  "visibilityConfig": {
+    "allowedLevels": [],
+    "xpathRulesEnabled": false,
+    "xpathRules": []
+  }
+}

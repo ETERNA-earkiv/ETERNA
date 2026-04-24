@@ -1,0 +1,76 @@
+/* Filterpanel layout — Digi-komponenter hanterar egen styling via Shadow DOM */
+
+.filter-panel {
+  padding: 20px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 0;
+  display: grid;
+  gap: 16px;
+}
+
+.filter-panel__fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.filter-panel__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Native date-inputs (behålls tills Digi type="date" verifierats) */
+.filter-panel__label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.filter-panel__input,
+.filter-panel__select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #333;
+  border-radius: 0;
+  font-size: 1rem;
+  font-family: inherit;
+  outline: none;
+  background: white;
+  color: #333;
+}
+
+.filter-panel__input:focus,
+.filter-panel__select:focus {
+  border-color: var(--brand1);
+  border-width: 2px;
+  padding: 9px 11px;
+}
+
+.filter-panel__date-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-panel__date-range input {
+  flex: 1;
+}
+
+.filter-panel__date-sep {
+  color: #666;
+  flex-shrink: 0;
+}
+
+.filter-panel__actions {
+  display: flex;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+@media (max-width: 600px) {
+  .filter-panel__fields {
+    grid-template-columns: 1fr;
+  }
+}

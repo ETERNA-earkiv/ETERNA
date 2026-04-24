@@ -1,0 +1,46 @@
+$font-path: './assets/fonts/' !default;
+
+/* open-sans-300 - latin */
+@font-face {
+  font-family: 'Open sans';
+  font-style: normal;
+  font-weight: 300;
+  src:
+    local(''),
+    url('#{$font-path}open-sans-300.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('#{$font-path}open-sans-300.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* open-sans-regular - latin */
+@font-face {
+  font-family: 'Open sans';
+  font-style: normal;
+  font-weight: 400;
+  src:
+    local(''),
+    url('#{$font-path}open-sans-regular.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('#{$font-path}open-sans-regular.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* open-sans-600 - latin */
+@font-face {
+  font-family: 'Open sans';
+  font-style: normal;
+  font-weight: 600;
+  src:
+    local(''),
+    url('#{$font-path}open-sans-600.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('#{$font-path}open-sans-600.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* open-sans-700 - latin */
+@font-face {
+  font-family: 'Open sans';
+  font-style: normal;
+  font-weight: 700;
+  src:
+    local(''),
+    url('#{$font-path}open-sans-700.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('#{$font-path}open-sans-700.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}

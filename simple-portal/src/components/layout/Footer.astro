@@ -1,0 +1,98 @@
+---
+/* Footer */
+interface Props {
+  siteName?: string;
+}
+const { siteName = 'E-Arkiv Portal' } = Astro.props;
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="footer" role="contentinfo">
+  <div class="footer-container">
+    <div class="footer-brand">
+      <p class="footer-name">{siteName}</p>
+      <p class="footer-copyright">&copy; {currentYear} &mdash; Alla rättigheter förbehålles</p>
+    </div>
+
+    <nav class="footer-links" aria-label="Sidfotslänkar">
+      <a href="/sok" class="footer-link">Sök</a>
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background-color: var(--footer-bg);
+    color: var(--footer-fg);
+    margin-top: auto;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .footer-container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .footer-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  .footer-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    opacity: 0.85;
+  }
+
+  .footer-copyright {
+    font-size: 0.75rem;
+    opacity: 0.5;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .footer-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.375rem 0.875rem;
+    border-radius: var(--border-radius);
+    color: var(--footer-fg);
+    text-decoration: none;
+    font-size: 0.82rem;
+    opacity: 0.6;
+    transition: opacity 0.15s, background-color 0.15s;
+  }
+
+  .footer-link:hover {
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.06);
+    text-decoration: none;
+  }
+
+  .footer-link:focus-visible {
+    outline: 2px solid var(--brand1);
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 40rem) {
+    .footer-container {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .footer-links {
+      justify-content: center;
+    }
+  }
+</style>

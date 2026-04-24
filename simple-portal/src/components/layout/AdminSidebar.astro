@@ -1,0 +1,92 @@
+---
+/* Admin Sidebar */
+const currentPath = Astro.url.pathname;
+---
+
+<aside class="sidebar" aria-label="Administrationsmeny">
+  <nav class="sidebar-nav">
+    <a
+      href="/admin/metadata"
+      class:list={['sidebar-link', { active: currentPath.startsWith('/admin/metadata') }]}
+    >
+      Metadata och synlighet
+    </a>
+    <a
+      href="/admin/tema"
+      class:list={['sidebar-link', { active: currentPath.startsWith('/admin/tema') }]}
+    >
+      Tema
+    </a>
+    <a
+      href="/admin/konfiguration"
+      class:list={['sidebar-link', { active: currentPath.startsWith('/admin/konfiguration') }]}
+    >
+      Konfiguration
+    </a>
+  </nav>
+</aside>
+
+<style>
+  .sidebar {
+    width: 14rem;
+    background-color: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    padding: var(--space-md) 0;
+    flex-shrink: 0;
+  }
+
+  .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    padding: 0 var(--space-sm);
+  }
+
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.625rem 0.875rem;
+    border-radius: var(--border-radius);
+    color: var(--sidebar-text);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background-color 0.15s;
+    opacity: 0.8;
+  }
+
+  .sidebar-link:hover {
+    background-color: var(--sidebar-bg-hover);
+    opacity: 1;
+    text-decoration: none;
+  }
+
+  .sidebar-link.active {
+    background-color: var(--sidebar-active-bg);
+    opacity: 1;
+    font-weight: 600;
+  }
+
+  .sidebar-link:focus-visible {
+    outline: 2px solid var(--sidebar-accent);
+    outline-offset: -2px;
+  }
+
+  @media (max-width: 48rem) {
+    .sidebar {
+      width: 100%;
+      padding: var(--space-sm) 0;
+    }
+
+    .sidebar-nav {
+      flex-direction: row;
+      overflow-x: auto;
+      padding: 0 var(--space-md);
+    }
+
+    .sidebar-link {
+      white-space: nowrap;
+    }
+  }
+</style>

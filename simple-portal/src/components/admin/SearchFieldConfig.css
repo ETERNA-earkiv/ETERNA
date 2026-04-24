@@ -1,0 +1,114 @@
+.sfc {
+  display: grid;
+  gap: var(--space-lg);
+  max-width: 52rem;
+}
+
+.sfc__desc { margin: 0; color: var(--portal-muted-fg); }
+
+.sfc__list {
+  display: grid;
+  gap: 0;
+  border: 1px solid #333;
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.sfc__row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  background: #fff;
+}
+
+.sfc__row:last-child { border-bottom: none; }
+.sfc__row--disabled { opacity: 0.5; }
+
+.sfc__row > input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--brand1);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.sfc__info {
+  flex: 1;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.sfc__label-input {
+  border: 1px solid #333;
+  border-radius: 0;
+  padding: 0.375rem 0.5rem;
+  font-size: 0.875rem;
+  width: 100%;
+  max-width: 16rem;
+}
+.sfc__label-input:focus-visible {
+  outline: 3px solid var(--brand1);
+  outline-offset: -1px;
+}
+
+.sfc__field-name {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--portal-muted-fg);
+}
+
+.sfc__type-select {
+  padding: 0.375rem 0.5rem;
+  border: 1px solid #333;
+  border-radius: 0;
+  font-size: 0.8rem;
+}
+.sfc__type-select:focus-visible {
+  outline: 3px solid var(--brand1);
+  outline-offset: -1px;
+}
+
+.sfc__actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.sfc__actions button {
+  background: none;
+  border: 1px solid #333;
+  border-radius: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sfc__actions button:focus-visible {
+  outline: 3px solid var(--brand1);
+  outline-offset: -1px;
+}
+
+.sfc__actions button:disabled { opacity: 0.3; cursor: not-allowed; }
+.sfc__remove { color: var(--color-danger); }
+
+.sfc__available {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.sfc__available select {
+  padding: 0.5rem;
+  border: 1px solid #333;
+  border-radius: 0;
+  font-size: 0.875rem;
+}
+.sfc__available select:focus-visible {
+  outline: 3px solid var(--brand1);
+  outline-offset: -1px;
+}

@@ -1,0 +1,40 @@
+---
+import PortalLayout from './PortalLayout.astro';
+import AdminSidebar from '../components/layout/AdminSidebar.astro';
+
+interface Props {
+  title?: string;
+}
+
+const { title = 'Administration — E-Arkiv Portal' } = Astro.props;
+---
+
+<PortalLayout title={title}>
+  <div class="admin-layout">
+    <AdminSidebar />
+    <div class="admin-content">
+      <slot />
+    </div>
+  </div>
+</PortalLayout>
+
+<style>
+  .admin-layout {
+    display: flex;
+    gap: 0;
+    min-height: calc(100vh - 8rem);
+    margin: calc(-1 * var(--space-lg)) calc(-1 * var(--content-padding));
+  }
+
+  .admin-content {
+    flex: 1;
+    padding: var(--space-lg) var(--space-xl);
+    min-width: 0;
+  }
+
+  @media (max-width: 48rem) {
+    .admin-layout {
+      flex-direction: column;
+    }
+  }
+</style>

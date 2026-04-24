@@ -1,0 +1,138 @@
+.expanded-content {
+  background: #fafafa;
+  padding: 24px;
+}
+
+.expanded-content__actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.expanded-content__download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--brand1);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.expanded-content__download-btn:hover:not(:disabled) {
+  filter: brightness(0.9);
+}
+
+.expanded-content__download-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.expanded-content__download-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.expanded-content__download-btn:focus-visible {
+  outline: 3px solid var(--brand1);
+  outline-offset: 2px;
+}
+
+.expanded-content__meta-section {
+  margin-bottom: 24px;
+}
+
+.expanded-content__standard-heading {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #202124;
+  margin: 0 0 12px;
+}
+
+.expanded-content__section-card {
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 0;
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.expanded-content__metadata-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 24px;
+  margin: 0;
+}
+
+.expanded-content__meta-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.expanded-content__meta-item dt {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #374151;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.expanded-content__meta-item dd {
+  font-size: 0.92rem;
+  color: #111827;
+  margin: 0;
+  word-break: break-word;
+}
+
+.expanded-content__meta-html {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  overflow-x: auto;
+}
+
+.expanded-content__meta-html table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.expanded-content__meta-html td,
+.expanded-content__meta-html th {
+  padding: 6px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.expanded-content__files-header {
+  margin-bottom: 16px;
+}
+
+.expanded-content__files-header h3 {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #202124;
+  margin: 0;
+}
+
+.expanded-content__no-files {
+  color: #6b7280;
+  font-style: italic;
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .expanded-content {
+    padding: 16px;
+  }
+
+  .expanded-content__metadata-grid {
+    grid-template-columns: 1fr;
+  }
+}

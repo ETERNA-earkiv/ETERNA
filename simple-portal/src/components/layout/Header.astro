@@ -1,0 +1,188 @@
+---
+/* Header — Sticky navigation bar */
+interface Props {
+  siteName?: string;
+  logoUrl?: string;
+}
+const { siteName = 'E-Arkiv Portal', logoUrl = '' } = Astro.props;
+---
+
+<header class="header" role="banner">
+  <div class="header-container">
+    <a href="/" class="brand-link" aria-label="Gå till startsidan">
+      {logoUrl ? (
+        <img src={logoUrl} alt={`${siteName} logotyp`} class="brand-logo" />
+      ) : (
+        <div class="brand-icon" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4" />
+          </svg>
+        </div>
+      )}
+      <div class="brand-text">
+        <span class="brand-name">{siteName}</span>
+      </div>
+    </a>
+
+    <nav class="nav" aria-label="Huvudnavigation">
+      <a href="/sok" class="nav-link" aria-label="Sök i arkivet">
+        <svg class="nav-icon" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
+        </svg>
+        <span>Sök</span>
+      </a>
+      <a href="/admin" class="nav-link" aria-label="Administration">
+        <svg class="nav-icon" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" />
+        </svg>
+        <span>Admin</span>
+      </a>
+      <a href="/logga-in" class="nav-link nav-link--accent" aria-label="Logga in">
+        <svg class="nav-icon" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3" />
+        </svg>
+        <span>Logga in</span>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: var(--header-bg, var(--portal-bg));
+    color: var(--header-fg);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+    gap: 1rem;
+  }
+
+  .brand-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .brand-link:hover {
+    text-decoration: none;
+  }
+
+  .brand-logo {
+    height: 2.75rem;
+    width: auto;
+    border-radius: 0;
+  }
+
+  .brand-icon {
+    width: 2.75rem;
+    height: 2.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--brand1);
+    color: #ffffff;
+    border-radius: 0.5rem;
+  }
+
+  .brand-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .brand-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .brand-tagline {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    opacity: 0.5;
+    font-weight: 500;
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 0.875rem;
+    border-radius: var(--border-radius);
+    color: var(--portal-fg);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background-color 0.15s, color 0.15s;
+  }
+
+  .nav-link:hover {
+    background-color: var(--portal-hover);
+    text-decoration: none;
+  }
+
+  .nav-link:focus-visible {
+    outline: 2px solid var(--brand1);
+    outline-offset: 2px;
+  }
+
+  .nav-link--accent {
+    background-color: var(--brand1);
+    color: var(--portal-primary-fg);
+  }
+
+  .nav-link--accent:hover {
+    background-color: color-mix(in srgb, var(--brand1) 85%, #000);
+  }
+
+  .nav-icon {
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 48rem) {
+    .header-container {
+      padding: 0.5rem 1rem;
+    }
+
+    .brand-tagline {
+      display: none;
+    }
+
+    .brand-name {
+      font-size: 1.05rem;
+    }
+
+    .brand-icon {
+      width: 2.25rem;
+      height: 2.25rem;
+    }
+
+    .nav-link span {
+      display: none;
+    }
+
+    .nav-link {
+      padding: 0.5rem;
+    }
+  }
+</style>

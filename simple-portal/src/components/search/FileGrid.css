@@ -1,0 +1,147 @@
+.file-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  padding-top: 16px;
+}
+
+.file-card {
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 0;
+  overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.file-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.file-card:hover .file-card__overlay {
+  opacity: 1;
+}
+
+.file-card:focus-within {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  outline: 3px solid var(--brand1);
+  outline-offset: 2px;
+}
+
+.file-card:focus-within .file-card__overlay {
+  opacity: 1;
+}
+
+.file-card__preview {
+  position: relative;
+  height: 140px;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.file-card__thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.3s;
+}
+
+.file-card__thumbnail--loading {
+  opacity: 0;
+  position: absolute;
+}
+
+.file-card__thumb-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: #f0f0f0;
+}
+
+.file-card__icon-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 48px;
+  opacity: 0.5;
+}
+
+.file-card__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.file-card__overlay-btn {
+  background: white;
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #333;
+  transition: transform 0.1s;
+}
+
+.file-card__overlay-btn:hover {
+  transform: scale(1.1);
+}
+
+.file-card__overlay-btn:focus-visible {
+  outline: 3px solid white;
+  outline-offset: 2px;
+  transform: scale(1.1);
+}
+
+.file-card__info {
+  padding: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.file-card__name {
+  display: block;
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: #202124;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+}
+
+.file-card__meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #5f6368;
+}
+
+.file-card__type {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-card__size {
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: 4px;
+}

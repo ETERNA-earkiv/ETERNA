@@ -1,0 +1,71 @@
+---
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+/* VIKTIGT: Importera ALDRIG digi-arbetsformedlingen.css via frontmatter-import —
+   det kraschar Vite HMR. Ladda istället via <link> i <head>.
+   CSS:en sätter --digi--* tokens som Shadow DOM-komponenterna kräver. */
+import '@styles/tokens.css';
+import '@styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+// Läs config.json server-side — en enda källa för tema
+let siteName = 'E-Arkiv Portal';
+let primaryColor = '#C4122A';
+let logoUrl = '';
+try {
+  const configPath = join(process.cwd(), 'public', 'assets', 'config', 'config.json');
+  const raw = await readFile(configPath, 'utf-8');
+  const config = JSON.parse(raw);
+  if (config?.siteConfig?.siteName) siteName = config.siteConfig.siteName;
+  if (config?.siteConfig?.primaryColor) primaryColor = config.siteConfig.primaryColor;
+  if (config?.siteConfig?.logoUrl) logoUrl = config.siteConfig.logoUrl;
+} catch { /* använd defaults */ }
+
+const { title = siteName, description = 'Sök och utforska arkivet' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="sv" data-theme-mode="light" style={`--brand1: ${primaryColor}`}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="stylesheet" href="/digi/fonts/src/fonts.css" />
+    <link rel="stylesheet" href="/digi/digi-arbetsformedlingen.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content" aria-label="Hoppa till huvudinnehåll">Hoppa till huvudinnehåll</a>
+    <Header siteName={siteName} logoUrl={logoUrl} />
+    <main id="main-content" tabindex="-1">
+      <slot />
+    </main>
+    <Footer siteName={siteName} />
+  </body>
+</html>
+
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  main {
+    flex: 1;
+    width: 100%;
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: var(--space-lg) var(--content-padding);
+  }
+
+  main:focus {
+    outline: none;
+  }
+</style>

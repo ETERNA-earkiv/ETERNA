@@ -1,0 +1,8 @@
+---
+import PortalLayout from '../layouts/PortalLayout.astro';
+import { LoginForm } from '../components/login/LoginForm';
+---
+
+<PortalLayout title="Logga in - E-Arkiv Portal">
+  <LoginForm client:only="react" />
+</PortalLayout>

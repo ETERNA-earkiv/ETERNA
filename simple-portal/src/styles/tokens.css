@@ -1,0 +1,110 @@
+/* ============================================
+   Design Tokens - Simple Portal
+   Portalens egna tokens, kompletterar Digis tokens.
+   Prefixade for att undvika kollision med Digi
+   (Digi definierar --background, --hover, --primary).
+   ============================================ */
+
+:root {
+  /* Brand */
+  --brand1: #C4122A;
+  --brand2: #424242;
+
+  /* Override Digi brand tokens to use portal brand color.
+     Digi buttons, links, borders reference --digi--natthimmel--*.
+     Checkbox selected uses --digi--color--background--interactive--selected--primary. */
+  --digi--natthimmel--800: var(--brand1);
+  --digi--natthimmel--700: color-mix(in srgb, var(--brand1) 85%, #000);
+  --digi--natthimmel--600: color-mix(in srgb, var(--brand1) 70%, #000);
+  --digi--color--background--interactive--selected--primary: var(--brand1);
+  --digi--color--background--interactive--selected--primary--light: var(--brand1);
+  --digi--color--text--interactive--primary: var(--brand1);
+  --digi--color--icon--cta: var(--brand1);
+  --digi--color--divider--cta: var(--brand1);
+
+  /* Base */
+  --portal-bg: hsl(0, 0%, 99%);
+  --portal-fg: hsl(0, 0%, 15%);
+
+  --portal-muted: hsl(0, 0%, 80%);
+  --portal-muted-fg: hsl(0, 0%, 40%);
+
+  --portal-hover: hsl(225, 2%, 95%);
+
+  --portal-primary: var(--brand1);
+  --portal-primary-fg: #ffffff;
+
+  /* Focus */
+  --focus-color: var(--brand1);
+
+  /* Sidebar */
+  --sidebar-bg: color-mix(in srgb, var(--brand1) 85%, #000);
+  --sidebar-bg-hover: color-mix(in srgb, var(--brand1) 70%, #000);
+  --sidebar-active-bg: color-mix(in srgb, var(--brand1) 60%, #000);
+  --sidebar-accent: color-mix(in srgb, var(--brand1) 40%, #fff);
+  --sidebar-text: #ffffff;
+
+  /* Components */
+  --card-bg: var(--portal-bg);
+  --card-fg: var(--portal-fg);
+  --header-bg: var(--portal-bg);
+  --header-fg: var(--portal-fg);
+  --footer-bg: hsl(0, 0%, 20%);
+  --footer-fg: hsl(0, 0%, 92%);
+
+  /* Borders */
+  --border-color: hsl(0, 0%, 85%);
+  --border-radius: 0.25rem;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06);
+
+  /* Spacing scale */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+
+  /* Layout */
+  --max-width: 80rem;
+  --content-padding: 1rem;
+
+  /* Typography */
+  --font-body: 'Open Sans', sans-serif;
+  --font-mono: 'Courier New', monospace;
+
+  /* Semantic status colors */
+  --color-success: hsl(142, 60%, 35%);
+  --color-warning: hsl(38, 92%, 45%);
+  --color-danger: hsl(0, 72%, 45%);
+  --color-info: hsl(210, 70%, 45%);
+}
+
+[data-theme-mode='dark'] {
+  --portal-bg: hsl(0, 0%, 12%);
+  --portal-fg: hsl(0, 0%, 90%);
+
+  --portal-muted: hsl(0, 0%, 30%);
+  --portal-muted-fg: hsl(0, 0%, 70%);
+
+  --portal-hover: hsl(0, 0%, 18%);
+
+  --card-bg: hsl(0, 0%, 14%);
+  --card-fg: hsl(0, 0%, 100%);
+
+  --header-bg: hsl(0, 0%, 10%);
+  --header-fg: hsl(0, 0%, 92%);
+
+  --footer-bg: hsl(0, 0%, 8%);
+  --footer-fg: hsl(0, 0%, 80%);
+
+  --border-color: hsl(0, 0%, 25%);
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.35);
+}

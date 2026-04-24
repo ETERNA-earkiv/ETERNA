@@ -1,0 +1,21 @@
+---
+import PortalLayout from '../../layouts/PortalLayout.astro';
+
+const { token } = Astro.params;
+---
+
+<PortalLayout title="Delad länk — E-Arkiv Portal">
+  <div class="share-page">
+    <h1>Delad länk</h1>
+    <p>Hämtar arkivobjekt&hellip;</p>
+    <p><small>Token: <code>{token}</code></small></p>
+  </div>
+</PortalLayout>
+
+<style>
+  .share-page {
+    max-width: 28rem;
+    margin: 4rem auto;
+    text-align: center;
+  }
+</style>

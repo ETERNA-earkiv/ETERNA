@@ -1,0 +1,18 @@
+.meta-config {
+  display: grid;
+  gap: 24px;
+  max-width: 58rem;
+}
+
+.meta-config__desc {
+  margin: 0;
+  color: #6b7280;
+}
+
+.meta-config__section {
+  padding: 24px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}

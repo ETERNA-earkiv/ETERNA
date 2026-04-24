@@ -1,0 +1,159 @@
+.xpath-editor {
+  border: 1px solid #e5e7eb;
+  border-radius: 0;
+  padding: 24px;
+  margin: 0;
+  display: grid;
+  gap: 16px;
+}
+
+.xpath-editor legend { font-size: 1.1rem; font-weight: 600; padding: 0 8px; }
+
+.xpath-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.xpath-toggle input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--brand1);
+}
+
+.xpath-detect { display: grid; gap: 8px; }
+.xpath-detect h4 { margin: 0; font-size: 1rem; }
+.xpath-help { margin: 0; color: #6b7280; font-size: 0.85rem; }
+
+.xpath-label { display: block; font-size: 0.875rem; font-weight: 600; color: #333; margin-bottom: 4px; margin-top: 8px; }
+
+.xpath-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #333;
+  border-radius: 0;
+  font-size: 0.9rem;
+  font-family: inherit;
+  outline: none;
+  background: white;
+}
+
+.xpath-input:focus { border-color: var(--brand1); border-width: 2px; padding: 9px 11px; }
+
+select.xpath-input { border-radius: 0; }
+
+.xpath-row { display: flex; gap: 8px; align-items: flex-end; }
+.xpath-row .xpath-input { flex: 1; }
+
+.xpath-btn {
+  padding: 10px 20px;
+  background: white;
+  color: #333;
+  border: 1px solid #333;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.xpath-btn:hover:not(:disabled) { background: #f3f4f6; }
+.xpath-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.xpath-btn:focus-visible { outline: 3px solid var(--brand1); outline-offset: 2px; }
+
+.xpath-btn--primary {
+  background: var(--brand1);
+  color: white;
+  border-color: var(--brand1);
+}
+
+.xpath-btn--primary:hover:not(:disabled) { filter: brightness(0.9); background: var(--brand1); }
+
+.xpath-ok { color: #1b5e20; font-size: 0.875rem; margin: 0; }
+.xpath-err { color: #b91c1c; font-size: 0.875rem; margin: 0; }
+
+.xpath-hr { border: none; border-top: 1px solid #e5e7eb; margin: 8px 0; }
+
+.xpath-rule {
+  border: 1px solid #e5e7eb;
+  border-radius: 0;
+  padding: 20px;
+  background: white;
+  display: grid;
+  gap: 4px;
+}
+
+.xpath-rule-head { display: flex; justify-content: space-between; align-items: center; }
+.xpath-rule-head h4 { margin: 0; font-size: 1rem; }
+
+.xpath-remove {
+  background: none;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  width: 28px; height: 28px;
+  font-size: 1.1rem;
+  color: #b91c1c;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.xpath-remove:hover { background: #b91c1c; color: white; }
+
+.xpath-value-group { display: grid; gap: 4px; margin-top: 12px; }
+
+.xpath-value-label { font-weight: 600; font-size: 0.875rem; }
+.xpath-value-label.chip-full { color: #1b5e20; }
+.xpath-value-label.chip-title-only { color: #b45309; }
+.xpath-value-label.chip-hidden { color: #b91c1c; }
+
+.xpath-chip-list { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+
+.xpath-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 4px 4px 10px;
+  border-radius: 1rem;
+  font-size: 0.85rem;
+}
+
+.xpath-chip.chip-full { background: #e8f5e9; }
+.xpath-chip.chip-title-only { background: #fff3e0; }
+.xpath-chip.chip-hidden { background: #ffebee; }
+
+.xpath-chip-remove { background: none; border: none; cursor: pointer; padding: 2px 4px; border-radius: 50%; font-size: 0.85rem; }
+.xpath-chip-remove:hover { background: rgba(0,0,0,0.08); }
+
+.xpath-chip-add { display: flex; align-items: center; gap: 4px; }
+
+.xpath-chip-input {
+  border: 1px dashed #333;
+  border-radius: 0;
+  padding: 4px 10px;
+  font-size: 0.85rem;
+  outline: none;
+  min-width: 8rem;
+  background: transparent;
+}
+.xpath-chip-input:focus { border-color: var(--brand1); }
+
+.xpath-chip-add-btn {
+  background: none;
+  border: 1px solid #333;
+  border-radius: 6px;
+  width: 28px; height: 28px;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.xpath-chip-add-btn:hover { background: #f3f4f6; }
+
+.xpath-test { border-top: 1px solid #e5e7eb; padding-top: 12px; margin-top: 12px; display: grid; gap: 8px; }
+
+.xpath-test-result { padding: 12px; border-radius: 0; font-size: 0.875rem; }
+.xpath-test-result p { margin: 2px 0; }
+.xpath-test-result code { background: rgba(0,0,0,0.06); padding: 2px 6px; border-radius: 0; font-family: var(--font-mono); }
+
+.result-full { background: #e8f5e9; border: 1px solid #a5d6a7; }
+.result-title-only { background: #fff3e0; border: 1px solid #ffcc80; }
+.result-hidden { background: #ffebee; border: 1px solid #ef9a9a; }

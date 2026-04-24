@@ -1,0 +1,8 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { AdminSettings } from '../../components/admin/AdminSettings';
+---
+
+<AdminLayout title="Konfiguration - E-Arkiv Portal">
+  <AdminSettings client:only="react" />
+</AdminLayout>
