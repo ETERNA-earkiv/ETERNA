@@ -5,8 +5,12 @@ DIR=/docker-entrypoint.d
 
 if [[ -d "$DIR" ]]; then
   for script in "$DIR"/*; do
-    [[ -f "$script" && -x "$script" ]] && echo "Running $script" && "$script"
+    if [[ -f "$script" && -x "$script" ]]; then
+      echo "Running $script"
+      "$script" || exit $?
+    fi
   done
+fi
 fi
 
 if [[ $# -eq 0 ]] ; then
