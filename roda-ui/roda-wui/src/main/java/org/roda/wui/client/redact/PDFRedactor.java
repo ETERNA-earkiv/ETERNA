@@ -4,6 +4,7 @@ import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -12,7 +13,10 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import config.i18n.client.ClientMessages;
 import org.roda.core.data.v2.index.IndexedRepresentationRequest;
+import org.roda.core.data.v2.ip.redaction.SaveRedactionRequest;
 import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.widgets.Toast;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 import elemental2.dom.AbortSignal;
@@ -175,11 +179,43 @@ public class PDFRedactor extends Composite {
   private void initPdfRedactorPanel(final String aipId, final IndexedFile file, final String downloadUrl) {
     pdfRedactorPanel.setUrl(downloadUrl);
     pdfRedactorPanel.mount();
+
+    pdfRedactorPanel.setPreSaveCallback(() -> {
+      PromiseWrapper<Void> preSavePromise = new PromiseWrapper<>();
+      boolean mandatory = ConfigurationManager.getBoolean(true, RodaConstants.UI_REDACTION_REASON_MANDATORY);
+
+      Dialogs.showPromptDialog(messages.redactPdfReasonTitle(), null, null,
+        messages.redactPdfReasonPlaceholder(), RegExp.compile(".*"),
+        messages.cancelButton(), messages.confirmButton(), mandatory, true,
+        new AsyncCallback<String>() {
+          @Override
+          public void onFailure(Throwable caught) {
+            preSavePromise.reject(caught);
+          }
+
+          @Override
+          public void onSuccess(String details) {
+            SaveRedactionRequest request = new SaveRedactionRequest(
+              aipId, file.getRepresentationId(), file.getId(), details);
+            Services services = new Services("Log redaction save", "post");
+            services.redactionResource(s -> s.logRedactionSave(request))
+              .whenComplete((result, throwable) -> {
+                if (throwable != null) {
+                  preSavePromise.reject(throwable);
+                } else {
+                  preSavePromise.resolve(null);
+                }
+              });
+          }
+        });
+      return preSavePromise.getPromise();
+    });
+
     pdfRedactorPanel.setSaveCallback((Blob pdfData, AbortSignal signal) ->
       getOrCreateRedactedRepresentation(aipId).then((representation) -> {
         List<String> path = new ArrayList<>(file.getPath());
 
-        String uploadUrl = RestUtils.createFileUploadUri(aipId, representation.getId(), path, "Saved redacted version");
+        String uploadUrl = RestUtils.createFileUploadUri(aipId, representation.getId(), path, "Maskerad PDF sparad");
 
         FormData formData = new FormData();
         formData.append("resource", pdfData, file.getId());

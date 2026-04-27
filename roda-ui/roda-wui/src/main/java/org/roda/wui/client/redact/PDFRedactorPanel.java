@@ -33,4 +33,6 @@ public class PDFRedactorPanel extends Composite {
   }
 
   public void setSaveCallback(PDFRedactorObject.SaveCallback callback) { PDFRedactorObject.setSaveCallback(callback); }
+
+  public void setPreSaveCallback(PDFRedactorObject.PreSaveCallback callback) { PDFRedactorObject.setPreSaveCallback(callback); }
 }
