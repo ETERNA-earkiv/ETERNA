@@ -1,14 +1,14 @@
 FROM eclipse-temurin:21-jre-jammy
 LABEL maintainer="admin@keep.pt" vendor="KEEP SOLUTIONS"
 
-# Install dependencies & Remove python dependency
 RUN set -ex; \
     apt-get -qq update && \
-    apt-get -qq -y install software-properties-common && \
-    apt-get -qq -y --no-install-recommends install clamdscan jq rsync && \
-    apt-get clean && rm -rf /var/lib/apt/lists/* && \
-	DEBIAN_FRONTEND=noninteractive \
-	apt-get autoremove -y --purge "*python*"
+    DEBIAN_FRONTEND=noninteractive apt-get -qq -y install software-properties-common && \
+    DEBIAN_FRONTEND=noninteractive apt-get -qq -y --no-install-recommends install \
+        clamdscan jq rsync netcat-openbsd \
+        python3 python3-pip && \
+    pip3 install --no-cache-dir --break-system-packages unoserver==3.3.2 && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY ./docker/docker-files/clamd.conf /etc/clamav/clamd.conf
 
@@ -24,7 +24,9 @@ ENV RODA_HOME=/roda \
     RODA_USER="roda" \
     RODA_UID="1000" \
     RODA_GROUP="roda" \
-    RODA_GID="1000"
+    RODA_GID="1000" \
+    UNOSERVER_HOST=unoserver \
+    UNOSERVER_PORT=2003
 
 COPY ./docker/docker-files/docker-entrypoint.sh /
 COPY ./docker/docker-files/docker-entrypoint.d/* /docker-entrypoint.d/
