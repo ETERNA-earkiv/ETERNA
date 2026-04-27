@@ -170,8 +170,8 @@ function generateMetadataPdf(
     y += 6;
   }
 
-  // Footer
-  if (y > ph - 20) { doc.addPage(); y = 20; }
+  // Footer — addPage räcker, footern positioneras absolut nedanför
+  if (y > ph - 20) doc.addPage();
   doc.setFontSize(9);
   doc.setFont('helvetica', 'italic');
   doc.setTextColor(136);

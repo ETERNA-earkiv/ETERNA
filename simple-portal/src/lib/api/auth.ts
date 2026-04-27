@@ -70,12 +70,12 @@ export async function validateSession(): Promise<boolean> {
 }
 
 /**
- * Logout — clear user state and expire cookie.
+ * Logout — clear user state.
+ * JSESSIONID är HttpOnly (sätts av ETERNA) och kan inte rensas från
+ * JavaScript. Servern invaliderar sessionen vid nästa request, eller
+ * när cookien expirerar. Vi rensar bara lokalt user-state här.
  */
 export function logout(): void {
-  // Secure-flag aktiveras på HTTPS — lämnas bort på localhost/HTTP för att kakan ska kunna rensas
-  const secure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : '';
-  document.cookie = `JSESSIONID=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Strict${secure}`;
   clearUser();
   sessionChecked = false;
 }

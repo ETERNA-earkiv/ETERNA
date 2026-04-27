@@ -36,6 +36,7 @@ async function proxyToRoda(
   request: Request,
   path: string,
   authMode: AuthMode,
+  bufferedBody: ArrayBuffer | null,
 ): Promise<Response> {
   // Bygg target URL med query string
   const url = new URL(request.url);
@@ -60,16 +61,10 @@ async function proxyToRoda(
   }
   // basic-auth och user-session: forward headers som de är
 
-  // Forward body (streaming för binärdata/uploads)
-  const hasBody = !['GET', 'HEAD'].includes(request.method);
-  const body = hasBody ? request.body : undefined;
-
   const rodaRes = await fetch(targetUrl, {
     method: request.method,
     headers,
-    body,
-    // @ts-expect-error — Node fetch stödjer duplex för streaming
-    duplex: hasBody ? 'half' : undefined,
+    body: bufferedBody ?? undefined,
     redirect: 'manual',
   });
 
@@ -136,14 +131,19 @@ const handler: APIRoute = async ({ params, request }) => {
     );
   }
 
+  // Buffra body en gång så att retry kan återanvända den (ReadableStream är
+  // engångskonsumerad — utan buffring skickas tom body på retry).
+  const hasBody = !['GET', 'HEAD'].includes(request.method);
+  const bufferedBody: ArrayBuffer | null = hasBody ? await request.arrayBuffer() : null;
+
   try {
-    const rodaRes = await proxyToRoda(request, path, authMode);
+    const rodaRes = await proxyToRoda(request, path, authMode, bufferedBody);
 
     // Om RODA returnerar 401 och vi använde service account — retry
     if (rodaRes.status === 401 && authMode === 'service-account') {
       invalidateServiceSession();
       try {
-        const retryRes = await proxyToRoda(request, path, 'service-account');
+        const retryRes = await proxyToRoda(request, path, 'service-account', bufferedBody);
         if (retryRes.status === 401) {
           return new Response(
             JSON.stringify({ error: 'Arkivet är tillfälligt otillgängligt.' }),
