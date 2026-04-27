@@ -184,27 +184,13 @@ textarea:focus-visible,
 }
 
 /* === ETERNA banner lockup === */
-/* Fix: centrera logotyp + text vertikalt i headerfältet */
 .bannerLogoContainer {
   align-items: center !important;
-  padding: 0 0 0 20px !important;
 }
-.eterna-banner {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.eterna-banner__flag {
-  width: 28px;
-  height: 28px;
-  flex-shrink: 0;
-}
-.eterna-banner__wordmark {
-  font-family: var(--eterna-font-display);
-  font-weight: 700;
-  font-size: 22px;
-  letter-spacing: 0.05em;
-  color: var(--eterna-slate);
+.homeLogo {
+  height: 34px !important;
+  width: 196px !important;
+  display: block !important;
 }
 
 /* === ETERNA Welcome (facelift 2026-04) === */
@@ -664,6 +650,7 @@ body:has(.eterna-login) {
 .eterna-login__logo {
   width: 300px;
   height: auto;
+  aspect-ratio: 542 / 94;
   display: block;
   margin-bottom: 32px;
 }
@@ -1620,4 +1607,154 @@ a.btn-hero:visited, a.btn-welcome:visited {
 .col-resize-handle:hover,
 .col-resize-handle:active {
     background: rgba(0,0,0,0.2);
+}
+
+/* ===================================================
+   Inline Representation Section (Design 1)
+   Representations shown as compact rows below metadata
+   =================================================== */
+
+.representationSection {
+    /* Match the 30px padding of upperContent so left edge aligns */
+    padding: 0 30px 16px 30px;
+    /* Shrink to content so nothing bleeds full-width */
+    display: inline-flex !important;
+    flex-direction: column;
+    width: fit-content;
+    max-width: 100%;
+}
+
+/* Header "Representationer" — same style as eterna-section-header */
+.representationSection .thumbnailCardListTitle .rodaTitleHeader {
+    font-family: var(--eterna-font-display) !important;
+    font-size: 22px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+    color: var(--eterna-ink) !important;
+    padding-left: 12px !important;
+    border-left: 3px solid var(--eterna-red) !important;
+    margin: 24px 0 16px !important;
+}
+
+.representationCardContainer {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+/* Intermediate GWT containers: shrink to content */
+.representationSection .thumbnailCardList {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    width: fit-content !important;
+    gap: 4px !important;
+}
+
+.representationSection .thumbnailCardListCards {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    width: fit-content !important;
+    gap: 6px !important;
+}
+
+/* Override vertical thumbnail card to compact horizontal row */
+.representationSection .thumbnailCard {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    width: fit-content !important;
+    min-width: 240px !important;
+    padding: 8px 14px !important;
+    background: var(--eterna-white, #fff) !important;
+    border: 1px solid var(--eterna-border, #e4e4e4) !important;
+    border-radius: 6px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+    min-height: 0 !important;
+    height: auto !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    cursor: default;
+}
+
+/* Hide large icon thumbnail */
+.representationSection .thumbnailCardIconThumbnail {
+    display: none !important;
+}
+
+/* Title on the left */
+.representationSection .thumbnailCardTitle {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 10px 0 0 !important;
+    white-space: nowrap;
+    flex-shrink: 0;
+    justify-content: flex-start !important;
+}
+
+/* Clickable area beside title */
+.representationSection .clickable {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    width: fit-content !important;
+    min-height: 0 !important;
+}
+
+/* Details row: tags + attributes inline — always visible */
+.representationSection .thumbnailCardExpandable .thumbnailCardDetails,
+.representationSection .thumbnailCardCollapsible .thumbnailCardDetails {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    width: fit-content !important;
+    gap: 10px !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    background: none !important;
+    border-radius: 0 !important;
+}
+
+/* Tags inline */
+.representationSection .thumbnailCardTags {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    width: fit-content !important;
+    gap: 5px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Attributes beside tags */
+.representationSection .thumbnailCardAttributes {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    width: fit-content !important;
+    gap: 12px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 13px;
+    color: #666;
+}
+
+/* Each attribute key-value pair inline */
+.representationSection .thumbnailCardAttributes > div {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 3px;
+    align-items: center;
+}
+
+/* Expand/collapse arrow indicator — hide in inline mode */
+.representationSection .thumbnailCardTitle::after {
+    display: none !important;
 }
