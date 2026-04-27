@@ -9,6 +9,7 @@ RUN set -ex; \
         clamav \
         rsync \
         jq \
+        curl \
         glibc-locale-base && \
     zypper clean -a && \
     chmod u-s /usr/bin/su && \
