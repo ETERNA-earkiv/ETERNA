@@ -30,9 +30,9 @@ RUN set -ex; \
     chmod g-s /sbin/unix2_chkpwd && \
     chmod g-s /usr/lib/utempter/utempter
 
-COPY ./docker/docker-files/clamd.conf /etc/clamav/clamd.conf
+COPY docker-files/clamd.conf /etc/clamav/clamd.conf
 
-COPY roda-ui/roda-wui/target/roda-wui-*.jar /KEEPS/bin/
+COPY target/roda-wui-*.jar /KEEPS/bin/
 
 ENV LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
@@ -49,8 +49,8 @@ ENV LANG=en_US.UTF-8 \
     UNOSERVER_HOST=unoserver \
     UNOSERVER_PORT=2003
 
-COPY ./docker/docker-files/docker-entrypoint.sh /
-COPY ./docker/docker-files/docker-entrypoint.d/* /docker-entrypoint.d/
+COPY docker-files/docker-entrypoint.sh /
+COPY docker-files/docker-entrypoint.d/* /docker-entrypoint.d/
 
 RUN set -ex; \
     groupadd -g "$RODA_GID" "$RODA_GROUP" && \
