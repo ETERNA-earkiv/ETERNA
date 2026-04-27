@@ -98,9 +98,6 @@ reviews:
     #      Rapportera täckning under 80 %.
 
   # ── Generella granskningsinstruktioner ────────────────────────────────────
-  auto_review:
-    enabled: true
-    drafts: false
 
 chat:
   auto_reply: true
