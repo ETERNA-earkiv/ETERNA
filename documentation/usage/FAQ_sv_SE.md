@@ -1,4 +1,4 @@
-# Frågor och svar
+# Vanliga frågor
 
 Vanliga frågor från ETERNA-användare och deras svar.
 
@@ -26,10 +26,6 @@ Systemet möjliggör definition av flera hierarkiska strukturer där man kan pla
 
 Inte just nu. En plugin skulle behöva utvecklas.
 
-### Kan beskrivningsenheten kopplas till en eller flera filer i ett annat arkiv eller system?
-
-Beskrivningsenheten är en del av AIP (Archival Information Package), vilket innebär att representationer och filer vanligtvis är nära knutna till postens metadata. Det är dock möjligt att lägga till HTTP-länkar till andra resurser som sitter utanför förvaret genom att placera dem i den beskrivande metadatan.
-
 ### Är det möjligt att koppla en arkivbeskrivning till en kontextuell enhet (t.ex. ISAAR-myndighet)?
 
 Systemet stöder inte behörighetsposter internt, men om du hanterar dessa poster externt kan du länka till dem genom att redigera den beskrivande metadatan.
@@ -41,10 +37,6 @@ Det är möjligt att ha poster utan digitala representationer, det vill säga en
 ### Kan applikationen registrera nivån på leveransen, t.ex. vem överförde vad, när?
 
 SIP:ar innehåller vanligtvis information om vem, vad och när de har skapats. Ingestprocessen skapar register över hela ingestprocessen. SIP:ar förväntas dock placeras på en nätverksplats som är tillgänglig för systemet. Att fastställa vem som kopierade SIP:ar till dessa platser ligger utanför systemets omfattning.
-
-### Hur kan systemet registrera var de fysiska arkiven finns?
-
-Det kan hanteras genom att fylla i ett metadatafält. Vanligtvis <ead:physloc>.
 
 ## Sök
 
