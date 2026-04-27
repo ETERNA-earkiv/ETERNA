@@ -16,3 +16,4 @@ roda-cas/overlays/
 **/.factorypath
 .vscode/
 **/**/*.log.txt
+.worktrees/

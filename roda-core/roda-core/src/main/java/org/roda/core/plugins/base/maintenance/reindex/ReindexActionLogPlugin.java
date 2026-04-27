@@ -53,20 +53,20 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS, "Delete older logs",
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS, "Radera äldre loggar",
           PluginParameterType.INTEGER)
-        .withDefaultValue("90").isMandatory(false).withDescription("Delete logs older than x days.").build());
+        .withDefaultValue("90").isMandatory(false).withDescription("Raderar loggposter äldre än X dagar.").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Clear indexes", PluginParameterType.BOOLEAN)
-        .withDefaultValue("false").isMandatory(false).withDescription("Clear all indexes before reindexing them.")
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Rensa index", PluginParameterType.BOOLEAN)
+        .withDefaultValue("false").isMandatory(false).withDescription("Rensar alla index innan återindexering.")
         .build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES, "Optimize indexes", PluginParameterType.BOOLEAN)
-        .withDefaultValue("true").isMandatory(false).withDescription("Optimize indexes after reindexing them.")
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES, "Optimera index", PluginParameterType.BOOLEAN)
+        .withDefaultValue("true").isMandatory(false).withDescription("Optimerar index efter återindexering.")
         .build());
   }
 
@@ -82,14 +82,14 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getName() {
-    return "Rebuild log index";
+    return "Återindexera loggindex";
   }
 
   @Override
   public String getDescription() {
-    return "Clears the index and recreates it from actual physical data that exists on the storage. This task aims to fix inconsistencies between"
-      + " what is shown in the graphical user interface of the repository and what is actually kept at the storage layer. Such inconsistencies may"
-      + " occur for various reasons, e.g. index corruption, ungraceful shutdown of the repository, etc.";
+    return "Rensar indexet och återskapar det från faktisk fysisk data som finns i lagringen. Denna uppgift syftar till att åtgärda inkonsekvenser mellan"
+      + " vad som visas i arkivets grafiska gränssnitt och vad som faktiskt finns i lagringsskiktet. Sådana inkonsekvenser kan"
+      + " uppstå av olika anledningar, t.ex. indexkorruption, ovarsam avstängning av arkivet, etc.";
   }
 
   @Override

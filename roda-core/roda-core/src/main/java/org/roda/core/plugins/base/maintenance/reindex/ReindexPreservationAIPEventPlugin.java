@@ -46,16 +46,14 @@ public class ReindexPreservationAIPEventPlugin extends AbstractPlugin<AIP> {
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES,
-      PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Clear indexes", PluginParameterType.BOOLEAN)
-        .withDefaultValue("false").isMandatory(false).withDescription("Clear all indexes before reindexing them.")
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Rensa index", PluginParameterType.BOOLEAN)
+        .withDefaultValue("false").isMandatory(false).withDescription("Rensar alla index innan återindexering.")
         .build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES, "Optimize indexes", PluginParameterType.BOOLEAN)
-        .withDefaultValue("true").isMandatory(false).withDescription("Optimize indexes after reindexing them.")
-        .build());
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES, "Optimera index", PluginParameterType.BOOLEAN)
+        .withDefaultValue("true").isMandatory(false).withDescription("Optimerar index efter återindexering.").build());
   }
 
   @Override
@@ -70,14 +68,14 @@ public class ReindexPreservationAIPEventPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "Rebuild preservation AIP event index";
+    return "Återindexera bevarandehändelseindex för AIP";
   }
 
   @Override
   public String getDescription() {
-    return "Clears the index and recreates it from actual physical data that exists on the storage. This task aims to fix inconsistencies "
-      + "between what is shown in the graphical user interface of the repository and what is actually kept at the storage layer. Such "
-      + "inconsistencies may occur for various reasons, e.g. index corruption, ungraceful shutdown of the repository, etc.";
+    return "Rensar indexet och återskapar det från faktisk fysisk data som finns i lagringen. Denna uppgift syftar till att åtgärda inkonsekvenser "
+      + "mellan vad som visas i arkivets grafiska gränssnitt och vad som faktiskt finns i lagringsskiktet. Sådana "
+      + "inkonsekvenser kan uppstå av olika anledningar, t.ex. indexkorruption, ovarsam avstängning av arkivet, etc.";
   }
 
   @Override
@@ -107,8 +105,8 @@ public class ReindexPreservationAIPEventPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> liteList)
+    throws PluginException {
     return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
       @Override
       public void process(IndexService index, ModelService model, Report report, Job cachedJob,
@@ -132,8 +130,7 @@ public class ReindexPreservationAIPEventPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     if (clearIndexes) {
       LOGGER.debug("Clearing indexes");
       try {

@@ -25,6 +25,7 @@ Step-by-step guides for using ETERNA effectively.
 - **[Troubleshooting](usage/Troubleshooting.md)** - Solutions to common problems
 - **[FAQ](usage/FAQ.md)** - Answers to frequently asked questions
 - **[README](usage/README.md)** - General information about ETERNA
+- **[Configuring fields for search result export](administration/Export_Configuration.md)** - How to configure fields for search result export
 
 ### Administration Guides
 Guides for system administrators and archive managers.

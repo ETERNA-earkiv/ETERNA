@@ -1990,6 +1990,22 @@ public interface ClientMessages extends Messages {
 
   String exportListMessage(int limit);
 
+  @DefaultMessage("Export search results")
+  String exportSearchDialogTitle();
+
+  @DefaultMessage("Your search returned {0} items. All will be exported as CSV.")
+  String exportSearchDialogHitCount(long count);
+
+  @DefaultMessage("Select fields to include:")
+  String exportSearchDialogFieldsLabel();
+
+  @DefaultMessage("Start export")
+  String exportSearchDialogStartButton();
+
+  @DefaultMessage("Export started — download the result from Internal Actions when the job is complete.")
+  String exportSearchJobStarted();
+
+
   String representationInformationAssociationsTitle();
 
   SafeHtml representationInformationAssociatedWith(String field, String value, @Select String indexObjectName);
@@ -2668,4 +2684,14 @@ public interface ClientMessages extends Messages {
   String redactPdfInvalidFormatMessage();
 
   String redactPdfMissingIdentifiers();
+
+  String catalogTreeTitle();
+
+  String catalogTreeFilterPlaceholder();
+
+  String catalogTreeLoadingLabel();
+
+  String catalogTreeLoadError();
+
+  String catalogTreeRetry();
 }

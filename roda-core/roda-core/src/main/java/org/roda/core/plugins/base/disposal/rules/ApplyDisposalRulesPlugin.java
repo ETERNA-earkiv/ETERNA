@@ -54,19 +54,19 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_MANUAL,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_MANUAL, "Override disposal schedule",
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_MANUAL, "Åsidosätt gallringsplan",
           PluginParameter.PluginParameterType.BOOLEAN)
-        .withDefaultValue("false").withDescription("Overrides manually associated disposal schedules.").build());
+        .withDefaultValue("false").withDescription("Åsidosätter manuellt kopplade gallringsplaner.").build());
   }
 
   private boolean overrideManualAssociations = false;
 
   public static String getStaticName() {
-    return "Disposal schedule association via disposal rule";
+    return "Koppling av gallringsplan via gallringsregel";
   }
 
   public static String getStaticDescription() {
-    return "Associates a disposal schedule to an AIP via rules previously defined for the repository.";
+    return "Kopplar en gallringsplan till ett AIP via regler som tidigare definierats för arkivet.";
   }
 
   @Override
@@ -107,22 +107,22 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Apply the disposal rules to AIPs in the repository";
+    return "Tillämpade gallringsregler på AIP:er i arkivet";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Disposal schedule successfully associated to AIP via disposal rule";
+    return "Gallringsplan kopplades till AIP:et via gallringsregel";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Failed to associate disposal schedule to AIP via disposal rule";
+    return "Det gick inte att koppla gallringsplan till AIP:et via gallringsregel";
   }
 
   @Override
   public String getPreservationEventSkippedMessage() {
-    return "Skipped disposal schedule association to AIP via disposal rule";
+    return "Hoppade över koppling av gallringsplan till AIP:et via gallringsregel";
   }
 
   @Override

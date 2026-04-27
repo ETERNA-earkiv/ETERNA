@@ -54,7 +54,7 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
   private static final String METADATA_TYPE = "key-value";
   private static final String METADATA_VERSION = null;
   private static final String METADATA_FILE = "metadata.xml";
-  private static final String UNPACK_DESCRIPTION = "Extracted objects from package in file/folder format.";
+  private static final String UNPACK_DESCRIPTION = "Extraherade objekt från paketet i fil/mappformat.";
 
   private boolean createSubmission = false;
   private Optional<String> computedSearchScope;
@@ -71,12 +71,12 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
 
   @Override
   public String getName() {
-    return "Uploaded file/folder";
+    return "Uppladdad fil/mapp";
   }
 
   @Override
   public String getDescription() {
-    return "Treats a file/folder as a SIP.";
+    return "Behandlar en fil/mapp som ett SIP.";
   }
 
   @Override

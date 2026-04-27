@@ -52,10 +52,10 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
 
   private static final Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID,
-      PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID, "Ingest job identifier", PluginParameterType.STRING)
-        .withDescription("The identifier of the job responsible to ingest the information package to fix.").build());
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID, PluginParameter
+      .getBuilder(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID, "Identifierare för ingest-jobb", PluginParameterType.STRING)
+      .withDescription("Identifieraren för jobbet som ansvarar för att ingestera informationspaketet som ska åtgärdas.")
+      .build());
   }
 
   @Override
@@ -69,7 +69,7 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
   }
 
   public static String getStaticName() {
-    return "AIP ancestor hierarchy fix";
+    return "Korrigering av AIP-föräldrahierarki";
   }
 
   @Override
@@ -78,9 +78,9 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
   }
 
   public static String getStaticDescription() {
-    return "Attempts to fix the ancestor hierarchy of the AIPs in the catalogue by removing ghosts (i.e. AIPs with nonexistent ancestors in the catalogue) "
-      + "and merging AIPs with the same Ingest SIP identifier.\nThis task aims to fix problems that may occur when SIPs are ingested but not all the "
-      + "necessary items to construct the catalogue hierarchy have been received or properly ingested.";
+    return "Försöker rätta till föräldrahierarkin för AIP:er i katalogen genom att ta bort spöken (dvs. AIP:er med icke-existerande förfäder i katalogen) "
+      + "och sammanfoga AIP:er med samma ingest-SIP-identifierare.\nDenna uppgift syftar till att åtgärda problem som kan uppstå när SIP:er importeras men inte alla "
+      + "nödvändiga objekt för att bygga katalogstrukturen har mottagits eller importerats korrekt.";
   }
 
   @Override
@@ -112,8 +112,8 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model,
-    List<LiteOptionalWithCause> list) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> list)
+    throws PluginException {
 
     final int counter = calculateSourceObjectsCount(index);
     return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
@@ -200,8 +200,7 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }
