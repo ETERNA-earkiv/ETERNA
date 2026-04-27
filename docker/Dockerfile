@@ -27,9 +27,9 @@ RUN set -ex; \
     chmod g-s /sbin/unix2_chkpwd && \
     chmod g-s /usr/lib/utempter/utempter
 
-COPY docker-files/clamd.conf /etc/clamav/clamd.conf
+COPY docker-files/clamd.conf /etc/clamd.conf
 
-COPY target/roda-wui-*.jar /KEEPS/bin/
+COPY target/roda-wui-*.jar /WhiteRed/bin/
 
 ENV LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
