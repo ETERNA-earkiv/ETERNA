@@ -28,7 +28,6 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Permissions;
-import org.roda.core.data.v2.ip.redaction.StartRedactionRequest;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
@@ -255,11 +254,11 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
   }
 
   // ACTIONS
-    private void redactPdf(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
-        if (!FileFormatSharedUtils.hasFileFormat(file, FileFormatSharedUtils.MIMETYPE_PDF, FileFormatSharedUtils.EXTENSION_PDF)) {
-            Dialogs.showInformationDialog(messages.redactPdfToastTitle(),
-                    messages.redactPdfOnlyPdfDialogMessage(), messages.dialogOk(), false);
-            callback.onSuccess(ActionImpact.NONE);
+  private void redactPdf(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
+    if (!FileFormatSharedUtils.hasFileFormat(file, FileFormatSharedUtils.MIMETYPE_PDF, FileFormatSharedUtils.EXTENSION_PDF)) {
+      Dialogs.showInformationDialog(messages.redactPdfToastTitle(),
+          messages.redactPdfOnlyPdfDialogMessage(), messages.dialogOk(), false);
+      callback.onSuccess(ActionImpact.NONE);
       return;
     }
 
@@ -277,34 +276,8 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
     List<String> historyItems = ListUtils.concat(
         ListUtils.concat(Arrays.asList(aipId, representationId), path), fileId);
 
-    boolean mandatory = ConfigurationManager.getBoolean(false, RodaConstants.UI_REDACTION_REASON_MANDATORY);
-
-    Dialogs.showPromptDialog(messages.redactPdfReasonTitle(), null, null,
-        messages.redactPdfReasonPlaceholder(), RegExp.compile(".*"), messages.cancelButton(),
-        messages.confirmButton(), mandatory, true,
-        new ActionNoAsyncCallback<String>(callback) {
-          @Override
-          public void onFailure(Throwable caught) {
-            callback.onSuccess(ActionImpact.NONE);
-          }
-
-          @Override
-          public void onSuccess(String details) {
-            StartRedactionRequest request = new StartRedactionRequest(aipId, representationId, fileId, details);
-            Services services = new Services("Log redaction start", "post");
-            services.redactionResource(s -> s.logRedactionStart(request))
-                .whenComplete((result, throwable) -> {
-                  if (throwable != null) {
-                    Dialogs.showInformationDialog(messages.alertErrorTitle(),
-                        messages.redactPdfLogErrorDescription(), messages.dialogOk(), false);
-                  } else {
-                    HistoryUtils.newHistory(PDFRedactor.RESOLVER,
-                        historyItems.toArray(new String[0]));
-                  }
-                  callback.onSuccess(ActionImpact.NONE);
-                });
-          }
-        });
+    HistoryUtils.newHistory(PDFRedactor.RESOLVER, historyItems.toArray(new String[0]));
+    callback.onSuccess(ActionImpact.NONE);
   }
 
   private void rename(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {

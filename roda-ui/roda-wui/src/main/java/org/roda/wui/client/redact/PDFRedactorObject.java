@@ -16,6 +16,11 @@ public class PDFRedactorObject {
     Promise<?> onInvoke(Blob pdfData, AbortSignal signal);
   }
 
+  @JsFunction
+  public interface PreSaveCallback {
+    Promise<?> onInvoke();
+  }
+
   @JsMethod
   public static native void mount(Element root);
 
@@ -27,5 +32,8 @@ public class PDFRedactorObject {
 
   @JsMethod
   public static native void setSaveCallback(SaveCallback callback);
+
+  @JsMethod
+  public static native void setPreSaveCallback(PreSaveCallback callback);
 }
 

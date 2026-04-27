@@ -11,7 +11,7 @@ import java.io.IOException;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.ip.redaction.StartRedactionRequest;
+import org.roda.core.data.v2.ip.redaction.SaveRedactionRequest;
 import org.roda.wui.api.v2.services.RedactionService;
 import org.roda.wui.client.services.RedactionRestService;
 import org.roda.wui.common.RequestControllerAssistant;
@@ -37,7 +37,7 @@ public class RedactionController implements RedactionRestService {
   RequestHandler requestHandler;
 
   @Override
-  public Void logRedactionStart(@RequestBody StartRedactionRequest request) {
+  public Void logRedactionSave(@RequestBody SaveRedactionRequest request) {
     return requestHandler.processRequest(new RequestHandler.RequestProcessor<Void>() {
       @Override
       public Void process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
@@ -49,7 +49,7 @@ public class RedactionController implements RedactionRestService {
           RodaConstants.CONTROLLER_DETAILS_PARAM, request.getDetails()
         );
         controllerAssistant.setRelatedObjectId(request.getAipId());
-        redactionService.logRedactionStart(requestContext.getUser(), request);
+        redactionService.logRedactionSave(requestContext.getUser(), request);
         return null;
       }
     });

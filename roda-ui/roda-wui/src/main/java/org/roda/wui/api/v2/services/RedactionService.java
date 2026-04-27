@@ -7,7 +7,7 @@
  */
 package org.roda.wui.api.v2.services;
 
-import org.roda.core.data.v2.ip.redaction.StartRedactionRequest;
+import org.roda.core.data.v2.ip.redaction.SaveRedactionRequest;
 import org.roda.core.data.v2.user.User;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +30,7 @@ public class RedactionService {
    * @param request
    *          the redaction request containing AIP ID, representation ID, file ID and details
    */
-  public void logRedactionStart(User user, StartRedactionRequest request) {
+  public void logRedactionSave(User user, SaveRedactionRequest request) {
     // Logging handled automatically by RequestControllerAssistant.registerAction()
     // in the controller's RequestHandler.processRequest() finally-block.
   }

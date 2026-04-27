@@ -4,13 +4,7 @@ PDF redaction lets you permanently mask sensitive content in a PDF file. The red
 
 ## Starting a redaction session
 
-Navigate to the file you want to redact and click the **Redact PDF** button in the toolbar. The button is only available for PDF files.
-
-Before the redaction editor opens, a dialog will ask you to provide a reason for the redaction. The reason is recorded in the audit log together with your username and the time of the action.
-
-Enter the reason and click **Confirm** to open the editor. Click **Cancel** to abort without opening the editor.
-
-> **Note:** Depending on your system configuration, providing a reason may be mandatory. When mandatory, the Confirm button is disabled until you have entered a reason.
+Navigate to the file you want to redact and click the **Redact PDF** button in the toolbar. The button is only available for PDF files. The redaction editor opens immediately.
 
 ## Using the redaction editor
 
@@ -46,7 +40,13 @@ Click the **Clear all redactions** button (circular arrow) to discard all marks 
 
 ### Saving
 
-When you are done, click **Save**. A dialog asks you to confirm before the export begins. The editor renders each page and replaces the redacted areas with solid black rectangles in the exported file. A progress indicator shows how many pages have been processed. Once complete, the redacted file is saved back to the archive.
+When you are done, click **Save**. A dialog will first ask you to provide a reason for the redaction. The reason is recorded in the audit log together with your username and the time of the action.
+
+Enter the reason and click **Confirm** to proceed. Click **Cancel** to return to the editor without saving.
+
+> **Note:** Depending on your system configuration, providing a reason may be mandatory. By default it is mandatory. When mandatory, the Confirm button is disabled until you have entered a reason.
+
+After confirming the reason, a second dialog asks you to confirm the export. The editor renders each page and replaces the redacted areas with solid black rectangles in the exported file. A progress indicator shows how many pages have been processed. Once complete, the redacted file is saved back to the archive.
 
 ## Audit log
 

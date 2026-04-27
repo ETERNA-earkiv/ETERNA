@@ -14,7 +14,7 @@ import java.io.Serializable;
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 
-public class StartRedactionRequest implements Serializable {
+public class SaveRedactionRequest implements Serializable {
 
   @Serial
   private static final long serialVersionUID = 4891623758294756821L;
@@ -24,11 +24,11 @@ public class StartRedactionRequest implements Serializable {
   private String fileId;
   private String details;
 
-  public StartRedactionRequest() {
+  public SaveRedactionRequest() {
     // empty constructor
   }
 
-  public StartRedactionRequest(String aipId, String representationId, String fileId, String details) {
+  public SaveRedactionRequest(String aipId, String representationId, String fileId, String details) {
     this.aipId = aipId;
     this.representationId = representationId;
     this.fileId = fileId;

@@ -4,13 +4,7 @@ PDF-maskning låter dig permanent maskera känsligt innehåll i en PDF-fil. De m
 
 ## Starta en maskningssession
 
-Navigera till den fil du vill maskera och klicka på knappen **Maskera PDF** i verktygsfältet. Knappen är bara tillgänglig för PDF-filer.
-
-Innan maskeringsredigeraren öppnas visas en dialog där du ombeds ange ett skäl till maskningen. Skälet registreras i granskningsloggen tillsammans med ditt användarnamn och tidpunkten för åtgärden.
-
-Ange skälet och klicka på **Bekräfta** för att öppna redigeraren. Klicka på **Avbryt** för att avbryta utan att öppna redigeraren.
-
-> **Observera:** Beroende på systemkonfigurationen kan det vara obligatoriskt att ange ett skäl. När det är obligatoriskt är Bekräfta-knappen inaktiverad tills du har angett ett skäl.
+Navigera till den fil du vill maskera och klicka på knappen **Maskera PDF** i verktygsfältet. Knappen är bara tillgänglig för PDF-filer. Maskeringsredigeraren öppnas direkt.
 
 ## Använda maskeringsredigeraren
 
@@ -46,7 +40,13 @@ Klicka på knappen **Rensa alla maskeringar** (cirkulär pil) för att ta bort a
 
 ### Spara
 
-När du är klar klickar du på **Spara**. En dialog ber dig bekräfta innan exporten påbörjas. Redigeraren renderar varje sida och ersätter de maskerade områdena med solida svarta rektanglar i den exporterade filen. En förloppsindikator visar hur många sidor som har bearbetats. När exporten är klar sparas den maskerade filen tillbaka till arkivet.
+När du är klar klickar du på **Spara**. En dialog ber dig ange ett skäl till maskningen. Skälet registreras i granskningsloggen tillsammans med ditt användarnamn och tidpunkten för åtgärden.
+
+Ange skälet och klicka på **Bekräfta** för att fortsätta. Klicka på **Avbryt** för att återgå till redigeraren utan att spara.
+
+> **Observera:** Beroende på systemkonfigurationen kan det vara obligatoriskt att ange ett skäl. Som standard är det obligatoriskt. När det är obligatoriskt är Bekräfta-knappen inaktiverad tills du har angett ett skäl.
+
+När skälet har bekräftats visas ytterligare en dialog som ber dig bekräfta exporten. Redigeraren renderar varje sida och ersätter de maskerade områdena med solida svarta rektanglar i den exporterade filen. En förloppsindikator visar hur många sidor som har bearbetats. När exporten är klar sparas den maskerade filen tillbaka till arkivet.
 
 ## Granskningslogg
 
