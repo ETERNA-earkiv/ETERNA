@@ -25,7 +25,7 @@ Marked areas are shown with a coloured overlay. Marks are not yet permanent at t
 
 ### Applying marks
 
-Click **Applicera** to permanently commit the current marks as redactions. Applied redactions are displayed as solid black rectangles in the editor.
+Click **Apply** to permanently commit the current marks as redactions. Applied redactions are displayed as solid black rectangles in the editor.
 
 You can continue marking and applying on other pages before saving.
 
