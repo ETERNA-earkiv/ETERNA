@@ -9,10 +9,7 @@ RUN set -ex; \
         clamav \
         rsync \
         jq \
-        glibc-locale-base \
-        python3 \
-        python3-pip && \
-    pip3 install --no-cache-dir unoserver==3.3.2 && \
+        glibc-locale-base && \
     zypper clean -a && \
     chmod u-s /usr/bin/su && \
     chmod u-s /usr/bin/newgrp && \
