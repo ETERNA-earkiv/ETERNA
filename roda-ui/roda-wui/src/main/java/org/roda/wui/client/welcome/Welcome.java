@@ -92,17 +92,17 @@ public class Welcome {
       // Hero section (static HTML, locale-aware)
       outer.add(new HTMLWidgetWrapper("WelcomeHero.html"));
 
+      // Quick actions header — placed above the grid so aside aligns with cards
+      Label actionsHeader = new Label("Snabbåtgärder");
+      actionsHeader.addStyleName("eterna-section-header");
+      outer.add(actionsHeader);
+
       // Grid: main column + aside
       FlowPanel grid = new FlowPanel();
       grid.addStyleName("eterna-welcome__grid");
 
       FlowPanel main = new FlowPanel();
       main.addStyleName("eterna-welcome__main");
-
-      // Quick actions header
-      Label actionsHeader = new Label("Snabbåtgärder");
-      actionsHeader.addStyleName("eterna-section-header");
-      main.add(actionsHeader);
 
       // Action cards built from roda-wui.properties
       main.add(buildActionCards());

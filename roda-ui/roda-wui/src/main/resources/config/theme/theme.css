@@ -11,6 +11,7 @@
   --eterna-surface: #F9FAFB;
   --eterna-paper: #FFFFFF;
   --eterna-dark: #111827;
+  --eterna-teal: #0E7490;
   --eterna-ok: #059669;
   --eterna-warn: #D97706;
 
@@ -145,14 +146,38 @@ textarea:focus-visible,
   border-radius: var(--eterna-radius-sm);
 }
 
-/* Undvik oönskad fokus-ring på GWT:s navigationsmenyraden
+/* === Fixed headers ===
+   body::before är 6px röd list (z-index:9999) — userMenu måste börja vid top:6px.
+   bannerHeader.top och contentPanel padding-top sätts dynamiskt av theme.js. */
+.userMenu {
+  position: fixed;
+  top: 6px;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background-color: #333;
+}
+.bannerHeader {
+  position: fixed !important;
+  left: 0;
+  right: 0;
+  z-index: 99;
+}
+
+/* Undvik oönskad fokus-ring på GWT:s menyradar
    (AcessibleMenuBar sätter tabindex för tangentbordsnavigering) */
 .bannerHeader .gwt-MenuBar,
 .bannerHeader .gwt-MenuBar:focus,
 .bannerHeader .gwt-MenuBar:focus-visible,
 .bannerHeader table,
 .bannerHeader table:focus,
-.bannerHeader table:focus-visible {
+.bannerHeader table:focus-visible,
+.userMenu .gwt-MenuBar,
+.userMenu .gwt-MenuBar:focus,
+.userMenu .gwt-MenuBar:focus-visible,
+.userMenu table,
+.userMenu table:focus,
+.userMenu table:focus-visible {
   outline: none !important;
   box-shadow: none !important;
   border: none !important;
@@ -179,13 +204,7 @@ textarea:focus-visible,
   font-weight: 700;
   font-size: 22px;
   letter-spacing: 0.05em;
-  color: var(--eterna-ink);
-}
-.eterna-banner__byline {
-  font-family: var(--eterna-font-body);
-  font-size: 12px;
-  color: var(--eterna-muted);
-  letter-spacing: 0.02em;
+  color: var(--eterna-slate);
 }
 
 /* === ETERNA Welcome (facelift 2026-04) === */
@@ -260,6 +279,61 @@ textarea:focus-visible,
   box-shadow: var(--eterna-focus-ring);
   border-radius: var(--eterna-radius-sm);
 }
+.eterna-welcome__results {
+  display: none;
+  max-width: 640px;
+  margin-top: 4px;
+  border: 1px solid var(--eterna-border);
+  border-radius: var(--eterna-radius-md);
+  background: var(--eterna-paper);
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+.eterna-welcome__results.is-open {
+  display: block;
+}
+.eterna-welcome__result-list {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+}
+.eterna-welcome__result-item a {
+  display: block;
+  padding: 10px 16px;
+  color: var(--eterna-ink);
+  text-decoration: none;
+  font-size: 14px;
+  line-height: 1.4;
+  border-bottom: 1px solid var(--eterna-border);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.eterna-welcome__result-item:last-child a {
+  border-bottom: 0;
+}
+.eterna-welcome__result-item a:hover {
+  background: var(--eterna-surface);
+  color: var(--eterna-teal);
+}
+.eterna-welcome__results-status {
+  padding: 12px 16px;
+  font-size: 14px;
+  color: var(--eterna-muted);
+  margin: 0;
+}
+.eterna-welcome__results-more {
+  display: block;
+  padding: 10px 16px;
+  font-size: 13px;
+  color: var(--eterna-teal);
+  text-decoration: none;
+  border-top: 1px solid var(--eterna-border);
+  background: var(--eterna-surface);
+}
+.eterna-welcome__results-more:hover {
+  text-decoration: underline;
+}
 
 .eterna-welcome__grid {
   display: grid;
@@ -318,7 +392,7 @@ textarea:focus-visible,
 
 .eterna-welcome__aside {
   display: grid;
-  gap: 16px;
+  gap: 24px;
   align-content: start;
 }
 .eterna-aside__title {
@@ -329,6 +403,12 @@ textarea:focus-visible,
   letter-spacing: 0.03em;
   text-transform: uppercase;
 }
+.eterna-card--dark .eterna-aside__title {
+  color: var(--eterna-paper);
+}
+.eterna-welcome__aside .eterna-card + .eterna-card {
+  margin-top: 24px;
+}
 .eterna-standards {
   list-style: none;
   margin: 0;
@@ -338,6 +418,34 @@ textarea:focus-visible,
   font-size: 13px;
   letter-spacing: 0.04em;
   color: rgba(255, 255, 255, 0.85);
+}
+.eterna-doc-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+.eterna-doc-links a {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  font-size: 14px;
+  color: var(--eterna-ink);
+  text-decoration: none;
+  border-radius: var(--eterna-radius-sm);
+  transition: background 0.15s, color 0.15s;
+}
+.eterna-doc-links a::before {
+  content: '→';
+  font-size: 12px;
+  color: var(--eterna-teal);
+  flex-shrink: 0;
+}
+.eterna-doc-links a:hover {
+  background: var(--eterna-surface);
+  color: var(--eterna-teal);
 }
 .eterna-card--dark::before {
   content: '';
@@ -426,6 +534,11 @@ textarea:focus-visible,
 
 /* === ETERNA footer === */
 .eterna-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -434,6 +547,10 @@ textarea:focus-visible,
   background: var(--eterna-surface);
   font-size: 13px;
   color: var(--eterna-slate);
+}
+/* Compensate for fixed footer so content isn't hidden behind it */
+body {
+  padding-bottom: 56px;
 }
 .eterna-footer__sep { opacity: 0.5; margin: 0 4px; }
 .eterna-footer a { color: var(--eterna-red); text-decoration: none; }
@@ -493,13 +610,30 @@ textarea:focus-visible,
 .eterna-error__desc a:hover { text-decoration: underline; }
 
 /* === ETERNA login (facelift 2026-04) === */
+
+/* Dölj headern när loginsidan visas (den har egen layout med ETERNA-logga) */
+.main:has(.eterna-login) .bannerHeader,
+.main:has(.eterna-login) .userMenu {
+  display: none;
+}
+
 .eterna-login {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
+}
+/* Dölj footer och body-scroll på login-sidan */
+body:has(.eterna-login) {
+  overflow: hidden;
+  padding-bottom: 0;
+}
+.main:has(.eterna-login) ~ .eterna-footer {
+  display: none;
 }
 @media (max-width: 780px) {
-  .eterna-login { grid-template-columns: 1fr; }
+  .eterna-login { grid-template-columns: 1fr; height: auto; overflow: auto; }
+  body:has(.eterna-login) { overflow: auto; }
   .eterna-login__brand-side { min-height: 240px; }
 }
 .eterna-login__brand-side {
@@ -510,7 +644,11 @@ textarea:focus-visible,
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
+}
+/* Tagline + lead: centrera vertikalt i kvarvarande utrymme under logga + byline */
+.eterna-login__brand-side > div {
+  margin: auto 0;
 }
 .eterna-login__brand-side::before {
   content: '';
@@ -524,14 +662,14 @@ textarea:focus-visible,
   pointer-events: none;
 }
 .eterna-login__logo {
-  width: 240px;
+  width: 300px;
   height: auto;
   display: block;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
 }
 .eterna-login__byline {
-  font-size: 12px;
-  letter-spacing: 0.14em;
+  font-size: 15px;
+  letter-spacing: 0.10em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.6);
   margin: 0 0 32px;
@@ -539,28 +677,19 @@ textarea:focus-visible,
 .eterna-login__tagline {
   font-family: var(--eterna-font-display);
   font-weight: 500;
-  font-size: 34px;
+  font-size: 44px;
   line-height: 1.15;
-  max-width: 340px;
+  max-width: 400px;
   color: var(--eterna-paper);
-  margin: 0 0 14px;
+  margin: 0 0 18px;
 }
 .eterna-login__tagline .eterna-accent { color: var(--eterna-red); }
 .eterna-login__lead {
-  font-size: 14px;
+  font-size: 17px;
   color: rgba(255, 255, 255, 0.7);
-  max-width: 360px;
-  line-height: 1.55;
+  max-width: 400px;
+  line-height: 1.6;
   margin: 0 0 24px;
-}
-.eterna-login__standards {
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.5);
-  margin: 0;
-  position: relative;
-  z-index: 1;
 }
 .eterna-login__form-side {
   background: var(--eterna-paper);
@@ -568,6 +697,49 @@ textarea:focus-visible,
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+.eterna-login__form-side h1 {
+  font-size: 36px;
+  margin: 0 0 32px;
+}
+.eterna-login__form-side .form-label {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--eterna-slate);
+  display: block;
+  margin: 20px 0 8px;
+}
+.eterna-login__form-side input.gwt-TextBox,
+.eterna-login__form-side input.gwt-PasswordTextBox {
+  padding: 14px 16px;
+  font-size: 16px;
+}
+.eterna-login__form-side .gwt-Button.login-button,
+.eterna-login__form-side .gwt-Button.btn-play {
+  background: var(--eterna-red);
+  color: var(--eterna-paper);
+  border: 0;
+  padding: 15px 28px;
+  border-radius: var(--eterna-radius-md);
+  font-family: var(--eterna-font-body);
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.eterna-login__form-side .gwt-Button.login-button:hover,
+.eterna-login__form-side .gwt-Button.btn-play:hover {
+  background: var(--eterna-red-deep);
+}
+.eterna-login__form-side .gwt-Button.login-link {
+  background: transparent;
+  border: 0;
+  color: var(--eterna-teal);
+  font-size: 15px;
+  cursor: pointer;
+  padding: 8px 4px;
+  text-decoration: underline;
 }
 
 /* === ETERNA empty state === */
@@ -673,14 +845,13 @@ textarea:focus-visible,
   .eterna-error__title { font-size: 22px; }
   .eterna-login__form-side { padding: 40px 28px; }
   .eterna-login__brand-side { padding: 40px 28px; }
-  .eterna-login__tagline { font-size: 26px; }
-  .eterna-login__logo { width: 180px; }
+  .eterna-login__tagline { font-size: 30px; }
+  .eterna-login__logo { width: 220px; }
 }
 
 /* Mycket litet: ≤ 400px */
 @media (max-width: 400px) {
-  .eterna-banner__byline { display: none; }
-  .eterna-welcome__greeting { font-size: 1.5rem; }
+.eterna-welcome__greeting { font-size: 1.5rem; }
   .eterna-section-header { font-size: 13px; }
 }
 
@@ -695,6 +866,18 @@ textarea:focus-visible,
   padding-left: 12px;
   border-left: 3px solid var(--eterna-red);
   margin: 32px 0 16px;
+}
+/* When section-header sits directly inside .eterna-welcome (above grid), remove top margin */
+.eterna-welcome > .eterna-section-header {
+  margin-top: 0;
+}
+/* Forum thread links — inherit ink color, not red */
+.eterna-activity .eterna-activity__title a {
+  color: var(--eterna-ink);
+  text-decoration: none;
+}
+.eterna-activity .eterna-activity__title a:hover {
+  text-decoration: underline;
 }
 
 .main .contentPanel {

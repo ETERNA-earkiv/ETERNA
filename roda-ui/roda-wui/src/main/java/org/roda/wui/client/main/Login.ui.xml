@@ -14,7 +14,6 @@
 				<p class="eterna-login__tagline">Digitalt bevarande som <span class="eterna-accent">står sig</span> över tid.</p>
 				<p class="eterna-login__lead">Öppen källkod, svensk dokumentation, byggd på internationella standarder för arkivering.</p>
 			</div>
-			<p class="eterna-login__standards">OAIS · E-ARK · FGS · PREMIS · METS</p>
 		</g:HTMLPanel>
 		<g:FlowPanel addStyleNames="eterna-login__form-side">
 		<g:FlowPanel addStyleNames="loginPanel" ui:field="loginPanel">
