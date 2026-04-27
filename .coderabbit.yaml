@@ -1,0 +1,106 @@
+# .coderabbit.yaml – ETERNA
+# Placera i repots rot.
+# Dokumentation: https://docs.coderabbit.ai/getting-started/configure-coderabbit
+#
+# Konfigurationen speglar ETERNAs lagerstyrda arkitektur (se REVIEW_RULES_CORE.md).
+# Granskningsprofil: "assertive" för tydlig och konkret feedback.
+
+language: "sv"
+
+reviews:
+  profile: assertive
+  request_changes_workflow: true
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+
+  # Automatisk tilldelning av reviewers styrs av .github/CODEOWNERS
+  auto_review:
+    enabled: true
+    drafts: false
+
+  path_instructions:
+    # ── roda-core: affärslogik och preservation workflows ─────────────────────
+    - path: "roda-core/**"
+      instructions: |
+        Du granskar kärnlagret i ett Java/GWT-baserat e-arkivsystem (ETERNA).
+        Tillämpa följande regler strikt:
+
+        R1 – Lagerintegriteten är okränkbar:
+          Flagga omedelbart om roda-core importerar klasser från roda-ui eller GWT-ramverket.
+          Kommunikation mot UI sker uteslutande via det definierade API-lagret.
+
+        R3 – Asynkrona callbacks hanterar fel:
+          Kontrollera att varje GWT AsyncCallback har en implementerad onFailure-metod.
+          En tom onFailure eller en som bara loggar utan felhantering är ett fel.
+
+        R4 – Intern state exponeras aldrig direkt:
+          Publika get-metoder ska returnera defensiva kopior, inte interna samlingar.
+
+        R6 – Javadoc på publika metoder:
+          Rapportera om täckning understiger 80 %. Lista saknade metoder explicit.
+
+    # ── roda-common: delade modeller och interfaces ───────────────────────────
+    - path: "roda-common/**"
+      instructions: |
+        Du granskar det delade modell- och interface-lagret i ETERNA.
+
+        R1 – Lagerintegriteten är okränkbar:
+          roda-common får inte importera från roda-core eller roda-ui.
+          Flagga alla sådana beroenden som blockerande.
+
+        R4 – Intern state exponeras aldrig direkt:
+          Publika get-metoder ska returnera defensiva kopior.
+
+        R6 – Javadoc på publika metoder:
+          Rapportera täckning under 80 %.
+
+    # ── roda-ui: presentationslager (GWT) ────────────────────────────────────
+    - path: "roda-ui/**"
+      instructions: |
+        Du granskar UI-lagret i ETERNA. Det är ett GWT-baserat presentationslager
+        som inte ska innehålla affärslogik.
+
+        R1 – Lagerintegriteten är okränkbar:
+          Flagga omedelbart om roda-ui importerar implementationsklasser direkt från
+          roda-core (t.ex. klasser under org.roda.core.* utanför API-paketet).
+          Detta är det vanligaste arkitekturbrottet i kodbasen.
+
+        R3 – Asynkrona callbacks hanterar fel:
+          Alla GWT AsyncCallback-implementationer måste ha en onFailure-metod med
+          faktisk felhantering – inte bara en tom kropp.
+
+        R5 – All UI-text via i18n:
+          Flagga hårdkodade strängar i .java-filer som borde ligga i
+          ClientMessages-gränssnitt. Undantag: tekniska konstanter och loggar.
+
+        Affärslogik i UI:
+          Om en PR introducerar state-management, rollockningslogik eller
+          asynkrona orkestreringsflöden i UI-lagret – flagga detta som ett
+          potentiellt lagerbrott och eskalera till arkitektansvarig.
+
+    # ── Plugins ───────────────────────────────────────────────────────────────
+    #- path: "plugins/**"
+    #  instructions: |
+    #    Du granskar ett plugin i ETERNA. Plugins ska vara självständiga enheter
+    #    som ärver från AbstractPlugin och inte har beroenden till roda-ui eller GWT.
+
+    #    R2 – Plugins är självständiga:
+    #      Om denna PR även kräver ändringar i roda-core eller roda-common,
+    #      flagga detta tydligt. Sådana förändringar kräver explicit motivering
+    #      och godkännande av arkitektansvarig.
+
+    #    R1 – Lagerintegriteten är okränkbar:
+    #      Plugin får inte importera från roda-ui eller GWT-ramverket (com.google.gwt.*).
+
+    #    R6 – Javadoc på publika metoder:
+    #      Rapportera täckning under 80 %.
+
+  # ── Generella granskningsinstruktioner ────────────────────────────────────
+  auto_review:
+    enabled: true
+    drafts: false
+
+chat:
+  auto_reply: true
