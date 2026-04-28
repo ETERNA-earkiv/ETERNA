@@ -102,6 +102,7 @@ public class CatalogTreePanel extends Composite {
         new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "item")),
       false)
       .withSorter(new Sorter(new SortParameter(RodaConstants.AIP_TITLE_SORT, false)))
+      .withSublist(new org.roda.core.data.v2.index.sublist.Sublist(0, Integer.MAX_VALUE))
       .build();
 
     Services service = new Services(messages.catalogTreeLoadingLabel(), "get");

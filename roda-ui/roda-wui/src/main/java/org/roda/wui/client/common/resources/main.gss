@@ -3333,7 +3333,9 @@ td.datePickerMonth, td.datePickerYear {
 
 .contentWithSidePanel {
     display: flex;
-    min-height: 767px !important;
+    height: calc(100vh - 64px);
+    overflow: hidden;
+    min-height: 0;
 }
 
 .browseSidePanel {
@@ -3474,7 +3476,8 @@ body.catalogTreeResizing * {
 .catalogTreeMainContent {
     flex: 1;
     min-width: 0;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 @media (max-width: 900px) {
