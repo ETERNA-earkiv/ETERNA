@@ -369,6 +369,8 @@ public interface ClientMessages extends Messages {
 
   String scheduleDialogPastTimeError();
 
+  String scheduleDialogInvalidDateError();
+
   String scheduleDialogOnceSummary(String date, String time);
 
   String createJobWorkflow();

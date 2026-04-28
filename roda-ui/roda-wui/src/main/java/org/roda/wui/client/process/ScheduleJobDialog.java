@@ -248,7 +248,11 @@ public class ScheduleJobDialog extends DialogBox {
       public void onClick(ClickEvent event) {
         if (frequencyList.getSelectedIndex() == FREQ_ONCE) {
           Date selected = buildOnceDate();
-          if (selected == null || !selected.after(new Date())) {
+          if (selected == null) {
+            previewLabel.setText(messages.scheduleDialogInvalidDateError());
+            return;
+          }
+          if (!selected.after(new Date())) {
             previewLabel.setText(messages.scheduleDialogPastTimeError());
             return;
           }
@@ -322,6 +326,10 @@ public class ScheduleJobDialog extends DialogBox {
   private void refreshPreview() {
     int freq = frequencyList.getSelectedIndex();
     if (freq == FREQ_ONCE) {
+      if (buildOnceDate() == null) {
+        previewLabel.setText(messages.scheduleDialogInvalidDateError());
+        return;
+      }
       String year = yearList.getSelectedValue();
       String month = pad2(Integer.parseInt(monthList.getSelectedValue()));
       String day = pad2(Integer.parseInt(onceDayList.getSelectedValue()));
