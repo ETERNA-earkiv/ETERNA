@@ -41,3 +41,5 @@ Genomför leveransen till ETERNA. SIP:arna överförs enligt överenskommen meto
 Kontrollera kvittenser och gör vid behov stickprov i ETERNA. Säkerställ att informationen är komplett, korrekt presenterad, sökbar och följer specifikationen. Fel rapporteras och åtgärdas.
 
 Gallra därefter informationen i källsystemet.
+
+Vid engångsarkivering genomförs processen steg för steg en gång. Vid kontinuerlig arkivering upprepas faserna "Arkivera" och "Kontrollera" flera gånger (givet att ingen förändring sker av leveransspecifikationen).
