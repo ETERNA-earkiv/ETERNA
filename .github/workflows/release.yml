@@ -63,7 +63,7 @@ jobs:
           sudo tar -xz -C /opt -f /tmp/apache-maven-${MVN_VERSION}-bin.tar.gz
           sudo ln -sf /opt/apache-maven-${MVN_VERSION}/bin/mvn /usr/local/bin/mvn
       - name: Cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
