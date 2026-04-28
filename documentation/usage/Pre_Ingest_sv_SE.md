@@ -1,6 +1,6 @@
 # Inleverans till ETERNA
 
-Vid inleverans till ETERNA rekommenderas att leveransprocessen utgår från PAIMAS, en internationell metodstandard som beskriver samarbetet mellan arkivbildare och arkiv inför en digital leverans. Processen används för att stegvis identifiera, specificera, paketera, överföra och kontrollera information som ska bevaras.
+Vid inleverans till ETERNA rekommenderas att leveransprocessen utgår från WhiteReds tolkning av PAIMAS, en internationell metodstandard som beskriver samarbetet mellan arkivbildare och arkiv inför en digital leverans. Processen används för att stegvis identifiera, specificera, paketera, överföra och kontrollera information som ska bevaras.
 
 I ETERNA sker inleveransen genom att information och metadata paketeras i ett eller flera Submission Information Packages (SIP). SIP:arna ska följa de krav som tas fram under leveransprocessens första faser och paketeras enligt E-ARK CSIP. Efter överföring tas materialet emot, kontrolleras och omvandlas till Archival Information Packages (AIP) för långsiktigt bevarande.
 
@@ -22,11 +22,11 @@ Bestäm vad som ska levereras och hur informationen ska struktureras i ETERNA. D
 
 Förbered ETERNA för mottagning. Sätt upp leveranskanaler, arkivstruktur och transformering. Skapa och testa SIP-paket med exempelexport.
 
-### Paketering
+#### Paketering
 
-Informationen paketeras till E-ARK CSIP utifrån information som framkommit under fas 2: Specificera. Verktyget Commons-ip kan användas: https://github.com/keeps/commons-ip.
+Informationen paketeras till E-ARK CSIP utifrån information som framkommit under fas 2: Specificera. Verktyget Commons-ip kan användas: https://github.com/ETERNA-earkiv/commons-ip.
 
-### Överföring av SIP:ar
+#### Överföring av SIP:ar
 
 SIP:ar kan överföras till ETERNA på flera sätt. Val av metod ska vara överenskommen i förväg. Överföring kan göras via webbgränssnitt, via SFTP eller via API:er.
 
