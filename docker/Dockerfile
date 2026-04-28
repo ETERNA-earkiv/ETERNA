@@ -10,7 +10,10 @@ RUN set -ex; \
         rsync \
         jq \
         curl \
-        glibc-locale-base && \
+        glibc-locale-base \
+        python311 \
+        python311-pip && \
+    pip3.11 install --no-cache-dir unoserver==3.3.2 && \
     zypper clean -a && \
     chmod u-s /usr/bin/su && \
     chmod u-s /usr/bin/newgrp && \
