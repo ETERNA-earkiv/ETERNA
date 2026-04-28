@@ -252,13 +252,12 @@ public class PDFRedactor extends Composite {
               // Resolve (inte reject) — React visar inline-feltext vid 409, ingen Toast
               return Promise.resolve(response);
             } else {
-              Toast.showError(messages.redactPdfToastTitle(), messages.redactPdfSaveErrorDescription());
               return Promise.reject(response);
             }
+          }).catch_(error -> {
+            Toast.showError(messages.redactPdfToastTitle(), messages.redactPdfSaveErrorDescription());
+            return Promise.reject(error);
           });
-        }).catch_(error -> {
-          Toast.showError(messages.redactPdfToastTitle(), messages.redactPdfSaveErrorDescription());
-          return Promise.reject(error);
         })
     );
   }
