@@ -156,6 +156,10 @@ textarea:focus-visible,
   border-radius: var(--eterna-radius-sm);
 }
 
+body .wui-toast {
+  z-index: 200;
+}
+
 /* === Fixed headers ===
    body::before är 6px röd list (z-index:9999) — userMenu måste börja vid top:6px.
    bannerHeader.top och contentPanel padding-top sätts dynamiskt av theme.js. */
@@ -172,6 +176,9 @@ textarea:focus-visible,
   left: 0;
   right: 0;
   z-index: 99;
+}
+.main .bannerHeader {
+  top: 32px;
 }
 
 /* Undvik oönskad fokus-ring på GWT:s menyradar
@@ -881,6 +888,7 @@ body:has(.eterna-login) {
 }
 
 .main .contentPanel {
+  padding-top: 96px;
   min-height: 767px !important;
 }
 

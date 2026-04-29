@@ -8,20 +8,21 @@
         const contentPanel = document.querySelector('.contentPanel');
         if (!userMenu || !bannerHeader || !contentPanel) return;
 
-        const umBottom = userMenu.getBoundingClientRect().bottom;
-
-        // If layout hasn't happened yet (bottom == 0 or <= 6px), retry
-        if (umBottom <= 6) {
-            setTimeout(applyFixedHeaders, 50);
-            return;
+        let lastBottom = 0;
+        function measure() {
+            const umBottom = Math.round(userMenu.getBoundingClientRect().bottom);
+            // Retry until the value is above the red-stripe height AND has stabilised
+            if (umBottom <= 6 || umBottom !== lastBottom) {
+                lastBottom = umBottom;
+                setTimeout(measure, 50);
+                return;
+            }
+            bannerHeader.style.top = umBottom + 'px';
+            void bannerHeader.offsetHeight;
+            const bhBottom = Math.round(bannerHeader.getBoundingClientRect().bottom);
+            contentPanel.style.paddingTop = bhBottom + 'px';
         }
-
-        bannerHeader.style.top = Math.round(umBottom) + 'px';
-
-        // Force reflow so bannerHeader position is recalculated before we measure it
-        void bannerHeader.offsetHeight;
-        const bhBottom = bannerHeader.getBoundingClientRect().bottom;
-        contentPanel.style.paddingTop = Math.round(bhBottom) + 'px';
+        measure();
     }
 
     // Start polling as soon as elements appear in DOM
