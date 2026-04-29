@@ -8,6 +8,8 @@
 package org.roda.core.common;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Date;
 
 import org.apache.http.HttpEntity;
@@ -61,6 +63,7 @@ public class TokenManager {
   }
 
   public AccessToken grantToken(LocalInstance localInstance) throws GenericException, AuthenticationDeniedException {
+    validateHttpUrl(localInstance.getCentralInstanceURL());
     CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     String url = localInstance.getCentralInstanceURL() + RodaConstants.API_SEP + RodaConstants.API_REST_V2_MEMBERS
       + RodaConstants.API_PATH_PARAM_AUTH_TOKEN;
@@ -83,6 +86,17 @@ public class TokenManager {
       }
     } catch (IOException e) {
       throw new GenericException("Error sending POST request", e);
+    }
+  }
+
+  private static void validateHttpUrl(String url) throws GenericException {
+    try {
+      String scheme = new URI(url).getScheme();
+      if (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme)) {
+        throw new GenericException("Invalid URL scheme: only http and https are allowed");
+      }
+    } catch (URISyntaxException e) {
+      throw new GenericException("Invalid URL format", e);
     }
   }
 

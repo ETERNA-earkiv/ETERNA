@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.sax.SAXSource;
@@ -149,6 +150,9 @@ public class ValidationUtils {
 
     try (Reader reader = new InputStreamReader(new BOMInputStream(xmlPayload.createInputStream()))) {
       XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+      xmlReader.setFeature("http://xml.org/sax/features/external-general-entities", false);
+      xmlReader.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+      xmlReader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
       xmlReader.setEntityResolver(new RodaEntityResolver());
       InputSource inputSource = new InputSource(reader);
 
@@ -272,11 +276,16 @@ public class ValidationUtils {
           new BOMInputStream(descriptiveMetadataPayload.createInputStream()))) {
 
           XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+          xmlReader.setFeature("http://xml.org/sax/features/external-general-entities", false);
+          xmlReader.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+          xmlReader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
           xmlReader.setEntityResolver(new RodaEntityResolver());
           InputSource inputSource = new InputSource(inputStreamReader);
           Source source = new SAXSource(xmlReader, inputSource);
 
           Validator validator = xmlSchema.get().newValidator();
+          validator.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+          validator.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
           validator.setErrorHandler(errorHandler);
           validator.validate(source);
           ret.setValid(errorHandler.getErrors().isEmpty());

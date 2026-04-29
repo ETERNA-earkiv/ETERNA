@@ -12,6 +12,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -50,6 +52,7 @@ public final class RESTClientUtility {
 
   public static <T extends Serializable> T sendPostRequestWithoutBodyHttp5(Class<T> elementClass, String url,
     String resource, AccessToken accessToken) throws GenericException {
+    validateHttpUrl(url);
     try (final CloseableHttpClient httpclient = HttpClients.createDefault()) {
       HttpPost httpPost = new HttpPost(url + resource);
       httpPost.addHeader("Authorization", "Bearer " + accessToken.getToken());
@@ -75,6 +78,7 @@ public final class RESTClientUtility {
 
   public static <T extends Serializable> T sendPostRequestHttpClient5(Object element, Class<T> elementClass, String url,
     String resource, AccessToken accessToken) throws GenericException {
+    validateHttpUrl(url);
     try (final CloseableHttpClient httpclient = HttpClients.createDefault()) {
       HttpPost httpPost = new HttpPost(url + resource);
       httpPost.addHeader("Authorization", "Bearer " + accessToken.getToken());
@@ -102,6 +106,7 @@ public final class RESTClientUtility {
 
   public static int sendPostRequestWithCompressedFileHttp5(String url, String resource, Path path,
     AccessToken accessToken) throws RODAException {
+    validateHttpUrl(url);
     try (final CloseableHttpClient httpclient = HttpClients.createDefault()) {
       HttpPost httpPost = new HttpPost(url + resource);
       httpPost.addHeader("Authorization", "Bearer " + accessToken.getToken());
@@ -123,6 +128,7 @@ public final class RESTClientUtility {
 
   public static int sendPostRequestWithFileHttp5(String url, String resource, String username, SecureString password,
     Path file) throws RODAException {
+    validateHttpUrl(url);
     try (final CloseableHttpClient httpclient = HttpClients.createDefault()) {
       HttpPost httpPost = new HttpPost(url + resource);
       try (
@@ -145,6 +151,17 @@ public final class RESTClientUtility {
       }
     } catch (IOException e) {
       throw new RODAException("Error sending POST request", e);
+    }
+  }
+
+  private static void validateHttpUrl(String url) throws GenericException {
+    try {
+      String scheme = new URI(url).getScheme();
+      if (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme)) {
+        throw new GenericException("Invalid URL scheme: only http and https are allowed");
+      }
+    } catch (URISyntaxException e) {
+      throw new GenericException("Invalid URL format", e);
     }
   }
 

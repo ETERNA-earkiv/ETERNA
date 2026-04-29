@@ -10,6 +10,8 @@ package org.roda.core.common;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -175,8 +177,12 @@ public class SyncUtils {
   }
 
   public static Path receiveBundle(String fileName, InputStream inputStream) throws IOException {
+    Path sanitized = Path.of(fileName).normalize();
+    if (sanitized.isAbsolute() || sanitized.startsWith("..")) {
+      throw new IOException("Invalid bundle file name: " + fileName);
+    }
     Path filePath = RodaCoreFactory.getSynchronizationDirectoryPath()
-      .resolve(RodaConstants.CORE_SYNCHRONIZATION_INCOMING_FOLDER).resolve(fileName);
+      .resolve(RodaConstants.CORE_SYNCHRONIZATION_INCOMING_FOLDER).resolve(sanitized);
     FileUtils.copyInputStreamToFile(inputStream, filePath.toFile());
     return filePath;
   }
@@ -245,6 +251,7 @@ public class SyncUtils {
   // Local instance methods
   public static DistributedInstance requestInstanceStatus(LocalInstance localInstance) throws GenericException {
     try {
+      validateHttpUrl(localInstance.getCentralInstanceURL());
       AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
       String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V2_DISTRIBUTED_INSTANCE + RodaConstants.API_SEP
         + localInstance.getId();
@@ -370,6 +377,7 @@ public class SyncUtils {
   public static void updateDistributedInstanceSyncStatus(LocalInstance localInstance,
     DistributedInstance distributedInstance) throws GenericException {
     try {
+      validateHttpUrl(localInstance.getCentralInstanceURL());
       AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
       String resource = RodaConstants.API_SEP + "api/v2/distributed-instances/" + distributedInstance.getId()
         + "/status?activate=false";
@@ -395,6 +403,7 @@ public class SyncUtils {
 
   public static Long getUpdatesFromDistributedInstance(LocalInstance localInstance) throws GenericException {
     try {
+      validateHttpUrl(localInstance.getCentralInstanceURL());
       AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
       String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V2_DISTRIBUTED_INSTANCE
         + RodaConstants.API_PATH_PARAM_DISTRIBUTED_INSTANCE_GET_UPDATES + RodaConstants.API_SEP + localInstance.getId();
@@ -419,6 +428,17 @@ public class SyncUtils {
       }
     } catch (AuthenticationDeniedException | GenericException | IOException e) {
       throw new GenericException("Unable to retrieve instance status: " + e.getMessage());
+    }
+  }
+
+  private static void validateHttpUrl(String url) throws GenericException {
+    try {
+      String scheme = new URI(url).getScheme();
+      if (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme)) {
+        throw new GenericException("Invalid URL scheme: only http and https are allowed");
+      }
+    } catch (URISyntaxException e) {
+      throw new GenericException("Invalid URL format", e);
     }
   }
 }
