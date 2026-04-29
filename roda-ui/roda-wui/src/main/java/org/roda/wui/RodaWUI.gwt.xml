@@ -21,7 +21,7 @@
 	<!--
 	<extend-property name="locale" values="de_AT" />
 	-->
-	<set-property-fallback name="locale" value="en" />
+	<set-property-fallback name="locale" value="sv_SE" />
 
 	<!-- Locale -->
 	<set-configuration-property name="locale.useragent" value="Y" />

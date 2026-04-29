@@ -23,6 +23,13 @@
 							<!-- DESCRIPTIVE METADATA -->
 							<tabs:BrowseAIPTabs ui:field="browseTab" />
 						</g:FlowPanel>
+
+						<!-- REPRESENTATIONS & DISSEMINATIONS (inline under metadata) -->
+						<g:FlowPanel ui:field="representationSection" addStyleNames="representationSection" visible="false">
+							<g:FlowPanel ui:field="representationCards" addStyleNames="representationCardContainer"/>
+							<g:FlowPanel ui:field="disseminationCards" addStyleNames="representationCardContainer"/>
+						</g:FlowPanel>
+
 						<g:FlowPanel addStyleNames="lowerContent" ui:field="lowerContent">
 							<!-- AIP CHILDREN -->
 							<labels:Header ui:field="aipChildrenTitle" />
@@ -32,13 +39,5 @@
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FocusPanel>
-		<g:FlowPanel styleName="browseSidePanel" ui:field="sidePanel">
-			<g:FlowPanel>
-				<g:FlowPanel ui:field="representationCards"  addStyleNames="verticalThumbnailCardContainer"/>
-			</g:FlowPanel>
-			<g:FlowPanel>
-				<g:FlowPanel ui:field="disseminationCards" addStyleNames="verticalThumbnailCardContainer"/>
-			</g:FlowPanel>
-		</g:FlowPanel>
 	</g:FlowPanel>
 </ui:UiBinder>

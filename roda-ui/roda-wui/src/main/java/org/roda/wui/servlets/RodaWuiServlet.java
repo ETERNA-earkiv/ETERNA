@@ -46,6 +46,10 @@ public class RodaWuiServlet extends HttpServlet {
     try {
       LOGGER.info("Injecting RODA WUI configurations...");
       RodaCoreFactory.addConfiguration("roda-wui.properties");
+      // Clear shared-properties cache so it is rebuilt with WUI config included.
+      // Without this, a DevTools restart can populate the cache before roda-wui.properties
+      // is loaded, leaving the client with only the 3 hardcoded base properties.
+      RodaCoreFactory.clearRodaCachableObjectsAfterConfigurationChange();
       final boolean debug = Boolean
         .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("ui.sharedProperties.debug"));
       if (debug) {

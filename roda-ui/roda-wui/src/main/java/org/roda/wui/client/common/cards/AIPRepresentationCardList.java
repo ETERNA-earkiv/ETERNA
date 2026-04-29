@@ -8,7 +8,7 @@
 package org.roda.wui.client.common.cards;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -58,11 +58,11 @@ public class AIPRepresentationCardList extends ThumbnailCardList<IndexedRepresen
             tags.add(Tag.fromText(messages.statusLabel(state), Tag.TagStyle.SUCCESS));
           }
 
-          // Attributes
-          Map<String, String> attributes = new HashMap<>();
-          attributes.put(messages.fileSize(), Humanize.readableFileSize(representation.getSizeInBytes()));
+          // Attributes (ordered: files first, then size, then dates)
+          Map<String, String> attributes = new LinkedHashMap<>();
           attributes.put(messages.representationFiles(), Long.toString(representation.getNumberOfDataFiles()));
           attributes.put(messages.representationFolders(), Long.toString(representation.getNumberOfDataFolders()));
+          attributes.put(messages.fileSize(), Humanize.readableFileSize(representation.getSizeInBytes()));
           if (representation.getCreatedOn() != null) {
             attributes.put(messages.objectCreatedDateShort(), Humanize.formatDate(representation.getCreatedOn()));
           }

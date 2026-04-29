@@ -1,0 +1,19 @@
+<section class="eterna-welcome__hero">
+  <p class="eterna-welcome__greeting-label" id="eterna-greeting-label">God dag</p>
+  <h1 class="eterna-welcome__greeting">Välkommen till ETERNA</h1>
+
+  <div class="eterna-welcome__search" role="search">
+    <div class="eterna-welcome__search-scope">
+      <label for="eterna-welcome-scope">I arkivet</label>
+      <select id="eterna-welcome-scope" aria-label="Sökområde">
+        <option value="all">Allt</option>
+        <option value="catalogue">Katalog</option>
+        <option value="deliveries">Leveranser</option>
+      </select>
+    </div>
+    <input class="eterna-welcome__search-input" type="search" id="eterna-welcome-q"
+           placeholder="Sök i arkivet…" aria-label="Sök" autocomplete="off" />
+    <a class="btn-eterna-primary" href="#search" id="eterna-welcome-submit">Sök</a>
+  </div>
+  <div class="eterna-welcome__results" id="eterna-welcome-results" aria-live="polite"></div>
+</section>
