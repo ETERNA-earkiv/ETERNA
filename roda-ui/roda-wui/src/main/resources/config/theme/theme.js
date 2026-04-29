@@ -304,14 +304,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!listEl || listEl.dataset.forumInit) return;
         listEl.dataset.forumInit = '1';
 
-        function escapeHtml(s) {
-            return String(s)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;');
-        }
-
         fetch('api/v2/forum/latest', { credentials: 'same-origin' })
             .then(r => r.ok ? r.json() : null)
             .then(posts => {
@@ -321,20 +313,41 @@ document.addEventListener('DOMContentLoaded', () => {
                         + '</div></li>';
                     return;
                 }
-                listEl.innerHTML = posts.map(p => {
+                const frag = document.createDocumentFragment();
+                posts.forEach(p => {
                     const replies = p.commentCount - 1; // commentCount includes the first post
                     const replyLabel = isSv
                         ? (replies === 1 ? '1 svar' : replies + ' svar')
                         : (replies === 1 ? '1 reply' : replies + ' replies');
-                    return '<li class="eterna-activity__item">'
-                        + '<div class="eterna-activity__body">'
-                        + '<p class="eterna-activity__title">'
-                        + '<a href="' + escapeHtml(p.url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(p.title) + '</a>'
-                        + '</p>'
-                        + '<p class="eterna-activity__desc">' + replyLabel + ' · ' + timeAgo(p.lastPostedAt, isSv) + '</p>'
-                        + '</div>'
-                        + '</li>';
-                }).join('');
+
+                    let safeUrl = null;
+                    try {
+                        const u = new URL(p.url);
+                        if (u.protocol === 'http:' || u.protocol === 'https:') safeUrl = u.href;
+                    } catch (_) {}
+
+                    const li    = document.createElement('li');
+                    li.className = 'eterna-activity__item';
+                    const body  = document.createElement('div');
+                    body.className = 'eterna-activity__body';
+                    const titleP = document.createElement('p');
+                    titleP.className = 'eterna-activity__title';
+                    const a = document.createElement('a');
+                    if (safeUrl) a.setAttribute('href', safeUrl);
+                    a.setAttribute('target', '_blank');
+                    a.setAttribute('rel', 'noopener noreferrer');
+                    a.textContent = p.title;
+                    titleP.appendChild(a);
+                    const descP = document.createElement('p');
+                    descP.className = 'eterna-activity__desc';
+                    descP.textContent = replyLabel + ' · ' + timeAgo(p.lastPostedAt, isSv);
+                    body.appendChild(titleP);
+                    body.appendChild(descP);
+                    li.appendChild(body);
+                    frag.appendChild(li);
+                });
+                listEl.innerHTML = '';
+                listEl.appendChild(frag);
             })
             .catch(() => {
                 listEl.innerHTML = '<li class="eterna-activity__item"><div class="eterna-activity__body">'
