@@ -228,7 +228,6 @@ document.addEventListener('DOMContentLoaded', () => {
                   || document.getElementById('eterna-greeting-label-en');
         if (label && !label.dataset.welcomeInit) {
             initWelcome();
-            if (window.initAside) window.initAside();
             welcomeObserver.disconnect();
         }
     });
@@ -236,7 +235,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('DOMContentLoaded', () => {
         welcomeObserver.observe(document.body, { childList: true, subtree: true });
         initWelcome(); // in case it's already there
-        if (window.initAside) window.initAside();
     });
 })();
 
@@ -284,7 +282,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    window.initAside = initAside;
+    const asideObserver = new MutationObserver(initAside);
+    document.addEventListener('DOMContentLoaded', () => {
+        asideObserver.observe(document.body, { childList: true, subtree: true });
+        initAside();
+    });
 })();
 
 // === Forum activity: fetch latest discussions from eterna.whitered.se ===
