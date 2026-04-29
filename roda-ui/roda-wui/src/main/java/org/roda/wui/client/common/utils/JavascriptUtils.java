@@ -365,6 +365,85 @@ public class JavascriptUtils {
     imageViewerObject.destroy();
   }-*/;
 
+  public static native void runTiffCanvasViewerOn(JavaScriptObject container, String url, String loadingMsg, String errorMsg) /*-{
+    var el = container;
+    var loading = $wnd.document.createElement('p');
+    loading.textContent = loadingMsg;
+    loading.style.textAlign = 'center';
+    el.appendChild(loading);
+
+    function removeLoading() {
+      if (el.contains(loading)) { el.removeChild(loading); }
+    }
+
+    $wnd.fetch(url)
+      .then(function(r) { return r.arrayBuffer(); })
+      .then(function(buf) {
+        removeLoading();
+        var ifds = $wnd.UTIF.decode(buf);
+        var pageCount = ifds.length;
+        var currentPage = 0;
+
+        function renderPage(page) {
+          $wnd.UTIF.decodeImage(buf, ifds[page]);
+          var rgba = $wnd.UTIF.toRGBA8(ifds[page]);
+          var w = ifds[page].width;
+          var h = ifds[page].height;
+          var canvas = el.querySelector('canvas') || $wnd.document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          canvas.style.maxWidth = '100%';
+          canvas.style.display = 'block';
+          canvas.style.margin = '0 auto';
+          var ctx = canvas.getContext('2d');
+          var imageData = new ImageData(new Uint8ClampedArray(rgba.buffer), w, h);
+          ctx.putImageData(imageData, 0, 0);
+          if (!el.querySelector('canvas')) {
+            el.appendChild(canvas);
+          }
+          if (pageCount > 1) {
+            var nav = el.querySelector('.tiff-nav');
+            if (nav) nav.querySelector('.tiff-page-info').textContent = (page + 1) + ' / ' + pageCount;
+          }
+        }
+
+        renderPage(0);
+
+        if (pageCount > 1) {
+          var nav = $wnd.document.createElement('div');
+          nav.className = 'tiff-nav';
+          nav.style.cssText = 'text-align:center;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;';
+          var prev = $wnd.document.createElement('button');
+          prev.textContent = '‹';
+          prev.className = 'btn btn-default';
+          var info = $wnd.document.createElement('span');
+          info.className = 'tiff-page-info';
+          info.textContent = '1 / ' + pageCount;
+          var next = $wnd.document.createElement('button');
+          next.textContent = '›';
+          next.className = 'btn btn-default';
+          prev.addEventListener('click', function() {
+            if (currentPage > 0) { currentPage--; renderPage(currentPage); prev.disabled = currentPage === 0; next.disabled = false; }
+          });
+          next.addEventListener('click', function() {
+            if (currentPage < pageCount - 1) { currentPage++; renderPage(currentPage); next.disabled = currentPage === pageCount - 1; prev.disabled = false; }
+          });
+          prev.disabled = true;
+          nav.appendChild(prev);
+          nav.appendChild(info);
+          nav.appendChild(next);
+          el.appendChild(nav);
+        }
+      })
+      ['catch'](function(err) {
+        removeLoading();
+        var msg = $wnd.document.createElement('p');
+        msg.textContent = errorMsg;
+        msg.style.cssText = 'text-align:center;color:red;';
+        el.appendChild(msg);
+      });
+  }-*/;
+
   public static native void cleanAdvancedSearch() /*-{
     $wnd.jQuery('.searchAdvancedPanel input').val('');
   }-*/;

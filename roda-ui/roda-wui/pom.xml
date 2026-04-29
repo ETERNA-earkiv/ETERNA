@@ -473,7 +473,7 @@
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
         </dependency>
-        <dependency>
+<dependency>
             <groupId>org.roda-project</groupId>
             <artifactId>roda-core</artifactId>
             <exclusions>
