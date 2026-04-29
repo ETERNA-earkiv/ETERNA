@@ -35,7 +35,7 @@ Guides for system administrators and archive managers.
 - **[Disposal](administration/Disposal.md)** - Processes for data management
 - **[Permissions](administration/Permissions.md)** - Managing user permissions
 - **[Risk Assessment](administration/Risk_Assessment.md)** - Evaluation of archiving risks
-- **[Original-METS](administration/original-mets.md)** - Handles METS files
+- **[Original-METS](../administration/original-mets.md)** - Handles METS files
 
 ### Developer Resources
 Documentation for developers who want to contribute to or extend ETERNA.
