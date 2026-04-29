@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Proxy endpoint that fetches the latest discussions from the ETERNA forum
@@ -46,49 +47,64 @@ public class ForumController {
     .connectTimeout(Duration.ofSeconds(5))
     .build();
 
-  private volatile List<Map<String, Object>> cachedResult = null;
-  private volatile long cacheExpiry = 0;
+  private record CacheEntry(List<Map<String, Object>> result, long expiry) {}
+
+  private final AtomicReference<CacheEntry> cache = new AtomicReference<>();
 
   @GetMapping("/latest")
   public List<Map<String, Object>> latestDiscussions() {
     long now = System.currentTimeMillis();
-    if (cachedResult != null && now < cacheExpiry) {
-      return cachedResult;
+    CacheEntry entry = cache.get();
+    if (entry != null && now < entry.expiry()) {
+      return entry.result();
     }
-    try {
-      HttpRequest request = HttpRequest.newBuilder()
-        .uri(URI.create(DISCUSSIONS_URL))
-        .header("Accept", "application/json")
-        .timeout(Duration.ofSeconds(8))
-        .GET()
-        .build();
-
-      HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-      JsonNode root = objectMapper.readTree(response.body());
-      JsonNode data = root.get("data");
-      if (data == null || !data.isArray()) {
-        return Collections.emptyList();
+    synchronized (this) {
+      entry = cache.get();
+      now = System.currentTimeMillis();
+      if (entry != null && now < entry.expiry()) {
+        return entry.result();
       }
+      try {
+        HttpRequest request = HttpRequest.newBuilder()
+          .uri(URI.create(DISCUSSIONS_URL))
+          .header("Accept", "application/json")
+          .timeout(Duration.ofSeconds(8))
+          .GET()
+          .build();
 
-      List<Map<String, Object>> result = new ArrayList<>();
-      for (JsonNode item : data) {
-        JsonNode attrs = item.get("attributes");
-        if (attrs == null) continue;
-        Map<String, Object> post = new HashMap<>();
-        post.put("title", attrs.path("title").asText());
-        post.put("url", FORUM_DISCUSSION_BASE + attrs.path("slug").asText());
-        post.put("lastPostedAt", attrs.path("lastPostedAt").asText());
-        post.put("commentCount", attrs.path("commentCount").asInt());
-        result.add(post);
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() < 200 || response.statusCode() > 299) {
+          LOGGER.warn("Forum API returned HTTP {}: {}", response.statusCode(), response.body());
+          CacheEntry stale = cache.get();
+          return stale != null ? stale.result() : Collections.emptyList();
+        }
+
+        JsonNode root = objectMapper.readTree(response.body());
+        JsonNode data = root.get("data");
+        if (data == null || !data.isArray()) {
+          return Collections.emptyList();
+        }
+
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (JsonNode item : data) {
+          JsonNode attrs = item.get("attributes");
+          if (attrs == null) continue;
+          Map<String, Object> post = new HashMap<>();
+          post.put("title", attrs.path("title").asText());
+          post.put("url", FORUM_DISCUSSION_BASE + attrs.path("slug").asText());
+          post.put("lastPostedAt", attrs.path("lastPostedAt").asText());
+          post.put("commentCount", attrs.path("commentCount").asInt());
+          result.add(post);
+        }
+
+        cache.set(new CacheEntry(result, now + CACHE_TTL_MS));
+        return result;
+      } catch (Exception e) {
+        LOGGER.warn("Could not fetch forum discussions", e);
+        CacheEntry stale = cache.get();
+        return stale != null ? stale.result() : Collections.emptyList();
       }
-
-      cachedResult = result;
-      cacheExpiry = now + CACHE_TTL_MS;
-      return result;
-    } catch (Exception e) {
-      LOGGER.warn("Could not fetch forum discussions", e);
-      return cachedResult != null ? cachedResult : Collections.emptyList();
     }
   }
 }

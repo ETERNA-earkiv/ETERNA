@@ -128,6 +128,9 @@ public class Welcome {
     container.addStyleName("eterna-actions");
 
     List<String> actionIds = ConfigurationManager.getStringList("ui", "welcome", "actions");
+    if (actionIds == null) {
+      return container;
+    }
     for (String id : actionIds) {
       String title = ConfigurationManager.getString("ui", "welcome", "action", id, "title");
       String href = ConfigurationManager.getString("ui", "welcome", "action", id, "href");

@@ -156,17 +156,4 @@
   font-display: swap;
   src: url(../../api/v2/themes?resource-id=fonts/BarlowCondensed/BarlowCondensed-Bold.woff2) format('woff2');
 }
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 100 900;
-  font-display: swap;
-  src: url(../../api/v2/themes?resource-id=fonts/Inter/Inter-VariableFont_opsz,wght.ttf) format('truetype-variations');
-}
-@font-face {
-  font-family: 'Inter';
-  font-style: italic;
-  font-weight: 100 900;
-  font-display: swap;
-  src: url(../../api/v2/themes?resource-id=fonts/Inter/Inter-Italic-VariableFont_opsz,wght.ttf) format('truetype-variations');
-}
+
