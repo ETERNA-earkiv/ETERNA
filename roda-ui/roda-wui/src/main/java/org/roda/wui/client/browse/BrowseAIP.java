@@ -108,6 +108,12 @@ public class BrowseAIP extends Composite {
   @UiField
   SimplePanel aipChildrenCard;
 
+  // CATALOG TREE
+  @UiField
+  FlowPanel catalogTreeContainer;
+  @UiField
+  FlowPanel treeResizeHandle;
+
   // SIDEBAR
   @UiField
   FlowPanel sidePanel;
@@ -137,6 +143,7 @@ public class BrowseAIP extends Composite {
 
     // INIT
     initWidget(uiBinder.createAndBindUi(this));
+    initTreeResize();
 
     AsyncCallback<Actionable.ActionImpact> listActionableCallback = new NoAsyncCallback<Actionable.ActionImpact>() {
       @Override
@@ -243,7 +250,15 @@ public class BrowseAIP extends Composite {
       this.sidePanel.setVisible(false);
     }
 
+    final int savedScrollLeft = com.google.gwt.user.client.Window.getScrollLeft();
+    final int savedScrollTop = com.google.gwt.user.client.Window.getScrollTop();
     keyboardFocus.setFocus(true);
+    com.google.gwt.core.client.Scheduler.get().scheduleDeferred(new com.google.gwt.core.client.Scheduler.ScheduledCommand() {
+      @Override
+      public void execute() {
+        com.google.gwt.user.client.Window.scrollTo(savedScrollLeft, savedScrollTop);
+      }
+    });
   }
 
   private void initHandlers() {
@@ -360,6 +375,53 @@ public class BrowseAIP extends Composite {
       HistoryUtils.newHistory(BrowseTop.RESOLVER, CreateDescriptiveMetadata.RESOLVER.getHistoryToken(),
         RodaConstants.RODA_OBJECT_AIP, aipId);
     }
+  }
+
+  private com.google.gwt.event.shared.HandlerRegistration resizeHandlerReg;
+
+  private void initTreeResize() {
+    treeResizeHandle.addDomHandler(new com.google.gwt.event.dom.client.MouseDownHandler() {
+      @Override
+      public void onMouseDown(com.google.gwt.event.dom.client.MouseDownEvent event) {
+        event.preventDefault();
+        if (resizeHandlerReg != null) {
+          resizeHandlerReg.removeHandler();
+          resizeHandlerReg = null;
+        }
+        final int startX = event.getClientX();
+        final int startWidth = CatalogTreePanel.getInstance().getOffsetWidth();
+        com.google.gwt.user.client.Event.setCapture(treeResizeHandle.getElement());
+        treeResizeHandle.addStyleName("resizing");
+
+        resizeHandlerReg = com.google.gwt.user.client.Event.addNativePreviewHandler(
+          new com.google.gwt.user.client.Event.NativePreviewHandler() {
+            @Override
+            public void onPreviewNativeEvent(com.google.gwt.user.client.Event.NativePreviewEvent e) {
+              com.google.gwt.dom.client.NativeEvent ne = e.getNativeEvent();
+              if ("mousemove".equals(ne.getType())) {
+                int newWidth = Math.max(150, Math.min(480, startWidth + ne.getClientX() - startX));
+                CatalogTreePanel.getInstance().getElement().getStyle().setPropertyPx("width", newWidth);
+              } else if ("mouseup".equals(ne.getType())) {
+                com.google.gwt.user.client.Event.releaseCapture(treeResizeHandle.getElement());
+                treeResizeHandle.removeStyleName("resizing");
+                if (resizeHandlerReg != null) {
+                  resizeHandlerReg.removeHandler();
+                  resizeHandlerReg = null;
+                }
+              }
+            }
+          });
+      }
+    }, com.google.gwt.event.dom.client.MouseDownEvent.getType());
+  }
+
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    catalogTreeContainer.clear();
+    CatalogTreePanel treePanel = CatalogTreePanel.getInstance();
+    catalogTreeContainer.add(treePanel);
+    treePanel.revealAip(aipId);
   }
 
   interface MyUiBinder extends UiBinder<Widget, BrowseAIP> {

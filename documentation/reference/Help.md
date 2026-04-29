@@ -22,9 +22,11 @@ Step-by-step guides for using ETERNA effectively.
 - **[Edit Descriptive Metadata](usage/EditDescriptiveMetadata.md)** - How to edit metadata
 - **[Advanced Search](usage/Advanced_Search.md)** - Advanced search features
 - **[Pre-Ingest](usage/Pre_Ingest.md)** - Preparing data for archiving
+- **[PDF Redaction](usage/PdfRedaction.md)** - How to redact sensitive content in PDF files
 - **[Troubleshooting](usage/Troubleshooting.md)** - Solutions to common problems
 - **[FAQ](usage/FAQ.md)** - Answers to frequently asked questions
 - **[README](usage/README.md)** - General information about ETERNA
+- **[Configuring fields for search result export](administration/Export_Configuration.md)** - How to configure fields for search result export
 
 ### Administration Guides
 Guides for system administrators and archive managers.

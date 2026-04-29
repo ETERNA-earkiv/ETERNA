@@ -45,8 +45,8 @@ public class MoveOrphansToParentNodePlugin extends AbstractPlugin<AIP> {
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_AIP_PARENT_ID,
-      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_AIP_PARENT_ID, "Parent AIP", PluginParameterType.AIP_ID)
-        .isMandatory(false).withDescription("Add the parent AIP.").build());
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_AIP_PARENT_ID, "Förälder-AIP", PluginParameterType.AIP_ID)
+        .isMandatory(false).withDescription("Lägg till föräldra-AIP.").build());
   }
 
   @Override
@@ -61,14 +61,14 @@ public class MoveOrphansToParentNodePlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "Move orphan(s) to a parent node";
+    return "Flytta föräldralös(a) till föräldernod";
   }
 
   @Override
   public String getDescription() {
-    return "Moves selected AIP(s) that are also orphans, i.e. AIPs whose direct ancestor in the catalogue hierarchy does not exist "
-      + "(except root level nodes) to a new parent node defined by the user.\nThis task aims to fix problems that may occur when SIPs are "
-      + "ingested but not all the necessary items to construct the catalogue hierarchy have been received or properly ingested.";
+    return "Flyttar valda AIP(er) som är föräldralösa, dvs. AIP:er vars direkta förfader i kataloghierarkin inte existerar "
+      + "(förutom rotnivånoder), till en ny föräldernod som definieras av användaren.\nDenna uppgift syftar till att åtgärda problem som kan uppstå när SIP:er "
+      + "importeras men inte alla nödvändiga objekt för att bygga katalogstrukturen har mottagits eller importerats korrekt.";
   }
 
   @Override
@@ -93,8 +93,8 @@ public class MoveOrphansToParentNodePlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> liteList)
+    throws PluginException {
     return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<AIP>() {
       @Override
       public void process(IndexService index, ModelService model, Report report, Job cachedJob,
@@ -137,8 +137,7 @@ public class MoveOrphansToParentNodePlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }

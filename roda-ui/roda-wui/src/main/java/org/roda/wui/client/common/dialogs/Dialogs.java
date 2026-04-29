@@ -355,10 +355,9 @@ public class Dialogs {
           callback.onSuccess(inputBox.getText());
         }
       } else {
-        TextBox box = (TextBox) event.getSource();
-        boolean isValid = validator.test(box.getText());
+        boolean isValid = validator.test(inputBox.getText());
         confirmButton.setEnabled(isValid);
-        validatePromptInput(errorPanel, isValid, box.getText(), validatorErrorMessage);
+        validatePromptInput(errorPanel, isValid, inputBox.getText(), validatorErrorMessage);
       }
     });
 

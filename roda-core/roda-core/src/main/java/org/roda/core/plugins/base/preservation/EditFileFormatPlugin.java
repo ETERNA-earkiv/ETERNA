@@ -56,27 +56,27 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_MIMETYPE,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_MIMETYPE, "Mimetype", PluginParameter.PluginParameterType.STRING)
-        .withDescription("The MIME type to set for all selected files.").build());
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_MIMETYPE, "MIME-typ", PluginParameter.PluginParameterType.STRING)
+        .withDescription("MIME-typen som ska sättas för alla markerade filer.").build());
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_FORMAT,
       PluginParameter
         .getBuilder(RodaConstants.PLUGIN_PARAMS_FORMAT, "Format", PluginParameter.PluginParameterType.STRING)
-        .withDescription("The full format descriptor to set for all selected files.").build());
+        .withDescription("Den fullständiga formatbeskrivningen som ska sättas för alla markerade filer.").build());
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_FORMAT_VERSION,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_FORMAT_VERSION, "Format version",
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_FORMAT_VERSION, "Formatversion",
           PluginParameter.PluginParameterType.STRING)
-        .withDescription("The version for the format descriptor to set for all selected files.").build());
+        .withDescription("Versionen för formatbeskrivningen som ska sättas för alla markerade filer.").build());
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_PRONOM,
       PluginParameter
         .getBuilder(RodaConstants.PLUGIN_PARAMS_PRONOM, "PRONOM", PluginParameter.PluginParameterType.STRING)
-        .withDescription("The PRONOM identifier to set for all selected files.").build());
+        .withDescription("PRONOM-identifieraren som ska sättas för alla markerade filer.").build());
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INCIDENCES,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_CLEAR_INCIDENCES, "Clear Siegfried risk incidences",
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_CLEAR_INCIDENCES, "Rensa Siegfried-riskincidenser",
           PluginParameter.PluginParameterType.BOOLEAN)
         .withDescription(
-          "Have this plugin clear risk incidences caused by Siegfried file format identification warnings.")
+          "Låt detta insticksprogram rensa riskincidenser orsakade av Siegfrieds varningar för filformatsidentifiering.")
         .build());
   }
 
@@ -87,11 +87,11 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
   private boolean clearIncidences;
 
   public static String getStaticName() {
-    return "Edit File Format";
+    return "Redigera filformat";
   }
 
   public static String getStaticDescription() {
-    return "Overwrites the selected files' extension, MIME type, format and PRONOM identifier with provided values.";
+    return "Skriver över de valda filernas filändelse, MIME-typ, format och PRONOM-identifierare med angivna värden.";
   }
 
   @Override
@@ -267,17 +267,17 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Changed files' format metadata";
+    return "Ändrade filernas formatmetadata";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "File formats were updated and recorded in PREMIS objects.";
+    return "Filformat uppdaterades och registrerades i PREMIS-objekt.";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Failed to update file formats in the package.";
+    return "Det gick inte att uppdatera filformaten i paketet.";
   }
 
   @Override

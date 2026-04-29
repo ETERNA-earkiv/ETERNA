@@ -130,6 +130,8 @@ public final class RodaConstants {
   public static final String UI_EXPIRED_SESSION_DETECTOR_ACTIVE = "ui.expired.session.detector.active";
   public static final String UI_EXPIRED_SESSION_DETECTOR_TIME = "ui.expired.session.detector.time";
 
+  public static final String UI_REDACTION_REASON_MANDATORY = "ui.redaction.reason.mandatory";
+
   public static final String UI_GOOGLE_ANALYTICS_CODE_PROPERTY = "ui.google.analytics.code";
   public static final String UI_GOOGLE_RECAPTCHA_CODE_PROPERTY = "ui.google.recaptcha.code";
 

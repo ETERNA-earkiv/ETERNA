@@ -27,7 +27,7 @@ public class ReindexAIPPlugin extends ReindexRodaEntityPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "Rebuild AIP index";
+    return "Återindexera AIP-index";
   }
 
   @Override

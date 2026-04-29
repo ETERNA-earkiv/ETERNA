@@ -13,7 +13,7 @@
     <properties>
         <gwt.module.main>org.roda.wui.RodaWUI</gwt.module.main>
         <gwt.module.portal>org.roda.wui.RodaWUIPortal</gwt.module.portal>
-        <pdf.redactor.version>1.0.3</pdf.redactor.version>
+        <pdf.redactor.version>1.1.0</pdf.redactor.version>
     </properties>
     <packaging>jar</packaging>
     <profiles>

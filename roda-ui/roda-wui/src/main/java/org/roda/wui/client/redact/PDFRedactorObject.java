@@ -13,7 +13,12 @@ import jsinterop.annotations.JsType;
 public class PDFRedactorObject {
   @JsFunction
   public interface SaveCallback {
-    Promise<?> onInvoke(Blob pdfData, AbortSignal signal);
+    Promise<?> onInvoke(Blob pdfData, AbortSignal signal, String suffix);
+  }
+
+  @JsFunction
+  public interface PreSaveCallback {
+    Promise<?> onInvoke();
   }
 
   @JsMethod
@@ -27,5 +32,7 @@ public class PDFRedactorObject {
 
   @JsMethod
   public static native void setSaveCallback(SaveCallback callback);
-}
 
+  @JsMethod
+  public static native void setPreSaveCallback(PreSaveCallback callback);
+}
