@@ -216,7 +216,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         inp.addEventListener('input', () => {
             if (!inp.value.trim() && results) {
-                results.innerHTML = '';
+                results.textContent = '';
+                results.classList.remove('is-open');
+            }
+        });
+    }
+
     // Watch for welcome hero to be inserted into DOM (GWT loads it asynchronously)
     const welcomeObserver = new MutationObserver(() => {
         const label = document.getElementById('eterna-greeting-label')
@@ -228,11 +233,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    document.addEventListener('DOMContentLoaded', () => {
-        welcomeObserver.observe(document.body, { childList: true, subtree: true });
-        initWelcome(); // in case it's already there
-        if (window.initAside) window.initAside();
-    });
     document.addEventListener('DOMContentLoaded', () => {
         welcomeObserver.observe(document.body, { childList: true, subtree: true });
         initWelcome(); // in case it's already there
@@ -301,33 +301,33 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderForumActivity(listEl, isSv) {
         if (!listEl || listEl.dataset.forumInit) return;
         listEl.dataset.forumInit = '1';
-                function escapeHtml(s) {
-                    return String(s)
-                        .replace(/&/g, '&amp;')
-                        .replace(/</g, '&lt;')
-                        .replace(/>/g, '&gt;')
-                        .replace(/"/g, '&quot;');
-                }
 
+        function escapeHtml(s) {
+            return String(s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        fetch('api/v2/forum/latest', { credentials: 'same-origin' })
+            .then(r => r.ok ? r.json() : null)
+            .then(posts => {
+                if (!posts || posts.length === 0) {
+                    listEl.innerHTML = '<li class="eterna-activity__item"><div class="eterna-activity__body">'
+                        + '<p class="eterna-activity__title">' + (isSv ? 'Inga trådar hittades.' : 'No threads found.') + '</p>'
+                        + '</div></li>';
+                    return;
+                }
                 listEl.innerHTML = posts.map(p => {
                     const replies = p.commentCount - 1; // commentCount includes the first post
                     const replyLabel = isSv
                         ? (replies === 1 ? '1 svar' : replies + ' svar')
                         : (replies === 1 ? '1 reply' : replies + ' replies');
                     return '<li class="eterna-activity__item">'
-                         '<div class="eterna-activity__body">'
-                         '<p class="eterna-activity__title">'
-                         '<a href="' + escapeHtml(p.url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(p.title) + '</a>'
-                         '</p>'
-                         '<p class="eterna-activity__desc">' + replyLabel + ' · ' + timeAgo(p.lastPostedAt, isSv) + '</p>'
-                         '</div>'
-                         '</li>';
-                }).join('');
-                        : (replies === 1 ? '1 reply' : replies + ' replies');
-                    return '<li class="eterna-activity__item">'
                         + '<div class="eterna-activity__body">'
                         + '<p class="eterna-activity__title">'
-                        + '<a href="' + p.url + '" target="_blank" rel="noopener noreferrer">' + p.title + '</a>'
+                        + '<a href="' + escapeHtml(p.url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(p.title) + '</a>'
                         + '</p>'
                         + '<p class="eterna-activity__desc">' + replyLabel + ' · ' + timeAgo(p.lastPostedAt, isSv) + '</p>'
                         + '</div>'
