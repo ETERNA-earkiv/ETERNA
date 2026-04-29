@@ -31,9 +31,9 @@ public class OpenAPIConfig {
   public OpenAPI generateOpenAPI() {
     OpenAPI oas = new OpenAPI();
 
-    Info info = new Info().title("RODA REST API").description("REST AIP for RODA")
-      .contact(new Contact().email("info@keep.pt").name("KEEP SOLUTIONS")
-        .url("https://www.keep.pt/en/contacts-proposals-information-telephone-address"))
+    Info info = new Info().title("ETERNA REST API").description("REST AIP for ETERNA")
+      .contact(new Contact().email("earkiv@whitered.se").name("White Red Consulting AB")
+        .url("https://www.whitered.se"))
       .license(new License().name("LGPLv3").url("http://www.gnu.org/licenses/lgpl-3.0.html")).version("2.0.0");
 
     oas.info(info);
