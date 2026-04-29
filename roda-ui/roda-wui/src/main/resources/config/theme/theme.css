@@ -17,14 +17,22 @@
 
   --eterna-font-display: 'Barlow Condensed', 'Arial Narrow', 'Helvetica Neue', Arial, sans-serif;
   --eterna-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  --eterna-font-legacy: 'Inter', 'Ubuntu', var(--eterna-font-body);
 
   --eterna-radius-sm: 4px;
   --eterna-radius-md: 6px;
   --eterna-radius-lg: 10px;
   --eterna-shadow-card: 0 2px 8px rgba(0, 0, 0, 0.04);
   --eterna-shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.06);
+  --eterna-shadow-legacy: 0 5px 10px rgba(0, 0, 0, 0.5);
+  --eterna-shadow-legacy-soft: 0 5px 10px rgba(0, 0, 0, 0.2);
 
   --eterna-focus-ring: 0 0 0 2px var(--eterna-paper), 0 0 0 4px var(--eterna-red);
+
+  --eterna-legacy-accent: #25a6d6;
+  --eterna-legacy-accent-dark: #127faa;
+  --eterna-legacy-ink: #1d1f20;
+  --eterna-legacy-copy: #363030;
 }
 
 /* === ETERNA typography === */
@@ -33,6 +41,12 @@ body,
 .wui-body {
   font-family: var(--eterna-font-body);
   color: var(--eterna-ink);
+}
+
+body {
+  box-sizing: border-box;
+  padding-top: 6px;
+  padding-bottom: 56px;
 }
 
 h1, h2, h3, h4, h5, h6,
@@ -56,10 +70,6 @@ body::before {
   background: var(--eterna-red);
   z-index: 9999;
   pointer-events: none;
-}
-
-body {
-  padding-top: 6px;
 }
 
 /* === ETERNA buttons === */
@@ -278,9 +288,15 @@ textarea:focus-visible,
 .eterna-welcome__results.is-open {
   display: block;
 }
-.eterna-welcome__result-list {
+.eterna-welcome__result-list,
+.eterna-standards,
+.eterna-doc-links,
+.eterna-activity {
   list-style: none;
   margin: 0;
+  padding: 0;
+}
+.eterna-welcome__result-list {
   padding: 4px 0;
 }
 .eterna-welcome__result-item a {
@@ -396,9 +412,6 @@ textarea:focus-visible,
   margin-top: 24px;
 }
 .eterna-standards {
-  list-style: none;
-  margin: 0;
-  padding: 0;
   display: grid;
   gap: 6px;
   font-size: 13px;
@@ -406,9 +419,6 @@ textarea:focus-visible,
   color: rgba(255, 255, 255, 0.85);
 }
 .eterna-doc-links {
-  list-style: none;
-  margin: 0;
-  padding: 0;
   display: grid;
   gap: 2px;
 }
@@ -447,9 +457,6 @@ textarea:focus-visible,
 
 /* === ETERNA aktivitetsström === */
 .eterna-activity {
-  list-style: none;
-  margin: 0;
-  padding: 0;
   display: grid;
   gap: 2px;
   border: 1px solid var(--eterna-border);
@@ -533,10 +540,6 @@ textarea:focus-visible,
   background: var(--eterna-surface);
   font-size: 13px;
   color: var(--eterna-slate);
-}
-/* Compensate for fixed footer so content isn't hidden behind it */
-body {
-  padding-bottom: 56px;
 }
 .eterna-footer__sep { opacity: 0.5; margin: 0 4px; }
 .eterna-footer a { color: var(--eterna-red); text-decoration: none; }
@@ -701,6 +704,13 @@ body:has(.eterna-login) {
   padding: 14px 16px;
   font-size: 16px;
 }
+.eterna-login__form-side .login-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
 .eterna-login__form-side .gwt-Button.login-button,
 .eterna-login__form-side .gwt-Button.btn-play {
   background: var(--eterna-red);
@@ -718,6 +728,9 @@ body:has(.eterna-login) {
 .eterna-login__form-side .gwt-Button.login-button:hover,
 .eterna-login__form-side .gwt-Button.btn-play:hover {
   background: var(--eterna-red-deep);
+}
+.eterna-login__form-side .gwt-Button.btn-play:after {
+  content: none;
 }
 .eterna-login__form-side .gwt-Button.login-link {
   background: transparent;
@@ -873,7 +886,7 @@ body:has(.eterna-login) {
 
 .double-bounce1,
 .double-bounce2 {
-  background-color: #127faa;
+  background-color: var(--eterna-legacy-accent-dark);
 }
 
 .padding-lg {
@@ -910,7 +923,7 @@ body:has(.eterna-login) {
 .grey-card {
   background-color: #e9e9e9;
   border-radius: 8px;
-  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--eterna-shadow-legacy-soft);
 }
 
 .card-header {
@@ -983,7 +996,7 @@ body:has(.eterna-login) {
 }
 
 .hero-button {
-  background-color: #25a6d6;
+  background-color: var(--eterna-legacy-accent);
   padding: 8px 28px;
   border: none;
   border-radius: 8px;
@@ -991,7 +1004,7 @@ body:has(.eterna-login) {
   text-transform: uppercase;
   font-weight: bold;
   font-size: 18px;
-  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--eterna-shadow-legacy);
 }
 
 .hero-logo {
@@ -1001,7 +1014,7 @@ body:has(.eterna-login) {
 .white-card {
   background-color: white;
   border-radius: 8px;
-  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--eterna-shadow-legacy-soft);
 }
 
 .credentials-card-elements .field {
@@ -1021,7 +1034,7 @@ body:has(.eterna-login) {
 hr.hero-separator {
   width: 100px;
   height: 3px;
-  background: #25a6d6;
+  background: var(--eterna-legacy-accent);
   border: unset;
   margin: 0;
 }
@@ -1029,7 +1042,7 @@ hr.hero-separator {
 hr.separator-sm {
   width: 50px;
   height: 3px;
-  background: #25a6d6;
+  background: var(--eterna-legacy-accent);
   margin-top: 8px;
   margin-bottom: 8px;
   display: inline-block;
@@ -1040,8 +1053,22 @@ h1.title {
   margin: unset !important;
 }
 
+.title,
+a.btn-hero,
+a.btn-welcome,
+.hero-elements h2,
+.highlight p,
+.get-quote p,
+.learn-more p,
+.features h6,
+.row-feature-details p,
+.component-column h6,
+.component-column p,
+.footer-roda-enterprise p {
+  font-family: var(--eterna-font-legacy);
+}
+
 .title {
-  font-family: "Inter", "Ubuntu";
   font-style: normal;
   font-weight: 800;
   font-size: 42px;
@@ -1050,7 +1077,7 @@ h1.title {
 
 .keyword {
   text-transform: uppercase;
-  background-color: #25a6d6;
+  background-color: var(--eterna-legacy-accent);
   padding: 0 4px;
   font-weight: bold;
   color: black;
@@ -1094,32 +1121,25 @@ h1.title {
   text-align: justify;
 }
 
-.more-info-btn {
-  padding: 8px 28px;
-
-  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.5);
-  border-radius: 8px;
-}
-
 .btn-row {
   display: flex;
 }
 
 a.btn-hero, a.btn-welcome {
   text-decoration: none;
-  font-family: "Inter", "Ubuntu";
   font-style: normal;
   font-weight: bold;
   font-size: 18px;
   text-transform: uppercase;
   color: #ffffff;
-  background-color: #25a6d6;
+  background-color: var(--eterna-legacy-accent);
 }
 
-.request-trial-btn, .learn-more-btn {
+.more-info-btn,
+.request-trial-btn,
+.learn-more-btn {
   padding: 8px 28px;
-
-  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--eterna-shadow-legacy);
   border-radius: 8px;
 }
 
@@ -1140,7 +1160,6 @@ a.btn-hero:visited, a.btn-welcome:visited {
 }
 
 .hero-elements h2 {
-  font-family: "Inter", "Ubuntu";
   font-style: normal;
   font-weight: 800;
   font-size: 24px;
@@ -1151,7 +1170,6 @@ a.btn-hero:visited, a.btn-welcome:visited {
 }
 
 .highlight p {
-  font-family: "Inter", "Ubuntu";
   font-style: normal;
   font-weight: 400;
   font-size: 13px;
@@ -1178,7 +1196,6 @@ a.btn-hero:visited, a.btn-welcome:visited {
 
 .get-quote p {
   display: inline;
-  font-family: "Inter", "Ubuntu";
   font-style: normal;
   font-weight: bold;
   font-size: 24px;
@@ -1187,26 +1204,16 @@ a.btn-hero:visited, a.btn-welcome:visited {
 }
 
 .get-quote p.alt {
-  color: #363030;
-  font-family: "Inter", "Ubuntu";
-  font-style: normal;
+  color: var(--eterna-legacy-copy);
   font-weight: 700;
-  font-size: 24px;
-  line-height: 28px;
   padding-left: 5px;
 }
 
 .get-quote p.values {
-  font-family: "Inter", "Ubuntu";
-  font-style: normal;
-  font-weight: bold;
   font-size: 16px;
   line-height: 22px;
-
   text-align: center;
-  text-transform: uppercase;
-
-  color: #363030;
+  color: var(--eterna-legacy-copy);
 }
 
 
@@ -1252,7 +1259,7 @@ a.btn-hero:visited, a.btn-welcome:visited {
 
 .suite-cards .white-card {
   flex: 1;
-  color: #1d1f20;
+  color: var(--eterna-legacy-ink);
 }
 
 .suite-cards .white-card .btn-hero {
@@ -1287,7 +1294,7 @@ a.btn-hero:visited, a.btn-welcome:visited {
 }
 
 .primary-text {
-  color: #25a6d6;
+  color: var(--eterna-legacy-accent);
 }
 
 .suite-cards .card-body {
@@ -1296,7 +1303,7 @@ a.btn-hero:visited, a.btn-welcome:visited {
 
 .input-with-icon-wrapper {
   background: white;
-  box-shadow: 0px 5px 10px rgba(54, 48, 48, 0.25);
+  box-shadow: 0 5px 10px rgba(54, 48, 48, 0.25);
   display: flex;
   gap: 8px;
   align-items: center;
@@ -1329,8 +1336,8 @@ a.btn-hero:visited, a.btn-welcome:visited {
 }
 
 .form .form-button {
-  background: #363030;
-  box-shadow: 0px 5px 10px rgba(54, 48, 48, 0.25);
+  background: var(--eterna-legacy-copy);
+  box-shadow: 0 5px 10px rgba(54, 48, 48, 0.25);
   border-radius: 8px;
   border: unset;
   color: #ffffff;
@@ -1363,7 +1370,6 @@ a.btn-hero:visited, a.btn-welcome:visited {
 }
 
 .learn-more p {
-  font-family: "Inter", "Ubuntu";
   font-style: normal;
   font-weight: 300;
   font-size: 16px;
@@ -1371,7 +1377,7 @@ a.btn-hero:visited, a.btn-welcome:visited {
 }
 
 .learn-more h1 span {
-  color: #127faa;
+  color: var(--eterna-legacy-accent-dark);
   font-weight: 500;
 }
 
@@ -1382,7 +1388,7 @@ a.btn-hero:visited, a.btn-welcome:visited {
 }
 
 .learn-more .subtitle p.alt {
-  color: #127faa;
+  color: var(--eterna-legacy-accent-dark);
 }
 
 .learn-more .details {
@@ -1394,19 +1400,13 @@ a.btn-hero:visited, a.btn-welcome:visited {
 .features h6 {
   margin: 0;
   font-weight: 500;
-  font-family: "Inter", "Ubuntu";
   line-height: 18px;
   font-size: 16px;
 }
 
 .authenticity .second-column,
-.vendor .second-column
-{
+.vendor .second-column {
   justify-content: center;
-}
-
-.tutorial-roda-community {
-
 }
 
 .build_time {
@@ -1421,14 +1421,10 @@ a.btn-hero:visited, a.btn-welcome:visited {
 
 .custom-column {
   margin-bottom: 10px;
-}
-
-.custom-column {
-    flex: 0.25
+  flex: 0.25;
 }
 
 .row-feature-details p {
-  font-family: "Inter", "Ubuntu";
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;
@@ -1469,21 +1465,17 @@ a.btn-hero:visited, a.btn-welcome:visited {
 .component-column h6 {
   margin: 0;
   font-weight: bold;
-  font-family: "Inter", "Ubuntu";
   line-height: 18px;
   font-size: 20px;
 }
 
 .component-column p {
-  font-family: "Inter", "Ubuntu";
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-
 }
 
 .footer-roda-enterprise p {
-  font-family: "Inter", "Ubuntu";
   font-weight: 300;
   font-size: 13px;
   line-height: 18px;
@@ -1520,7 +1512,7 @@ a.btn-hero:visited, a.btn-welcome:visited {
 }
 
 .background-black {
-    background-color: #1d1f20;
+    background-color: var(--eterna-legacy-ink);
 }
 
 .background-white {
@@ -1536,7 +1528,7 @@ a.btn-hero:visited, a.btn-welcome:visited {
 }
 
 .background-primary {
-    background-color: #25a6d6;
+    background-color: var(--eterna-legacy-accent);
 }
 
 .background-very-dark-grey {
@@ -1563,35 +1555,18 @@ a.btn-hero:visited, a.btn-welcome:visited {
   border-radius: 50% / 0 0 100px 100px;
 }
 
-.hero {
-    color: white;
-}
-
-.tutorial-roda-community {
-    color: #1d1f20;
-}
-
-.authenticity {
-    color: #1d1f20;
-}
-
-.vendor {
-    color: #1d1f20;
-}
-
-.features {
-    color: #1d1f20;
-}
-
-.learn-more {
-    color: white;
-}
-
-.get-quote {
-}
-
+.hero,
+.get-quote,
+.learn-more,
 .enterprise-editions {
-    color: white;
+  color: white;
+}
+
+.tutorial-roda-community,
+.authenticity,
+.vendor,
+.features {
+  color: var(--eterna-legacy-ink);
 }
 
 .col-resize-handle {
@@ -1637,44 +1612,62 @@ a.btn-hero:visited, a.btn-welcome:visited {
     margin: 24px 0 16px !important;
 }
 
-.representationCardContainer {
+.representationCardContainer,
+.representationSection .thumbnailCardList,
+.representationSection .thumbnailCardListCards {
     display: flex !important;
     flex-direction: column !important;
     align-items: flex-start !important;
+}
+
+.representationCardContainer {
     gap: 6px;
     margin-bottom: 8px;
 }
 
 /* Intermediate GWT containers: shrink to content */
-.representationSection .thumbnailCardList {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
+.representationSection .thumbnailCardList,
+.representationSection .thumbnailCardListCards {
     width: fit-content !important;
+}
+
+.representationSection .thumbnailCardList {
     gap: 4px !important;
 }
 
 .representationSection .thumbnailCardListCards {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    width: fit-content !important;
     gap: 6px !important;
 }
 
-/* Override vertical thumbnail card to compact horizontal row */
-.representationSection .thumbnailCard {
+.representationSection .thumbnailCard,
+.representationSection .clickable,
+.representationSection .thumbnailCardExpandable .thumbnailCardDetails,
+.representationSection .thumbnailCardCollapsible .thumbnailCardDetails {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
     width: fit-content !important;
+    min-height: 0 !important;
+}
+
+.representationSection .thumbnailCardTags,
+.representationSection .thumbnailCardAttributes {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    width: fit-content !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Override vertical thumbnail card to compact horizontal row */
+.representationSection .thumbnailCard {
     min-width: 240px !important;
     padding: 8px 14px !important;
     background: var(--eterna-white, #fff) !important;
     border: 1px solid var(--eterna-border, #e4e4e4) !important;
     border-radius: 6px !important;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
-    min-height: 0 !important;
     height: auto !important;
     box-sizing: border-box !important;
     margin: 0 !important;
@@ -1699,24 +1692,10 @@ a.btn-hero:visited, a.btn-welcome:visited {
     justify-content: flex-start !important;
 }
 
-/* Clickable area beside title */
-.representationSection .clickable {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    width: fit-content !important;
-    min-height: 0 !important;
-}
-
 /* Details row: tags + attributes inline — always visible */
 .representationSection .thumbnailCardExpandable .thumbnailCardDetails,
 .representationSection .thumbnailCardCollapsible .thumbnailCardDetails {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    width: fit-content !important;
     gap: 10px !important;
-    min-height: 0 !important;
     padding: 0 !important;
     background: none !important;
     border-radius: 0 !important;
@@ -1724,24 +1703,12 @@ a.btn-hero:visited, a.btn-welcome:visited {
 
 /* Tags inline */
 .representationSection .thumbnailCardTags {
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    width: fit-content !important;
     gap: 5px !important;
-    margin: 0 !important;
-    padding: 0 !important;
 }
 
 /* Attributes beside tags */
 .representationSection .thumbnailCardAttributes {
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    width: fit-content !important;
     gap: 12px !important;
-    margin: 0 !important;
-    padding: 0 !important;
     font-size: 13px;
     color: #666;
 }
