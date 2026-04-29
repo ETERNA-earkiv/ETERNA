@@ -7,18 +7,9 @@
  */
 package org.roda.wui.api.v2.services;
 
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -85,22 +76,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReadParam;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
-
 @Service
 public class FilesService {
   private static final Logger LOGGER = LoggerFactory.getLogger(FilesService.class);
   private static final String HTML_EXT = ".html";
-  private static final String TIFF_MIME_TYPE = "image/tiff";
-  private static final String BIG_TIFF_MIME_TYPE = "image/x-tiff-big";
-  private static final String PNG_MIME_TYPE = "image/png";
-  // 50 MB default; overridable via ui.viewers.image.tiff.maxBytes
-  private static final long DEFAULT_TIFF_MAX_BYTES = 50L * 1024 * 1024;
-  // Decode every Nth pixel in each dimension — keeps peak RAM ~(1/N²) of raw TIFF
-  private static final int TIFF_SUBSAMPLE_FACTOR = 4;
 
   public IndexedFile renameFolder(RequestContext requestContext, IndexedFile indexedFolder, String newName,
     String details) throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
@@ -263,123 +242,6 @@ public class FilesService {
     } else {
       throw new RequestNotValidException("Range stream for directory unsupported");
     }
-  }
-
-  public boolean shouldRenderTiffPreview(IndexedFile indexedFile) {
-    if (indexedFile == null || indexedFile.isDirectory()) {
-      return false;
-    }
-
-    if (indexedFile.getFileFormat() != null && StringUtils.isNotBlank(indexedFile.getFileFormat().getMimeType())) {
-      String mimeType = indexedFile.getFileFormat().getMimeType();
-      if (TIFF_MIME_TYPE.equalsIgnoreCase(mimeType) || BIG_TIFF_MIME_TYPE.equalsIgnoreCase(mimeType)) {
-        return true;
-      }
-    }
-
-    String filename = indexedFile.getOriginalName() != null ? indexedFile.getOriginalName() : indexedFile.getId();
-    String lowerCaseFilename = filename.toLowerCase(Locale.ROOT);
-    return lowerCaseFilename.endsWith(".tif") || lowerCaseFilename.endsWith(".tiff");
-  }
-
-  public StreamResponse retrieveAIPRepresentationPreview(RequestContext requestContext, IndexedFile indexedFile)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    if (!shouldRenderTiffPreview(indexedFile)) {
-      return retrieveAIPRepresentationFile(requestContext, indexedFile);
-    }
-
-    ModelService model = requestContext.getModelService();
-    try (DirectResourceAccess directFileAccess = model.getDirectAccess(indexedFile)) {
-      Path sourcePath = directFileAccess.getPath();
-
-      long maxBytes = RodaCoreFactory.getRodaConfiguration()
-        .getLong("ui.viewers.image.tiff.maxBytes", DEFAULT_TIFF_MAX_BYTES);
-      if (Files.size(sourcePath) > maxBytes) {
-        return retrieveAIPRepresentationFile(requestContext, indexedFile);
-      }
-
-      Date lastModified = new Date(Files.getLastModifiedTime(sourcePath).toMillis());
-      String previewFilename = buildTiffPreviewFilename(indexedFile);
-      String fileId = indexedFile.getId();
-
-      ConsumesOutputStream stream = new ConsumesOutputStream() {
-        @Override
-        public void consumeOutputStream(OutputStream out) throws IOException {
-          renderTiffPreview(sourcePath, fileId, out);
-        }
-
-        @Override
-        public long getSize() {
-          return -1;
-        }
-
-        @Override
-        public Date getLastModified() {
-          return lastModified;
-        }
-
-        @Override
-        public String getFileName() {
-          return previewFilename;
-        }
-
-        @Override
-        public String getMediaType() {
-          return PNG_MIME_TYPE;
-        }
-      };
-
-      return new StreamResponse(stream);
-    } catch (IOException e) {
-      throw new GenericException("Could not render TIFF preview for file: " + indexedFile.getId(), e);
-    }
-  }
-
-  /**
-   * Decodes page 0 of a (possibly multi-page) TIFF with 4× subsampling in each
-   * dimension, keeping peak heap at ~1/16 of a full-resolution decode, then
-   * streams the result as PNG directly into {@code out}.
-   */
-  private void renderTiffPreview(Path sourcePath, String fileId, OutputStream out) throws IOException {
-    Iterator<ImageReader> readers = ImageIO.getImageReadersByMIMEType(TIFF_MIME_TYPE);
-    if (!readers.hasNext()) {
-      throw new IOException("No ImageReader available for TIFF (file: " + fileId + ")");
-    }
-    ImageReader reader = readers.next();
-    try (ImageInputStream iis = ImageIO.createImageInputStream(sourcePath.toFile())) {
-      reader.setInput(iis, true, true);
-      // Read page 0; multi-page TIFFs expose further pages at indices 1…N-1.
-      ImageReadParam param = reader.getDefaultReadParam();
-      param.setSourceSubsampling(TIFF_SUBSAMPLE_FACTOR, TIFF_SUBSAMPLE_FACTOR, 0, 0);
-      BufferedImage decoded = reader.read(0, param);
-      if (decoded == null) {
-        throw new IOException("Could not decode TIFF preview for file: " + fileId);
-      }
-      int targetType = decoded.getColorModel().hasAlpha() ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB;
-      BufferedImage image = new BufferedImage(decoded.getWidth(), decoded.getHeight(), targetType);
-      Graphics2D g = image.createGraphics();
-      try {
-        g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-        g.drawImage(decoded, 0, 0, null);
-      } finally {
-        g.dispose();
-      }
-      if (!ImageIO.write(image, "png", out)) {
-        throw new IOException("No PNG writer available for TIFF preview of file: " + fileId);
-      }
-    } finally {
-      reader.dispose();
-    }
-  }
-
-  private String buildTiffPreviewFilename(IndexedFile indexedFile) {
-    String filename = indexedFile.getOriginalName() != null ? indexedFile.getOriginalName() : indexedFile.getId();
-    int extensionIndex = filename.lastIndexOf('.');
-    if (extensionIndex >= 0) {
-      return filename.substring(0, extensionIndex) + ".png";
-    }
-
-    return filename + ".png";
   }
 
   public StreamResponse retrieveAIPRepresentationFile(RequestContext requestContext, IndexedFile indexedFile)

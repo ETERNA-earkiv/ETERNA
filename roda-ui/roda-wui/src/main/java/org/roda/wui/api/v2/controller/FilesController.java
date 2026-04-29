@@ -114,13 +114,8 @@ public class FilesController implements FileRestService, Exportable {
         IndexedFile file = indexService.retrieve(IndexedFile.class, fileUUID, fileFields);
         controllerAssistant.checkObjectPermissions(requestContext.getUser(), file);
 
-        if (filesService.shouldRenderTiffPreview(file)) {
-          StreamResponse response = filesService.retrieveAIPRepresentationPreview(requestContext, file);
-          return ApiUtils.okResponse(response);
-        } else {
-          RangeConsumesOutputStream stream = filesService.retrieveAIPRepresentationRangeStream(requestContext, file);
-          return ApiUtils.rangeResponse(headers, stream);
-        }
+        RangeConsumesOutputStream stream = filesService.retrieveAIPRepresentationRangeStream(requestContext, file);
+        return ApiUtils.rangeResponse(headers, stream);
       }
     });
   }
