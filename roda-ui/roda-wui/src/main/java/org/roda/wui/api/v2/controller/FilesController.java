@@ -95,7 +95,7 @@ public class FilesController implements FileRestService, Exportable {
   RequestHandler requestHandler;
 
   @RequestMapping(path = "{uuid}/preview", method = RequestMethod.GET, produces = {
-    MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.IMAGE_PNG_VALUE})
+    MediaType.APPLICATION_OCTET_STREAM_VALUE})
   @Operation(summary = "Previews a file", description = "Previews a particular file using streaming capabilities", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = StreamingResponseBody.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),

@@ -365,17 +365,21 @@ public class JavascriptUtils {
     imageViewerObject.destroy();
   }-*/;
 
-  public static native void runTiffCanvasViewerOn(JavaScriptObject container, String url) /*-{
+  public static native void runTiffCanvasViewerOn(JavaScriptObject container, String url, String loadingMsg, String errorMsg) /*-{
     var el = container;
     var loading = $wnd.document.createElement('p');
-    loading.textContent = 'Laddar TIFF…';
+    loading.textContent = loadingMsg;
     loading.style.textAlign = 'center';
     el.appendChild(loading);
+
+    function removeLoading() {
+      if (el.contains(loading)) { el.removeChild(loading); }
+    }
 
     $wnd.fetch(url)
       .then(function(r) { return r.arrayBuffer(); })
       .then(function(buf) {
-        el.removeChild(loading);
+        removeLoading();
         var ifds = $wnd.UTIF.decode(buf);
         var pageCount = ifds.length;
         var currentPage = 0;
@@ -432,9 +436,9 @@ public class JavascriptUtils {
         }
       })
       ['catch'](function(err) {
-        el.removeChild(loading);
+        removeLoading();
         var msg = $wnd.document.createElement('p');
-        msg.textContent = 'Kunde inte läsa TIFF-filen.';
+        msg.textContent = errorMsg;
         msg.style.cssText = 'text-align:center;color:red;';
         el.appendChild(msg);
       });

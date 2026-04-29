@@ -524,6 +524,10 @@ public interface ClientMessages extends Messages {
 
   String viewRepresentationNotSupportedPreviewShallowFile();
 
+  String viewRepresentationTiffLoading();
+
+  String viewRepresentationTiffError();
+
   String viewRepresentationFileDisseminationTitle();
 
   String viewRepresentationInfoFilename();

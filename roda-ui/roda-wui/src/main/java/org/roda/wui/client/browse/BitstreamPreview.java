@@ -263,7 +263,8 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
       @Override
       public void onAttachOrDetach(AttachEvent event) {
         if (event.isAttached()) {
-          JavascriptUtils.runTiffCanvasViewerOn(canvasContainer.getElement(), bitstreamDownloadUri.asString());
+          JavascriptUtils.runTiffCanvasViewerOn(canvasContainer.getElement(), bitstreamDownloadUri.asString(),
+            messages.viewRepresentationTiffLoading(), messages.viewRepresentationTiffError());
         }
       }
     });
