@@ -461,7 +461,7 @@ UTIF.decode._decodeNewJPEG = function(img, data, off, len, tgt, toff)
 UTIF.decode._decodeOldJPEGInit = function(img, data, off, len)
 {
 	var SOI = 216, EOI = 217, DQT = 219, DHT = 196, DRI = 221, SOF0 = 192, SOS = 218;
-	var joff = 0, soff = 0, tables, sosMarker, isTiled = false, i, j, k;
+	var joff = null, soff = 0, tables, sosMarker, isTiled = false, i, j, k;
 	var jpgIchgFmt    = img["t513"], jifoff = jpgIchgFmt ? jpgIchgFmt[0] : 0;
 	var jpgIchgFmtLen = img["t514"], jiflen = jpgIchgFmtLen ? jpgIchgFmtLen[0] : 0;
 	var soffTag       = img["t324"] || img["t273"] || jpgIchgFmt;
@@ -614,6 +614,7 @@ UTIF.decode._decodeOldJPEGInit = function(img, data, off, len)
 UTIF.decode._decodeOldJPEG = function(img, data, off, len, tgt, toff)
 {
 	var i, dlen, tlen, buff, buffoff;
+	var SOS = 218, EOI = 217;
 	var jpegData = UTIF.decode._decodeOldJPEGInit(img, data, off, len);
 
 	if(jpegData.jpegOffset!=null)
@@ -635,7 +636,7 @@ UTIF.decode._decodeOldJPEG = function(img, data, off, len, tgt, toff)
 		if(data[off]!=255 || data[off+1]!=SOS)
 		{
 			buff.set(jpegData.sosMarker, buffoff);
-			buffoff += sosMarker.length;
+			buffoff += jpegData.sosMarker.length;
 		}
 		for(i=0; i<len; i++) buff[buffoff++] = data[off+i];
 		buff[buffoff++] = 255;  buff[buffoff++] = EOI;
