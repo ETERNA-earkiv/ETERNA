@@ -1,37 +1,33 @@
-// === Fixed headers: place bannerHeader directly below userMenu ===
-// userMenu: top:6px in CSS (clears the 6px red stripe from body::before).
-// bannerHeader.top is set here once userMenu has a real rendered height.
+// === Fixed header ===
+// bannerHeader sits directly below the 6px red stripe (body::before).
+// contentPanel padding-top is set once bannerHeader height has stabilised.
 (function () {
     function applyFixedHeaders() {
-        const userMenu     = document.querySelector('.userMenu');
         const bannerHeader = document.querySelector('.bannerHeader');
         const contentPanel = document.querySelector('.contentPanel');
-        if (!userMenu || !bannerHeader || !contentPanel) return;
+        if (!bannerHeader || !contentPanel) return;
+
+        bannerHeader.style.top = '6px';
 
         let lastBottom = 0;
         function measure() {
-            const umBottom = Math.round(userMenu.getBoundingClientRect().bottom);
-            // Retry until the value is above the red-stripe height AND has stabilised
-            if (umBottom <= 6 || umBottom !== lastBottom) {
-                lastBottom = umBottom;
+            void bannerHeader.offsetHeight;
+            const bhBottom = Math.round(bannerHeader.getBoundingClientRect().bottom);
+            if (bhBottom <= 6 || bhBottom !== lastBottom) {
+                lastBottom = bhBottom;
                 setTimeout(measure, 50);
                 return;
             }
-            bannerHeader.style.top = umBottom + 'px';
-            void bannerHeader.offsetHeight;
-            const bhBottom = Math.round(bannerHeader.getBoundingClientRect().bottom);
             contentPanel.style.paddingTop = bhBottom + 'px';
         }
         measure();
     }
 
-    // Start polling as soon as elements appear in DOM
     const headerObserver = new MutationObserver(() => {
-        if (document.querySelector('.userMenu') &&
-            document.querySelector('.bannerHeader') &&
+        if (document.querySelector('.bannerHeader') &&
             document.querySelector('.contentPanel')) {
             headerObserver.disconnect();
-            setTimeout(applyFixedHeaders, 0); // defer past current mutation batch
+            setTimeout(applyFixedHeaders, 0);
         }
     });
 

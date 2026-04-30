@@ -72,7 +72,7 @@ public class ServerTools {
         locale = Locale.of(localeArgs[0], localeArgs[1], localeArgs[2]);
       }
     } else {
-      locale = Locale.ENGLISH;
+      locale = Locale.of("sv", "SE");
     }
 
     return locale;

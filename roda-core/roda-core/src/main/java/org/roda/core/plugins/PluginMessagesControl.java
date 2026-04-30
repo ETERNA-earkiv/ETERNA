@@ -24,10 +24,7 @@ public class PluginMessagesControl extends Control {
     if (baseName == null) {
       throw new NullPointerException();
     }
-    // 20160712 hsilva: the following line is needed otherwise default locale
-    // is used and this can be incoherent with other parts of the code where
-    // the default locale is ENGLISH
-    Locale defaultLocale = Locale.ENGLISH;
+    Locale defaultLocale = Locale.of("sv", "SE");
     return locale.equals(defaultLocale) ? null : defaultLocale;
   }
 }
