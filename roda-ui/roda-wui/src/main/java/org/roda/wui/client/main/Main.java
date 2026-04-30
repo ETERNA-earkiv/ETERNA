@@ -119,8 +119,8 @@ public class Main extends Composite implements EntryPoint {
     RootPanel.get().addStyleName("roda");
 
     // Initialize
-    userMenu.init();
     header.init();
+    userMenu.init(header.getNavigationMenu());
     contentPanel.init();
     onHistoryChanged(History.getToken());
     History.addValueChangeHandler(event -> onHistoryChanged(event.getValue()));

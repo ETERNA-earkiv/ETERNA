@@ -133,6 +133,10 @@ public class Header extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
   }
 
+  public AcessibleMenuBar getNavigationMenu() {
+    return navigationMenu;
+  }
+
   public void init() {
     bannerLogo.add(new HTMLWidgetWrapper("Banner.html"));
     homeLinkArea.addClickHandler(event -> HistoryUtils.newHistory(Welcome.RESOLVER));

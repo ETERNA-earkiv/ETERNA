@@ -161,24 +161,24 @@ body .wui-toast {
 }
 
 /* === Fixed headers ===
-   body::before är 6px röd list (z-index:9999) — userMenu måste börja vid top:6px.
-   bannerHeader.top och contentPanel padding-top sätts dynamiskt av theme.js. */
-.userMenu {
-  position: fixed;
-  top: 6px;
-  left: 0;
-  right: 0;
-  z-index: 100;
-  background-color: #333;
-}
+   body::before är 6px röd list (z-index:9999).
+   bannerHeader.top sätts till 6px av theme.js.
+   contentPanel padding-top sätts dynamiskt av theme.js. */
 .bannerHeader {
   position: fixed !important;
   left: 0;
   right: 0;
   z-index: 99;
 }
-.main .bannerHeader {
-  top: 32px;
+/* Loginikon: 20px, mellanrum till etiketttext, vertikal justering */
+.bannerHeader .user_menu_item i.fa-user {
+  font-size: 12px;
+  margin-right: 6px;
+  vertical-align: middle;
+  line-height: 0px;
+}
+.bannerHeader td.gwt-MenuItem.user_menu_item {
+  vertical-align: middle;
 }
 
 /* Undvik oönskad fokus-ring på GWT:s menyradar
@@ -607,10 +607,13 @@ body .wui-toast {
 
 /* === ETERNA login (facelift 2026-04) === */
 
-/* Dölj headern när loginsidan visas (den har egen layout med ETERNA-logga) */
-.main:has(.eterna-login) .bannerHeader,
-.main:has(.eterna-login) .userMenu {
+/* Dölj headern när loginsidan visas — userMenu är inne i bannerHeader, räcker med en regel */
+.main:has(.eterna-login) .bannerHeader {
   display: none;
+}
+/* Nollställ padding-top som theme.js sätter dynamiskt — sätts innan GWT renderat login */
+.main:has(.eterna-login) .contentPanel {
+  padding-top: 0 !important;
 }
 
 .eterna-login {
