@@ -40,7 +40,7 @@ core.plugins.base.keep_original_mets = true
 and indicates ETERNA's version 
 
 ```javaproperties
-core.plugins.base.keep_original_mets.software_version = xxxx
+core.plugins.base.keep_original_mets.software_version = <eterna-version>
 ```
 
-in the ETERNA'S configuration file, `roda-core.properties`
+in the ETERNA's configuration file, `roda-core.properties`

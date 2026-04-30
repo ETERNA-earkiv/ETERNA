@@ -39,7 +39,7 @@ core.plugins.base.keep_original_mets = true
 samt anger ETERNA:s version 
 
 ```javaproperties
-core.plugins.base.keep_original_mets.software_version = xxxx
+core.plugins.base.keep_original_mets.software_version = <eterna-version>
 ```
 
-i ETERNAS konfigurationsfil, `roda-core.properties`
+i ETERNA:s konfigurationsfil, `roda-core.properties`
