@@ -6,7 +6,7 @@
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
-	<g:FlowPanel styleName="contentWithSidePanel">
+	<g:FlowPanel styleName="contentWithSidePanel catalogTreeLayout">
 		<g:FlowPanel ui:field="catalogTreeContainer" />
 		<g:FlowPanel ui:field="treeResizeHandle" styleName="catalogTreeResizeHandle" />
 		<g:FocusPanel addStyleNames="catalogTreeMainContent">
