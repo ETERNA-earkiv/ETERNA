@@ -2633,6 +2633,14 @@ public interface ClientMessages extends Messages {
 
   String conversionProfileDescription();
 
+  String conversionOutcomeLabel();
+
+  String conversionOutcomeDescription();
+
+  String outcomeTypeRepresentation();
+
+  String outcomeTypeDissemination();
+
   /* Audit logs */
   String relatedAuditLogs();
 
