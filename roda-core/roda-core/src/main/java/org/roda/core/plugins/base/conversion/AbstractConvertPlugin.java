@@ -137,7 +137,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
   private static class ConversionContext {
     final String aipId;
     final String sourceRepresentationId;
-    final String newRepresentationId;
+    String newRepresentationId;
     final Report reportItem;
     final List<String> newRepresentations;
 
@@ -351,6 +351,8 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                         context.newRepresentationId,
                         representationType, cachedJob.getUsername(), markAsPreservation);
 
+                    context.newRepresentationId = actualRepresentationId;
+
                     if (!context.newRepresentations.contains(actualRepresentationId)) {
                       context.newRepresentations.add(actualRepresentationId);
                     }
@@ -467,7 +469,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
           if (!createDIP && !alteredFiles.isEmpty()) {
             try {
-              Representation rep = model.retrieveRepresentation(aip.getId(), newRepresentationID);
+              Representation rep = model.retrieveRepresentation(aip.getId(), context.newRepresentationId);
               createPremisSkeletonOnRepresentation(model, aip.getId(), rep, cachedJob.getUsername());
             } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
                 | ValidationException | IOException e) {
@@ -521,21 +523,21 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
         reportItem.setOutcomeObjectClass(DIP.class.getName());
       }
 
+      ConversionContext context = new ConversionContext(aipId, representation.getId(),
+          newRepresentationID, reportItem, newRepresentations);
+
       try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(representation.getAipId(),
           representation.getId(), true)) {
         LOGGER.debug("Processing representation {}", representation);
-
-        ConversionContext context = new ConversionContext(aipId, representation.getId(),
-            newRepresentationID, reportItem, newRepresentations);
 
         ConversionResult result = processFilesForConversion(index, model, storage, allFiles, cachedJob, context, report);
 
         // add unchanged files to the new representation
         if (!result.alteredFiles.isEmpty()) {
           if (createDIP) {
-            createNewFilesOnDIP(storage, model, new ArrayList<>(), newRepresentationID, notify);
+            createNewFilesOnDIP(storage, model, new ArrayList<>(), context.newRepresentationId, notify);
           } else {
-            createNewFilesOnRepresentation(storage, model, new ArrayList<>(), newRepresentationID, cachedJob.getUsername(),
+            createNewFilesOnRepresentation(storage, model, new ArrayList<>(), context.newRepresentationId, cachedJob.getUsername(),
                 notify);
           }
         }
@@ -560,7 +562,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
       if (!createDIP) {
         try {
-          Representation rep = model.retrieveRepresentation(representation.getAipId(), newRepresentationID);
+          Representation rep = model.retrieveRepresentation(representation.getAipId(), context.newRepresentationId);
           createPremisSkeletonOnRepresentation(model, representation.getAipId(), rep, cachedJob.getUsername());
         } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
             | ValidationException | IOException e) {
@@ -595,6 +597,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
             executeOnFile(index, model, report, jobPluginInfo, Arrays.asList(fileShallows.get()), cachedJob);
           }
         } else {
+          ConversionContext context = null;
           try {
             LOGGER.debug("Processing file {}", file.getId());
 
@@ -617,7 +620,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                 }
               };
 
-              ConversionContext context = new ConversionContext(file.getAipId(), file.getRepresentationId(),
+              context = new ConversionContext(file.getAipId(), file.getRepresentationId(),
                   newRepresentationID, reportItem, newRepresentations);
               // Note: For executeOnFile, we don't set createPerFileContainer anymore since
               // containers are created lazily
@@ -652,9 +655,9 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
           createEvent(model, index, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
               outputFormat, reportState, Arrays.asList(file), new ArrayList<>(), notifyEvent, cachedJob);
 
-          if (!createDIP) {
+          if (!createDIP && context != null) {
             try {
-              Representation rep = model.retrieveRepresentation(file.getAipId(), newRepresentationID);
+              Representation rep = model.retrieveRepresentation(file.getAipId(), context.newRepresentationId);
               createPremisSkeletonOnRepresentation(model, file.getAipId(), rep, cachedJob.getUsername());
             } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
                 | ValidationException | IOException e) {
