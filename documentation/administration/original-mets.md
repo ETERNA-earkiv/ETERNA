@@ -37,7 +37,7 @@ To use the original-METS function, add the property
 core.plugins.base.keep_original_mets = true
 ```
 
-and indicates ETERNA's version 
+and indicate ETERNA's version 
 
 ```javaproperties
 core.plugins.base.keep_original_mets.software_version = <eterna-version>
