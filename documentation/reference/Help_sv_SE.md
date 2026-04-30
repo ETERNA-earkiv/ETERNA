@@ -5,6 +5,7 @@ Välkommen till ETERNAs hjälpdokumentation! Här hittar du all information du b
 ## Innehållsförteckning
 
 ### Referensdokumentation
+
 Tekniska referenser och detaljerad information om systemet.
 
 - **[Överblick](reference/Overview_sv_SE.md)** - En introduktion till ETERNA och dess kärnfunktioner
@@ -16,6 +17,7 @@ Tekniska referenser och detaljerad information om systemet.
 - **[Licens](reference/LICENSE_sv_SE.md)** - Licensinformation för projektet
 
 ### Användarguider
+
 Steg-för-steg guider för att använda ETERNA effektivt.
 
 - **[Snabbstart](usage/Quickstart_sv_SE.md)** - Kom igång snabbt med ETERNA
@@ -27,6 +29,7 @@ Steg-för-steg guider för att använda ETERNA effektivt.
 - **[Felsökning](usage/Troubleshooting_sv_SE.md)** - Felsökning
 
 ### Administrationsguider
+
 Guider för systemadministratörer och ansvariga för arkivet.
 
 - **[Portaladministration](administration/Portal_Administration.md)** - Administrera ETERNA-portalen
@@ -38,6 +41,7 @@ Guider för systemadministratörer och ansvariga för arkivet.
 - **[Original-METS](../administration/original-mets_sv_SE.md)** - Hanterar METS filer
 
 ### Utvecklarresurser
+
 Dokumentation för utvecklare som vill bidra till eller utöka ETERNA.
 
 - **[Utvecklarguide](development/Developers_Guide_sv_SE.md)** - Guide för utvecklare
