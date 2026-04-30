@@ -29,11 +29,11 @@ För mer information, besök gärna ETERNA:s webbplats:
 
 ## Funktioner
 
-ETERNA har UI-stöd för följande funktionella enheter. Funktionerna är organiserade i menyn under följande huvudkategorier: **Leverans** (Leveransförberedelse, Inleverans, Process, Ankomstkontroll), **Administration** (Arkivvårdsjobb, Interna åtgärder, Granskningslogg, Aviseringslogg, Rapportering, Användare och grupper), **Gallring** (Gallringspolicyer, Gallringsbekräftelse, Förfallna gallringar, Gallrade objekt) och **Planering** (Representationsnätverk, Riskregister, Bevarandehändelser, Bevarandeaktör).
+ETERNA har UI-stöd för följande funktionella enheter. Funktionerna är organiserade i menyn under följande huvudkategorier: **Katalog**, **Sök**, **Leverans** (Inleverans, Process, Ankomstkontroll), **Administration** (Arkivvårdsjobb, Interna åtgärder, Granskningslogg, Aviseringslogg, Rapportering, Användare och grupper), **Gallring** (Gallringspolicyer, Gallringsbekräftelse, Förfallna gallringar, Gallrade objekt) och **Planering** (Representationsnätverk, Riskregister, Bevarandehändelser, Bevarandeaktör).
 
 ### Katalog
 
-Katalogen är en inventering av alla handlingar och information i arkivet. En handling kan representera olika typer av information i arkivet (t ex böcker, elektroniska dokument, bilder, databaser export mm). Handlingar är vanligtvis samlat i en samling (eller arkivbestånd) och vidare indelat i undersamlingar, sektioner, serier, filer osv. Den här sidan listar alla samlingar på högsta nivå i arkivet. Du kan komma ner till undersamlingar genom att klicka på samlingens namn. 
+Katalogen är en inventering av alla handlingar och information i arkivet. En handling kan representera olika typer av information i arkivet (t ex böcker, elektroniska dokument, bilder, databaser export mm). Handlingar är vanligtvis samlat i en samling (eller arkivbestånd) och vidare indelat i undersamlingar, sektioner, serier, filer osv. Den här sidan listar alla samlingar på högsta nivå i arkivet. Du kan komma ner till undersamlingar genom att klicka på samlingens namn.
 
 ### Sök & Avancerad sökning
 
@@ -61,7 +61,7 @@ Ankomstkontroll är en process för att avgöra om informationen och annat mater
 
 Arkivvårdsjobb är åtgärder som utförs på arkiverat material för att förbättra tillgänglighet och minska risker vid digitalt bevarande. Inom ETERNA hanteras dessa via en exekveringsmodul, där behöriga användare kan köra jobb på AIP:er, representationer eller filer. Exempel på arkivvårdsjobb är formatkonverteringar, kontrollsummeverifiering, rapportering och viruskontroller.
 
-Arkivvårdsjobb startas genom att klicka på de tre prickarna och välja "Starta process". Alla tillgängliga jobb visas i listan "Åtgärder". Genom att välja ett jobb visas en kort beskrivning och, i vissa fall, mer information under fliken "Dokumentation".
+Ett arkivvårdsjobb kan startas på två sätt: välj en eller flera rader i tabellen och klicka på "Starta ny process" i åtgärdsmenyn till höger för att köra jobbet på de markerade objekten, eller klicka på knappen "Bevarande" -> "Starta ny process" längst upp för att köra jobbet på hela hela AIP:en, representationen eller filen.
 
 ### Interna åtgärder
 
@@ -93,7 +93,20 @@ Här är det möjligt för användare med rätt behörighet att skapa eller änd
 - **För att redigera en befintlig användare eller grupp**:  
 Klicka på ett objekt i listan.  
 
-> Kom ihåg att det är viktigt att ha en strikt behörighetshantering för att minimera risken för otillåten röjning av sekretess! 
+> Kom ihåg att det är viktigt att ha en strikt behörighetshantering för att minimera risken för otillåten röjning av sekretess!
+
+#### Lösenord vid skapande av användare
+
+När en ny användare skapas skickar systemet normalt ett aktiveringsmail med en länk för att användaren ska kunna sätta sitt lösenord. Om e-post inte är konfigurerat i miljön fungerar inte detta flöde.
+
+**Workaround för miljöer utan e-post:**
+
+1. Skapa användaren som vanligt via "Lägg till användare".
+2. Öppna den nyss skapade användaren och klicka på "Ändra".
+3. Sätt ett lösenord manuellt i fältet för lösenord.
+4. Kommunicera lösenordet till användaren via en lämplig intern kanal.
+
+> Lösenord kan alltid sättas eller ändras i efterhand via "Ändra" på en befintlig användare.
 
 ### Gallring
 
