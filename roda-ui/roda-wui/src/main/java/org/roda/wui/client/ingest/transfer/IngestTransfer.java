@@ -193,6 +193,7 @@ public class IngestTransfer extends Composite {
     Anchor infoIconIngesttransfertitle = new Anchor();
     infoIconIngesttransfertitle.getElement().setInnerHTML("<i class=\"fa fa-info-circle\"></i>");
     infoIconIngesttransfertitle.addStyleName("description-toggle-icon");
+    infoIconIngesttransfertitle.setTitle("Klicka för att fälla ut hjälpen");
     infoIconIngesttransfertitle.addClickHandler(event -> ingestTransferDescription.setVisible(!ingestTransferDescription.isVisible()));
     ingestTransferTitle.add(infoIconIngesttransfertitle);
 
@@ -215,6 +216,7 @@ public class IngestTransfer extends Composite {
     Anchor infoIconIngesttransfertitle = new Anchor();
     infoIconIngesttransfertitle.getElement().setInnerHTML("<i class=\"fa fa-info-circle\"></i>");
     infoIconIngesttransfertitle.addStyleName("description-toggle-icon");
+    infoIconIngesttransfertitle.setTitle("Klicka för att fälla ut hjälpen");
     infoIconIngesttransfertitle.addClickHandler(event -> ingestTransferDescription.setVisible(!ingestTransferDescription.isVisible()));
     ingestTransferTitle.add(infoIconIngesttransfertitle);
 

@@ -158,6 +158,7 @@ public class BrowseTop extends Composite {
     Anchor infoIcon = new Anchor();
     infoIcon.getElement().setInnerHTML("<i class=\"fa fa-info-circle\"></i>");
     infoIcon.addStyleName("description-toggle-icon");
+    infoIcon.setTitle("Klicka för att fälla ut hjälpen");
     infoIcon.addClickHandler(event -> browseDescription.setVisible(!browseDescription.isVisible()));
     title.add(infoIcon);
 

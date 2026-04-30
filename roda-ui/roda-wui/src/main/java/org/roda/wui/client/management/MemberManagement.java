@@ -106,6 +106,7 @@ public class MemberManagement extends Composite {
     Anchor infoIconTitle = new Anchor();
     infoIconTitle.getElement().setInnerHTML("<i class=\"fa fa-info-circle\"></i>");
     infoIconTitle.addStyleName("description-toggle-icon");
+    infoIconTitle.setTitle("Klicka för att fälla ut hjälpen");
     infoIconTitle.addClickHandler(event -> memberManagementDescription.setVisible(!memberManagementDescription.isVisible()));
     title.add(infoIconTitle);
   }
