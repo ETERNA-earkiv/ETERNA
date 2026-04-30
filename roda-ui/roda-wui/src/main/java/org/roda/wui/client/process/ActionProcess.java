@@ -36,6 +36,8 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
+import org.roda.wui.client.common.TitlePanel;
+import com.google.gwt.user.client.ui.Anchor;
 
 /**
  * @author Luis Faria
@@ -71,6 +73,8 @@ public class ActionProcess extends Composite {
 
   @UiField
   FlowPanel preservationProcessDescription;
+  @UiField
+  TitlePanel title;
 
   @UiField(provided = true)
   JobSearch jobSearch;
@@ -90,6 +94,12 @@ public class ActionProcess extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
     preservationProcessDescription.add(new HTMLWidgetWrapper("PreservationProcessDescription.html"));
+    preservationProcessDescription.setVisible(false);
+    Anchor infoIconTitle = new Anchor();
+    infoIconTitle.getElement().setInnerHTML("<i class=\"fa fa-info-circle\"></i>");
+    infoIconTitle.addStyleName("description-toggle-icon");
+    infoIconTitle.addClickHandler(event -> preservationProcessDescription.setVisible(!preservationProcessDescription.isVisible()));
+    title.add(infoIconTitle);
   }
 
   /**

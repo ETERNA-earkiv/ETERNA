@@ -26,6 +26,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
+import org.roda.wui.client.common.TitlePanel;
+import com.google.gwt.user.client.ui.Anchor;
 
 /**
  * @author Luis Faria
@@ -76,6 +78,8 @@ public class Search extends Composite {
 
   @UiField
   FlowPanel searchDescription;
+  @UiField
+  TitlePanel title;
 
   @UiField(provided = true)
   CatalogueSearch catalogueSearch;
@@ -87,6 +91,12 @@ public class Search extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
     searchDescription.add(new HTMLWidgetWrapper("SearchDescription.html"));
+    searchDescription.setVisible(false);
+    Anchor infoIconTitle = new Anchor();
+    infoIconTitle.getElement().setInnerHTML("<i class=\"fa fa-info-circle\"></i>");
+    infoIconTitle.addStyleName("description-toggle-icon");
+    infoIconTitle.addClickHandler(event -> searchDescription.setVisible(!searchDescription.isVisible()));
+    title.add(infoIconTitle);
   }
 
   public static Search getInstance() {
