@@ -11,7 +11,7 @@
 			visible="false" />
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_12 content">
-				<common:TitlePanel text="{messages.preservationEventsTitle}" iconClass="IndexedPreservationEvent" />
+				<common:TitlePanel text="{messages.preservationEventsTitle}" iconClass="IndexedPreservationEvent" ui:field="title" />
 				<g:FlowPanel addStyleNames="page-description" ui:field="pageDescription" />
 				<search:PreservationEventsSearch ui:field="eventsSearch" addStyleNames="searchResults" />
 			</g:FlowPanel>
