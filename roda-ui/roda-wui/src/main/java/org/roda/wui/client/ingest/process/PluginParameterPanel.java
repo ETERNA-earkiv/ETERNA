@@ -159,13 +159,13 @@ public class PluginParameterPanel extends Composite {
 
   private void createConversionLayout() {
     conversionPanel = true;
-    Label parameterName = new Label(parameter.getName());
+    Label parameterName = new Label(messages.conversionOutcomeLabel());
     final ListBox dropdown = new ListBox();
     dropdown.addStyleName(FORM_SELECTBOX);
     dropdown.addStyleName(FORM_TEXTBOX_SMALL);
 
-    dropdown.addItem("Representation", ConversionProfileOutcomeType.REPRESENTATION.toString());
-    dropdown.addItem("Dissemination", ConversionProfileOutcomeType.DISSEMINATION.toString());
+    dropdown.addItem(messages.outcomeTypeRepresentation(), ConversionProfileOutcomeType.REPRESENTATION.toString());
+    dropdown.addItem(messages.outcomeTypeDissemination(), ConversionProfileOutcomeType.DISSEMINATION.toString());
 
     value = dropdown.getSelectedValue();
     FlowPanel innerPanel = new FlowPanel();
@@ -213,7 +213,7 @@ public class PluginParameterPanel extends Composite {
 
     dropdown.setTitle(OBJECT_BOX);
     layout.add(parameterName);
-    addHelp();
+    addHelp(layout, messages.conversionOutcomeDescription());
     layout.add(dropdown);
     layout.add(innerPanel);
   }
