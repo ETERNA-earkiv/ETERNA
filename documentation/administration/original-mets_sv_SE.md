@@ -35,9 +35,11 @@ För att använda original-METS funktionen lägger man till egenskapen
 ```javaproperties
 core.plugins.base.keep_original_mets = true
 ```
+
 samt anger ETERNA:s version 
 
 ```javaproperties
 core.plugins.base.keep_original_mets.software_version = xxxx
 ```
+
 i ETERNAS konfigurationsfil, `roda-core.properties`
