@@ -189,6 +189,7 @@ public class IngestTransfer extends Composite {
     objectToolbar.setObjectAndBuild(resource, null, null);
 
     ingestTransferDescription.add(new HTMLWidgetWrapper("IngestTransferDescription.html"));
+    ingestTransferDescription.setVisible(false);
     Anchor infoIconIngesttransfertitle = new Anchor();
     infoIconIngesttransfertitle.getElement().setInnerHTML("<i class=\"fa fa-info-circle\"></i>");
     infoIconIngesttransfertitle.addStyleName("description-toggle-icon");
@@ -210,6 +211,7 @@ public class IngestTransfer extends Composite {
     // navigationToolbar.setHeader(messages.oneOfAObject(TransferredResource.class.getName())); //TODO: Add header
 
     ingestTransferDescription.add(new HTMLWidgetWrapper("IngestTransferDescription.html"));
+    ingestTransferDescription.setVisible(false);
     Anchor infoIconIngesttransfertitle = new Anchor();
     infoIconIngesttransfertitle.getElement().setInnerHTML("<i class=\"fa fa-info-circle\"></i>");
     infoIconIngesttransfertitle.addStyleName("description-toggle-icon");
@@ -223,7 +225,6 @@ public class IngestTransfer extends Composite {
     if (resource == null) {
       itemTitle.setVisible(false);
       ingestTransferTitle.setVisible(true);
-      ingestTransferDescription.setVisible(true);
       itemDates.setText("");
       download.setVisible(false);
       navigationToolbar.setVisible(false);
