@@ -157,9 +157,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     filter: {
-                        parameters: [{ type: 'BasicSearchFilterParameter', name: '*', value: q }]
+                        parameters: [{ type: 'BasicSearchFilterParameter', name: 'search', value: q }]
                     },
-                    sublist: { firstElementIndex: 0, maximumElementCount: 7 }
+                    onlyActive: true,
+                    sublist: { firstElementIndex: 0, maximumElementCount: 6 }
                 })
             })
             .then(r => r.ok ? r.json() : null)
@@ -183,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 html += '</ul>';
                 const total = data.totalCount || data.total || objects.length;
                 if (total > objects.length) {
-                    html += '<a class="eterna-welcome__results-more" href="#search?query='
+                    html += '<a class="eterna-welcome__results-more" href="#search/q/'
                         + encodeURIComponent(q) + '">'
                         + (isSv ? 'Visa alla ' + total + ' tr\u00e4ffar \u2192' : 'Show all ' + total + ' results \u2192')
                         + '</a>';

@@ -33,6 +33,8 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class Search extends Composite {
 
+  private static final String QUERY_HANDLER = "q";
+
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
@@ -43,6 +45,9 @@ public class Search extends Composite {
           SavedSearch.resolveToNewInstance(historyTokens, callback);
         } else if (RodaConstants.SEARCH_WITH_PREFILTER_HANDLER.equals(searchType)) {
           SearchWithPreFilters.resolveToNewInstance(historyTokens, callback);
+        } else if (QUERY_HANDLER.equals(searchType)) {
+          String query = historyTokens.get(1);
+          getInstance().resolveWithQuery(query, callback);
         } else {
           getInstance().resolve(callback);
         }
@@ -97,6 +102,11 @@ public class Search extends Composite {
   }
 
   public void resolve(AsyncCallback<Widget> callback) {
+    callback.onSuccess(this);
+  }
+
+  public void resolveWithQuery(String query, AsyncCallback<Widget> callback) {
+    catalogueSearch.setQuery(query);
     callback.onSuccess(this);
   }
 }
