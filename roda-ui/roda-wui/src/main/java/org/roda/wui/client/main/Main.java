@@ -104,7 +104,10 @@ public class Main extends Composite implements EntryPoint {
     Defaults.setDispatcher(RODADispatcher.INSTANCE);
 
     // Remove loading image
-    RootPanel.getBodyElement().removeChild(DOM.getElementById("loading"));
+    Element loadingEl = DOM.getElementById("loading");
+    if (loadingEl != null) {
+      RootPanel.getBodyElement().removeChild(loadingEl);
+    }
     NodeList<Element> bodyChilds = RootPanel.getBodyElement().getElementsByTagName("iframe");
     for (int i = 0; i < bodyChilds.getLength(); i++) {
       Element bodyChild = bodyChilds.getItem(i);

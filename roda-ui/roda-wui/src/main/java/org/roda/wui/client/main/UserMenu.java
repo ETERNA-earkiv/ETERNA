@@ -109,7 +109,7 @@ public class UserMenu extends Composite {
       navMenu.addItem(registerItem);
       activeItems.add(registerItem);
     } else {
-      String name = user.getName();
+      String name = user.getName() != null ? user.getName() : "";
       String displayName = name.isEmpty() ? name
         : Character.toUpperCase(name.charAt(0)) + name.substring(1);
       SafeHtmlBuilder b = new SafeHtmlBuilder();

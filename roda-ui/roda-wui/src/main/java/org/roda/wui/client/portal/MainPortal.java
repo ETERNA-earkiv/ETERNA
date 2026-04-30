@@ -83,7 +83,10 @@ public class MainPortal extends Composite implements EntryPoint {
     HistoryUtils.initEndpoint(true);
 
     // Remove loading image
-    RootPanel.getBodyElement().removeChild(DOM.getElementById("loading"));
+    Element loadingEl = DOM.getElementById("loading");
+    if (loadingEl != null) {
+      RootPanel.getBodyElement().removeChild(loadingEl);
+    }
     NodeList<Element> bodyChilds = RootPanel.getBodyElement().getElementsByTagName("iframe");
 
     for (int i = 0; i < bodyChilds.getLength(); i++) {
