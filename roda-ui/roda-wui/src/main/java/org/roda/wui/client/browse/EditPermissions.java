@@ -76,6 +76,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
+import com.google.gwt.user.client.ui.Anchor;
 
 public class EditPermissions extends Composite {
 
@@ -106,6 +107,13 @@ public class EditPermissions extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
     buttonApplyToAll.setVisible(IndexedAIP.class.getName().equals(objectClass));
     editPermissionsDescription.add(new HTMLWidgetWrapper("EditMultiplePermissionsDescription.html"));
+    editPermissionsDescription.setVisible(false);
+    Anchor infoIconTitle = new Anchor();
+    infoIconTitle.getElement().setInnerHTML("<i class=\"fa fa-info-circle\"></i>");
+    infoIconTitle.addStyleName("description-toggle-icon");
+    infoIconTitle.setTitle("Klicka för att fälla ut hjälpen");
+    infoIconTitle.addClickHandler(event -> editPermissionsDescription.setVisible(!editPermissionsDescription.isVisible()));
+    title.add(infoIconTitle);
   }
 
   public EditPermissions(String objectClass, HasPermissions object) {
@@ -126,6 +134,13 @@ public class EditPermissions extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
     buttonApplyToAll.setVisible(IndexedAIP.class.getName().equals(objectClass));
     editPermissionsDescription.add(new HTMLWidgetWrapper("EditPermissionsDescription.html"));
+    editPermissionsDescription.setVisible(false);
+    Anchor infoIconTitle = new Anchor();
+    infoIconTitle.getElement().setInnerHTML("<i class=\"fa fa-info-circle\"></i>");
+    infoIconTitle.addStyleName("description-toggle-icon");
+    infoIconTitle.setTitle("Klicka för att fälla ut hjälpen");
+    infoIconTitle.addClickHandler(event -> editPermissionsDescription.setVisible(!editPermissionsDescription.isVisible()));
+    title.add(infoIconTitle);
     createPermissionPanelList();
   }
 

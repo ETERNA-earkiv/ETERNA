@@ -32,6 +32,8 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
+import org.roda.wui.client.common.TitlePanel;
+import com.google.gwt.user.client.ui.Anchor;
 
 public class MemberManagement extends Composite {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
@@ -82,6 +84,8 @@ public class MemberManagement extends Composite {
 
   @UiField
   FlowPanel memberManagementDescription;
+  @UiField
+  TitlePanel title;
 
   @UiField(provided = true)
   SearchWrapper searchWrapper;
@@ -98,6 +102,13 @@ public class MemberManagement extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     memberManagementDescription.add(new HTMLWidgetWrapper("MemberManagementDescription.html"));
+    memberManagementDescription.setVisible(false);
+    Anchor infoIconTitle = new Anchor();
+    infoIconTitle.getElement().setInnerHTML("<i class=\"fa fa-info-circle\"></i>");
+    infoIconTitle.addStyleName("description-toggle-icon");
+    infoIconTitle.setTitle("Klicka för att fälla ut hjälpen");
+    infoIconTitle.addClickHandler(event -> memberManagementDescription.setVisible(!memberManagementDescription.isVisible()));
+    title.add(infoIconTitle);
   }
 
   private void refresh() {

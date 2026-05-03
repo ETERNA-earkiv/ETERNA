@@ -8,7 +8,7 @@
 	<g:FlowPanel styleName="search" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_12 content">
-				<common:TitlePanel text="{messages.searchTitle}" icon="fas fa-search" />
+				<common:TitlePanel text="{messages.searchTitle}" icon="fas fa-search" ui:field="title" />
 				<g:FlowPanel addStyleNames="page-description" ui:field="searchDescription" />
 				<commonsearch:CatalogueSearch ui:field="catalogueSearch" />
 			</g:FlowPanel>

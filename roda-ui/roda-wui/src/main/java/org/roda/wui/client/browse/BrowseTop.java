@@ -26,19 +26,18 @@ import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.ingest.transfer.TransferUpload;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.Event.NativePreviewEvent;
 import com.google.gwt.user.client.Event.NativePreviewHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -154,6 +153,14 @@ public class BrowseTop extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     browseDescription.add(new HTMLWidgetWrapper("BrowseDescription.html"));
+    browseDescription.setVisible(false);
+
+    Anchor infoIcon = new Anchor();
+    infoIcon.getElement().setInnerHTML("<i class=\"fa fa-info-circle\"></i>");
+    infoIcon.addStyleName("description-toggle-icon");
+    infoIcon.setTitle("Klicka för att fälla ut hjälpen");
+    infoIcon.addClickHandler(event -> browseDescription.setVisible(!browseDescription.isVisible()));
+    title.add(infoIcon);
 
     initTreeResize();
   }

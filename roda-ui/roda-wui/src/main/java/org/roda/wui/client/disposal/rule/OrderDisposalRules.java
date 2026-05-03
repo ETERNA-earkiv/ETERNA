@@ -46,6 +46,8 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
+import org.roda.wui.client.common.TitlePanel;
+import com.google.gwt.user.client.ui.Anchor;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
@@ -87,6 +89,8 @@ public class OrderDisposalRules extends Composite {
   private final DisposalRules disposalRules;
   @UiField
   FlowPanel orderDisposalRulesDescription;
+  @UiField
+  TitlePanel title;
 
   @UiField
   FlowPanel orderDisposalRulesTablePanel;
@@ -200,6 +204,13 @@ public class OrderDisposalRules extends Composite {
 
   private void createDescription() {
     orderDisposalRulesDescription.add(new HTMLWidgetWrapper("OrderDisposalRulesDescription.html"));
+    orderDisposalRulesDescription.setVisible(false);
+    Anchor infoIconTitle = new Anchor();
+    infoIconTitle.getElement().setInnerHTML("<i class=\"fa fa-info-circle\"></i>");
+    infoIconTitle.addStyleName("description-toggle-icon");
+    infoIconTitle.setTitle("Klicka för att fälla ut hjälpen");
+    infoIconTitle.addClickHandler(event -> orderDisposalRulesDescription.setVisible(!orderDisposalRulesDescription.isVisible()));
+    title.add(infoIconTitle);
   }
 
   private void createDisposalRulesPanel() {

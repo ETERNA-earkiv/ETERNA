@@ -1736,3 +1736,21 @@ a.btn-hero:visited, a.btn-welcome:visited {
 .representationSection .thumbnailCardTitle::after {
     display: none !important;
 }
+
+/* Description toggle */
+.page-description {
+    padding-right: 266px;
+}
+
+.description-toggle-icon {
+    margin-left: 8px;
+    font-size: 1em;
+    vertical-align: super;
+    cursor: pointer;
+    color: #666;
+    text-decoration: none !important;
+}
+
+.description-toggle-icon:hover {
+    color: #333;
+}

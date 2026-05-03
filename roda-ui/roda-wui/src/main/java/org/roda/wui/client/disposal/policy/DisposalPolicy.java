@@ -43,6 +43,8 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
+import org.roda.wui.client.common.TitlePanel;
+import com.google.gwt.user.client.ui.Anchor;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
@@ -94,6 +96,8 @@ public class DisposalPolicy extends Composite {
 
   @UiField
   FlowPanel disposalPolicyDescription;
+  @UiField
+  TitlePanel title;
 
   @UiField
   FlowPanel contentFlowPanel;
@@ -265,6 +269,13 @@ public class DisposalPolicy extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
     initSidebar();
     disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
+    disposalPolicyDescription.setVisible(false);
+    Anchor infoIconTitle = new Anchor();
+    infoIconTitle.getElement().setInnerHTML("<i class=\"fa fa-info-circle\"></i>");
+    infoIconTitle.addStyleName("description-toggle-icon");
+    infoIconTitle.setTitle("Klicka för att fälla ut hjälpen");
+    infoIconTitle.addClickHandler(event -> disposalPolicyDescription.setVisible(!disposalPolicyDescription.isVisible()));
+    title.add(infoIconTitle);
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {

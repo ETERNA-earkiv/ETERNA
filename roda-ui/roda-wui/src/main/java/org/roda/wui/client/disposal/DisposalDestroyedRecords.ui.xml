@@ -7,7 +7,7 @@
 	<g:FlowPanel styleName="wui-disposal-destroyed-records" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_12 content" ui:field="content">
-				<common:TitlePanel text="{messages.disposalDestroyedRecordsTitle}" iconClass="DisposalDestroyedRecords" />
+				<common:TitlePanel text="{messages.disposalDestroyedRecordsTitle}" iconClass="DisposalDestroyedRecords" ui:field="title" />
 				<g:FlowPanel addStyleNames="page-description" ui:field="disposalDestroyedRecordsDescription">
 				</g:FlowPanel>
 				<commonsearch:SearchWrapper ui:field="disposalDestroyedRecordsSearch" />
