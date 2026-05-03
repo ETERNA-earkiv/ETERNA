@@ -233,6 +233,11 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
     searchInputBox.setText("");
   }
 
+  public void setQuery(String query) {
+    searchInputBox.setText(query == null ? "" : query);
+    doSearch();
+  }
+
   @UiHandler("searchAdvancedFieldOptionsAdd")
   void handleSearchAdvancedAdd(ClickEvent e) {
     advancedSearchFieldsPanel.addSearchFieldPanel();

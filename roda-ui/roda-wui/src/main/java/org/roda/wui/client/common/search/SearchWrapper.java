@@ -161,6 +161,18 @@ public class SearchWrapper extends Composite {
     return searchPanelSelectionDropdown.setSelectedValue(objectClassSimpleName, true);
   }
 
+  public void setQuery(String query) {
+    String currentClass = searchPanelSelectionDropdown != null
+      ? searchPanelSelectionDropdown.getSelectedValue()
+      : listClassForSingleSearchPanel;
+    if (currentClass != null) {
+      SearchPanel<?> searchPanel = components.getSearchPanel(currentClass);
+      if (searchPanel != null) {
+        searchPanel.setQuery(query);
+      }
+    }
+  }
+
   public void refreshAllLists() {
     components.forEachList(list -> list.refresh());
   }

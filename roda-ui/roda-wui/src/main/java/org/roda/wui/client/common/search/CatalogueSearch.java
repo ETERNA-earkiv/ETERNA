@@ -144,6 +144,10 @@ public class CatalogueSearch extends Composite {
     searchWrapper.refreshCurrentList();
   }
 
+  public void setQuery(String query) {
+    searchWrapper.setQuery(query);
+  }
+
   private boolean calculateRedirectOnSingleResult(List<String> historyTokens, Map<String, Filter> classFilters,
     boolean redirectOnSingleResult) {
     if (historyTokens.get(0).startsWith("$")) {
