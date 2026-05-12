@@ -1547,6 +1547,25 @@ public class SolrUtils {
     return ret;
   }
 
+  public static <T extends IsIndexed, S extends Object> ReturnWithExceptions<Void, S> atomicIncrement(
+    SolrClient index, Class<T> classToCreate, String uuid, Map<String, Long> increments, S source) {
+    ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>(source);
+    SolrInputDocument doc = new SolrInputDocument();
+    doc.addField(RodaConstants.INDEX_UUID, uuid);
+    increments.forEach((key, delta) -> {
+      Map<String, Object> modifier = new HashMap<>(1);
+      modifier.put("inc", delta);
+      doc.addField(key, modifier);
+    });
+    try {
+      create(index, SolrCollectionRegistry.getIndexName(classToCreate), doc, source).addTo(ret);
+    } catch (NotSupportedException e) {
+      LOGGER.error("Error incrementing document in index", e);
+      ret.add(e);
+    }
+    return ret;
+  }
+
   private static Map<String, Object> set(Object value) {
     Map<String, Object> fieldModifier = new HashMap<>(1);
     // 20160511 this workaround fixes solr wrong behaviour with partial update
