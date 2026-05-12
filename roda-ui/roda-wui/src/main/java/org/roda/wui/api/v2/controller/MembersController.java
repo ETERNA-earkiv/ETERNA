@@ -22,6 +22,7 @@ import javax.crypto.SecretKey;
 import org.apache.commons.lang3.StringUtils;
 import org.apereo.cas.client.authentication.AttributePrincipal;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.JwtUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.SecureString;
@@ -190,33 +191,46 @@ public class MembersController implements MembersRestService, Exportable {
       }
 
       user = RodaCoreFactory.getModelService().createUser(user, true);
+      try {
+        PremisV3Utils.createOrUpdatePremisUserAgentBinary(user.getName(),
+          RodaCoreFactory.getModelService(), RodaCoreFactory.getIndexService(), true);
+      } catch (Exception e) {
+        LOGGER.warn("Could not create PREMIS agent for CAS user '{}'", user.getName(), e);
+      }
     } else {
       // found user and authentication externally, so update user email, full name and
-      // groups from cas principal
-      // attributes if they have changed
-      if (attributes.get("email") instanceof String email && !user.getEmail().equals(attributes.get("email"))) {
-        user.setEmail(email);
-      }
-      if (attributes.get("fullname") instanceof String fullname
-        && !user.getFullName().equals(attributes.get("fullname"))) {
-        user.setFullName(fullname);
-      }
-      if (RodaCoreFactory.getRodaConfiguration().getBoolean(RodaConstants.CORE_EXTERNAL_AUTH_GROUP_MAPPING_ENABLED,
-        false)) {
-        if (attributes.get(groupsAttribute) instanceof Collection<?> memberOf) {
-          Set<String> casGroups = new HashSet<>();
-          for (Object group : memberOf) {
-            if (group instanceof String groupString) {
-              casGroups.add(groupString);
+      // groups from cas principal attributes if they have changed
+      if (attributes != null) {
+        if (attributes.get("email") instanceof String email && !user.getEmail().equals(attributes.get("email"))) {
+          user.setEmail(email);
+        }
+        if (attributes.get("fullname") instanceof String fullname
+          && !user.getFullName().equals(attributes.get("fullname"))) {
+          user.setFullName(fullname);
+        }
+        if (RodaCoreFactory.getRodaConfiguration().getBoolean(RodaConstants.CORE_EXTERNAL_AUTH_GROUP_MAPPING_ENABLED,
+          false)) {
+          if (attributes.get(groupsAttribute) instanceof Collection<?> memberOf) {
+            Set<String> casGroups = new HashSet<>();
+            for (Object group : memberOf) {
+              if (group instanceof String groupString) {
+                casGroups.add(groupString);
+              }
             }
-          }
-          Set<String> rodaGroups = mapCasGroupstoRODAGroups(casGroups);
-          if (!user.getGroups().equals(rodaGroups)) {
-            user.setGroups(rodaGroups);
+            Set<String> rodaGroups = mapCasGroupstoRODAGroups(casGroups);
+            if (!user.getGroups().equals(rodaGroups)) {
+              user.setGroups(rodaGroups);
+            }
           }
         }
       }
       RodaCoreFactory.getModelService().updateUser(user, null, true);
+      try {
+        PremisV3Utils.createOrUpdatePremisUserAgentBinary(user.getName(),
+          RodaCoreFactory.getModelService(), RodaCoreFactory.getIndexService(), true);
+      } catch (Exception e) {
+        LOGGER.warn("Could not update PREMIS agent for CAS user '{}'", user.getName(), e);
+      }
     }
 
     if (!user.isActive()) {
