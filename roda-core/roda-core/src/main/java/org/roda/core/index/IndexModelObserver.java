@@ -1036,7 +1036,7 @@ public class IndexModelObserver implements ModelObserver {
 
     String uuid = IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId);
 
-    // Läs filens metadata innan borttagning — behövs för att dekrementera representationsräknarna
+    // Read file metadata before deletion to update representation counters
     IndexedFile indexedFile = null;
     try {
       List<String> fields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.FILE_SIZE,
@@ -1049,10 +1049,8 @@ public class IndexModelObserver implements ModelObserver {
       ret.add(e);
     }
 
-    // Ta alltid bort fildokumentet (idempotent operation)
     deleteDocumentFromIndex(IndexedFile.class, uuid).addTo(ret);
 
-    // Dekrementera representationsräknarna om vi lyckades hämta filens metadata
     if (indexedFile != null) {
       String repUUID = IdUtils.getRepresentationId(aipId, representationId);
       Map<String, Long> decrements = new HashMap<>();
