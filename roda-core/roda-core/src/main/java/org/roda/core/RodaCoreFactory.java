@@ -1435,7 +1435,7 @@ public class RodaCoreFactory {
           PremisV3Utils.createOrUpdatePremisUserAgentBinary(user.getName(), getModelService(), getIndexService(), true);
         } catch (ValidationException | NotFoundException | RequestNotValidException | AuthorizationDeniedException
           | AlreadyExistsException e) {
-          LOGGER.error("Could not create PREMIS agent for default users");
+          LOGGER.error("Could not create PREMIS agent for user '{}'", user.getName(), e);
         }
       }
     }
