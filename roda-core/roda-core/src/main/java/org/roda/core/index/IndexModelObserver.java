@@ -1035,7 +1035,36 @@ public class IndexModelObserver implements ModelObserver {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
     String uuid = IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId);
+
+    // Läs filens metadata innan borttagning — behövs för att dekrementera representationsräknarna
+    IndexedFile indexedFile = null;
+    try {
+      List<String> fields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.FILE_SIZE,
+        RodaConstants.FILE_ISDIRECTORY);
+      indexedFile = SolrUtils.retrieve(index, IndexedFile.class, uuid, fields);
+    } catch (NotFoundException e) {
+      LOGGER.warn("File not found in index before deletion, representation stats will not be updated: {}", uuid);
+    } catch (GenericException e) {
+      LOGGER.error("Error retrieving file from index before deletion: {}", uuid, e);
+      ret.add(e);
+    }
+
+    // Ta alltid bort fildokumentet (idempotent operation)
     deleteDocumentFromIndex(IndexedFile.class, uuid).addTo(ret);
+
+    // Dekrementera representationsräknarna om vi lyckades hämta filens metadata
+    if (indexedFile != null) {
+      String repUUID = IdUtils.getRepresentationId(aipId, representationId);
+      Map<String, Long> decrements = new HashMap<>();
+      if (indexedFile.isDirectory()) {
+        decrements.put(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FOLDERS, -1L);
+      } else {
+        decrements.put(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES, -1L);
+      }
+      decrements.put(RodaConstants.REPRESENTATION_SIZE_IN_BYTES, -indexedFile.getSize());
+      SolrUtils.atomicIncrement(index, IndexedRepresentation.class, repUUID, decrements, (ModelObserver) this)
+        .addTo(ret);
+    }
 
     if (deleteIncidences) {
       deleteDocumentsFromIndex(RiskIncidence.class, RodaConstants.RISK_INCIDENCE_FILE_ID, fileId).addTo(ret);
