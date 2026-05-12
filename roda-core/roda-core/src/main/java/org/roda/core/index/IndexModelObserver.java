@@ -998,7 +998,21 @@ public class IndexModelObserver implements ModelObserver {
     try {
       AIP aip = model.retrieveAIP(file.getAipId());
       List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
-      indexFile(aip, file, ancestors, true).addTo(ret);
+      Long size = indexFile(aip, file, ancestors, true).addTo(ret).getReturnedObject();
+
+      // ret.isEmpty() = no exceptions from indexFile; do not update stats on partial failure
+      if (ret.isEmpty() && size != null) {
+        String repUUID = IdUtils.getRepresentationId(file.getAipId(), file.getRepresentationId());
+        Map<String, Long> increments = new HashMap<>();
+        if (file.isDirectory()) {
+          increments.put(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FOLDERS, 1L);
+        } else {
+          increments.put(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES, 1L);
+        }
+        increments.put(RodaConstants.REPRESENTATION_SIZE_IN_BYTES, size);
+        SolrUtils.atomicIncrement(index, IndexedRepresentation.class, repUUID, increments, (ModelObserver) this)
+          .addTo(ret);
+      }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error indexing file: {}", file, e);
       ret.add(e);
