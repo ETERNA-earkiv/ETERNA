@@ -1269,14 +1269,17 @@ public final class PluginHelper {
         throw new RequestNotValidException(
           "Could not get LITE for agent with ID: " + linkingIdentifierAgent.getValue());
       }
-      if (!model.existsInStorage(agentLite.get())) {
-        PreservationMetadata pm = PremisV3Utils.createOrUpdatePremisUserAgentBinary(agentName, model, index, true,
-          jobUserDetails);
-        if (pm != null) {
-          agentIds.add(linkingIdentifierAgent);
-        }
-      } else {
+      PreservationMetadata pm = PremisV3Utils.createOrUpdatePremisUserAgentBinary(agentName, model, index, true,
+        jobUserDetails);
+      if (pm != null) {
         agentIds.add(linkingIdentifierAgent);
+      } else if (model.existsInStorage(agentLite.get())) {
+        LOGGER.warn("PREMIS agent binary exists in storage but could not be created/updated (blank agent name?): {}",
+          linkingIdentifierAgent.getValue());
+        agentIds.add(linkingIdentifierAgent);
+      } else {
+        LOGGER.warn("PREMIS agent binary could not be created and does not exist in storage: {}",
+          linkingIdentifierAgent.getValue());
       }
     } catch (AlreadyExistsException e) {
       agentIds.add(linkingIdentifierAgent);
