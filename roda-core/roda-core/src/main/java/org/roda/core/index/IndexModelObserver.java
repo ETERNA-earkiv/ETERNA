@@ -131,6 +131,7 @@ public class IndexModelObserver implements ModelObserver {
           }
         }
       }
+      SolrUtils.commit(index, IndexedAIP.class);
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error getting ancestors when creating AIP", e);
       ret.add(e);
@@ -860,6 +861,7 @@ public class IndexModelObserver implements ModelObserver {
           descriptiveMetadata.getRepresentationId());
         indexRepresentation(aip, representation, ancestors).addTo(ret);
       }
+      SolrUtils.commit(index, IndexedAIP.class);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Failed to index AIP or representation when creating descriptive metadata", e);
       ret.add(e);
