@@ -202,4 +202,19 @@ public class CatalogTreePanel extends Composite {
     }
     return null;
   }
+
+  public void refreshSubtree(String parentAipId) {
+    if (parentAipId == null || parentAipId.isEmpty()) {
+      rootNodes.clear();
+      treeBody.clear();
+      rootsLoaded = false;
+      pendingRevealAipId = null;
+      loadRootNodes();
+    } else {
+      CatalogTreeNode parent = findNode(parentAipId, rootNodes);
+      if (parent != null) {
+        parent.invalidateChildren();
+      }
+    }
+  }
 }
