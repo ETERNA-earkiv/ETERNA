@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package config.i18n.client;
 
@@ -523,6 +523,10 @@ public interface ClientMessages extends Messages {
   String viewRepresentationNotSupportedPreviewCentralInstance();
 
   String viewRepresentationNotSupportedPreviewShallowFile();
+
+  String viewRepresentationTiffLoading();
+
+  String viewRepresentationTiffError();
 
   String viewRepresentationFileDisseminationTitle();
 
@@ -2628,6 +2632,14 @@ public interface ClientMessages extends Messages {
   String conversionProfileTitle();
 
   String conversionProfileDescription();
+
+  String conversionOutcomeLabel();
+
+  String conversionOutcomeDescription();
+
+  String outcomeTypeRepresentation();
+
+  String outcomeTypeDissemination();
 
   /* Audit logs */
   String relatedAuditLogs();

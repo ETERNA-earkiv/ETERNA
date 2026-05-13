@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.search;
 
@@ -142,6 +142,10 @@ public class CatalogueSearch extends Composite {
 
   public void refresh() {
     searchWrapper.refreshCurrentList();
+  }
+
+  public void setQuery(String query) {
+    searchWrapper.setQuery(query);
   }
 
   private boolean calculateRedirectOnSingleResult(List<String> historyTokens, Map<String, Filter> classFilters,

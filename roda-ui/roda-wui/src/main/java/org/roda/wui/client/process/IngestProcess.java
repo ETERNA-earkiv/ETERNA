@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 /**
  *
@@ -39,6 +39,8 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
+import org.roda.wui.client.common.TitlePanel;
+import com.google.gwt.user.client.ui.Anchor;
 
 /**
  * @author Luis Faria
@@ -94,6 +96,8 @@ public class IngestProcess extends Composite {
 
   @UiField
   FlowPanel ingestProcessDescription;
+  @UiField
+  TitlePanel title;
 
   @UiField(provided = true)
   JobSearch jobSearch;
@@ -114,6 +118,13 @@ public class IngestProcess extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     ingestProcessDescription.add(new HTMLWidgetWrapper("IngestProcessDescription.html"));
+    ingestProcessDescription.setVisible(false);
+    Anchor infoIconTitle = new Anchor();
+    infoIconTitle.getElement().setInnerHTML("<i class=\"fa fa-info-circle\"></i>");
+    infoIconTitle.addStyleName("description-toggle-icon");
+    infoIconTitle.setTitle("Klicka för att fälla ut hjälpen");
+    infoIconTitle.addClickHandler(event -> ingestProcessDescription.setVisible(!ingestProcessDescription.isVisible()));
+    title.add(infoIconTitle);
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {

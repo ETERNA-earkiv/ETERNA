@@ -5,6 +5,7 @@ Welcome to ETERNA's help documentation! Here you'll find all the information you
 ## Table of Contents
 
 ### Reference Documentation
+
 Technical references and detailed information about the system.
 
 - **[Overview](reference/Overview.md)** - An introduction to ETERNA and its core functions
@@ -16,6 +17,7 @@ Technical references and detailed information about the system.
 - **[License](reference/LICENSE.md)** - License information for the project
 
 ### User Guides
+
 Step-by-step guides for using ETERNA effectively.
 
 - **[Quickstart](usage/Quickstart.md)** - Get started quickly with ETERNA
@@ -29,6 +31,7 @@ Step-by-step guides for using ETERNA effectively.
 - **[Configuring fields for search result export](administration/Export_Configuration.md)** - How to configure fields for search result export
 
 ### Administration Guides
+
 Guides for system administrators and archive managers.
 
 - **[Portal Administration](administration/Portal_Administration.md)** - Administer the ETERNA portal
@@ -37,8 +40,10 @@ Guides for system administrators and archive managers.
 - **[Disposal](administration/Disposal.md)** - Processes for data management
 - **[Permissions](administration/Permissions.md)** - Managing user permissions
 - **[Risk Assessment](administration/Risk_Assessment.md)** - Evaluation of archiving risks
+- **[Original-METS](../administration/original-mets.md)** - Handles METS files
 
 ### Developer Resources
+
 Documentation for developers who want to contribute to or extend ETERNA.
 
 - **[Developer's Guide](development/Developers_Guide.md)** - Guide for developers

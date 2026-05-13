@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.browse;
 
@@ -19,6 +19,7 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
+import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.services.Services;
 
@@ -42,6 +43,8 @@ public class CatalogTreePanel extends Composite {
   private static final ClientLogger LOGGER = new ClientLogger(CatalogTreePanel.class.getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+  /** Maximum number of root nodes to load in the catalog tree. */
+  private static final int TREE_MAX_CHILDREN = 10_000;
 
   interface MyUiBinder extends UiBinder<Widget, CatalogTreePanel> {}
 
@@ -98,10 +101,10 @@ public class CatalogTreePanel extends Composite {
     FindRequest findRequest = new FindRequest.FindRequestBuilder(
       new Filter(
         new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID),
-        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file"),
-        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "item")),
+        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file")),
       false)
       .withSorter(new Sorter(new SortParameter(RodaConstants.AIP_TITLE_SORT, false)))
+      .withSublist(new Sublist(0, TREE_MAX_CHILDREN))
       .build();
 
     Services service = new Services(messages.catalogTreeLoadingLabel(), "get");

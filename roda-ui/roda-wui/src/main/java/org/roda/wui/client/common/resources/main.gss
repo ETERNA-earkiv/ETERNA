@@ -3477,12 +3477,34 @@ body.catalogTreeResizing * {
     overflow: hidden;
 }
 
+/* #337: Trädpanel ska stå still medan höger sida skrollar för sig.
+   Begränsar layoutens höjd till viewport (minus sticky bannerHeader 64px),
+   så att .catalogTreePanel (intern scroll i .catalogTreeBodyScroll) håller
+   sin position och .catalogTreeMainContent kan ha egen y-scroll. */
+.catalogTreeLayout {
+    height: calc(100vh - 64px);
+    min-height: 0 !important;
+    overflow: hidden;
+}
+
+.catalogTreeLayout .catalogTreeMainContent {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
 @media (max-width: 900px) {
     .catalogTreePanel {
         display: none;
     }
     .catalogTreeResizeHandle {
         display: none;
+    }
+    .catalogTreeLayout {
+        height: auto;
+        overflow: visible;
+    }
+    .catalogTreeLayout .catalogTreeMainContent {
+        overflow: visible;
     }
 }
 

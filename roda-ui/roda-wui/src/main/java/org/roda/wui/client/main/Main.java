@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 /**
  *
@@ -104,7 +104,10 @@ public class Main extends Composite implements EntryPoint {
     Defaults.setDispatcher(RODADispatcher.INSTANCE);
 
     // Remove loading image
-    RootPanel.getBodyElement().removeChild(DOM.getElementById("loading"));
+    Element loadingEl = DOM.getElementById("loading");
+    if (loadingEl != null) {
+      RootPanel.getBodyElement().removeChild(loadingEl);
+    }
     NodeList<Element> bodyChilds = RootPanel.getBodyElement().getElementsByTagName("iframe");
     for (int i = 0; i < bodyChilds.getLength(); i++) {
       Element bodyChild = bodyChilds.getItem(i);
@@ -119,8 +122,8 @@ public class Main extends Composite implements EntryPoint {
     RootPanel.get().addStyleName("roda");
 
     // Initialize
-    userMenu.init();
     header.init();
+    userMenu.init(header.getNavigationMenu());
     contentPanel.init();
     onHistoryChanged(History.getToken());
     History.addValueChangeHandler(event -> onHistoryChanged(event.getValue()));

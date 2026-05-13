@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.browse;
 
@@ -58,6 +58,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   private static final String VIEWER_TYPE_HTML = "html";
   private static final String VIEWER_TYPE_PDF = "pdf";
   private static final String VIEWER_TYPE_IMAGE = "image";
+  private static final String VIEWER_TYPE_TIFF = "tiff";
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -179,6 +180,8 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     if (type != null) {
       if (type.equals(VIEWER_TYPE_IMAGE)) {
         imagePreview();
+      } else if (type.equals(VIEWER_TYPE_TIFF)) {
+        tiffCanvasPreview();
       } else if (type.equals(VIEWER_TYPE_PDF)) {
         pdfPreview();
       } else if (type.equals(VIEWER_TYPE_TEXT)) {
@@ -249,6 +252,22 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
       }
     });
 
+  }
+
+  private void tiffCanvasPreview() {
+    final SimplePanel canvasContainer = new SimplePanel();
+    canvasContainer.setStyleName("viewRepresentationTiffFilePreview");
+    panel.add(canvasContainer);
+
+    canvasContainer.addAttachHandler(new Handler() {
+      @Override
+      public void onAttachOrDetach(AttachEvent event) {
+        if (event.isAttached()) {
+          JavascriptUtils.runTiffCanvasViewerOn(canvasContainer.getElement(), bitstreamDownloadUri.asString(),
+            messages.viewRepresentationTiffLoading(), messages.viewRepresentationTiffError());
+        }
+      }
+    });
   }
 
   private void pdfPreview() {

@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 /**
  *
@@ -114,9 +114,9 @@ public class BrowseAIP extends Composite {
   @UiField
   FlowPanel treeResizeHandle;
 
-  // SIDEBAR
+  // REPRESENTATIONS (inline section)
   @UiField
-  FlowPanel sidePanel;
+  FlowPanel representationSection;
   @UiField
   FlowPanel representationCards;
   @UiField
@@ -230,24 +230,24 @@ public class BrowseAIP extends Composite {
 
     lowerContent.setVisible(response.getChildAipsCount().getResult() > 0);
 
-    // Side panel representations
+    // Inline representations (shown below metadata)
     // Check if user has permissions to see the representations
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION)
       && !aip.getState().equals(AIPState.INGEST_PROCESSING)) {
-      boolean showSidePanel = false;
+      boolean showRepresentations = false;
       if (Boolean.TRUE.equals(response.getIndexedAIP().getHasRepresentations())) {
-        showSidePanel = true;
+        showRepresentations = true;
         this.representationCards.add(new AIPRepresentationCardList(aipId, justActive));
       }
 
       if (response.getDipCount().getResult() > 0) {
-        showSidePanel = true;
+        showRepresentations = true;
         this.disseminationCards.add(new AIPDisseminationCardList(aipId));
       }
 
-      this.sidePanel.setVisible(showSidePanel);
+      this.representationSection.setVisible(showRepresentations);
     } else {
-      this.sidePanel.setVisible(false);
+      this.representationSection.setVisible(false);
     }
 
     final int savedScrollLeft = com.google.gwt.user.client.Window.getScrollLeft();

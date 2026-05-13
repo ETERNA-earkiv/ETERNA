@@ -3,22 +3,18 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
-
 /**
  *
  */
 package org.roda.wui.client.main;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.Profile;
 import org.roda.wui.client.management.Register;
 import org.roda.wui.common.client.ClientLogger;
@@ -27,11 +23,9 @@ import org.roda.wui.common.client.widgets.wcag.AcessibleMenuBar;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
-import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.MenuBar;
@@ -53,13 +47,8 @@ public class UserMenu extends Composite {
   interface MyUiBinder extends UiBinder<Widget, UserMenu> {
   }
 
-  @UiField
-  AcessibleMenuBar menu;
-
-  private AcessibleMenuBar userMenu;
-  private AcessibleMenuBar languagesMenu;
-
-  private String selectedLanguage;
+  private AcessibleMenuBar profileDropdown;
+  private final List<MenuItem> activeItems = new ArrayList<>();
 
   /**
    * User menu constructor
@@ -69,17 +58,13 @@ public class UserMenu extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
   }
 
-  public void init() {
-    userMenu = new AcessibleMenuBar(true);
-    userMenu.addStyleName("userMenuColors");
-    MenuItem profile = userMenu.addItem(messages.loginProfile(), createCommand(Profile.RESOLVER.getHistoryPath()));
+  public void init(AcessibleMenuBar navMenu) {
+    profileDropdown = new AcessibleMenuBar(true);
+    profileDropdown.addStyleName("userMenuColors");
+    MenuItem profile = profileDropdown.addItem(messages.loginProfile(), createCommand(Profile.RESOLVER.getHistoryPath()));
     profile.addStyleName("profile_user_item");
-    MenuItem login = userMenu.addItem(messages.loginLogout(), () -> UserLogin.getInstance().logout());
-    login.addStyleName("login_user_item");
-
-    languagesMenu = new AcessibleMenuBar(true);
-    languagesMenu.addStyleName("userMenuColors");
-    setLanguageMenu();
+    MenuItem logout = profileDropdown.addItem(messages.loginLogout(), () -> UserLogin.getInstance().logout());
+    logout.addStyleName("login_user_item");
 
     UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<User>() {
 
@@ -90,11 +75,11 @@ public class UserMenu extends Composite {
 
       @Override
       public void onSuccess(User user) {
-        updateVisibles(user);
+        updateVisibles(navMenu, user);
       }
     });
 
-    UserLogin.getInstance().addLoginStatusListener(this::updateVisibles);
+    UserLogin.getInstance().addLoginStatusListener(user -> updateVisibles(navMenu, user));
   }
 
   private ScheduledCommand createCommand(final List<String> path) {
@@ -105,38 +90,44 @@ public class UserMenu extends Composite {
     return () -> UserLogin.getInstance().login();
   }
 
-  private void updateVisibles(User user) {
-    menu.clearItems();
+  private void updateVisibles(AcessibleMenuBar navMenu, User user) {
+    for (MenuItem item : activeItems) {
+      navMenu.removeItem(item);
+    }
+    activeItems.clear();
 
-    // TODO make creating sync (not async)
-    // User
     if (user.isGuest()) {
       MenuItem loginItem = customMenuItem("fa fa-user", messages.loginLogin(), "navigationMenu-item-label", null,
         createLoginCommand());
       loginItem.addStyleName("user_menu_item");
-      menu.addItem(loginItem);
+      navMenu.addItem(loginItem);
+      activeItems.add(loginItem);
 
       MenuItem registerItem = customMenuItem("fa fa-user-plus", messages.loginRegister(),
         "navigationMenu-item-label navigationMenu-register", null, createCommand(Register.RESOLVER.getHistoryPath()));
       registerItem.addStyleName("user_menu_item_register");
-      menu.addItem(registerItem);
+      navMenu.addItem(registerItem);
+      activeItems.add(registerItem);
     } else {
-      MenuItem userItem = customMenuItem("fa fa-user", user.getName(), "navigationMenu-item-label", userMenu, null);
+      String name = user.getName() != null ? user.getName() : "";
+      String displayName = name.isEmpty() ? name
+        : Character.toUpperCase(name.charAt(0)) + name.substring(1);
+      SafeHtmlBuilder b = new SafeHtmlBuilder();
+      b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-user'></i>"));
+      b.appendEscaped(displayName);
+      MenuItem userItem = new MenuItem(b.toSafeHtml(), profileDropdown);
+      userItem.addStyleName("navigationMenu-item");
+      userItem.addStyleName("navigationMenu-item-label");
       userItem.addStyleName("user_menu_item");
-      menu.addItem(userItem);
+      navMenu.addItem(userItem);
+      activeItems.add(userItem);
     }
-
-    MenuItem languageMenuItem = customMenuItem("fa fa-globe", selectedLanguage, "navigationMenu-item-label", languagesMenu, null);
-    languageMenuItem.addStyleName("navigationMenu-item-language");
-    menu.addItem(languageMenuItem);
   }
 
   private MenuItem customMenuItem(String icon, String label, String styleNames, MenuBar subMenu,
     ScheduledCommand command) {
     SafeHtmlBuilder b = new SafeHtmlBuilder();
-    String iconHTML = "<i class='" + icon + "'></i>";
-
-    b.append(SafeHtmlUtils.fromSafeConstant(iconHTML));
+    b.append(SafeHtmlUtils.fromSafeConstant("<i class='" + icon + "'></i>"));
     if (label != null) {
       b.append(SafeHtmlUtils.fromSafeConstant(label));
     }
@@ -155,42 +146,4 @@ public class UserMenu extends Composite {
     return menuItem;
   }
 
-  private void setLanguageMenu() {
-    String locale = LocaleInfo.getCurrentLocale().getLocaleName();
-
-    // Getting supported languages and their display name
-    Map<String, String> supportedLanguages = new HashMap<>();
-
-    for (String localeName : LocaleInfo.getAvailableLocaleNames()) {
-      if (!"default".equals(localeName)) {
-        supportedLanguages.put(localeName, LocaleInfo.getLocaleNativeDisplayName(localeName));
-      }
-    }
-
-    languagesMenu.clearItems();
-
-    for (final Entry<String, String> entry : supportedLanguages.entrySet()) {
-      final String key = entry.getKey();
-      final String value = entry.getValue();
-
-      if (key.equals(locale)) {
-        SafeHtmlBuilder b = new SafeHtmlBuilder();
-        String iconHTML = "<i class='fa fa-check'></i>";
-
-        b.append(SafeHtmlUtils.fromSafeConstant(value));
-        b.append(SafeHtmlUtils.fromSafeConstant(iconHTML));
-
-        MenuItem languageMenuItem = new MenuItem(b.toSafeHtml());
-        languageMenuItem.addStyleName("navigationMenu-item-language-selected");
-        languageMenuItem.addStyleName("navigationMenu-item-language");
-        languagesMenu.addItem(languageMenuItem);
-        selectedLanguage = value;
-      } else {
-        MenuItem languageMenuItem = new MenuItem(SafeHtmlUtils.fromSafeConstant(value),
-          () -> JavascriptUtils.changeLocale(key));
-        languagesMenu.addItem(languageMenuItem);
-        languageMenuItem.addStyleName("navigationMenu-item-language");
-      }
-    }
-  }
 }

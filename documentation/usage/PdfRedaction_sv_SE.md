@@ -46,7 +46,11 @@ Ange skälet och klicka på **Bekräfta** för att fortsätta. Klicka på **Avbr
 
 > **Observera:** Beroende på systemkonfigurationen kan det vara obligatoriskt att ange ett skäl. Som standard är det obligatoriskt. När det är obligatoriskt är Bekräfta-knappen inaktiverad tills du har angett ett skäl.
 
-När skälet har bekräftats visas ytterligare en dialog som ber dig bekräfta exporten. Redigeraren renderar varje sida och ersätter de maskerade områdena med solida svarta rektanglar i den exporterade filen. En förloppsindikator visar hur många sidor som har bearbetats. När exporten är klar sparas den maskerade filen tillbaka till arkivet.
+När skälet har bekräftats visas ytterligare en dialog som ber dig bekräfta exporten. Den innehåller ett **Versionssuffix**-fält där du kan ge den sparade versionen ett beskrivande namn — till exempel `personuppgifter-borttagna`. Den sparade filen får namnet `[originalfilnamn]_[suffix].pdf`. Lämna fältet tomt om du vill att en tidsstämpel ska genereras automatiskt istället (till exempel `rapport_2026-04-27T14-30.pdf`).
+
+Om det redan finns en version med samma suffix visas ett felmeddelande i dialogen och du kan ange ett annat suffix. Klicka på **Spara** för att fortsätta eller **Avbryt** för att återgå till redigeraren. Redigeraren renderar varje sida och ersätter de maskerade områdena med solida svarta rektanglar i den exporterade filen. En förloppsindikator visar hur många sidor som har bearbetats. När exporten är klar sparas den maskerade filen tillbaka till arkivet.
+
+Flera maskerade versioner av samma fil kan samexistera. Alla versioner lagras i samma maskerade representation av arkivpaketet.
 
 ## Granskningslogg
 
@@ -57,6 +61,6 @@ Varje gång maskeringsredigeraren öppnas skapas en post i granskningsloggen som
 - datum och tidpunkt
 - det angivna skälet
 
-Varje sparning loggas dessutom som en separat post med åtgärden **Upload File Resource**. För att hitta alla maskeringssparningar i granskningsloggen, skriv in `Maskerad PDF sparad` i sökrutan eller filtrera på det värdet i den högra sidopanelen. Statusfältet på posten visar om sparningen lyckades eller misslyckades.
+Varje lyckad sparning loggas dessutom som en separat post med åtgärden **Upload File Resource**. Filnamnet i posten återspeglar det versionssuffix som användes, vilket gör det möjligt att skilja mellan olika versioner i granskningsloggen. För att hitta alla maskeringssparningar, skriv in `Maskerad PDF sparad` i sökrutan eller filtrera på det värdet i den högra sidopanelen. Sparförsök som misslyckas på grund av namnkrock (duplicerat suffix) registreras inte — bara slutförda uppladdningar visas i loggen.
 
 Detta säkerställer att all maskeringsaktivitet är spårbar och kan granskas i efterhand.

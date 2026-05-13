@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 /**
  *
@@ -53,6 +53,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
+import com.google.gwt.user.client.ui.Anchor;
 
 /**
  * @author Luis Faria <lfaria@keep.pt>
@@ -188,6 +189,13 @@ public class IngestTransfer extends Composite {
     objectToolbar.setObjectAndBuild(resource, null, null);
 
     ingestTransferDescription.add(new HTMLWidgetWrapper("IngestTransferDescription.html"));
+    ingestTransferDescription.setVisible(false);
+    Anchor infoIconIngesttransfertitle = new Anchor();
+    infoIconIngesttransfertitle.getElement().setInnerHTML("<i class=\"fa fa-info-circle\"></i>");
+    infoIconIngesttransfertitle.addStyleName("description-toggle-icon");
+    infoIconIngesttransfertitle.setTitle("Klicka för att fälla ut hjälpen");
+    infoIconIngesttransfertitle.addClickHandler(event -> ingestTransferDescription.setVisible(!ingestTransferDescription.isVisible()));
+    ingestTransferTitle.add(infoIconIngesttransfertitle);
 
     draw();
   }
@@ -204,6 +212,13 @@ public class IngestTransfer extends Composite {
     // navigationToolbar.setHeader(messages.oneOfAObject(TransferredResource.class.getName())); //TODO: Add header
 
     ingestTransferDescription.add(new HTMLWidgetWrapper("IngestTransferDescription.html"));
+    ingestTransferDescription.setVisible(false);
+    Anchor infoIconIngesttransfertitle = new Anchor();
+    infoIconIngesttransfertitle.getElement().setInnerHTML("<i class=\"fa fa-info-circle\"></i>");
+    infoIconIngesttransfertitle.addStyleName("description-toggle-icon");
+    infoIconIngesttransfertitle.setTitle("Klicka för att fälla ut hjälpen");
+    infoIconIngesttransfertitle.addClickHandler(event -> ingestTransferDescription.setVisible(!ingestTransferDescription.isVisible()));
+    ingestTransferTitle.add(infoIconIngesttransfertitle);
 
     draw();
   }
@@ -212,7 +227,6 @@ public class IngestTransfer extends Composite {
     if (resource == null) {
       itemTitle.setVisible(false);
       ingestTransferTitle.setVisible(true);
-      ingestTransferDescription.setVisible(true);
       itemDates.setText("");
       download.setVisible(false);
       navigationToolbar.setVisible(false);

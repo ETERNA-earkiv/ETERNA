@@ -1,0 +1,24 @@
+# CODEOWNERS – ETERNA
+# Placera denna fil i: .github/CODEOWNERS
+#
+# Styrprincip (se REVIEW_RULES_CORE.md och beslutsunderlag april 2026):
+#   - Ändringar i roda-core och roda-common kräver godkännande av arkitektansvarig.
+#   - Ändringar i roda-ui kan granskas av valfri teammedlem (via branch protection).
+#   - Plugin-förändringar som kräver core-ändringar eskaleras alltid till arkitektansvarig (R2).
+#
+
+# ── Kärnlager – arkitektansvarig krävs ──────────────────────────────────────
+roda-core/                  @JerryMalmstrom
+roda-common/                @JerryMalmstrom
+
+# ── UI-lager – valfri teammedlem (branch protection kräver minst 1 approval) ─
+roda-ui/                    @whitered
+
+# ── Plugins – minst en reviewer via branch protection ────────────────────────
+# Plugin-PRs som kräver samtidiga core-ändringar ska alltid eskaleras (R2).
+# plugins/                    @whitered
+
+# ── GitHub-konfiguration – arkitektansvarig ──────────────────────────────────
+.github/                    @JerryMalmstrom
+.coderabbit.yaml            @JerryMalmstrom
+REVIEW_RULES_CORE.md        @JerryMalmstrom

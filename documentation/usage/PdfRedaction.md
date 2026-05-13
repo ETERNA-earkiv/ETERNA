@@ -46,7 +46,11 @@ Enter the reason and click **Confirm** to proceed. Click **Cancel** to return to
 
 > **Note:** Depending on your system configuration, providing a reason may be mandatory. By default it is mandatory. When mandatory, the Confirm button is disabled until you have entered a reason.
 
-After confirming the reason, a second dialog asks you to confirm the export. The editor renders each page and replaces the redacted areas with solid black rectangles in the exported file. A progress indicator shows how many pages have been processed. Once complete, the redacted file is saved back to the archive.
+After confirming the reason, a second dialog asks you to confirm the export. It contains a **Version suffix** field where you can give the saved version a descriptive name — for example `personal-data-removed`. The saved file will be named `[original filename]_[suffix].pdf`. Leave the field empty to use an automatically generated timestamp instead (for example `report_2026-04-27T14-30.pdf`).
+
+If a version with the same suffix already exists, an error message appears in the dialog and you can enter a different suffix. Click **Save** to proceed or **Cancel** to return to the editor. The editor renders each page and replaces the redacted areas with solid black rectangles in the exported file. A progress indicator shows how many pages have been processed. Once complete, the redacted file is saved back to the archive.
+
+Multiple redacted versions of the same file can coexist. All versions are stored in the same redacted representation of the archival information package.
 
 ## Audit log
 
@@ -57,6 +61,6 @@ Every time the redaction editor is opened, an entry is created in the audit log 
 - the date and time
 - the reason provided
 
-Each save is also recorded as a separate entry with the action **Upload File Resource**. To find all redaction saves in the audit log, type `Maskerad PDF sparad` in the search box or filter on that value in the right sidebar. The status field on the entry shows whether the save succeeded or failed.
+Each successful save is also recorded as a separate entry with the action **Upload File Resource**. The filename in the entry reflects the version suffix used, making it possible to distinguish between different versions in the audit log. To find all redaction saves, type `Maskerad PDF sparad` in the search box or filter on that value in the right sidebar. Save attempts that fail due to a filename conflict (duplicate suffix) are not recorded — only completed uploads appear in the log.
 
 This ensures that all redaction activity is traceable and can be reviewed later.
