@@ -3349,12 +3349,53 @@ td.datePickerMonth, td.datePickerYear {
 .catalogTreePanel {
     width: 260px;
     min-width: 150px;
+    height: 100%;
     flex-shrink: 0;
     background: white;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    position: relative;
 }
+
+/* Collapsed drawer: panel shrinks to a thin rail; only the expand button remains visible. */
+.catalogTreePanel.collapsed { width: 36px !important; min-width: 36px; }
+.catalogTreePanel.collapsed .catalogTreePanelHeader,
+.catalogTreePanel.collapsed .catalogTreeFilter,
+.catalogTreePanel.collapsed .catalogTreeBodyScroll { display: none; }
+.catalogTreePanel.collapsed .catalogTreeExpandButton { display: flex; }
+.catalogTreePanel.collapsed + .catalogTreeResizeHandle { visibility: hidden; }
+
+.catalogTreePanelHeader {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px 8px;
+    flex-shrink: 0;
+}
+
+.catalogTreePanelHeaderTitle {
+    font-size: 16px; font-weight: 700; color: #1F2937;
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+}
+.catalogTreePanelHeaderTitle:hover { color: COLOR_PRIMARY; }
+.catalogTreePanelHeaderTitle.active { color: COLOR_PRIMARY; }
+
+.catalogTreeCollapseToggle {
+    width: 22px; height: 22px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: #111827; font-size: 14px;
+    border-radius: 3px;
+}
+.catalogTreeCollapseToggle:hover { background: rgba(0, 0, 0, 0.06); }
+
+.catalogTreeExpandButton {
+    display: none; align-items: center; justify-content: center;
+    width: 22px; height: 22px; margin: 8px auto 0;
+    cursor: pointer; color: #111827; font-size: 14px;
+    border-radius: 3px;
+}
+.catalogTreeExpandButton:hover { background: rgba(0, 0, 0, 0.06); }
 
 .catalogTreeResizeHandle {
     width: 3px;
@@ -3389,17 +3430,6 @@ body.catalogTreeResizing * {
     background: white;
     color: #333333;
     box-sizing: border-box;
-}
-
-.catalogTreePanelHeader {
-    background: COLOR_GREY_DARK;
-    color: COLOR_GREY_LIGHT;
-    padding: 10px 14px;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    flex-shrink: 0;
 }
 
 .catalogTreeBodyScroll {

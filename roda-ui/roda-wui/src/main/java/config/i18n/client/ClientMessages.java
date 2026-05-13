@@ -2712,4 +2712,10 @@ public interface ClientMessages extends Messages {
   String catalogTreeLoadError();
 
   String catalogTreeRetry();
+
+  String catalogTreeRootLabel();
+
+  String catalogTreeCollapse();
+
+  String catalogTreeExpand();
 }

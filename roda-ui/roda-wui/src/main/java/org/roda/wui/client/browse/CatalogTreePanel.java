@@ -33,6 +33,8 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -46,6 +48,9 @@ public class CatalogTreePanel extends Composite {
   /** Maximum number of root nodes to load in the catalog tree. */
   private static final int TREE_MAX_CHILDREN = 10_000;
 
+  private static final String ICON_COLLAPSE = "<i class='fas fa-angle-double-left'></i>";
+  private static final String ICON_EXPAND = "<i class='fas fa-angle-double-right'></i>";
+
   interface MyUiBinder extends UiBinder<Widget, CatalogTreePanel> {}
 
   @UiField
@@ -53,6 +58,15 @@ public class CatalogTreePanel extends Composite {
 
   @UiField
   TextBox filterInput;
+
+  @UiField
+  HTML collapseToggle;
+
+  @UiField
+  HTML expandButton;
+
+  @UiField
+  Anchor headerTitle;
 
   private static CatalogTreePanel instance = null;
 
@@ -77,7 +91,31 @@ public class CatalogTreePanel extends Composite {
         onFilterChanged(event);
       }
     });
+
+    collapseToggle.setHTML(ICON_COLLAPSE);
+    collapseToggle.setTitle(messages.catalogTreeCollapse());
+    collapseToggle.addClickHandler(e -> {
+      e.stopPropagation();
+      setCollapsed(true);
+    });
+
+    expandButton.setHTML(ICON_EXPAND);
+    expandButton.setTitle(messages.catalogTreeExpand());
+    expandButton.addClickHandler(e -> setCollapsed(false));
+
+    headerTitle.setTitle(messages.catalogTreeTitle());
+    headerTitle.setHref(org.roda.wui.common.client.tools.HistoryUtils.createHistoryHashLink(BrowseTop.RESOLVER));
+
     loadRootNodes();
+  }
+
+  private void setCollapsed(boolean collapse) {
+    if (collapse) {
+      addStyleName("collapsed");
+      getElement().getStyle().clearWidth();
+    } else {
+      removeStyleName("collapsed");
+    }
   }
 
   private void onFilterChanged(KeyUpEvent event) {
@@ -125,7 +163,7 @@ public class CatalogTreePanel extends Composite {
           return;
         }
         for (IndexedAIP aip : result.getResults()) {
-          CatalogTreeNode node = new CatalogTreeNode(aip.getId(), aip.getTitle(), 0);
+          CatalogTreeNode node = new CatalogTreeNode(aip.getId(), aip.getTitle(), aip.getLevel(), 0);
           rootNodes.put(aip.getId(), node);
           treeBody.add(node);
         }
@@ -182,9 +220,11 @@ public class CatalogTreePanel extends Composite {
       selectedNode.deselect();
       selectedNode = null;
     }
+    headerTitle.addStyleName("active");
   }
 
   private void selectNode(String aipId) {
+    headerTitle.removeStyleName("active");
     if (selectedNode != null) selectedNode.deselect();
     CatalogTreeNode node = findNode(aipId, rootNodes);
     if (node != null) {
