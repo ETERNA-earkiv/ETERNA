@@ -238,4 +238,15 @@ public class CatalogTreeNode extends Composite {
   public Map<String, CatalogTreeNode> getChildNodes() {
     return childNodes;
   }
+
+  public void invalidateChildren() {
+    loaded = false;
+    expanded = false;
+    isLeaf = false;
+    childNodes.clear();
+    childrenPanel.clear();
+    childrenPanel.setVisible(false);
+    toggleHtml.setHTML(ICON_TOGGLE_COLLAPSED);
+    iconHtml.setHTML(ICON_FOLDER_CLOSED);
+  }
 }
