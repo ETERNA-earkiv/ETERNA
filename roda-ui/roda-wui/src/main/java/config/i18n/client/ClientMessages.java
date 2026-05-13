@@ -2669,4 +2669,10 @@ public interface ClientMessages extends Messages {
 
   String xsltPrintError();
 
+  String xsltSelectLabel();
+
+  String xsltViewOriginalButton();
+
+  String xsltViewRenderedButton();
+
 }
