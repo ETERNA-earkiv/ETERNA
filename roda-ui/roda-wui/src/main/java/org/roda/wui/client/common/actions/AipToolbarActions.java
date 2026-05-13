@@ -39,6 +39,7 @@ import org.roda.core.data.v2.ip.disposalhold.DisassociateDisposalHoldRequest;
 import org.roda.core.data.v2.representation.ChangeTypeRequest;
 import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowseTop;
+import org.roda.wui.client.browse.CatalogTreePanel;
 import org.roda.wui.client.browse.CreateDescriptiveMetadata;
 import org.roda.wui.client.browse.EditPermissions;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
@@ -361,6 +362,7 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
 
     service.aipResource(s -> s.createAIP(parentAipId, aipType)).whenComplete((value, error) -> {
       if (value != null) {
+        CatalogTreePanel.getInstance().refreshSubtree(parentAipId);
         LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
         callback.onSuccess(ActionImpact.NONE);
         HistoryUtils.newHistory(CreateDescriptiveMetadata.RESOLVER, RodaConstants.RODA_OBJECT_AIP, value.getId(),
