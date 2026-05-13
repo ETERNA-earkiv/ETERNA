@@ -1754,3 +1754,15 @@ a.btn-hero:visited, a.btn-welcome:visited {
 .description-toggle-icon:hover {
     color: #333;
 }
+
+/* PDF-maskning: gör alla texter i sparadialogen lättare att läsa */
+.MuiDialog-root .MuiFormHelperText-root,
+.MuiDialog-root .MuiDialogContentText-root,
+.MuiDialog-root .MuiInputLabel-root,
+.MuiDialog-root .MuiInputBase-input {
+    font-size: 1.2rem !important;
+}
+
+.MuiDialog-root .MuiInputLabel-shrink {
+    font-size: 1rem !important;
+}
