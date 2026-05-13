@@ -32,19 +32,57 @@
     document.getElementById('viewer').setAttribute('replayBase', replayBase);
   </script>
   <script>
-    var source = new URLSearchParams(window.location.search).get('source');
-    if (source) {
-      // Validate that source is a safe path on the same origin
+    (function () {
+      var raw = new URLSearchParams(window.location.search).get('source');
+      if (!raw) return;
+
       try {
-        var resolved = new URL(source, window.location.origin);
-        if (resolved.origin === window.location.origin
-            && /^\/api\/v2\/files\//.test(resolved.pathname)) {
-          document.getElementById('viewer').setAttribute('source', resolved.pathname + resolved.search);
+        // Reject suspicious encodings up front: encoded traversal, encoded slashes,
+        // backslashes, or any fragment marker in the raw query value.
+        var rawLower = raw.toLowerCase();
+        if (rawLower.indexOf('%2e%2e') !== -1
+            || rawLower.indexOf('%2f%2f') !== -1
+            || rawLower.indexOf('%5c') !== -1
+            || raw.indexOf('\\') !== -1
+            || raw.indexOf('#') !== -1) {
+          return;
         }
+
+        var resolved = new URL(raw, window.location.origin);
+
+        // Enforce same origin, no fragments, no empty/duplicated slashes.
+        if (resolved.origin !== window.location.origin) return;
+        if (resolved.hash) return;
+        if (resolved.pathname.indexOf('//') !== -1) return;
+
+        // Each decoded path segment must not be '.', '..', empty or contain slashes.
+        var segments = resolved.pathname.split('/');
+        for (var i = 0; i < segments.length; i++) {
+          var seg = segments[i];
+          if (seg === '') continue; // leading/trailing slash splits produce empty strings
+          var decoded;
+          try {
+            decoded = decodeURIComponent(seg);
+          } catch (e) {
+            return; // malformed percent-encoding
+          }
+          if (decoded === '.' || decoded === '..'
+              || decoded.indexOf('/') !== -1
+              || decoded.indexOf('\\') !== -1
+              || decoded.indexOf('\0') !== -1) {
+            return;
+          }
+        }
+
+        // Final allow-list check on the normalized pathname.
+        if (!/^\/api\/v2\/files\//.test(resolved.pathname)) return;
+
+        document.getElementById('viewer').setAttribute(
+          'source', resolved.pathname + resolved.search);
       } catch (e) {
-        // Invalid URL — ignore
+        // Invalid URL or unexpected error — ignore silently.
       }
-    }
+    })();
   </script>
 </body>
 </html>
