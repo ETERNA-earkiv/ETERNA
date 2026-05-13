@@ -101,8 +101,7 @@ public class CatalogTreePanel extends Composite {
     FindRequest findRequest = new FindRequest.FindRequestBuilder(
       new Filter(
         new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID),
-        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file"),
-        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "item")),
+        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file")),
       false)
       .withSorter(new Sorter(new SortParameter(RodaConstants.AIP_TITLE_SORT, false)))
       .withSublist(new Sublist(0, TREE_MAX_CHILDREN))
