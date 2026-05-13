@@ -66,6 +66,7 @@ public class CatalogTreePanel extends Composite {
   private final Map<String, CatalogTreeNode> rootNodes = new HashMap<>();
   private CatalogTreeNode selectedNode = null;
   private boolean rootsLoaded = false;
+  private boolean rootsLoading = false;
   private String pendingRevealAipId = null;
 
   public CatalogTreePanel() {
@@ -98,6 +99,7 @@ public class CatalogTreePanel extends Composite {
   }
 
   private void loadRootNodes() {
+    rootsLoading = true;
     FindRequest findRequest = new FindRequest.FindRequestBuilder(
       new Filter(
         new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID),
@@ -113,6 +115,7 @@ public class CatalogTreePanel extends Composite {
       s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
       IndexedAIP.class)
       .whenComplete((result, error) -> {
+        rootsLoading = false;
         if (error != null) {
           LOGGER.error("Failed to load catalog tree root nodes", error);
           treeBody.clear();
@@ -142,6 +145,9 @@ public class CatalogTreePanel extends Composite {
   public void revealAip(String aipId) {
     if (!rootsLoaded) {
       pendingRevealAipId = aipId;
+      if (!rootsLoading) {
+        loadRootNodes();
+      }
       return;
     }
     doRevealAip(aipId);
@@ -208,8 +214,9 @@ public class CatalogTreePanel extends Composite {
       rootNodes.clear();
       treeBody.clear();
       rootsLoaded = false;
+      rootsLoading = false;
       pendingRevealAipId = null;
-      loadRootNodes();
+      // Reload triggered lazily by next revealAip call (after metadata is saved)
     } else {
       CatalogTreeNode parent = findNode(parentAipId, rootNodes);
       if (parent != null) {
