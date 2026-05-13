@@ -1547,6 +1547,20 @@ public class SolrUtils {
     return ret;
   }
 
+  /**
+   * Atomically increments or decrements numeric fields in a Solr document using Solr's "inc" modifier.
+   * This method is thread-safe and can be used to update counters (e.g., file counts, sizes) without 
+   * race conditions.
+   *
+   * `@param` <T> the indexed class type
+   * `@param` <S> the source object type
+   * `@param` index the Solr client
+   * `@param` classToCreate the class of the document to update
+   * `@param` uuid the document ID
+   * `@param` increments a map of field names to increment deltas (positive to increment, negative to decrement)
+   * `@param` source the source object for error tracking
+   * `@return` a ReturnWithExceptions containing any NotSupportedException that occurred
+   */
   public static <T extends IsIndexed, S extends Object> ReturnWithExceptions<Void, S> atomicIncrement(
     SolrClient index, Class<T> classToCreate, String uuid, Map<String, Long> increments, S source) {
     ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>(source);
