@@ -475,6 +475,7 @@ public class EditDescriptiveMetadata extends Composite {
                     errors.setText("");
                     errors.setVisible(false);
                     Toast.showInfo(messages.dialogSuccess(), messages.metadataFileSaved());
+                    CatalogTreePanel.getInstance().refreshNodeTitle(aipId);
                     back();
                   }
                 });
