@@ -59,6 +59,7 @@ public class BrowseRepresentationActionsToolbar extends BrowseObjectActionsToolb
     RepresentationToolbarActions representationActions = RepresentationToolbarActions.get(object.getAipId(), state,
       actionPermissions);
     this.actions.add(new ActionableWidgetBuilder<IndexedRepresentation>(representationActions)
+      .withActionCallback(actionCallback)
       .buildGroupedListWithObjects(new ActionableObject<>(object)));
 
   }

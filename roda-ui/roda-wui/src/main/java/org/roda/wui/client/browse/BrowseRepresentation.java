@@ -51,10 +51,15 @@ import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.event.dom.client.MouseDownEvent;
+import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -102,6 +107,12 @@ public class BrowseRepresentation extends Composite {
       return "representation";
     }
   };
+  // Catalog tree
+  @UiField
+  FlowPanel catalogTreeContainer;
+  @UiField
+  FlowPanel treeResizeHandle;
+
   // Focus
   @UiField
   FocusPanel keyboardFocus;
@@ -138,6 +149,8 @@ public class BrowseRepresentation extends Composite {
     }
   };
 
+  private HandlerRegistration resizeHandlerReg;
+
   // FILES
   private final IndexedAIP aip;
 
@@ -146,6 +159,50 @@ public class BrowseRepresentation extends Composite {
   private final String aipId;
   private final String repId;
   private final String repUUID;
+
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    catalogTreeContainer.clear();
+    CatalogTreePanel treePanel = CatalogTreePanel.getInstance();
+    catalogTreeContainer.add(treePanel);
+    treePanel.revealAip(aipId);
+  }
+
+  private void initTreeResize() {
+    treeResizeHandle.addDomHandler(new MouseDownHandler() {
+      @Override
+      public void onMouseDown(MouseDownEvent event) {
+        event.preventDefault();
+        if (resizeHandlerReg != null) {
+          resizeHandlerReg.removeHandler();
+          resizeHandlerReg = null;
+        }
+        final int startX = event.getClientX();
+        final int startWidth = CatalogTreePanel.getInstance().getOffsetWidth();
+        Event.setCapture(treeResizeHandle.getElement());
+        Document.get().getBody().addClassName("catalogTreeResizing");
+
+        resizeHandlerReg = Event.addNativePreviewHandler(new Event.NativePreviewHandler() {
+          @Override
+          public void onPreviewNativeEvent(Event.NativePreviewEvent e) {
+            com.google.gwt.dom.client.NativeEvent ne = e.getNativeEvent();
+            if ("mousemove".equals(ne.getType())) {
+              int newWidth = Math.max(150, Math.min(480, startWidth + ne.getClientX() - startX));
+              CatalogTreePanel.getInstance().getElement().getStyle().setPropertyPx("width", newWidth);
+            } else if ("mouseup".equals(ne.getType())) {
+              Event.releaseCapture(treeResizeHandle.getElement());
+              Document.get().getBody().removeClassName("catalogTreeResizing");
+              if (resizeHandlerReg != null) {
+                resizeHandlerReg.removeHandler();
+                resizeHandlerReg = null;
+              }
+            }
+          }
+        });
+      }
+    }, MouseDownEvent.getType());
+  }
 
   public BrowseRepresentation(BrowseRepresentationResponse response) {
     this.representation = response.getIndexedRepresentation();
@@ -163,6 +220,7 @@ public class BrowseRepresentation extends Composite {
 
     // INIT
     initWidget(uiBinder.createAndBindUi(this));
+    initTreeResize();
 
     if (justActive) {
       initHandlers();
