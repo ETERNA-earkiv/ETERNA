@@ -22,6 +22,7 @@ import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.ClientLogger;
+import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
@@ -47,9 +48,6 @@ public class CatalogTreeNode extends Composite {
   private static final String ICON_TOGGLE_COLLAPSED = "<span class='fas fa-chevron-right'></span>";
   private static final String ICON_TOGGLE_EXPANDED = "<span class='fas fa-chevron-down'></span>";
   private static final String ICON_TOGGLE_LOADING = "<span class='fas fa-circle-notch fa-spin'></span>";
-  private static final String ICON_FOLDER_CLOSED = "<span class='fas fa-folder'></span>";
-  private static final String ICON_FOLDER_OPEN_STR = "<span class='fas fa-folder-open'></span>";
-  private static final String ICON_FILE_LEAF = "<span class='fas fa-folder'></span>";
 
   private final String aipId;
   private final String title;
@@ -58,7 +56,6 @@ public class CatalogTreeNode extends Composite {
   private final FlowPanel rowPanel;
   private final FlowPanel childrenPanel;
   private final HTML toggleHtml;
-  private final HTML iconHtml;
   private final Map<String, CatalogTreeNode> childNodes = new HashMap<>();
 
   private boolean expanded = false;
@@ -66,7 +63,7 @@ public class CatalogTreeNode extends Composite {
   private boolean isLeaf = false;
   private Command pendingOnComplete = null;
 
-  public CatalogTreeNode(String aipId, String title, int depth) {
+  public CatalogTreeNode(String aipId, String title, String level, int depth) {
     this.aipId = aipId;
     this.title = title;
     this.depth = depth;
@@ -86,7 +83,7 @@ public class CatalogTreeNode extends Composite {
     toggleHtml.setStyleName("catalogTreeToggle");
     rowPanel.add(toggleHtml);
 
-    iconHtml = new HTML(ICON_FOLDER_CLOSED);
+    HTML iconHtml = new HTML(DescriptionLevelUtils.getElementLevelIconSafeHtml(level, false));
     iconHtml.setStyleName("catalogTreeIcon");
     rowPanel.add(iconHtml);
 
@@ -137,7 +134,6 @@ public class CatalogTreeNode extends Composite {
       childrenPanel.setVisible(true);
       expanded = true;
       toggleHtml.setHTML(ICON_TOGGLE_EXPANDED);
-      iconHtml.setHTML(ICON_FOLDER_OPEN_STR);
       if (onComplete != null) onComplete.execute();
     } else {
       loadChildren(onComplete);
@@ -174,14 +170,13 @@ public class CatalogTreeNode extends Composite {
           markAsLeaf();
         } else {
           for (IndexedAIP child : children) {
-            CatalogTreeNode childNode = new CatalogTreeNode(child.getId(), child.getTitle(), depth + 1);
+            CatalogTreeNode childNode = new CatalogTreeNode(child.getId(), child.getTitle(), child.getLevel(), depth + 1);
             childNodes.put(child.getId(), childNode);
             childrenPanel.add(childNode);
           }
           childrenPanel.setVisible(true);
           expanded = true;
           toggleHtml.setHTML(ICON_TOGGLE_EXPANDED);
-          iconHtml.setHTML(ICON_FOLDER_OPEN_STR);
         }
         if (onComplete != null) onComplete.execute();
       });
@@ -190,7 +185,6 @@ public class CatalogTreeNode extends Composite {
   private void markAsLeaf() {
     isLeaf = true;
     toggleHtml.setHTML("");
-    iconHtml.setHTML(ICON_FILE_LEAF);
   }
 
   private void showLoadError() {
@@ -215,7 +209,6 @@ public class CatalogTreeNode extends Composite {
     childrenPanel.setVisible(false);
     expanded = false;
     toggleHtml.setHTML(ICON_TOGGLE_COLLAPSED);
-    iconHtml.setHTML(ICON_FOLDER_CLOSED);
   }
 
   public void select() {
