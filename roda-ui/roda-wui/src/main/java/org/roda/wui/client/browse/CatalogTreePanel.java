@@ -209,6 +209,40 @@ public class CatalogTreePanel extends Composite {
     return null;
   }
 
+  public void removeNode(String aipId, String parentAipId) {
+    if (parentAipId == null || parentAipId.isEmpty()) {
+      CatalogTreeNode node = rootNodes.remove(aipId);
+      if (node != null) {
+        node.removeFromParent();
+      }
+    } else {
+      CatalogTreeNode parent = findNode(parentAipId, rootNodes);
+      if (parent != null) {
+        parent.removeChild(aipId);
+      }
+    }
+    if (selectedNode != null && aipId.equals(selectedNode.getAipId())) {
+      selectedNode = null;
+    }
+  }
+
+  public void refreshNodeTitle(String aipId) {
+    CatalogTreeNode node = findNode(aipId, rootNodes);
+    if (node == null) return;
+    Services service = new Services(messages.catalogTreeLoadingLabel(), "get");
+    service.rodaEntityRestService(
+      s -> s.findByUuid(aipId, LocaleInfo.getCurrentLocale().getLocaleName()),
+      IndexedAIP.class)
+      .whenComplete((aip, error) -> {
+        if (error != null) {
+          // Node keeps its current title as fallback — non-critical background refresh
+          LOGGER.error("Could not refresh title for AIP " + aipId + ": " + error.getMessage(), error);
+          return;
+        }
+        node.updateTitle(aip.getTitle());
+      });
+  }
+
   public void refreshSubtree(String parentAipId) {
     if (parentAipId == null || parentAipId.isEmpty()) {
       rootNodes.clear();
