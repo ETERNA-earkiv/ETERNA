@@ -52,7 +52,7 @@ public class CatalogTreeNode extends Composite {
   private static final String ICON_FILE_LEAF = "<span class='fas fa-folder'></span>";
 
   private final String aipId;
-  private final String title;
+  private String title;
   private final int depth;
   private final FlowPanel rootPanel;
   private final FlowPanel rowPanel;
@@ -60,6 +60,7 @@ public class CatalogTreeNode extends Composite {
   private final HTML toggleHtml;
   private final HTML iconHtml;
   private final Map<String, CatalogTreeNode> childNodes = new HashMap<>();
+  private Label titleLabel;
 
   private boolean expanded = false;
   private boolean loaded = false;
@@ -90,9 +91,9 @@ public class CatalogTreeNode extends Composite {
     iconHtml.setStyleName("catalogTreeIcon");
     rowPanel.add(iconHtml);
 
-    Label labelWidget = new Label(title);
-    labelWidget.setStyleName("catalogTreeLabel");
-    rowPanel.add(labelWidget);
+    titleLabel = new Label(title);
+    titleLabel.setStyleName("catalogTreeLabel");
+    rowPanel.add(titleLabel);
 
     childrenPanel = new FlowPanel();
     childrenPanel.setStyleName("catalogTreeNodeChildren");
@@ -237,6 +238,21 @@ public class CatalogTreeNode extends Composite {
 
   public Map<String, CatalogTreeNode> getChildNodes() {
     return childNodes;
+  }
+
+  public void updateTitle(String newTitle) {
+    title = newTitle != null ? newTitle : "";
+    titleLabel.setText(title);
+  }
+
+  public void removeChild(String aipId) {
+    CatalogTreeNode child = childNodes.remove(aipId);
+    if (child != null) {
+      child.removeFromParent();
+    }
+    if (childNodes.isEmpty() && loaded) {
+      markAsLeaf();
+    }
   }
 
   public void invalidateChildren() {
