@@ -3356,6 +3356,7 @@ td.datePickerMonth, td.datePickerYear {
     flex-direction: column;
     overflow: hidden;
     position: relative;
+    transition: width 0.2s ease-in-out, min-width 0.2s ease-in-out;
 }
 
 /* Collapsed drawer: panel shrinks to a thin rail; only the expand button remains visible. */
@@ -3386,16 +3387,34 @@ td.datePickerMonth, td.datePickerYear {
     display: flex; align-items: center; justify-content: center;
     cursor: pointer; color: #111827; font-size: 14px;
     border-radius: 3px;
+    background: transparent;
+    border: none;
+    padding: 0;
 }
 .catalogTreeCollapseToggle:hover { background: rgba(0, 0, 0, 0.06); }
+.catalogTreeCollapseToggle:focus,
+.catalogTreeCollapseToggle:focus-visible {
+    background: rgba(0, 0, 0, 0.06);
+    outline: 2px solid COLOR_PRIMARY;
+    outline-offset: 2px;
+}
 
 .catalogTreeExpandButton {
     display: none; align-items: center; justify-content: center;
     width: 22px; height: 22px; margin: 8px auto 0;
     cursor: pointer; color: #111827; font-size: 14px;
     border-radius: 3px;
+    background: transparent;
+    border: none;
+    padding: 0;
 }
 .catalogTreeExpandButton:hover { background: rgba(0, 0, 0, 0.06); }
+.catalogTreeExpandButton:focus,
+.catalogTreeExpandButton:focus-visible {
+    background: rgba(0, 0, 0, 0.06);
+    outline: 2px solid COLOR_PRIMARY;
+    outline-offset: 2px;
+}
 
 .catalogTreeResizeHandle {
     width: 3px;

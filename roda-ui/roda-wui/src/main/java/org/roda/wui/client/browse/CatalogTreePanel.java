@@ -31,10 +31,10 @@ import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -60,10 +60,10 @@ public class CatalogTreePanel extends Composite {
   TextBox filterInput;
 
   @UiField
-  HTML collapseToggle;
+  Button collapseToggle;
 
   @UiField
-  HTML expandButton;
+  Button expandButton;
 
   @UiField
   Anchor headerTitle;
@@ -94,6 +94,8 @@ public class CatalogTreePanel extends Composite {
 
     collapseToggle.setHTML(ICON_COLLAPSE);
     collapseToggle.setTitle(messages.catalogTreeCollapse());
+    collapseToggle.getElement().setAttribute("aria-label", messages.catalogTreeCollapse());
+    collapseToggle.getElement().setAttribute("aria-expanded", "true");
     collapseToggle.addClickHandler(e -> {
       e.stopPropagation();
       setCollapsed(true);
@@ -101,6 +103,8 @@ public class CatalogTreePanel extends Composite {
 
     expandButton.setHTML(ICON_EXPAND);
     expandButton.setTitle(messages.catalogTreeExpand());
+    expandButton.getElement().setAttribute("aria-label", messages.catalogTreeExpand());
+    expandButton.getElement().setAttribute("aria-expanded", "false");
     expandButton.addClickHandler(e -> setCollapsed(false));
 
     headerTitle.setTitle(messages.catalogTreeTitle());
@@ -116,6 +120,8 @@ public class CatalogTreePanel extends Composite {
     } else {
       removeStyleName("collapsed");
     }
+    collapseToggle.getElement().setAttribute("aria-expanded", collapse ? "false" : "true");
+    expandButton.getElement().setAttribute("aria-expanded", collapse ? "false" : "true");
   }
 
   private void onFilterChanged(KeyUpEvent event) {
@@ -136,6 +142,9 @@ public class CatalogTreePanel extends Composite {
   }
 
   private void loadRootNodes() {
+    treeBody.clear();
+    rootNodes.clear();
+
     FindRequest findRequest = new FindRequest.FindRequestBuilder(
       new Filter(
         new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID),

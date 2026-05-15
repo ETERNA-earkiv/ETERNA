@@ -6,10 +6,10 @@
     <ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
     <g:FlowPanel styleName="catalogTreePanel">
-        <g:HTML ui:field="expandButton" styleName="catalogTreeExpandButton" />
+        <g:Button ui:field="expandButton" styleName="catalogTreeExpandButton" />
         <g:FlowPanel styleName="catalogTreePanelHeader">
             <g:Anchor ui:field="headerTitle" styleName="catalogTreePanelHeaderTitle" text="{messages.catalogTreeTitle}" />
-            <g:HTML ui:field="collapseToggle" styleName="catalogTreeCollapseToggle" />
+            <g:Button ui:field="collapseToggle" styleName="catalogTreeCollapseToggle" />
         </g:FlowPanel>
         <g:FlowPanel styleName="catalogTreeFilter">
             <g:TextBox ui:field="filterInput" styleName="catalogTreeFilterInput" />
