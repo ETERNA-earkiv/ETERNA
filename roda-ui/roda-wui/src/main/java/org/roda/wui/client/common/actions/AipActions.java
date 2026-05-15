@@ -346,6 +346,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
                             @Override
                             public void onFailure(Throwable caught) {
+                              CatalogTreePanel.getInstance().refreshSubtree(aip.getParentID());
+                              CatalogTreePanel.getInstance().refreshSubtree(parentId);
                               doActionCallbackNone();
                             }
 
@@ -491,6 +493,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                         @Override
                         public void onFailure(Throwable caught) {
                           Toast.showInfo(messages.removingSuccessTitle(), messages.removingSuccessMessage(1L));
+                          CatalogTreePanel.getInstance().removeNode(aip.getId(), aip.getParentID());
                           doActionCallbackDestroyed();
                         }
 
