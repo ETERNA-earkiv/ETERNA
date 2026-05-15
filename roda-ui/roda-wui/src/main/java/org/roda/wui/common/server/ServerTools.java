@@ -191,7 +191,7 @@ public class ServerTools {
         result = aip.getTitle();
         break;
       case "language":
-        result = Locale.getDefault().getDisplayLanguage();
+        result = "Svenska";
         break;
       case "parentid":
         result = aip.getParentID();
