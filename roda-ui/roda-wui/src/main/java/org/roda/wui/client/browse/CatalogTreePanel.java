@@ -144,6 +144,7 @@ public class CatalogTreePanel extends Composite {
   private void loadRootNodes() {
     treeBody.clear();
     rootNodes.clear();
+    rootsLoaded = false;
 
     FindRequest findRequest = new FindRequest.FindRequestBuilder(
       new Filter(
