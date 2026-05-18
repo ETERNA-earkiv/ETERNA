@@ -255,6 +255,5 @@ public class CatalogTreeNode extends Composite {
     childrenPanel.clear();
     childrenPanel.setVisible(false);
     toggleHtml.setHTML(ICON_TOGGLE_COLLAPSED);
-    iconHtml.setHTML(ICON_FOLDER_CLOSED);
   }
 }
