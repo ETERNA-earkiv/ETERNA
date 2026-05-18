@@ -16,8 +16,8 @@ import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.SecureString;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
-import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.user.requests.RegisterUserRequest;
@@ -223,7 +223,7 @@ public class Register extends Composite {
 
     if (caught instanceof EmailAlreadyExistsException) {
       Toast.showError(messages.registerEmailAlreadyExists());
-    } else if (caught instanceof UserAlreadyExistsException) {
+    } else if (caught instanceof AlreadyExistsException) {
       Toast.showError(messages.registerUserExists());
     } else if (caught instanceof RecaptchaException) {
       Toast.showError(messages.registerWrongCaptcha());

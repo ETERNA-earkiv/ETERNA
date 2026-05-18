@@ -10,6 +10,7 @@ package org.roda.wui.client.services;
 import org.fusesource.restygwt.client.Method;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
+import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.validation.ValidationException;
@@ -58,7 +59,11 @@ public class MethodCallThrowableTreatment {
     } else if (method.getResponse().getStatusCode() == Response.SC_FORBIDDEN) {
       throwable = new AuthorizationDeniedException(throwableDetails);
     } else if (method.getResponse().getStatusCode() == Response.SC_CONFLICT) {
-      throwable = new AlreadyExistsException(throwableDetails);
+      if (throwableDetails.toLowerCase().contains("email")) {
+        throwable = new EmailAlreadyExistsException(throwableDetails);
+      } else {
+        throwable = new AlreadyExistsException(throwableDetails);
+      }
     } else if (method.getResponse().getStatusCode() == Response.SC_BAD_REQUEST) {
       if (throwableMessage.equals("Validation error")) {
         ValidationReport details = VALIDATION_REPORT_MAPPER.read(parse.isObject().get("objectDetails").toString());
