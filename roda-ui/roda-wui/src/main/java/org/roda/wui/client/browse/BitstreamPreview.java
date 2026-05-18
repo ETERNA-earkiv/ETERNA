@@ -19,6 +19,7 @@ import org.roda.wui.client.common.utils.IndexedDIPUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.tools.ConfigurationManager;
+import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import java.util.Arrays;
@@ -574,12 +575,10 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   private void xmlHtmlPreview() {
     if (object instanceof IndexedFile) {
       IndexedFile indexedFile = (IndexedFile) object;
+      String fileUuid = indexedFile.getUUID();
       String locale = LocaleInfo.getCurrentLocale().getLocaleName();
-      String xsltsUrl = GWT.getHostPageBaseURL() + "api/v2/files/" + indexedFile.getUUID() + "/preview/html/xslts";
-      String baseHtmlUrl = GWT.getHostPageBaseURL() + "api/v2/files/" + indexedFile.getUUID()
-        + "/preview/html?lang=" + locale;
-      String transformUrl = GWT.getHostPageBaseURL() + "api/v2/files/" + indexedFile.getUUID()
-        + "/preview/html/transform?lang=" + locale;
+      String xsltsUrl = RestUtils.createRepresentationFileXsltsUri(fileUuid).asString();
+      String transformUrl = RestUtils.createRepresentationFileTransformUri(fileUuid, locale).asString();
 
       // Print button + toggle XML/rendered - always visible
       FlowPanel printToolbar = new FlowPanel();
@@ -681,7 +680,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
           if (xsltDropdown.getItemCount() > 1) {
             dropdownToolbar.setVisible(true);
           }
-          loadXsltPreview(baseHtmlUrl, currentXsltId[0], frame);
+          loadXsltPreview(buildPreviewUrl(fileUuid, locale, currentXsltId[0]), frame);
         }
       });
 
@@ -709,30 +708,30 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
 
                   // Load with first XSLT (already default, but be explicit)
                   currentXsltId[0] = xsltDropdown.getValue(0);
-                  loadXsltPreview(baseHtmlUrl, currentXsltId[0], frame);
+                  loadXsltPreview(buildPreviewUrl(fileUuid, locale, currentXsltId[0]), frame);
 
                   // On selection change, reload
                   xsltDropdown.addChangeHandler(event -> {
                     String selectedId = xsltDropdown.getValue(xsltDropdown.getSelectedIndex());
                     currentXsltId[0] = selectedId;
-                    loadXsltPreview(baseHtmlUrl, selectedId, frame);
+                    loadXsltPreview(buildPreviewUrl(fileUuid, locale, selectedId), frame);
                   });
                 } else {
                   // Only one or zero XSLTs — load default, no dropdown
-                  loadXsltPreview(baseHtmlUrl, null, frame);
+                  loadXsltPreview(buildPreviewUrl(fileUuid, locale, null), frame);
                 }
               } catch (Exception e) {
-                loadXsltPreview(baseHtmlUrl, null, frame);
+                loadXsltPreview(buildPreviewUrl(fileUuid, locale, null), frame);
               }
             } else {
-              loadXsltPreview(baseHtmlUrl, null, frame);
+              loadXsltPreview(buildPreviewUrl(fileUuid, locale, null), frame);
             }
             panel.add(frame);
           }
 
           @Override
           public void onError(Request req, Throwable exception) {
-            loadXsltPreview(baseHtmlUrl, null, frame);
+            loadXsltPreview(buildPreviewUrl(fileUuid, locale, null), frame);
             panel.add(frame);
           }
         });
@@ -744,11 +743,11 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     }
   }
 
-  private void loadXsltPreview(String baseHtmlUrl, String xsltId, Frame frame) {
-    String url = baseHtmlUrl;
-    if (xsltId != null && !xsltId.isEmpty()) {
-      url = url + "&xslt=" + xsltId;
-    }
+  private static String buildPreviewUrl(String fileUuid, String locale, String xsltId) {
+    return RestUtils.createRepresentationFileHtmlPreviewUri(fileUuid, locale, xsltId).asString();
+  }
+
+  private void loadXsltPreview(String url, Frame frame) {
     RequestBuilder request = new RequestBuilder(RequestBuilder.GET, url);
     try {
       request.sendRequest(null, new RequestCallback() {
