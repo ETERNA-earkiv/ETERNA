@@ -353,6 +353,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
                             @Override
                             public void onSuccess(final Void nothing) {
+                              CatalogTreePanel.getInstance().refreshSubtree(aip.getParentID());
+                              CatalogTreePanel.getInstance().refreshSubtree(parentId);
                               doActionCallbackNone();
                               HistoryUtils.newHistory(ShowJob.RESOLVER, value.getId());
                             }
@@ -499,6 +501,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
                         @Override
                         public void onSuccess(final Void nothing) {
+                          CatalogTreePanel.getInstance().removeNode(aip.getId(), aip.getParentID());
                           doActionCallbackNone();
                           HistoryUtils.newHistory(ShowJob.RESOLVER, value.getId());
                         }
