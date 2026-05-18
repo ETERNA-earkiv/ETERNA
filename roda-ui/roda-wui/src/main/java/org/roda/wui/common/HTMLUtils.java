@@ -9,10 +9,13 @@ package org.roda.wui.common;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
@@ -71,6 +74,50 @@ public final class HTMLUtils {
 
   private static String sanitizeHtml(String html) {
     return HTML_SANITIZER.sanitize(html);
+  }
+
+  // Cache the preview stylesheet contents on first use. The config file is
+  // looked up via RODA's configuration mechanism so deployments can override
+  // it by placing a file at $RODA_HOME/config/theme/xslt-preview.css.
+  private static final AtomicReference<String> CACHED_XSLT_PREVIEW_CSS = new AtomicReference<>();
+
+  private static String loadXsltPreviewCss() {
+    String cached = CACHED_XSLT_PREVIEW_CSS.get();
+    if (cached != null) {
+      return cached;
+    }
+    String content = "";
+    try (InputStream is = RodaCoreFactory.getConfigurationFileAsStream("theme/xslt-preview.css")) {
+      if (is != null) {
+        try (Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+          content = CharStreams.toString(reader);
+        }
+      }
+    } catch (IOException e) {
+      // Fall back to no styling — the iframe will render unstyled HTML.
+      // Logging would require a logger import; the empty fallback is safe.
+      content = "";
+    }
+    CACHED_XSLT_PREVIEW_CSS.compareAndSet(null, content);
+    return content;
+  }
+
+  /**
+   * Wraps an XSLT-rendered HTML fragment in a complete HTML document with an inline
+   * stylesheet, so the result renders with ETERNA-style typography when assigned to
+   * an iframe srcdoc attribute. Default XSLT crosswalks emit a bare fragment
+   * (e.g. {@code <div class="descriptiveMetadata">…</div>}) — without this wrapper
+   * the iframe shows unstyled HTML because srcdoc is isolated from the parent page.
+   */
+  static String wrapXsltHtml(String renderedFragment) {
+    String css = loadXsltPreviewCss();
+    StringBuilder b = new StringBuilder(renderedFragment.length() + css.length() + 256);
+    b.append("<!DOCTYPE html><html><head><meta charset=\"UTF-8\">");
+    if (!css.isEmpty()) {
+      b.append("<style>").append(css).append("</style>");
+    }
+    b.append("</head><body>").append(renderedFragment).append("</body></html>");
+    return b.toString();
   }
 
   /** Private empty constructor */
@@ -174,7 +221,7 @@ public final class HTMLUtils {
     Reader reader = RodaUtils.applyMetadataStylesheet(binary,
       RodaConstants.CROSSWALKS_DISSEMINATION_HTML_REPRESENTATION_PATH, xsltName, null, translations);
     try {
-      return sanitizeHtml(CharStreams.toString(reader));
+      return wrapXsltHtml(sanitizeHtml(CharStreams.toString(reader)));
     } catch (IOException e) {
       throw new GenericException("Could not transform representation file to HTML", e);
     }
@@ -185,7 +232,7 @@ public final class HTMLUtils {
     Map<String, String> translations = new HashMap<>();
     Reader reader = RodaUtils.applyCustomStylesheet(binary, xsltInputStream, translations);
     try {
-      return sanitizeHtml(CharStreams.toString(reader));
+      return wrapXsltHtml(sanitizeHtml(CharStreams.toString(reader)));
     } catch (IOException e) {
       throw new GenericException("Could not transform representation file with custom XSLT", e);
     }
