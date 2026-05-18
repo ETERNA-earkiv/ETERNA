@@ -578,174 +578,181 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   }
 
   private void xmlHtmlPreview() {
-    if (object instanceof IndexedFile) {
-      IndexedFile indexedFile = (IndexedFile) object;
-      String fileUuid = indexedFile.getUUID();
-      String locale = LocaleInfo.getCurrentLocale().getLocaleName();
-      String xsltsUrl = RestUtils.createRepresentationFileXsltsUri(fileUuid).asString();
-      String transformUrl = RestUtils.createRepresentationFileTransformUri(fileUuid, locale).asString();
-
-      // Print button + toggle XML/rendered - always visible
-      FlowPanel printToolbar = new FlowPanel();
-      printToolbar.setStyleName("xmlPreviewToolbar");
-      Button printButton = new Button(messages.xsltPrintButton());
-      printButton.setStyleName("btn btn-play xmlPreviewPrintButton");
-      Button toggleXmlButton = new Button(messages.xsltViewOriginalButton());
-      toggleXmlButton.setStyleName("btn btn-play xmlPreviewToggleButton");
-      printToolbar.add(printButton);
-      printToolbar.add(toggleXmlButton);
-      panel.add(printToolbar);
-
-      // Dropdown toolbar - populated after XSLT list is loaded (hidden until needed)
-      FlowPanel dropdownToolbar = new FlowPanel();
-      dropdownToolbar.setStyleName("xmlPreviewToolbar");
-      dropdownToolbar.setVisible(false);
-      Label dropdownLabel = new Label(messages.xsltSelectLabel());
-      dropdownLabel.setStyleName("xmlPreviewSelectLabel");
-      ListBox xsltDropdown = new ListBox();
-      xsltDropdown.setStyleName("xmlPreviewSelectDropdown");
-      dropdownToolbar.add(dropdownLabel);
-      dropdownToolbar.add(xsltDropdown);
-      panel.add(dropdownToolbar);
-
-      // Upload toolbar - only visible if user has representation.apply_xslt role
-      FlowPanel toolbar = new FlowPanel();
-      toolbar.setStyleName("xmlPreviewToolbar");
-      toolbar.setVisible(false);
-      FileUpload xsltUpload = new FileUpload();
-      xsltUpload.setName("xslt");
-      xsltUpload.getElement().setAttribute("accept", ".xslt,.xsl");
-      xsltUpload.setStyleName("xmlPreviewFileInput");
-      Button applyButton = new Button(messages.applyXsltButton());
-      applyButton.setStyleName("btn btn-play xmlPreviewApplyButton");
-      applyButton.setEnabled(false);
-      xsltUpload.addChangeHandler(event -> applyButton.setEnabled(true));
-      toolbar.add(xsltUpload);
-      toolbar.add(applyButton);
-      panel.add(toolbar);
-
-      UserLogin.getInstance().checkRole(Arrays.asList("representation.apply_xslt"), new AsyncCallback<Boolean>() {
-        @Override
-        public void onSuccess(Boolean hasRole) {
-          toolbar.setVisible(Boolean.TRUE.equals(hasRole));
-        }
-
-        @Override
-        public void onFailure(Throwable caught) {
-          toolbar.setVisible(false);
-        }
-      });
-
-      // Iframe for rendered HTML
-      Frame frame = new Frame();
-      frame.setStyleName("viewRepresentationHtmlFilePreview");
-      frame.getElement().setAttribute("sandbox", "allow-same-origin");
-
-      applyButton.addClickHandler(event -> {
-        applyButton.setEnabled(false);
-        applyButton.setText(messages.xsltLoading());
-        applyCustomXslt(xsltUpload.getElement(), transformUrl, frame.getElement(), applyButton.getElement(),
-          messages.applyXsltButton(), messages.xsltFileTooLarge(), messages.xsltTransformFailed(),
-          messages.xsltUploadError(), messages.xsltTransformTimeout());
-      });
-
-      printButton.addClickHandler(event -> printIframeContent(frame.getElement(), messages.xsltPrintError()));
-
-      // Toggle between XSLT-rendered view and raw XML
-      final boolean[] showingRawXml = {false};
-      final String[] currentXsltId = {null};
-
-      toggleXmlButton.addClickHandler(event -> {
-        if (!showingRawXml[0]) {
-          // Switch to raw XML view
-          showingRawXml[0] = true;
-          toggleXmlButton.setText(messages.xsltViewRenderedButton());
-          dropdownToolbar.setVisible(false);
-          RequestBuilder rawRequest = new RequestBuilder(RequestBuilder.GET, bitstreamDownloadUri.asString());
-          try {
-            rawRequest.sendRequest(null, new RequestCallback() {
-              @Override
-              public void onResponseReceived(Request req, Response response) {
-                if (response.getStatusCode() == HttpStatus.SC_OK) {
-                  String escaped = SafeHtmlUtils.htmlEscape(response.getText());
-                  String xmlHtml = "<html><body style=\"margin:0;font-family:monospace;font-size:13px;\">"
-                    + "<pre style=\"white-space:pre-wrap;word-break:break-all;padding:16px;\">"
-                    + escaped + "</pre></body></html>";
-                  frame.getElement().setAttribute("srcdoc", xmlHtml);
-                }
-              }
-              @Override
-              public void onError(Request req, Throwable exception) {}
-            });
-          } catch (RequestException e) {}
-        } else {
-          // Switch back to rendered view
-          showingRawXml[0] = false;
-          toggleXmlButton.setText(messages.xsltViewOriginalButton());
-          if (xsltDropdown.getItemCount() > 1) {
-            dropdownToolbar.setVisible(true);
-          }
-          loadXsltPreview(buildPreviewUrl(fileUuid, locale, currentXsltId[0]), frame);
-        }
-      });
-
-      // Step 1: fetch available XSLTs, then render
-      RequestBuilder xsltsRequest = new RequestBuilder(RequestBuilder.GET, xsltsUrl);
-      try {
-        xsltsRequest.sendRequest(null, new RequestCallback() {
-          @Override
-          public void onResponseReceived(Request req, Response response) {
-            if (response.getStatusCode() == HttpStatus.SC_OK) {
-              try {
-                JSONValue parsed = JSONParser.parseStrict(response.getText());
-                JSONArray arr = parsed.isArray();
-                if (arr != null && arr.size() > 1) {
-                  // Populate dropdown
-                  for (int i = 0; i < arr.size(); i++) {
-                    JSONObject obj = arr.get(i).isObject();
-                    if (obj != null) {
-                      String id = obj.get("id").isString().stringValue();
-                      String label = obj.get("label").isString().stringValue();
-                      xsltDropdown.addItem(label, id);
-                    }
-                  }
-                  dropdownToolbar.setVisible(true);
-
-                  // Load with first XSLT (already default, but be explicit)
-                  currentXsltId[0] = xsltDropdown.getValue(0);
-                  loadXsltPreview(buildPreviewUrl(fileUuid, locale, currentXsltId[0]), frame);
-
-                  // On selection change, reload
-                  xsltDropdown.addChangeHandler(event -> {
-                    String selectedId = xsltDropdown.getValue(xsltDropdown.getSelectedIndex());
-                    currentXsltId[0] = selectedId;
-                    loadXsltPreview(buildPreviewUrl(fileUuid, locale, selectedId), frame);
-                  });
-                } else {
-                  // Only one or zero XSLTs — load default, no dropdown
-                  loadXsltPreview(buildPreviewUrl(fileUuid, locale, null), frame);
-                }
-              } catch (Exception e) {
-                loadXsltPreview(buildPreviewUrl(fileUuid, locale, null), frame);
-              }
-            } else {
-              loadXsltPreview(buildPreviewUrl(fileUuid, locale, null), frame);
-            }
-            panel.add(frame);
-          }
-
-          @Override
-          public void onError(Request req, Throwable exception) {
-            loadXsltPreview(buildPreviewUrl(fileUuid, locale, null), frame);
-            panel.add(frame);
-          }
-        });
-      } catch (RequestException e) {
-        textPreview();
-      }
-    } else {
+    if (!(object instanceof IndexedFile)) {
       textPreview();
+      return;
     }
+
+    final IndexedFile indexedFile = (IndexedFile) object;
+    final String fileUuid = indexedFile.getUUID();
+    final String locale = LocaleInfo.getCurrentLocale().getLocaleName();
+    String xsltsUrl = RestUtils.createRepresentationFileXsltsUri(fileUuid).asString();
+
+    // Fetch the available-XSLT list FIRST. Branch the UI on the result:
+    //  - empty / error  → fall back to native textPreview only (no XSLT toolbars)
+    //  - non-empty      → build the XSLT viewer (toolbar + iframe + raw-XML container)
+    RequestBuilder xsltsRequest = new RequestBuilder(RequestBuilder.GET, xsltsUrl);
+    try {
+      xsltsRequest.sendRequest(null, new RequestCallback() {
+        @Override
+        public void onResponseReceived(Request req, Response response) {
+          JSONArray xslts = parseXsltArray(response);
+          if (xslts == null || xslts.size() == 0) {
+            textPreview(panel);
+          } else {
+            buildXsltViewer(indexedFile, fileUuid, locale, xslts);
+          }
+        }
+
+        @Override
+        public void onError(Request req, Throwable exception) {
+          textPreview(panel);
+        }
+      });
+    } catch (RequestException e) {
+      textPreview(panel);
+    }
+  }
+
+  private static JSONArray parseXsltArray(Response response) {
+    if (response.getStatusCode() != HttpStatus.SC_OK) {
+      return null;
+    }
+    try {
+      JSONValue parsed = JSONParser.parseStrict(response.getText());
+      return parsed.isArray();
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  private void buildXsltViewer(IndexedFile indexedFile, String fileUuid, String locale, JSONArray xslts) {
+    String transformUrl = RestUtils.createRepresentationFileTransformUri(fileUuid, locale).asString();
+
+    // Render toolbar (print + toggle) — always visible when a renderable XSLT exists
+    FlowPanel printToolbar = new FlowPanel();
+    printToolbar.setStyleName("xmlPreviewToolbar");
+    Button printButton = new Button(messages.xsltPrintButton());
+    printButton.setStyleName("btn btn-play xmlPreviewPrintButton");
+    Button toggleXmlButton = new Button(messages.xsltViewOriginalButton());
+    toggleXmlButton.setStyleName("btn btn-play xmlPreviewToggleButton");
+    printToolbar.add(printButton);
+    printToolbar.add(toggleXmlButton);
+    panel.add(printToolbar);
+
+    // Dropdown toolbar — only visible when more than one XSLT is available
+    FlowPanel dropdownToolbar = new FlowPanel();
+    dropdownToolbar.setStyleName("xmlPreviewToolbar");
+    Label dropdownLabel = new Label(messages.xsltSelectLabel());
+    dropdownLabel.setStyleName("xmlPreviewSelectLabel");
+    ListBox xsltDropdown = new ListBox();
+    xsltDropdown.setStyleName("xmlPreviewSelectDropdown");
+    dropdownToolbar.add(dropdownLabel);
+    dropdownToolbar.add(xsltDropdown);
+    final boolean multipleXslts = xslts.size() > 1;
+    if (multipleXslts) {
+      for (int i = 0; i < xslts.size(); i++) {
+        JSONObject obj = xslts.get(i).isObject();
+        if (obj != null) {
+          String id = obj.get("id").isString().stringValue();
+          String label = obj.get("label").isString().stringValue();
+          xsltDropdown.addItem(label, id);
+        }
+      }
+    }
+    dropdownToolbar.setVisible(multipleXslts);
+    panel.add(dropdownToolbar);
+
+    // Upload toolbar — visible only if the user has the representation.apply_xslt role
+    final FlowPanel uploadToolbar = new FlowPanel();
+    uploadToolbar.setStyleName("xmlPreviewToolbar");
+    uploadToolbar.setVisible(false);
+    FileUpload xsltUpload = new FileUpload();
+    xsltUpload.setName("xslt");
+    xsltUpload.getElement().setAttribute("accept", ".xslt,.xsl");
+    xsltUpload.setStyleName("xmlPreviewFileInput");
+    Button applyButton = new Button(messages.applyXsltButton());
+    applyButton.setStyleName("btn btn-play xmlPreviewApplyButton");
+    applyButton.setEnabled(false);
+    xsltUpload.addChangeHandler(event -> applyButton.setEnabled(true));
+    uploadToolbar.add(xsltUpload);
+    uploadToolbar.add(applyButton);
+    panel.add(uploadToolbar);
+
+    UserLogin.getInstance().checkRole(Arrays.asList("representation.apply_xslt"), new AsyncCallback<Boolean>() {
+      @Override
+      public void onSuccess(Boolean hasRole) {
+        uploadToolbar.setVisible(Boolean.TRUE.equals(hasRole));
+      }
+
+      @Override
+      public void onFailure(Throwable caught) {
+        uploadToolbar.setVisible(false);
+      }
+    });
+
+    // XSLT-rendered iframe — primary view
+    final Frame xsltFrame = new Frame();
+    xsltFrame.setStyleName("viewRepresentationHtmlFilePreview");
+    xsltFrame.getElement().setAttribute("sandbox", "allow-same-origin");
+    panel.add(xsltFrame);
+
+    // Raw XML container — built once, lazily populated on first toggle, then
+    // shown/hidden via setVisible. Avoids stacking new textPreview widgets on
+    // every toggle click.
+    final FlowPanel rawXmlContainer = new FlowPanel();
+    rawXmlContainer.setVisible(false);
+    panel.add(rawXmlContainer);
+
+    applyButton.addClickHandler(event -> {
+      applyButton.setEnabled(false);
+      applyButton.setText(messages.xsltLoading());
+      applyCustomXslt(xsltUpload.getElement(), transformUrl, xsltFrame.getElement(), applyButton.getElement(),
+        messages.applyXsltButton(), messages.xsltFileTooLarge(), messages.xsltTransformFailed(),
+        messages.xsltUploadError(), messages.xsltTransformTimeout());
+    });
+
+    printButton.addClickHandler(event -> printIframeContent(xsltFrame.getElement(), messages.xsltPrintError()));
+
+    // Toggle XSLT-rendered ↔ raw XML by flipping visibility on existing
+    // widgets. The raw XML view is populated by textPreview(rawXmlContainer)
+    // exactly once, the first time the user requests it.
+    final boolean[] showingRawXml = {false};
+    final boolean[] rawXmlLoaded = {false};
+    final String[] currentXsltId = {multipleXslts ? xsltDropdown.getValue(0) : null};
+
+    toggleXmlButton.addClickHandler(event -> {
+      if (!showingRawXml[0]) {
+        showingRawXml[0] = true;
+        toggleXmlButton.setText(messages.xsltViewRenderedButton());
+        dropdownToolbar.setVisible(false);
+        xsltFrame.setVisible(false);
+        rawXmlContainer.setVisible(true);
+        if (!rawXmlLoaded[0]) {
+          rawXmlLoaded[0] = true;
+          textPreview(rawXmlContainer);
+        }
+      } else {
+        showingRawXml[0] = false;
+        toggleXmlButton.setText(messages.xsltViewOriginalButton());
+        rawXmlContainer.setVisible(false);
+        if (multipleXslts) {
+          dropdownToolbar.setVisible(true);
+        }
+        xsltFrame.setVisible(true);
+      }
+    });
+
+    if (multipleXslts) {
+      xsltDropdown.addChangeHandler(event -> {
+        String selectedId = xsltDropdown.getValue(xsltDropdown.getSelectedIndex());
+        currentXsltId[0] = selectedId;
+        loadXsltPreview(buildPreviewUrl(fileUuid, locale, selectedId), xsltFrame);
+      });
+    }
+
+    // Initial render of XSLT-transformed view
+    loadXsltPreview(buildPreviewUrl(fileUuid, locale, currentXsltId[0]), xsltFrame);
   }
 
   private static String buildPreviewUrl(String fileUuid, String locale, String xsltId) {
@@ -761,18 +768,25 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
           if (response.getStatusCode() == HttpStatus.SC_OK) {
             frame.getElement().setAttribute("srcdoc", response.getText());
           } else {
-            textPreview();
+            showXsltErrorInFrame(frame, messages.xsltTransformFailed() + response.getStatusCode());
           }
         }
 
         @Override
         public void onError(Request req, Throwable exception) {
-          textPreview();
+          showXsltErrorInFrame(frame, messages.xsltTransformFailed() + exception.getMessage());
         }
       });
     } catch (RequestException e) {
-      textPreview();
+      showXsltErrorInFrame(frame, messages.xsltTransformFailed() + e.getMessage());
     }
+  }
+
+  private static void showXsltErrorInFrame(Frame frame, String message) {
+    String escaped = SafeHtmlUtils.htmlEscape(message);
+    String errorHtml = "<html><body style=\"margin:0;padding:16px;font-family:sans-serif;color:#a33;\">"
+      + escaped + "</body></html>";
+    frame.getElement().setAttribute("srcdoc", errorHtml);
   }
 
   private native void printIframeContent(com.google.gwt.dom.client.Element iframe, String errorMsg) /*-{
