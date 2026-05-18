@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.api.v2.services;
 
@@ -576,7 +576,7 @@ public class AIPService {
           descriptiveMetadataId + XML_EXT);
         String xml = IOUtils.toString(binary.getContent().createInputStream(), StandardCharsets.UTF_8);
 
-        Set<MetadataValue> result = getMetadataValuesFromDescriptiveMetadataFile(template, xml);
+        Set<MetadataValue> result = getMetadataValuesFromDescriptiveMetadataFile(template, xml, locale, messages);
 
         return new SupportedMetadataValue(result);
       } else {
@@ -610,7 +610,8 @@ public class AIPService {
     return false;
   }
 
-  private Set<MetadataValue> getMetadataValuesFromDescriptiveMetadataFile(String template, String xml) {
+  private Set<MetadataValue> getMetadataValuesFromDescriptiveMetadataFile(String template, String xml, Locale locale,
+    Messages messages) throws GenericException {
     Set<MetadataValue> values = ServerTools.transform(template);
     Set<MetadataValue> result = new TreeSet<>();
 
@@ -633,8 +634,8 @@ public class AIPService {
         }
         mv.set("value", value.trim());
       }
-      // getMetadataValueLabels(mv, locale, messages);
-      // getMetadataValueI18nPrefix(mv, locale, messages);
+      CommonServicesUtils.getMetadataValueLabels(mv, locale, messages);
+      CommonServicesUtils.getMetadataValueI18nPrefix(mv, locale, messages);
       result.add(mv);
     }
 

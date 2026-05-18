@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.api.v2.controller;
 
@@ -98,7 +98,8 @@ public class FilesController implements FileRestService, Exportable {
   @Autowired
   RequestHandler requestHandler;
 
-  @RequestMapping(path = "{uuid}/preview", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  @RequestMapping(path = "{uuid}/preview", method = RequestMethod.GET, produces = {
+    MediaType.APPLICATION_OCTET_STREAM_VALUE})
   @Operation(summary = "Previews a file", description = "Previews a particular file using streaming capabilities", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = StreamingResponseBody.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
@@ -118,7 +119,6 @@ public class FilesController implements FileRestService, Exportable {
         controllerAssistant.checkObjectPermissions(requestContext.getUser(), file);
 
         RangeConsumesOutputStream stream = filesService.retrieveAIPRepresentationRangeStream(requestContext, file);
-
         return ApiUtils.rangeResponse(headers, stream);
       }
     });

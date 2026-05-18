@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.data.v2.jobs;
 
@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * This class contains information about a plugin.
@@ -249,6 +250,7 @@ public class PluginInfo implements Serializable {
     isInstalled = installed;
   }
 
+  @JsonProperty("hasLicenseFile")
   public Boolean hasLicenseFile() {
     return hasLicenseFile;
   }
@@ -265,6 +267,7 @@ public class PluginInfo implements Serializable {
     this.licenseFilePath = licenseFilePath;
   }
 
+  @JsonProperty("hasDocumentationFile")
   public Boolean hasDocumentationFile() {
     return hasDocumentationFile;
   }

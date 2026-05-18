@@ -8,7 +8,7 @@
 	<g:FlowPanel styleName="wui-ingest-list" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_12 content" ui:field="contentFlowPanel">
-				<common:TitlePanel text="{messages.ingestProcessTitle}" iconClass="Job" />
+				<common:TitlePanel text="{messages.ingestProcessTitle}" iconClass="Job" ui:field="title" />
 				<g:FlowPanel addStyleNames="page-description" ui:field="ingestProcessDescription" />
 				<search:JobSearch ui:field="jobSearch" />
 			</g:FlowPanel>

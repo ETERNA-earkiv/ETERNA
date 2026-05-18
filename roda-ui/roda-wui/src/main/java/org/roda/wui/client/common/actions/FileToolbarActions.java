@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.actions;
 
@@ -36,11 +36,15 @@ import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectFileDialog;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.FileFormatSharedUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.client.redact.PDFRedactor;
 import org.roda.wui.client.services.Services;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -147,6 +151,12 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
               CanActResult.Reason.CONTEXT, messages.reasonAIPUnderAppraisal());
     }
 
+    if (FileAction.REDACT_PDF.equals(action)) {
+      boolean canRedact = !file.isDirectory()
+              && FileFormatSharedUtils.hasFileFormat(file, FileFormatSharedUtils.MIMETYPE_PDF, FileFormatSharedUtils.EXTENSION_PDF);
+      return new CanActResult(canRedact, CanActResult.Reason.CONTEXT, messages.reasonCantActOnFileBitstream());
+    }
+
     if (file.isDirectory()) {
       return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_FILE_DIRECTORY.contains(action), CanActResult.Reason.CONTEXT,
         messages.reasonCantActOnFileDirectory());
@@ -211,6 +221,8 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
       newProcess(file, callback);
     } else if (FileAction.IDENTIFY_FORMATS.equals(action)) {
       identifyFormats(file, callback);
+    } else if (FileAction.REDACT_PDF.equals(action)) {
+      redactPdf(file, callback);
     } else {
       unsupportedAction(action, callback);
     }
@@ -242,6 +254,31 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
   }
 
   // ACTIONS
+  private void redactPdf(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
+    if (!FileFormatSharedUtils.hasFileFormat(file, FileFormatSharedUtils.MIMETYPE_PDF, FileFormatSharedUtils.EXTENSION_PDF)) {
+      Dialogs.showInformationDialog(messages.redactPdfToastTitle(),
+          messages.redactPdfOnlyPdfDialogMessage(), messages.dialogOk(), false);
+      callback.onSuccess(ActionImpact.NONE);
+      return;
+    }
+
+    String aipId = file.getAipId();
+    String representationId = file.getRepresentationId();
+    String fileId = file.getId();
+    List<String> path = file.getPath() != null ? file.getPath() : Collections.emptyList();
+
+    if (aipId == null || representationId == null || fileId == null) {
+      Toast.showError(messages.redactPdfMissingIdentifiers());
+      callback.onSuccess(ActionImpact.NONE);
+      return;
+    }
+
+    List<String> historyItems = ListUtils.concat(
+        ListUtils.concat(Arrays.asList(aipId, representationId), path), fileId);
+
+    HistoryUtils.newHistory(PDFRedactor.RESOLVER, historyItems.toArray(new String[0]));
+    callback.onSuccess(ActionImpact.NONE);
+  }
 
   private void rename(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showPromptDialog(messages.renameItemTitle(), null, file.getId(), null, RegExp.compile("^[^/]+$"),
@@ -588,6 +625,8 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
       "btn-plus-circle", "fileCreateFolderButton");
     managementGroup.addButton(messages.removeButton(), FileAction.REMOVE, ActionImpact.DESTROYED, "btn-ban",
       "fileRemoveButton");
+    managementGroup.addButton(messages.redactPdfButton(), FileAction.REDACT_PDF, 
+    ActionImpact.NONE, "btn-eraser", "fileRedactButton");
 
     // DOWNLOAD
     ActionableGroup<IndexedFile> downloadGroup = new ActionableGroup<>(messages.downloadButton(), "btn-download");
@@ -611,7 +650,8 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
     REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_FILE), UPLOAD_FILES(RodaConstants.PERMISSION_METHOD_CREATE_FILE),
     CREATE_FOLDER(RodaConstants.PERMISSION_METHOD_CREATE_FOLDER),
     NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
-    IDENTIFY_FORMATS(RodaConstants.PERMISSION_METHOD_CREATE_JOB);
+    IDENTIFY_FORMATS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
+    REDACT_PDF(RodaConstants.PERMISSION_METHOD_CREATE_FILE);
 
     private final List<String> methods;
 

@@ -3,13 +3,13 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.data.v2.properties;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -22,7 +22,7 @@ public class ConversionProfiles implements Serializable {
   private Set<ConversionProfile> conversionProfileSet;
 
   public ConversionProfiles() {
-    conversionProfileSet = new HashSet<>();
+    conversionProfileSet = new LinkedHashSet<>();
   }
 
   public Set<ConversionProfile> getConversionProfileSet() {

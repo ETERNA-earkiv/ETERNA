@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.browse;
 
@@ -44,6 +44,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.safehtml.shared.UriUtils;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
@@ -66,6 +67,8 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   private static final String VIEWER_TYPE_PDF = "pdf";
   private static final String VIEWER_TYPE_IMAGE = "image";
   private static final String VIEWER_TYPE_XML = "xml";
+  private static final String VIEWER_TYPE_TIFF = "tiff";
+  private static final String VIEWER_TYPE_WEBARCHIVE = "webarchive";
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -187,8 +190,12 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     if (type != null) {
       if (type.equals(VIEWER_TYPE_IMAGE)) {
         imagePreview();
+      } else if (type.equals(VIEWER_TYPE_TIFF)) {
+        tiffCanvasPreview();
       } else if (type.equals(VIEWER_TYPE_PDF)) {
         pdfPreview();
+      } else if (type.equals(VIEWER_TYPE_WEBARCHIVE)) {
+        webarchivePreview();
       } else if (type.equals(VIEWER_TYPE_TEXT)) {
         if (isXmlFile()) {
           xmlHtmlPreview();
@@ -265,16 +272,45 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
 
   }
 
+  private void tiffCanvasPreview() {
+    final SimplePanel canvasContainer = new SimplePanel();
+    canvasContainer.setStyleName("viewRepresentationTiffFilePreview");
+    panel.add(canvasContainer);
+
+    canvasContainer.addAttachHandler(new Handler() {
+      @Override
+      public void onAttachOrDetach(AttachEvent event) {
+        if (event.isAttached()) {
+          JavascriptUtils.runTiffCanvasViewerOn(canvasContainer.getElement(), bitstreamDownloadUri.asString(),
+            messages.viewRepresentationTiffLoading(), messages.viewRepresentationTiffError());
+        }
+      }
+    });
+  }
+
   private void pdfPreview() {
 
     String viewerPdf = GWT.getHostPageBaseURL() + "webjars/pdf-js/web/viewer.html" + "?file="
-      + encode(GWT.getHostPageBaseURL() + bitstreamDownloadUri.asString()) + "#" + viewers.getOptions();
+      + URL.encodeQueryString(GWT.getHostPageBaseURL() + bitstreamDownloadUri.asString()) + "#" + viewers.getOptions();
 
     final Frame frame = new Frame(viewerPdf);
     frame.addLoadHandler(ev -> JavascriptUtils.runIframeResizer(frame.getElement()));
 
     panel.add(frame);
     frame.setStyleName("viewRepresentationPDFFilePreview");
+  }
+
+  private void webarchivePreview() {
+    String sourceUrl = GWT.getHostPageBaseURL() + bitstreamDownloadUri.asString();
+
+    String viewerUrl = GWT.getHostPageBaseURL() + "replay-viewer.html?source=" + URL.encodeQueryString(sourceUrl);
+
+    final Frame frame = new Frame(viewerUrl);
+    frame.getElement().setAttribute("title", filename);
+    frame.addLoadHandler(ev -> JavascriptUtils.runIframeResizer(frame.getElement()));
+
+    panel.add(frame);
+    frame.setStyleName("viewRepresentationWebArchiveFilePreview");
   }
 
   private void textPreview() {
@@ -408,10 +444,6 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
         frame.addLoadHandler(ev -> JavascriptUtils.runIframeResizer(frame.getElement()));
     }
     panel.add(frame);
-  }
-
-  private String encode(String string) {
-    return string.replace("?", "%3F").replace("=", "%3D");
   }
 
   private void errorPreview() {

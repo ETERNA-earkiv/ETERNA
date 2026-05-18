@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.data.common;
 
@@ -131,6 +131,8 @@ public final class RodaConstants {
   public static final String UI_EXPIRED_SESSION_DETECTOR_ACTIVE = "ui.expired.session.detector.active";
   public static final String UI_EXPIRED_SESSION_DETECTOR_TIME = "ui.expired.session.detector.time";
 
+  public static final String UI_REDACTION_REASON_MANDATORY = "ui.redaction.reason.mandatory";
+
   public static final String UI_GOOGLE_ANALYTICS_CODE_PROPERTY = "ui.google.analytics.code";
   public static final String UI_GOOGLE_RECAPTCHA_CODE_PROPERTY = "ui.google.recaptcha.code";
 
@@ -184,6 +186,15 @@ public final class RodaConstants {
   public static final String UI_SERVICE_MULTI_METHOD_AUTHENTICATION_ACTIVE = "ui.service.multi.method.authentication.active";
   public static final String UI_SERVICE_MULTI_METHOD_AUTHENTICATION_LIST = "ui.service.multi.method.authentication.item[]";
   public static final String UI_SERVICE_DROPFOLDER_ACTIVE = "ui.service.dropfolder.active";
+
+  public static final String UI_MAINMENU_HIDE_HOME = "ui.mainmenu.hide.home";
+  public static final String UI_MAINMENU_HIDE_BROWSE = "ui.mainmenu.hide.browse";
+  public static final String UI_MAINMENU_HIDE_SEARCH = "ui.mainmenu.hide.search";
+  public static final String UI_MAINMENU_HIDE_INGEST = "ui.mainmenu.hide.ingest";
+  public static final String UI_MAINMENU_HIDE_ADMINISTRATION = "ui.mainmenu.hide.administration";
+  public static final String UI_MAINMENU_HIDE_DISPOSAL = "ui.mainmenu.hide.disposal";
+  public static final String UI_MAINMENU_HIDE_PLANNING = "ui.mainmenu.hide.planning";
+  public static final String UI_MAINMENU_HIDE_HELP = "ui.mainmenu.hide.help";
 
   public static final String UI_SERVICE_MONITORING_DEFAULT_URL = "https://www.roda-enterprise.com";
   public static final String UI_SERVICE_CAS_DEFAULT_URL = "https://www.roda-enterprise.com";

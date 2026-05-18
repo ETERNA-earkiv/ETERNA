@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.disposal.confirmations;
 
@@ -45,6 +45,8 @@ import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
+import org.roda.wui.client.common.TitlePanel;
+import com.google.gwt.user.client.ui.Anchor;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -101,6 +103,8 @@ public class CreateDisposalConfirmation extends Composite {
 
   @UiField
   FlowPanel createDisposalConfirmationDescription;
+  @UiField
+  TitlePanel title;
 
   @UiField
   RadioButton destroyScheduleOpt;
@@ -138,6 +142,13 @@ public class CreateDisposalConfirmation extends Composite {
     configureDisposalAction();
 
     createDisposalConfirmationDescription.add(new HTMLWidgetWrapper("CreateDisposalConfirmationDescription.html"));
+    createDisposalConfirmationDescription.setVisible(false);
+    Anchor infoIconTitle = new Anchor();
+    infoIconTitle.getElement().setInnerHTML("<i class=\"fa fa-info-circle\"></i>");
+    infoIconTitle.addStyleName("description-toggle-icon");
+    infoIconTitle.setTitle("Klicka för att fälla ut hjälpen");
+    infoIconTitle.addClickHandler(event -> createDisposalConfirmationDescription.setVisible(!createDisposalConfirmationDescription.isVisible()));
+    title.add(infoIconTitle);
   }
 
   public static CreateDisposalConfirmation getInstance() {

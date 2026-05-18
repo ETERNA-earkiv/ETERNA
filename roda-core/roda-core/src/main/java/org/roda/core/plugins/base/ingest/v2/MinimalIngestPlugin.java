@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.plugins.base.ingest.v2;
 
@@ -40,22 +40,22 @@ public class MinimalIngestPlugin extends DefaultIngestPlugin {
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS, "Format of the Submission Information Packages",
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS, "Format för leveransinformationspaket",
           PluginParameterType.PLUGIN_SIP_TO_AIP)
         .withDefaultValue(EARKSIP2ToAIPPlugin.class.getName()).withDescription(
-          "Select the format of the Submission Information Packages to be ingested in this ingest process.")
+          "Välj format för de leveransinformationspaket som ska inlevereras i denna inleveransprocess.")
         .build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID,
-      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_PARENT_ID, "Parent node", PluginParameterType.AIP_ID)
-        .isMandatory(false).withDescription("Use the provided parent node if the SIPs does not provide one.").build());
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_PARENT_ID, "Föräldernod", PluginParameterType.AIP_ID)
+        .isMandatory(false).withDescription("Använd den angivna föräldernoden om SIP:et inte anger någon.").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, "Force parent node", PluginParameterType.BOOLEAN)
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, "Tvinga föräldernod", PluginParameterType.BOOLEAN)
         .withDefaultValue("false").isMandatory(false)
         .withDescription(
-          "Force the use of the selected parent node even if the SIPs provide information about the desired parent.")
+          "Tvinga användningen av den valda föräldernoden även om SIP:en anger information om önskad förälder.")
         .build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION,
@@ -86,11 +86,12 @@ public class MinimalIngestPlugin extends DefaultIngestPlugin {
         .withDefaultValue("true").isReadOnly(true).withDescription(AutoAcceptSIPPlugin.getStaticDescription()).build());
     pluginParameters.put(RodaConstants.NOTIFICATION_HTTP_ENDPOINT,
       PluginParameter
-        .getBuilder(RodaConstants.NOTIFICATION_HTTP_ENDPOINT, "Ingest finished HTTP notification",
+        .getBuilder(RodaConstants.NOTIFICATION_HTTP_ENDPOINT, "HTTP-notifikation om avslutad inleverans",
           PluginParameterType.STRING)
         .withDefaultValue(RodaCoreFactory.getRodaConfigurationAsString("ingest.configurable.http_endpoint"))
         .isMandatory(false)
-        .withDescription("Send a notification after finishing the ingest process to a specific HTTP endpoint").build());
+        .withDescription("Skickar en notifikation efter avslutad inleveransprocess till en specifik HTTP-endpoint.")
+        .build());
 
     // 2) descriptive metadata validation
     steps.add(new IngestStep(DescriptiveMetadataValidationPlugin.class.getName(),
@@ -108,7 +109,7 @@ public class MinimalIngestPlugin extends DefaultIngestPlugin {
 
   @Override
   public String getName() {
-    return "Minimal ingest workflow";
+    return "Minimal inleveransprocess";
   }
 
   @Override
@@ -118,7 +119,7 @@ public class MinimalIngestPlugin extends DefaultIngestPlugin {
 
   @Override
   public String getDescription() {
-    return "Performs the minimum set of tasks needed to ingest a SIP into the repository and therefore creating an AIP.";
+    return "Utför den minsta uppsättningen uppgifter som krävs för att inleverera ett SIP till arkivet och därigenom skapa ett AIP.";
   }
 
   @Override

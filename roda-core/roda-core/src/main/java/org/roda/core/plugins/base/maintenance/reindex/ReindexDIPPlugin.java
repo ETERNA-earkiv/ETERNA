@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.plugins.base.maintenance.reindex;
 
@@ -25,7 +25,7 @@ public class ReindexDIPPlugin extends ReindexRodaEntityPlugin<DIP> {
 
   @Override
   public String getName() {
-    return "Rebuild DIP index";
+    return "Återindexera DIP-index";
   }
 
   @Override

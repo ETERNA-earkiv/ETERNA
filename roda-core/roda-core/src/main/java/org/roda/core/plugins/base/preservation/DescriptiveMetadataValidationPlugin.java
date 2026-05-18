@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.plugins.base.preservation;
 
@@ -47,35 +47,35 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
 
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_VALIDATE_DESCRIPTIVE_METADATA, PluginParameter
-      .getBuilder(RodaConstants.PLUGIN_PARAMS_VALIDATE_DESCRIPTIVE_METADATA, "Validate descriptive metadata",
+      .getBuilder(RodaConstants.PLUGIN_PARAMS_VALIDATE_DESCRIPTIVE_METADATA, "Validera beskrivande metadata",
         PluginParameterType.BOOLEAN)
       .withDefaultValue("true")
       .withDescription(
-        "If true, the action will check if the descriptive metadata is valid according to the schemas installed in the repository.")
+        "Om sant kontrollerar åtgärden om den beskrivande metadatan är giltig enligt de scheman som är installerade i arkivet.")
       .build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_TYPE, PluginParameter
-      .getBuilder(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_TYPE, "Descriptive metadata format",
+      .getBuilder(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_TYPE, "Format för beskrivande metadata",
         PluginParameterType.STRING)
       .isMandatory(false)
       .withDescription(
-        "Descriptive metadata format to be used as fallback if the information package does not specify the metadata format or if the action is set to FORCE.")
+        "Format för beskrivande metadata som används som reserv om informationspaketet inte anger metadataformatet eller om åtgärden är inställd på TVINGA.")
       .build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_VERSION, PluginParameter
-      .getBuilder(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_VERSION, "Descriptive metadata version",
+      .getBuilder(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_VERSION, "Version av beskrivande metadata",
         PluginParameterType.STRING)
       .isMandatory(false)
       .withDescription(
-        "Descriptive metadata version to be used as fallback if the information package does not specify the metadata version or if the action is set to FORCE.")
+        "Version av beskrivande metadata som används som reserv om informationspaketet inte anger metadataversionen eller om åtgärden är inställd på TVINGA.")
       .build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_FORCE_TYPE, PluginParameter
-      .getBuilder(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_FORCE_TYPE, "Force metadata format and version",
+      .getBuilder(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_FORCE_TYPE, "Tvinga metadataformat och version",
         PluginParameterType.BOOLEAN)
       .withDefaultValue("false")
       .withDescription(
-        "If true, bypass the metadata format and version set in the information package and use the metadata format and version passed as parameters (see above).")
+        "Om sant, förbigås metadataformatet och versionen som anges i informationspaketet och metadataformatet och versionen som anges som parametrar används istället (se ovan).")
       .build());
   }
 
@@ -87,12 +87,12 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
   private List<Pair<String, String>> schemasInfo;
 
   public static String getStaticName() {
-    return "Metadata validation";
+    return "Metadatavalidering";
   }
 
   public static String getStaticDescription() {
-    return "Checks if the descriptive metadata included in the Information Package is present, and if it is valid according to the "
-      + "XML Schemas installed in the repository. A validation report is generated indicating which Information Packages have valid and invalid metadata.";
+    return "Kontrollerar om den beskrivande metadata som ingår i informationspaketet finns och om den är giltig enligt de "
+      + "XML-scheman som är installerade i arkivet. En valideringsrapport genereras som anger vilka informationspaket som har giltig respektive ogiltig metadata.";
   }
 
   @Override

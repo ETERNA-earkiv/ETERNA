@@ -3345,6 +3345,230 @@ td.datePickerMonth, td.datePickerYear {
     gap: 32px;
 }
 
+/* ── Catalog Tree Panel ── */
+.catalogTreePanel {
+    width: 260px;
+    min-width: 150px;
+    height: 100%;
+    flex-shrink: 0;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+.catalogTreePanel.animatingCollapse {
+    transition: width 0.2s ease-in-out, min-width 0.2s ease-in-out;
+}
+
+/* Collapsed drawer: panel shrinks to a thin rail; only the expand button remains visible. */
+.catalogTreePanel.collapsed { width: 36px !important; min-width: 36px; }
+.catalogTreePanel.collapsed .catalogTreePanelHeader,
+.catalogTreePanel.collapsed .catalogTreeFilter,
+.catalogTreePanel.collapsed .catalogTreeBodyScroll { display: none; }
+.catalogTreePanel.collapsed .catalogTreeExpandButton { display: flex; }
+.catalogTreePanel.collapsed + .catalogTreeResizeHandle { visibility: hidden; }
+
+.catalogTreePanelHeader {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px 8px;
+    flex-shrink: 0;
+}
+
+.catalogTreePanelHeaderTitle {
+    font-size: 16px; font-weight: 700; color: #1F2937;
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+}
+.catalogTreePanelHeaderTitle:hover { color: COLOR_PRIMARY; }
+.catalogTreePanelHeaderTitle.active { color: COLOR_PRIMARY; }
+
+.catalogTreeCollapseToggle {
+    width: 22px; height: 22px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: #111827; font-size: 14px;
+    border-radius: 3px;
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+.catalogTreeCollapseToggle:hover { background: rgba(0, 0, 0, 0.06); }
+.catalogTreeCollapseToggle:focus,
+.catalogTreeCollapseToggle:focus-visible {
+    background: rgba(0, 0, 0, 0.06);
+    outline: 2px solid COLOR_PRIMARY;
+    outline-offset: 2px;
+}
+
+.catalogTreeExpandButton {
+    display: none; align-items: center; justify-content: center;
+    width: 22px; height: 22px; margin: 8px auto 0;
+    cursor: pointer; color: #111827; font-size: 14px;
+    border-radius: 3px;
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+.catalogTreeExpandButton:hover { background: rgba(0, 0, 0, 0.06); }
+.catalogTreeExpandButton:focus,
+.catalogTreeExpandButton:focus-visible {
+    background: rgba(0, 0, 0, 0.06);
+    outline: 2px solid COLOR_PRIMARY;
+    outline-offset: 2px;
+}
+
+.catalogTreeResizeHandle {
+    width: 3px;
+    background: COLOR_GREY_LIGHT;
+    cursor: col-resize;
+    flex-shrink: 0;
+    transition: background 0.15s;
+}
+
+.catalogTreeResizeHandle:hover {
+    background: COLOR_PRIMARY;
+}
+
+body.catalogTreeResizing,
+body.catalogTreeResizing * {
+    cursor: col-resize !important;
+}
+
+.catalogTreeFilter {
+    padding: 6px 8px;
+    border-bottom: 1px solid COLOR_GREY_VERYLIGHT;
+    flex-shrink: 0;
+    background: #fafafa;
+}
+
+.catalogTreeFilterInput {
+    width: 100%;
+    padding: 5px 8px;
+    border: 1px solid COLOR_GREY_LIGHT;
+    border-radius: 3px;
+    font-size: 12px;
+    background: white;
+    color: #333333;
+    box-sizing: border-box;
+}
+
+.catalogTreeBodyScroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 0;
+}
+
+.catalogTreeNode {
+    display: flex;
+    align-items: center;
+    height: 27px;
+    cursor: pointer;
+    color: #333333;
+    padding-right: 8px;
+}
+
+.catalogTreeNode:hover {
+    background: COLOR_GREY_BGDARKER;
+}
+
+.catalogTreeNode.selected {
+    background: COLOR_PRIMARY;
+    color: white;
+}
+
+.catalogTreeNode.selected .catalogTreeToggle {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.catalogTreeIndent {
+    display: inline-block;
+    width: 16px;
+    flex-shrink: 0;
+}
+
+.catalogTreeToggle {
+    width: 16px;
+    text-align: center;
+    font-size: 10px;
+    color: #999999;
+    flex-shrink: 0;
+    margin-right: 2px;
+    cursor: pointer;
+}
+
+.catalogTreeIcon {
+    width: 16px;
+    text-align: center;
+    font-size: 12px;
+    color: #666666;
+    flex-shrink: 0;
+    margin-right: 4px;
+}
+
+.catalogTreeNode.selected .catalogTreeIcon {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.catalogTreeLabel {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12.5px;
+}
+
+.catalogTreeNodeChildren {
+    /* Synlighet styrs via setVisible() */
+}
+
+.catalogTreeMainContent {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+/* #337: Trädpanel ska stå still medan höger sida skrollar för sig.
+   Begränsar layoutens höjd till viewport (minus sticky bannerHeader 64px),
+   så att .catalogTreePanel (intern scroll i .catalogTreeBodyScroll) håller
+   sin position och .catalogTreeMainContent kan ha egen y-scroll. */
+.catalogTreeLayout {
+    height: calc(100vh - 64px);
+    min-height: 0 !important;
+    overflow: hidden;
+}
+
+.catalogTreeLayout .catalogTreeMainContent {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+@media (max-width: 900px) {
+    .catalogTreePanel {
+        display: none;
+    }
+    .catalogTreeResizeHandle {
+        display: none;
+    }
+    .catalogTreeLayout {
+        height: auto;
+        overflow: visible;
+    }
+    .catalogTreeLayout .catalogTreeMainContent {
+        overflow: visible;
+    }
+}
+
+.catalogTreeNodeError {
+    padding: 4px 8px 4px 40px;
+    font-size: 11px;
+    color: COLOR_PRIMARY;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
 .browseSidePanel .actionable-menu {
     display: flex;
     flex-direction: column;
@@ -5453,6 +5677,12 @@ td.datePickerMonth, td.datePickerYear {
       to be the sum of the heights of the banner,
       menu and footer elements.
     */
+}
+
+.viewRepresentationWebArchiveFilePreview {
+    height: 100dvh;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .viewRepresentationHtmlFilePreview, .viewDIPPreview {
@@ -8026,10 +8256,21 @@ span.code {
 }
 
 .my-asyncdatagrid-footer {
-    display: flex;
-    justify-content: end;
-    align-items: center;
-    gap: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.my-asyncdatagrid-footer .footer-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.my-asyncdatagrid-footer .footer-left {
+  display: flex;
+  align-items: center;
 }
 
 .ActionableStyleButtons {
@@ -9301,5 +9542,43 @@ wui-disposal-hold-data .form-textbox {
 
 .details-anchor {
     display: block;
+    margin-bottom: 0.5em;
+}
+.permission-header-flex {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.permission-select-all-checkbox {
+    cursor: pointer;
+}
+
+.permission-select-all-checkbox input[type="checkbox"] {
+    appearance: auto !important;
+    -webkit-appearance: checkbox !important;
+    -moz-appearance: checkbox !important;
+}
+
+.permissions--readonly {
+    cursor: default;
+}
+
+.permissions--readonly .permission {
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.permissions--readonly .permission-header-flex {
+    pointer-events: none;
+}
+
+.permissions-readonly-badge {
+    display: inline-block;
+    background-color: #e0e0e0;
+    color: #555555;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.85em;
     margin-bottom: 0.5em;
 }

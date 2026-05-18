@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.actions;
 
@@ -35,11 +35,15 @@ import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectFileDialog;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.FileFormatSharedUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.client.redact.PDFRedactor;
 import org.roda.wui.client.services.Services;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -82,8 +86,8 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
   private final IndexedFile parentFolder;
   private final Permissions permissions;
 
-  private FileSearchWrapperActions(String aipId, String representationId, AIPState state, IndexedFile parentFolder,
-    Permissions permissions) {
+  private FileSearchWrapperActions(String aipId, String representationId, AIPState state,
+    IndexedFile parentFolder, Permissions permissions) {
     this.aipId = aipId;
     this.representationId = representationId;
     this.state = state;
@@ -91,18 +95,18 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
     this.parentFolder = parentFolder != null && parentFolder.isDirectory() ? parentFolder : null;
   }
 
-  public static FileSearchWrapperActions get(String aipId, String representationId, AIPState state,
-    Permissions permissions) {
+  public static FileSearchWrapperActions get(String aipId, String representationId,
+    AIPState state, Permissions permissions) {
     return new FileSearchWrapperActions(aipId, representationId, state, null, permissions);
   }
 
-  public static FileSearchWrapperActions get(String aipId, String representationId, AIPState state,
-    IndexedFile parentFolder, Permissions permissions) {
+  public static FileSearchWrapperActions get(String aipId, String representationId,
+    AIPState state, IndexedFile parentFolder, Permissions permissions) {
     return new FileSearchWrapperActions(aipId, representationId, state, parentFolder, permissions);
   }
 
-  public static FileSearchWrapperActions getWithoutNoFileActions(String aipId, String representationId, AIPState state,
-    IndexedFile parentFolder, Permissions permissions) {
+  public static FileSearchWrapperActions getWithoutNoFileActions(String aipId, String representationId,
+    AIPState state, IndexedFile parentFolder, Permissions permissions) {
     return new FileSearchWrapperActions(aipId, representationId, state, parentFolder, permissions) {
       @Override
       public CanActResult contextCanAct(Action<IndexedFile> action) {
@@ -145,6 +149,12 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
     if (AIPState.UNDER_APPRAISAL.equals(state)) {
       return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_FILE_UNDER_APPRAISAL.contains(action),
         CanActResult.Reason.CONTEXT, messages.reasonAIPUnderAppraisal());
+    }
+
+    if (FileSearchWrapperAction.REDACT_PDF.equals(action)) {
+      boolean canRedact = !file.isDirectory()
+              && FileFormatSharedUtils.hasFileFormat(file, FileFormatSharedUtils.MIMETYPE_PDF, FileFormatSharedUtils.EXTENSION_PDF);
+      return new CanActResult(canRedact, CanActResult.Reason.CONTEXT, messages.reasonCantActOnFileBitstream());
     }
 
     if (file.isDirectory()) {
@@ -207,6 +217,8 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
       newProcess(file, callback);
     } else if (FileSearchWrapperAction.IDENTIFY_FORMATS.equals(action)) {
       identifyFormats(file, callback);
+    } else if (FileSearchWrapperAction.REDACT_PDF.equals(action)) {
+      redactPdf(file, callback);
     } else {
       unsupportedAction(action, callback);
     }
@@ -232,6 +244,31 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
   }
 
   // ACTIONS
+  private void redactPdf(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
+    if (!FileFormatSharedUtils.hasFileFormat(file, FileFormatSharedUtils.MIMETYPE_PDF, FileFormatSharedUtils.EXTENSION_PDF)) {
+      Dialogs.showInformationDialog(messages.redactPdfToastTitle(),
+          messages.redactPdfOnlyPdfDialogMessage(), messages.dialogOk(), false);
+      callback.onSuccess(ActionImpact.NONE);
+      return;
+    }
+
+    String aipId = file.getAipId();
+    String representationId = file.getRepresentationId();
+    String fileId = file.getId();
+    List<String> path = file.getPath() != null ? file.getPath() : Collections.emptyList();
+
+    if (aipId == null || representationId == null || fileId == null) {
+      Toast.showError(messages.redactPdfMissingIdentifiers());
+      callback.onSuccess(ActionImpact.NONE);
+      return;
+    }
+
+    List<String> historyItems = ListUtils.concat(
+        ListUtils.concat(Arrays.asList(aipId, representationId), path), fileId);
+
+    HistoryUtils.newHistory(PDFRedactor.RESOLVER, historyItems.toArray(new String[0]));
+    callback.onSuccess(ActionImpact.NONE);
+  }
 
   private void move(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     move(file.getAipId(), file.getRepresentationId(),
@@ -544,6 +581,8 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
       ActionImpact.UPDATED, "btn-plus-circle", "fileCreateFolderButton");
     managementGroup.addButton(messages.removeButton(), FileSearchWrapperAction.REMOVE, ActionImpact.DESTROYED,
       "btn-ban", "fileRemoveButton");
+    managementGroup.addButton(messages.redactPdfButton(), FileSearchWrapperAction.REDACT_PDF,
+      ActionImpact.NONE, "btn-eraser", "fileRedactPdfButton");
 
     // PRESERVATION
     ActionableGroup<IndexedFile> preservationGroup = new ActionableGroup<>(messages.preservationTitle());
@@ -562,7 +601,8 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
     UPLOAD_FILES(RodaConstants.PERMISSION_METHOD_CREATE_FILE),
     CREATE_FOLDER(RodaConstants.PERMISSION_METHOD_CREATE_FOLDER),
     NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
-    IDENTIFY_FORMATS(RodaConstants.PERMISSION_METHOD_CREATE_JOB);
+    IDENTIFY_FORMATS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
+    REDACT_PDF(RodaConstants.PERMISSION_METHOD_CREATE_FILE);
 
     private final List<String> methods;
 

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui">
+
+    <ui:with field='messages' type='config.i18n.client.ClientMessages' />
+
+    <g:FlowPanel styleName="catalogTreePanel">
+        <g:Button ui:field="expandButton" styleName="catalogTreeExpandButton" />
+        <g:FlowPanel styleName="catalogTreePanelHeader">
+            <g:Anchor ui:field="headerTitle" styleName="catalogTreePanelHeaderTitle" text="{messages.catalogTreeTitle}" />
+            <g:Button ui:field="collapseToggle" styleName="catalogTreeCollapseToggle" />
+        </g:FlowPanel>
+        <g:FlowPanel styleName="catalogTreeFilter">
+            <g:TextBox ui:field="filterInput" styleName="catalogTreeFilterInput" />
+        </g:FlowPanel>
+        <g:FlowPanel styleName="catalogTreeBodyScroll">
+            <g:FlowPanel ui:field="treeBody" />
+        </g:FlowPanel>
+    </g:FlowPanel>
+</ui:UiBinder>

@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.disposal;
 
@@ -32,6 +32,8 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
+import org.roda.wui.client.common.TitlePanel;
+import com.google.gwt.user.client.ui.Anchor;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
@@ -70,6 +72,8 @@ public class DisposalDestroyedRecords extends Composite {
 
   @UiField
   FlowPanel disposalDestroyedRecordsDescription;
+  @UiField
+  TitlePanel title;
 
   @UiField(provided = true)
   SearchWrapper disposalDestroyedRecordsSearch;
@@ -91,6 +95,13 @@ public class DisposalDestroyedRecords extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
     disposalDestroyedRecordsDescription.add(new HTMLWidgetWrapper("DisposalDestroyedRecordsDescription.html"));
+    disposalDestroyedRecordsDescription.setVisible(false);
+    Anchor infoIconTitle = new Anchor();
+    infoIconTitle.getElement().setInnerHTML("<i class=\"fa fa-info-circle\"></i>");
+    infoIconTitle.addStyleName("description-toggle-icon");
+    infoIconTitle.setTitle("Klicka för att fälla ut hjälpen");
+    infoIconTitle.addClickHandler(event -> disposalDestroyedRecordsDescription.setVisible(!disposalDestroyedRecordsDescription.isVisible()));
+    title.add(infoIconTitle);
   }
 
   /**

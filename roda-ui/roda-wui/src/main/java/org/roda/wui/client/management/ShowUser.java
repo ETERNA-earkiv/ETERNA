@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.management;
 
@@ -13,15 +13,12 @@ import java.util.Set;
 
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
-import org.roda.core.data.v2.generics.MetadataValue;
-import org.roda.wui.client.browse.bundle.UserExtraBundle;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.RODAMemberActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
-import org.roda.wui.client.common.utils.FormUtilities;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.management.access.AccessKeyTablePanel;
@@ -123,9 +120,6 @@ public class ShowUser extends Composite {
     emailValue.setText(user.getEmail());
     stateValue.setHTML(HtmlSnippetUtils.getUserStateHtml(user));
 
-    // Extra fields
-    loadExtraFields();
-
     if (!user.getExtra().isEmpty()) {
       HtmlSnippetUtils.createExtraShow(extraValue, user.getExtra(), false);
     }
@@ -160,75 +154,26 @@ public class ShowUser extends Composite {
     actionsSidebar.setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(this.user)));
   }
 
-  private void loadExtraFields() {
-    UserManagementService.Util.getInstance().retrieveUserExtraBundle(user.getName(),
-      new AsyncCallback<UserExtraBundle>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          extraValue.add(new Label("Error loading extra fields"));
-        }
-
-        @Override
-        public void onSuccess(UserExtraBundle bundle) {
-          displayExtraFields(bundle);
-        }
-      });
-  }
-
-  private void displayExtraFields(UserExtraBundle bundle) {
-    if (bundle != null && bundle.getValues() != null && !bundle.getValues().isEmpty()) {
-      for (MetadataValue mv : bundle.getValues()) {
-        String label = FormUtilities.getFieldLabel(mv);
-        String value = mv.get("value");
-
-        if (value != null && !value.trim().isEmpty()) {
-          // For list fields, convert stored value to localized display text
-          String displayValue = value;
-          String fieldType = mv.get("type");
-          if ("list".equals(fieldType)) {
-            displayValue = FormUtilities.getLocalizedListValue(mv, value);
-          }
-
-          FlowPanel fieldPanel = new FlowPanel();
-          fieldPanel.setStyleName("field");
-
-          Label labelWidget = new Label(label);
-          labelWidget.setStyleName("label");
-
-          Label valueWidget = new Label(displayValue);
-          valueWidget.setStyleName("value");
-
-          fieldPanel.add(labelWidget);
-          fieldPanel.add(valueWidget);
-
-          extraValue.add(fieldPanel);
-        }
-      }
-    }
-    // Don't show anything when there are no extra fields
-  }
-
   private void buildPermissionList() {
-    Set<String> allUserRoles = user.getAllRoles();
-
-    if (allUserRoles.isEmpty()) {
-      permissionList.add(new Label(messages.showUserEmptyPermissions()));
-    } else {
-      List<String> roles = ConfigurationManager.getStringList("ui.role");
-      for (String role : roles) {
-        String description;
-        try {
-          description = messages.role(role);
-        } catch (MissingResourceException e) {
-          description = role + " (needs translation)";
-        }
-        if (allUserRoles.contains(role)) {
-          permissionList.add(createListItem(description));
-        }
+    PermissionsPanel permissionsPanel = new PermissionsPanel();
+    permissionsPanel.init(new AsyncCallback<Boolean>() {
+      @Override
+      public void onFailure(Throwable caught) {
+        permissionList.add(new Label(messages.permissionsLoadError()));
       }
-    }
+      @Override
+      public void onSuccess(Boolean result) {
+        Set<String> userRoles = user.getAllRoles();
+        if (userRoles.isEmpty()) {
+          permissionList.add(new Label(messages.showUserEmptyPermissions()));
+          return;
+        }
+        permissionsPanel.checkPermissions(userRoles, true);
+        permissionsPanel.setMode(PermissionsPanel.PermissionsMode.READ_ONLY);
+        permissionList.add(permissionsPanel);
+      }
+    });
   }
-
   private FlowPanel createListItem(String item) {
     FlowPanel panel = new FlowPanel();
     InlineHTML bullet = new InlineHTML("&#8226;");

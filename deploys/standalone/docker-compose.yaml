@@ -1,7 +1,7 @@
 services:
 
   zoo:
-    image: docker.io/zookeeper:3.9-jre-17
+    image: ghcr.io/eterna-earkiv/zookeeper:3.9.5
     restart: unless-stopped
     environment:
       - ZOO_4LW_COMMANDS_WHITELIST=mntr,conf,ruok
@@ -10,7 +10,8 @@ services:
       - zookeeper_datalog:/datalog
 
   solr:
-    image: docker.io/solr:9.8.1
+    image: ghcr.io/eterna-earkiv/solr:9.10.1
+    user: "8983"
     restart: unless-stopped
     ports:
       - "8983:8983"
@@ -22,14 +23,14 @@ services:
       - solr_data:/var/solr
 
   clamd:
-    image: docker.io/clamav/clamav:1.4
+    image: docker.io/clamav/clamav:stable
     restart: unless-stopped
     volumes:
       - clam_data:/var/lib/clamav
       - roda_data:/roda/data/
 
   siegfried:
-    image: ghcr.io/keeps/siegfried:v1.11.0
+    image: ghcr.io/eterna-earkiv/siegfried:v1.11.4
     restart: unless-stopped
     environment:
       SIEGFRIED_HOST: 0.0.0.0
@@ -56,7 +57,7 @@ services:
       - "8025:8025" # web ui
 
   openldap:
-    image: docker.io/bitnami/openldap:2.6
+    image: docker.io/bitnamilegacy/openldap:2.6
     restart: unless-stopped
     user: 1001:root
     ports:
@@ -72,16 +73,32 @@ services:
     volumes:
       - ./ldap/ldif/pbkdf2.ldif:/opt/bitnami/openldap/etc/schema/pbkdf2.ldif
 
+  unoserver:
+    image: ghcr.io/eterna-earkiv/eterna-unoserver:latest
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 2003 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
   eterna:
     image: ghcr.io/eterna-earkiv/eterna:test-eterna-v1-alpha-latest
     restart: unless-stopped
     ports:
       - "8080:8080"
     depends_on:
-      - solr
-      - clamd
-      - siegfried
-      - postgres
+      solr:
+        condition: service_started
+      clamd:
+        condition: service_started
+      siegfried:
+        condition: service_started
+      postgres:
+        condition: service_started
+      unoserver:
+        condition: service_healthy
     volumes:
       - roda_data:/roda/data/
       - ./roda/config/roda-core.properties:/roda/config/roda-core.properties:ro
@@ -101,10 +118,11 @@ services:
       # SMTP configuration
       - SMTP_HOST=mailpit
       - SMTP_PORT=1025
+      - UNOSERVER_HOST=unoserver
+      - UNOSERVER_PORT=2003
 
   postgres:
     image: docker.io/postgres:17
-    container_name: postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: admin

@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.plugins.base.maintenance;
 
@@ -70,21 +70,21 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
 
   static {
     pluginParameters.put(PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER,
-      PluginParameter.getBuilder(PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER, "Destination folder", PluginParameterType.STRING)
-        .withDefaultValue("/tmp/export").withDescription("Folder where the exported AIPs will be stored.").build());
+      PluginParameter.getBuilder(PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER, "Målmapp", PluginParameterType.STRING)
+        .withDefaultValue("/tmp/export").withDescription("Mapp där de exporterade AIP:erna sparas.").build());
 
     pluginParameters.put(PLUGIN_PARAM_EXPORT_TYPE,
-      PluginParameter.getBuilder(PLUGIN_PARAM_EXPORT_TYPE, "Type of export", PluginParameterType.STRING)
+      PluginParameter.getBuilder(PLUGIN_PARAM_EXPORT_TYPE, "Exporttyp", PluginParameterType.STRING)
         .withDefaultValue("FOLDER")
-        .withDescription("Type of export: ZIP – exports each AIP as a ZIP file; FOLDER – exports each AIP as a folder.")
+        .withDescription("Exporttyp: ZIP – exporterar varje AIP som en ZIP-fil; FOLDER – exporterar varje AIP som en mapp.")
         .build());
 
     pluginParameters.put(PLUGIN_PARAM_EXPORT_REMOVE_IF_ALREADY_EXISTS,
       PluginParameter
-        .getBuilder(PLUGIN_PARAM_EXPORT_REMOVE_IF_ALREADY_EXISTS, "Overwrite files/folders",
+        .getBuilder(PLUGIN_PARAM_EXPORT_REMOVE_IF_ALREADY_EXISTS, "Skriv över filer/mappar",
           PluginParameterType.BOOLEAN)
         .withDefaultValue("true")
-        .withDescription("Overwrites files and folders if they already exist on the destination folder.").build());
+        .withDescription("Skriver över filer och mappar om de redan finns i målmappen.").build());
   }
 
   @Override
@@ -99,15 +99,15 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "AIP Batch Exporter";
+    return "AIP-batchexportör";
   }
 
   @Override
   public String getDescription() {
-    return "The AIP Batch Exporter is a powerful plugin that allows you to select a group of AIPs and export them as a single ZIP file or folder. "
-      + "The outcome is saved on the server file system, which can be accessed by users with the necessary permissions.\nThis plugin is particularly "
-      + "useful when you need to export a large number of AIPs based on specific search criteria. With just a few clicks, you can create a batch"
-      + "export of AIPs and download them in a compressed format.\nThis saves time and effort and ensures that your AIPs are stored and transferred efficiently.";
+    return "AIP-batchexportören är ett kraftfullt plugin som låter dig välja en grupp AIP:er och exportera dem som en enda ZIP-fil eller mapp. "
+      + "Resultatet sparas i serverns filsystem och kan nås av användare med nödvändiga behörigheter.\nDetta plugin är särskilt "
+      + "användbart när du behöver exportera ett stort antal AIP:er baserat på specifika sökkriterier. Med bara några klick kan du skapa en "
+      + "batchexport av AIP:er och ladda ner dem i komprimerat format.\nDetta sparar tid och arbete och säkerställer att dina AIP:er lagras och överförs effektivt.";
   }
 
   @Override

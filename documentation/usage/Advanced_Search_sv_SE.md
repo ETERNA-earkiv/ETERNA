@@ -18,7 +18,7 @@ Valfritt:
 
 
 ### 1. Generera SIP:ar med din nya beskrivande metadatatyp och version
-På SIP:en måste du definiera den beskrivande metadatatypen och versionen. Eftersom du använder din egen bör du definiera metadatatyp OTHER, annan metadatatyp t.ex. "GolikSwe" och metadatatypversion t.ex. "1". Detta kan göras direkt i METS eller med hjälp av [RODA-in application](http://rodain.roda-community.org/) eller [commons-ip library](https://github.com/keeps/commons-ip).
+På SIP:en måste du definiera den beskrivande metadatatypen och versionen. Eftersom du använder din egen bör du definiera metadatatyp OTHER, annan metadatatyp t.ex. "GolikSwe" och metadatatypversion t.ex. "1". Detta kan göras direkt i METS eller med hjälp av commons-ip.
 
 ### 2. Konfigurera ETERNA för att indexera ditt nya beskrivande metadataformat
 I ETERNA måste du konfigurera hur systemet kan indexera den här filen. För att göra det måste du definiera XSLT under `$RODA_HOME/config/crosswalks/ingest/` med ett namn baserat på din metadatatyp och version.

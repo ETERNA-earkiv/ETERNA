@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.plugins.base.antivirus;
 
@@ -78,7 +78,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticName() {
-    return "Malware detector";
+    return "Detektering av skadlig kod";
   }
 
   @Override
@@ -87,9 +87,9 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticDescription() {
-    return "This plugin provides robust security features by leveraging the ClamAV antivirus engine to scan files for potential threats, including trojans, "
-      + "viruses, malware, and other malicious content.\nClamAV is a trusted, open-source (GPL) antivirus engine that is widely used in the industry for its "
-      + "exceptional accuracy and effectiveness in detecting threats";
+    return "Detta insticksprogram erbjuder robusta säkerhetsfunktioner genom att använda ClamAV-antivirusmotorn för att söka igenom filer efter potentiella hot, "
+      + "inklusive trojaner, virus, skadlig kod och annat skadligt innehåll.\nClamAV är en betrodd antivirusmotor med öppen källkod (GPL) som används brett i "
+      + "branschen tack vare sin träffsäkerhet och effektivitet i att upptäcka hot.";
   }
 
   @Override
@@ -245,17 +245,17 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Scanned package for malicious programs using ClamAV.";
+    return "Sökte igenom paketet efter skadliga program med ClamAV.";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "The package does not contain any known malicious programs.";
+    return "Paketet innehåller inga kända skadliga program.";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "A malicious program was detected inside the package.";
+    return "Ett skadligt program hittades i paketet.";
   }
 
   @Override

@@ -1,7 +1,16 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/ETERNA-earkiv/ETERNA
+ */
 package org.roda.wui.client.redact;
 
 import com.google.gwt.dom.client.Element;
+import elemental2.dom.AbortSignal;
 import elemental2.dom.Blob;
+import elemental2.promise.Promise;
 import jsinterop.annotations.JsFunction;
 import jsinterop.annotations.JsMethod;
 import jsinterop.annotations.JsPackage;
@@ -11,7 +20,12 @@ import jsinterop.annotations.JsType;
 public class PDFRedactorObject {
   @JsFunction
   public interface SaveCallback {
-    public abstract boolean onInvoke(Blob pdfData);
+    Promise<?> onInvoke(Blob pdfData, AbortSignal signal, String suffix);
+  }
+
+  @JsFunction
+  public interface PreSaveCallback {
+    Promise<?> onInvoke();
   }
 
   @JsMethod
@@ -25,5 +39,7 @@ public class PDFRedactorObject {
 
   @JsMethod
   public static native void setSaveCallback(SaveCallback callback);
-}
 
+  @JsMethod
+  public static native void setPreSaveCallback(PreSaveCallback callback);
+}

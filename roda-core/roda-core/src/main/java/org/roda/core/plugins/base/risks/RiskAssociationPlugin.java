@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.plugins.base.risks;
 
@@ -66,34 +66,34 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_ID,
-      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_RISK_ID, "Risks", PluginParameterType.RISK_ID)
-        .isMandatory(false).withDescription("Add the risks that will be associated with the objects above.").build());
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_RISK_ID, "Risker", PluginParameterType.RISK_ID)
+        .isMandatory(false).withDescription("Lägg till de risker som ska kopplas till objekten ovan.").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_DESCRIPTION,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_DESCRIPTION, "Incidence description",
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_DESCRIPTION, "Beskrivning av incident",
           PluginParameterType.STRING)
-        .isMandatory(false).withDescription("Associate a description to the incidence(s) created").build());
+        .isMandatory(false).withDescription("Koppla en beskrivning till den eller de skapade incidenterna.").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY, "Incidence severity",
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY, "Incidentens allvarlighetsgrad",
           PluginParameterType.SEVERITY)
-        .isMandatory(false).withDescription("Associate a severity to the incidence").build());
+        .isMandatory(false).withDescription("Koppla en allvarlighetsgrad till incidenten.").build());
   }
 
   @Override
   public String getName() {
-    return "Risk Incidence Creator";
+    return "Skapare av riskincidenter";
   }
 
   @Override
   public String getDescription() {
-    return "The Risk Associator plugin associates selected items (AIPs, Representations or Files) to existing risks in the Risk registry (as risk incidences)."
-      + "\nThis action is convenient when the preservation expert wants to associate a set of items to a risk to be mitigated in the near future.\nAs an example, "
-      + "if the designated community of the repository provides feedback that a given format under a certain collection is not being displayed properly "
-      + "on the graphical user interface of the repository, then the preservation expert may want to mark these files to be targeted by a preservation"
-      + " action (e.g. generate new representations for access purposes).";
+    return "Skaparen av riskincidenter kopplar valda objekt (AIP:er, representationer eller filer) till befintliga risker i riskregistret (som riskincidenter)."
+      + "\nDenna åtgärd är lämplig när bevarandeexperten vill koppla en uppsättning objekt till en risk som ska hanteras inom den närmaste framtiden.\nSom ett exempel: "
+      + "om arkivets utsedda gemenskap återkopplar att ett visst format i en viss samling inte visas korrekt "
+      + "i arkivets grafiska gränssnitt, kan bevarandeexperten vilja markera dessa filer för att rikta in en bevarandeåtgärd"
+      + " (t.ex. generera nya representationer för åtkomständamål).";
   }
 
   @Override
@@ -133,15 +133,14 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> liteList)
+    throws PluginException {
     LOGGER.debug("Creating risk incidences");
     Report pluginReport = PluginHelper.initPluginReport(this);
 

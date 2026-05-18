@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.utils;
 
@@ -583,7 +583,11 @@ public class HtmlSnippetUtils {
       final Label mvText = new Label();
       mvText.setTitle(mvLabel.getText());
       mvText.addStyleName("value");
-      mvText.setText(mv.get("value"));
+      String displayValue = mv.get("value");
+      if ("list".equals(mv.get("type"))) {
+        displayValue = FormUtilities.getLocalizedListValue(mv, displayValue);
+      }
+      mvText.setText(displayValue);
 
       layout.add(mvLabel);
       layout.add(mvText);

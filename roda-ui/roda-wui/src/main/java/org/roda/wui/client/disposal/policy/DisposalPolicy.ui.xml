@@ -7,7 +7,7 @@
 	<g:FlowPanel styleName="wui-disposal-policy" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel ui:field="contentFlowPanel" addStyleNames="col_10 content">
-				<common:TitlePanel text="{messages.disposalPolicyTitle}" iconClass="DisposalPolicy" />
+				<common:TitlePanel text="{messages.disposalPolicyTitle}" iconClass="DisposalPolicy" ui:field="title" />
 				<g:FlowPanel addStyleNames="page-description" ui:field="disposalPolicyDescription" />
 				<g:FlowPanel ui:field="disposalSchedulesDescription" />
 				<u:DisposalPolicySchedulesPanel ui:field="disposalPolicySchedulesPanel" />

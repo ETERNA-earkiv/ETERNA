@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.services;
 
@@ -101,6 +101,8 @@ public class Services implements DirectRestService {
       return GWT.create(DistributedInstancesRestService.class);
     } else if (ClientLoggerRestService.class.equals(serviceClass)) {
       return GWT.create(ClientLoggerRestService.class);
+    } else if (RedactionRestService.class.equals(serviceClass)) {
+      return GWT.create(RedactionRestService.class);
     } else {
       String error = serviceClass.getName() + " not supported";
       Toast.showError(error);
@@ -293,5 +295,9 @@ public class Services implements DirectRestService {
 
   public <T> CompletableFuture<T> clientLoggerResource(CheckedFunction<ClientLoggerRestService, T> method) {
     return future(ClientLoggerRestService.class, method);
+  }
+
+  public <T> CompletableFuture<T> redactionResource(CheckedFunction<RedactionRestService, T> method) {
+    return future(RedactionRestService.class, method);
   }
 }

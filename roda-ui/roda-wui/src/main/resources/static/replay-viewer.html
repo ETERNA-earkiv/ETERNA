@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <title>Web Archive Viewer</title>
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+    replay-web-page { display: block; width: 100%; height: 100vh; }
+  </style>
+  <script>
+    // Derive base path from this page's location (works with any context path)
+    var basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+    var replayBase = basePath + 'replay/';
+
+    // Clean up stale replay service workers only (not other SWs on same origin)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        registrations.forEach(function(reg) {
+          var canonicalReplayScope = new URL(replayBase, window.location.origin).href;
+          if (reg.scope.startsWith(canonicalReplayScope) && reg.scope !== canonicalReplayScope) {
+            reg.unregister();
+          }
+        });
+      });
+    }
+  </script>
+</head>
+<body>
+  <script src="replay/ui.js"></script>
+  <replay-web-page id="viewer"></replay-web-page>
+  <script>
+    document.getElementById('viewer').setAttribute('replayBase', replayBase);
+  </script>
+  <script>
+    (function () {
+      var raw = new URLSearchParams(window.location.search).get('source');
+      if (!raw) return;
+
+      try {
+        // Reject suspicious encodings up front: encoded traversal, encoded slashes,
+        // backslashes, or any fragment marker in the raw query value.
+        var rawLower = raw.toLowerCase();
+        if (rawLower.indexOf('%2e%2e') !== -1
+            || rawLower.indexOf('%2f%2f') !== -1
+            || rawLower.indexOf('%5c') !== -1
+            || raw.indexOf('\\') !== -1
+            || raw.indexOf('#') !== -1) {
+          return;
+        }
+
+        var resolved = new URL(raw, window.location.origin);
+
+        // Enforce same origin, no fragments, no empty/duplicated slashes.
+        if (resolved.origin !== window.location.origin) return;
+        if (resolved.hash) return;
+        if (resolved.pathname.indexOf('//') !== -1) return;
+
+        // Each decoded path segment must not be '.', '..', empty or contain slashes.
+        var segments = resolved.pathname.split('/');
+        for (var i = 0; i < segments.length; i++) {
+          var seg = segments[i];
+          if (seg === '') continue; // leading/trailing slash splits produce empty strings
+          var decoded;
+          try {
+            decoded = decodeURIComponent(seg);
+          } catch (e) {
+            return; // malformed percent-encoding
+          }
+          if (decoded === '.' || decoded === '..'
+              || decoded.indexOf('/') !== -1
+              || decoded.indexOf('\\') !== -1
+              || decoded.indexOf('\0') !== -1) {
+            return;
+          }
+        }
+
+        // Final allow-list check on the normalized pathname.
+        if (!/^\/api\/v2\/files\//.test(resolved.pathname)) return;
+
+        document.getElementById('viewer').setAttribute(
+          'source', resolved.pathname + resolved.search);
+      } catch (e) {
+        // Invalid URL or unexpected error — ignore silently.
+      }
+    })();
+  </script>
+</body>
+</html>

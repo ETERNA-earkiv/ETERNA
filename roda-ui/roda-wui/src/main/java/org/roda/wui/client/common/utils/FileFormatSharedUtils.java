@@ -1,0 +1,56 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/ETERNA-earkiv/ETERNA
+ */
+package org.roda.wui.client.common.utils;
+
+import java.util.Objects;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.metadata.FileFormat;
+
+public class FileFormatSharedUtils {
+  public static final String MIMETYPE_PDF = "application/pdf";
+  public static final String EXTENSION_PDF = "pdf";
+
+  private FileFormatSharedUtils() {}
+
+  public static boolean hasFileFormat(final IndexedFile file, final String mimeType, final String fileExtension) {
+    if (file == null) {
+      return false;
+    }
+
+    String fileIdExtension = getFileExtension(file.getId());
+    FileFormat fileFormat = file.getFileFormat();
+    if (fileFormat == null) {
+      return fileIdExtension.equalsIgnoreCase(fileExtension);
+    }
+
+    String mime = fileFormat.getMimeType();
+    String extension = fileFormat.getExtension();
+
+    if (mimeType != null && Objects.equals(mime, mimeType)) {
+      return true;
+    } else if (mime == null && extension != null && (extension.equalsIgnoreCase("." + fileExtension) || extension.equalsIgnoreCase(fileExtension))) {
+      return true;
+    } else {
+      return mime == null && extension == null && fileIdExtension.equalsIgnoreCase(fileExtension);
+    }
+  }
+
+  public static String getFileExtension(String name) {
+    String extension = "";
+    if (name == null) { return extension; }
+
+    int dotIndex = name.lastIndexOf('.');
+    int unixPathSeparatorIndex = name.lastIndexOf('/');
+    int windowsPathSeparatorIndex = name.lastIndexOf('\\');
+
+    if (dotIndex > unixPathSeparatorIndex && dotIndex > windowsPathSeparatorIndex && dotIndex < name.length() - 1) {
+      extension = name.substring(dotIndex + 1);
+    }
+    return extension;
+  }
+}

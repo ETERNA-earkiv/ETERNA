@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.plugins.base.ingest.v2;
 
@@ -84,7 +84,7 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
 
   @Override
   public String getName() {
-    return "Default ingest workflow";
+    return "Standard inleveransprocess";
   }
 
   @Override
@@ -94,7 +94,7 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
 
   @Override
   public String getDescription() {
-    return "Performs all the tasks needed to ingest a SIP into the repository and therefore creating an AIP.";
+    return "Utför alla uppgifter som krävs för att inleverera ett SIP till arkivet och därigenom skapa ett AIP.";
   }
 
   @Override
@@ -137,23 +137,23 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS,
         PluginParameter
-          .getBuilder(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS, "Format of the Submission Information Packages",
+          .getBuilder(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS, "Format för leveransinformationspaket",
             PluginParameterType.PLUGIN_SIP_TO_AIP)
           .withDefaultValue(EARKSIP2ToAIPPlugin.class.getName()).withDescription(
-            "Select the format of the Submission Information Packages to be ingested in this ingest process.")
+            "Välj format för de leveransinformationspaket som ska inlevereras i denna inleveransprocess.")
           .build());
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID,
-        PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_PARENT_ID, "Parent node", PluginParameterType.AIP_ID)
-          .isMandatory(false).withDescription("Use the provided parent node if the SIPs does not provide one.")
+        PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_PARENT_ID, "Föräldernod", PluginParameterType.AIP_ID)
+          .isMandatory(false).withDescription("Använd den angivna föräldernoden om SIP:et inte anger någon.")
           .build());
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID,
         PluginParameter
-          .getBuilder(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, "Force parent node", PluginParameterType.BOOLEAN)
+          .getBuilder(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, "Tvinga föräldernod", PluginParameterType.BOOLEAN)
           .withDefaultValue(FALSE).isMandatory(false)
           .withDescription(
-            "Force the use of the selected parent node even if the SIPs provide information about the desired parent.")
+            "Tvinga användningen av den valda föräldernoden även om SIP:en anger information om önskad förälder.")
           .build());
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_VIRUS_CHECK,
@@ -204,8 +204,9 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
         pluginParameters.put(DefaultIngestPlugin.PLUGIN_PARAMS_DO_FEATURE_AND_FULL_TEXT_EXTRACTION,
           PluginParameter
             .getBuilder(DefaultIngestPlugin.PLUGIN_PARAMS_DO_FEATURE_AND_FULL_TEXT_EXTRACTION,
-              "Feature & full-text extraction", PluginParameterType.BOOLEAN)
-            .withDefaultValue(FALSE).withDescription("Extraction of technical metadata and full-text using Apache Tika")
+              "Funktions- och fulltextextraktion", PluginParameterType.BOOLEAN)
+            .withDefaultValue(FALSE)
+            .withDescription("Extrahering av tekniska metadata och fulltext med Apache Tika.")
             .build());
       } else {
         deactivatedPlugins.add(DefaultIngestPlugin.PLUGIN_CLASS_TIKA_FULLTEXT);
@@ -236,28 +237,29 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_NOTIFICATION_WHEN_FAILED,
         PluginParameter
           .getBuilder(RodaConstants.PLUGIN_PARAMS_NOTIFICATION_WHEN_FAILED,
-            "Ingest finished notification only when failed", PluginParameterType.BOOLEAN)
+            "Notifikation om avslutad inleverans enbart vid fel", PluginParameterType.BOOLEAN)
           .withDefaultValue(RodaCoreFactory.getRodaConfigurationAsString("ingest.notification.when_failed"))
           .isMandatory(false)
           .withDescription(
-            "If checked, the ingest finished notification will only be sent if a fail occurs during ingestion")
+            "Om markerad skickas notifikationen om avslutad inleverans endast om ett fel uppstår under inleveransen.")
           .build());
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION,
         PluginParameter
-          .getBuilder(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION, "Ingest finished email notification",
+          .getBuilder(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION, "E-postnotifikation om avslutad inleverans",
             PluginParameterType.STRING)
           .isMandatory(false)
           .withDescription(
-            "Send a notification after finishing the ingest process to one or more e-mail addresses (comma separated)")
+            "Skickar en notifikation efter avslutad inleveransprocess till en eller flera e-postadresser (kommaseparerade).")
           .build());
 
       pluginParameters.put(RodaConstants.NOTIFICATION_HTTP_ENDPOINT, PluginParameter
-        .getBuilder(RodaConstants.NOTIFICATION_HTTP_ENDPOINT, "Ingest finished HTTP notification",
+        .getBuilder(RodaConstants.NOTIFICATION_HTTP_ENDPOINT, "HTTP-notifikation om avslutad inleverans",
           PluginParameterType.STRING)
         .withDefaultValue(RodaCoreFactory.getRodaConfigurationAsString("ingest.configurable.http_endpoint"))
         .isMandatory(false)
-        .withDescription("Send a notification after finishing the ingest process to a specific HTTP endpoint").build());
+        .withDescription("Skickar en notifikation efter avslutad inleveransprocess till en specifik HTTP-endpoint.")
+        .build());
     }
   }
 

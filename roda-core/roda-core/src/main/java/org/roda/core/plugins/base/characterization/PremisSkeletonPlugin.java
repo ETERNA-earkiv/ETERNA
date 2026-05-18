@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.plugins.base.characterization;
 
@@ -56,14 +56,14 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
    */
 
   public static String getStaticName() {
-    return "File information computation";
+    return "Beräkning av filinformation";
   }
 
   public static String getStaticDescription() {
-    return "Computes file fixity information (also known as checksum) for all data files within an AIP, representation or file and stores this information in PREMIS objects "
-      + "within the corresponding entity. This task uses SHA-256 as the default checksum algorithm, however, other algorithms can be configured in “roda-core.properties”."
-      + "\nFile fixity is the property of a digital file being fixed, or unchanged. “AIP corruption risk assessment” is the process of validating that a file has not changed or been "
-      + "altered from a previous state. In order to validate the fixity of an AIP or file, fixity information has to be generated beforehand.";
+    return "Beräknar filintegritetsinformation (även känd som kontrollsumma) för alla datafiler i ett AIP, en representation eller en fil och lagrar denna information i PREMIS-objekt "
+      + "i motsvarande entitet. Uppgiften använder SHA-256 som standardalgoritm för kontrollsumma, men andra algoritmer kan konfigureras i \"roda-core.properties\"."
+      + "\nFilintegritet är egenskapen att en digital fil är fixerad, eller oförändrad. \"Riskbedömning för AIP-korruption\" är processen att validera att en fil inte har förändrats "
+      + "eller manipulerats från ett tidigare tillstånd. För att validera integriteten hos ett AIP eller en fil måste integritetsinformation ha genererats i förväg.";
   }
 
   @Override

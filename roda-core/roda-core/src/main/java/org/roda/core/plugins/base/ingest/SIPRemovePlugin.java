@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.plugins.base.ingest;
 
@@ -48,7 +48,7 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
   }
 
   public static String getStaticName() {
-    return "Delete SIP from transfer";
+    return "Ta bort SIP från överföringsområdet";
   }
 
   @Override
@@ -57,7 +57,7 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
   }
 
   public static String getStaticDescription() {
-    return "Deletes SIP from the transfer area if the ingest process is successful.";
+    return "Tar bort SIP från överföringsområdet om inleveransprocessen lyckades.";
   }
 
   @Override

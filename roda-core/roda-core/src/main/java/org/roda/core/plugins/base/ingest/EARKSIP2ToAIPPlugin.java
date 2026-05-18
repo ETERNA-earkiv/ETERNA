@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.plugins.base.ingest;
 
@@ -59,7 +59,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class EARKSIP2ToAIPPlugin extends SIPToAIPPlugin {
-  public static final String UNPACK_DESCRIPTION = "Extracted objects from package in E-ARK SIP 2 format.";
+  public static final String UNPACK_DESCRIPTION = "Extraherade objekt från paket i E-ARK SIP 2-format.";
   private static final Logger LOGGER = LoggerFactory.getLogger(EARKSIP2ToAIPPlugin.class);
   private boolean createSubmission = false;
 
@@ -84,7 +84,7 @@ public class EARKSIP2ToAIPPlugin extends SIPToAIPPlugin {
 
   @Override
   public String getDescription() {
-    return "E-ARK SIP 2 as a zip file.";
+    return "E-ARK SIP 2 som en zip-fil.";
   }
 
   @Override

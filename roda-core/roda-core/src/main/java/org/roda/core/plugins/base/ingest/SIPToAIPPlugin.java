@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.plugins.base.ingest;
 
@@ -29,14 +29,14 @@ import org.slf4j.LoggerFactory;
 public abstract class SIPToAIPPlugin extends AbstractPlugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(SIPToAIPPlugin.class);
 
-  public static final String UNPACK_SUCCESS_MESSAGE = "The SIP has been successfully unpacked.";
-  public static final String UNPACK_FAILURE_MESSAGE = "The ingest process failed to unpack the SIP.";
+  public static final String UNPACK_SUCCESS_MESSAGE = "SIP:et har packats upp.";
+  public static final String UNPACK_FAILURE_MESSAGE = "Inleveransprocessen misslyckades med att packa upp SIP:et.";
   public static final String UNPACK_PARTIAL_MESSAGE = null;
   public static final PreservationEventType UNPACK_EVENT_TYPE = PreservationEventType.UNPACKING;
 
-  public static final String WELLFORMED_DESCRIPTION = "Checked that the received SIP is well formed, complete and that no unexpected files were included.";
-  public static final String WELLFORMED_SUCCESS_MESSAGE = "The SIP was well formed and complete.";
-  public static final String WELLFORMED_FAILURE_MESSAGE = "The SIP was not well formed or some files were missing.";
+  public static final String WELLFORMED_DESCRIPTION = "Kontrollerade att det mottagna SIP:et är välformat, komplett och att inga oväntade filer inkluderades.";
+  public static final String WELLFORMED_SUCCESS_MESSAGE = "SIP:et var välformat och komplett.";
+  public static final String WELLFORMED_FAILURE_MESSAGE = "SIP:et var inte välformat eller några filer saknades.";
   public static final String WELLFORMED_PARTIAL_MESSAGE = null;
   public static final PreservationEventType WELLFORMED_EVENT_TYPE = PreservationEventType.WELLFORMEDNESS_CHECK;
 

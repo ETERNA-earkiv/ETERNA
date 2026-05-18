@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.lists.utils;
 
@@ -36,6 +36,7 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
@@ -44,6 +45,7 @@ import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
+import org.roda.wui.client.common.dialogs.ExportSearchDialog;
 import org.roda.wui.client.common.lists.pagination.ListSelectionState;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.popup.CalloutPopup;
@@ -66,6 +68,7 @@ import org.roda.wui.common.client.widgets.wcag.AcessibleCheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.shared.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
@@ -244,6 +247,11 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
     applySavedSortState(display);
     dataProvider.addDataDisplay(display);
+    display.addLoadingStateChangeHandler(event -> {
+      if (LoadingStateChangeEvent.LoadingState.LOADED.equals(event.getLoadingState())) {
+        Scheduler.get().scheduleDeferred(() -> makeColumnsResizable(display.getElement()));
+      }
+    });
 
     resultsPager = new AccessibleSimplePager(AccessibleSimplePager.TextLocation.CENTER,
       GWT.create(SimplePager.Resources.class), false, initialPageSize, false, false,
@@ -363,13 +371,18 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     FlowPanel footer = new FlowPanel();
     footer.addStyleName("my-asyncdatagrid-footer");
 
+    FlowPanel footerLeft = new FlowPanel();
+    footerLeft.addStyleName("footer-left");
+    FlowPanel footerRight = new FlowPanel();
+    footerRight.addStyleName("footer-right");
+    footerLeft.add(csvDownloadButton);
+    footerRight.add(pageSizeSelectorPanel);
+    footerRight.add(resultsPager);
+    footerRight.add(autoUpdatePanel);
+    footer.add(footerLeft);
+    footer.add(footerRight);
     mainPanel.add(display);
     mainPanel.add(footer);
-    footer.add(csvDownloadButton);
-    footer.add(pageSizePager);
-    mainPanel.add(pageSizeSelectorPanel);
-    footer.add(resultsPager);
-    footer.add(autoUpdatePanel);
 
     sidePanel.add(actionsToolbar);
     sidePanel.add(sidePanelDivider);
@@ -382,18 +395,41 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     toggleFacetsPanel(createAndBindFacets(facetsPanel));
 
     csvDownloadButton.addClickHandler(event -> {
-      Services services = new Services("Retrieve export limit", "get");
-      services.configurationsResource(ConfigurationRestService::retrieveExportLimit)
-        .whenComplete((limit, throwable) -> {
-          if (throwable != null) {
-            AsyncCallbackUtils.defaultFailureTreatment(throwable);
-          } else {
-            Toast.showInfo(messages.exportListTitle(), messages.exportListMessage(limit.getResult().intValue()));
-            RestUtils.requestCSVExport(getClassToReturn(), getFilter(), dataProvider.getSorter(),
-              new Sublist(0, limit.getResult().intValue()), getFacets(), getJustActive(), false,
-              notNullSummary + ".csv");
-          }
-        });
+      Class<?> clazz = getClassToReturn();
+      String configKeyPrefix = null;
+      String exportClass = null;
+      if (IndexedAIP.class.equals(clazz)) {
+        configKeyPrefix = "ui.export.aip";
+        exportClass = "org.roda.core.data.v2.ip.IndexedAIP";
+      } else if (IndexedJob.class.equals(clazz)) {
+        configKeyPrefix = "ui.export.job";
+        exportClass = "org.roda.core.data.v2.jobs.IndexedJob";
+      } else if (IndexedReport.class.equals(clazz)) {
+        configKeyPrefix = "ui.export.report";
+        exportClass = "org.roda.core.data.v2.jobs.IndexedReport";
+      } else if (LogEntry.class.equals(clazz)) {
+        configKeyPrefix = "ui.export.logentry";
+        exportClass = "org.roda.core.data.v2.log.LogEntry";
+      }
+      if (configKeyPrefix != null) {
+        long total = (getResult() != null && getResult().getTotalCount() > 0) ? getResult().getTotalCount() : 0;
+        ExportSearchDialog dialog = new ExportSearchDialog(getFilter(), total, notNullSummary, configKeyPrefix,
+          exportClass);
+        dialog.show();
+      } else {
+        Services services = new Services("Retrieve export limit", "get");
+        services.configurationsResource(ConfigurationRestService::retrieveExportLimit)
+          .whenComplete((limit, throwable) -> {
+            if (throwable != null) {
+              AsyncCallbackUtils.defaultFailureTreatment(throwable);
+            } else {
+              Toast.showInfo(messages.exportListTitle(), messages.exportListMessage(limit.getResult().intValue()));
+              RestUtils.requestCSVExport(getClassToReturn(), getFilter(), dataProvider.getSorter(),
+                new Sublist(0, limit.getResult().intValue()), getFacets(), getJustActive(), false,
+                notNullSummary + ".csv");
+            }
+          });
+      }
     });
 
     selectionModel = new SingleSelectionModel<>(getKeyProvider());
@@ -456,6 +492,46 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
     return this;
   }
+
+  private native void makeColumnsResizable(Element table) /*-{
+    var ths = table.querySelectorAll('th');
+    var cols = table.querySelectorAll('colgroup col');
+    for (var i = 0; i < ths.length; i++) {
+      (function(th, col) {
+        if (th.querySelector('.col-resize-handle')) return;
+        th.style.position = 'relative';
+        th.style.overflow = 'visible';
+        var handle = $doc.createElement('div');
+        handle.className = 'col-resize-handle';
+        th.appendChild(handle);
+        handle.addEventListener('click', function(e) {
+          e.stopPropagation();
+        });
+        handle.addEventListener('mousedown', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var startX = e.pageX;
+          var startWidth = th.offsetWidth;
+          $doc.body.style.userSelect = 'none';
+          $doc.body.style.cursor = 'col-resize';
+          function onMove(e) {
+            var w = Math.max(30, startWidth + e.pageX - startX);
+            if (col) col.style.width = w + 'px';
+            th.style.minWidth = w + 'px';
+          }
+          function onUp(e) {
+            e.stopPropagation();
+            $doc.body.style.userSelect = '';
+            $doc.body.style.cursor = '';
+            $doc.removeEventListener('mousemove', onMove);
+            $doc.removeEventListener('mouseup', onUp);
+          }
+          $doc.addEventListener('mousemove', onMove);
+          $doc.addEventListener('mouseup', onUp);
+        });
+      })(ths[i], cols[i] || null);
+    }
+  }-*/;
 
   protected void adjustOptions(AsyncTableCellOptions<T> options) {
     // override this to add defaults or enforce rules
@@ -757,6 +833,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
       resumeAutoUpdate();
     }
     super.onLoad();
+    Scheduler.get().scheduleDeferred(() -> makeColumnsResizable(display.getElement()));
   }
 
   public void redraw() {

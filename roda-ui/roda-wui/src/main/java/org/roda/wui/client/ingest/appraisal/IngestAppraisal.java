@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 /**
  *
@@ -43,6 +43,8 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
+import org.roda.wui.client.common.TitlePanel;
+import com.google.gwt.user.client.ui.Anchor;
 
 /**
  * @author Luis Faria
@@ -87,6 +89,8 @@ public class IngestAppraisal extends Composite {
 
   @UiField
   FlowPanel ingestAppraisalDescription;
+  @UiField
+  TitlePanel title;
 
   @UiField(provided = true)
   SearchWrapper searchWrapper;
@@ -132,6 +136,13 @@ public class IngestAppraisal extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
     ingestAppraisalDescription.add(new HTMLWidgetWrapper("IngestAppraisalDescription.html"));
+    ingestAppraisalDescription.setVisible(false);
+    Anchor infoIconTitle = new Anchor();
+    infoIconTitle.getElement().setInnerHTML("<i class=\"fa fa-info-circle\"></i>");
+    infoIconTitle.addStyleName("description-toggle-icon");
+    infoIconTitle.setTitle("Klicka för att fälla ut hjälpen");
+    infoIconTitle.addClickHandler(event -> ingestAppraisalDescription.setVisible(!ingestAppraisalDescription.isVisible()));
+    title.add(infoIconTitle);
 
   }
 

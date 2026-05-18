@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.plugins.base.preservation;
 
@@ -104,38 +104,37 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
 
   static {
     pluginParameters.put(CSV_FILE_FIELDS, PluginParameter
-      .getBuilder(CSV_FILE_FIELDS, "Attributes to include in the report", PluginParameterType.STRING)
+      .getBuilder(CSV_FILE_FIELDS, "Attribut att inkludera i rapporten", PluginParameterType.STRING)
       .withDefaultValue(CSV_DEFAULT_FIELDS)
       .withDescription(
-        "List of file attributes to include in the inventory export. The example includes all the possible options. Remove attributes as necessary.")
+        "Lista med filattribut att inkludera i inventeringsexporten. Exemplet inkluderar alla möjliga alternativ. Ta bort attribut efter behov.")
       .build());
     pluginParameters.put(CSV_FILE_OUTPUT,
-      PluginParameter.getBuilder(CSV_FILE_OUTPUT, "Report file path", PluginParameterType.STRING)
+      PluginParameter.getBuilder(CSV_FILE_OUTPUT, "Sökväg till rapportfilen", PluginParameterType.STRING)
         .withDefaultValue(CSV_DEFAULT_OUTPUT)
-        .withDescription("The full path and file name on the server where the inventory report file should be created.")
+        .withDescription("Den fullständiga sökvägen och filnamnet på servern där inventeringsrapporten ska skapas.")
         .build());
     pluginParameters.put(CSV_FILE_HEADERS,
-      PluginParameter.getBuilder(CSV_FILE_HEADERS, "Include header line", PluginParameterType.BOOLEAN)
-        .withDefaultValue(CSV_DEFAULT_HEADERS).withDescription("Include a header line in the CSV inventory report.")
+      PluginParameter.getBuilder(CSV_FILE_HEADERS, "Inkludera rubrikrad", PluginParameterType.BOOLEAN)
+        .withDefaultValue(CSV_DEFAULT_HEADERS).withDescription("Inkludera en rubrikrad i CSV-inventeringsrapporten.")
         .build());
     pluginParameters.put(CSV_FILE_OUTPUT_DATA,
-      PluginParameter.getBuilder(CSV_FILE_OUTPUT_DATA, "Include data files", PluginParameterType.BOOLEAN)
+      PluginParameter.getBuilder(CSV_FILE_OUTPUT_DATA, "Inkludera datafiler", PluginParameterType.BOOLEAN)
         .withDefaultValue(CSV_DEFAULT_HEADERS)
-        .withDescription("Include in the inventory report information about data files that exist inside AIPs.")
+        .withDescription("Inkludera information om datafiler som finns i AIP:er i inventeringsrapporten.")
         .build());
     pluginParameters.put(CSV_FILE_OUTPUT_DESCRIPTIVE,
       PluginParameter
-        .getBuilder(CSV_FILE_OUTPUT_DESCRIPTIVE, "Include descriptive metadata files", PluginParameterType.BOOLEAN)
+        .getBuilder(CSV_FILE_OUTPUT_DESCRIPTIVE, "Inkludera beskrivande metadatafiler", PluginParameterType.BOOLEAN)
         .withDefaultValue(CSV_DEFAULT_HEADERS)
         .withDescription(
-          "Include in the inventory report information about descriptive metadata files that exist inside AIPs.")
+          "Inkludera information om beskrivande metadatafiler som finns i AIP:er i inventeringsrapporten.")
         .build());
-    pluginParameters.put(CSV_FILE_OTHER_METADATA_TYPES,
-      PluginParameter
-        .getBuilder(CSV_FILE_OTHER_METADATA_TYPES, "Include other metadata files", PluginParameterType.STRING)
-        .withDefaultValue(CSV_DEFAULT_OTHER_METADATA).withDescription(
-          "Include in the inventory report information about other metadata files that exist inside AIPs.")
-        .build());
+    pluginParameters.put(CSV_FILE_OTHER_METADATA_TYPES, PluginParameter
+      .getBuilder(CSV_FILE_OTHER_METADATA_TYPES, "Inkludera andra metadatafiler", PluginParameterType.STRING)
+      .withDefaultValue(CSV_DEFAULT_OTHER_METADATA)
+      .withDescription("Inkludera information om andra metadatafiler som finns i AIP:er i inventeringsrapporten.")
+      .build());
   }
 
   @Override
@@ -150,17 +149,17 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "Inventory Report Creator";
+    return "Inventeringsrapportgenerator";
   }
 
   @Override
   public String getDescription() {
-    return "The Inventory Report Creator plugin automates the generation of a detailed inventory report in CSV format for all AIPs and their corresponding "
-      + "files (both data and metadata) within a repository. The report includes technical information such as SIP ID, AIP ID, representation ID, "
-      + "file path, and cryptographic hash values such as SHA-256, MD5, and SHA-1. This information can be used to validate the completeness and correctness "
-      + "of the repository content by comparing it to previous inventory reports generated during pre-ingest.\nThe Inventory Report Comparator App is "
-      + "an optional tool that can be used to compare inventory reports from different time periods. This allows for easy identification of any changes "
-      + "or discrepancies in the repository's content over time. To learn more about the Inventory Report Comparator App or to request a demo, please contact sales@keep.pt.";
+    return "Inventeringsrapportgeneratorn automatiserar skapandet av en detaljerad inventeringsrapport i CSV-format för alla AIP:er och deras tillhörande "
+      + "filer (både data och metadata) i ett arkiv. Rapporten inkluderar teknisk information såsom SIP-ID, AIP-ID, representations-ID, "
+      + "filsökväg och kryptografiska hashvärden som SHA-256, MD5 och SHA-1. Denna information kan användas för att validera innehållets fullständighet och korrekthet "
+      + "i arkivet genom att jämföra med tidigare inventeringsrapporter som genererades vid pre-ingest.\nInventeringsrapportjämföraren är "
+      + "ett valfritt verktyg som kan användas för att jämföra inventeringsrapporter från olika tidsperioder. Detta möjliggör enkel identifiering av ändringar "
+      + "eller avvikelser i arkivets innehåll över tid. Kontakta sales@keep.pt för mer information om inventeringsrapportjämföraren eller för att begära en demo.";
   }
 
   @Override
@@ -222,8 +221,8 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> liteList)
+    throws PluginException {
 
     Path jobCSVTempFolder = getJobCSVTempFolder();
     Path csvTempFile = jobCSVTempFolder.resolve(IdUtils.createUUID() + ".csv");
@@ -234,8 +233,8 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
       return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
         @Override
 
-        public void process(IndexService index, ModelService model, Report report,
-          Job cachedJob, JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
+        public void process(IndexService index, ModelService model, Report report, Job cachedJob,
+          JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
           processAIP(model, jobPluginInfo, csvFilePrinter, object);
         }
       }, index, model, liteList);
@@ -244,8 +243,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
     }
   }
 
-  private void processAIP(ModelService model, JobPluginInfo jobPluginInfo,
-    CSVPrinter csvFilePrinter, AIP aip) {
+  private void processAIP(ModelService model, JobPluginInfo jobPluginInfo, CSVPrinter csvFilePrinter, AIP aip) {
     if (csvFilePrinter == null) {
       LOGGER.warn("CSVPrinter is NULL! Skipping...");
       return;
@@ -276,8 +274,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     try {
       Path jobCSVTempFolder = getJobCSVTempFolder();
       Files.createDirectories(jobCSVTempFolder);

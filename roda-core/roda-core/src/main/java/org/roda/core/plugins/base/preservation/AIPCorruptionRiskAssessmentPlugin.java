@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.plugins.base.preservation;
 
@@ -93,18 +93,18 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "File Integrity Verifier";
+    return "Filintegritetsverifierare";
   }
 
   @Override
   public String getDescription() {
-    return "The File Integrity Verifier plugin Computes the fixity/checksum information of files inside an Archival Information "
-      + "Package (AIP) and verifies if this information differs from the information stored in the preservation metadata. If so, "
-      + "it creates a new risk and assigns the corrupted file to that risk in the Risk register.\nThe plugin also creates an "
-      + "incidence linked to the representation if a PREMIS file exists, but the associated file does not. Within the repository, "
-      + "fixity checking is used to ensure that digital files have not been affected by data rot or other digital preservation dangers. "
-      + "By itself, fixity checking does not ensure the preservation of a digital file. Instead, it allows a repository to identify "
-      + "which corrupted files to replace with a clean copy from the producer or from a backup.";
+    return "Filintegritetsverifieraren beräknar fixitetsinformation/kontrollsummor för filer i ett arkivpaket (AIP) "
+      + "och verifierar om denna information avviker från informationen som lagrats i bevarandemetadata. Om så är fallet "
+      + "skapas en ny risk och den korrupta filen kopplas till denna risk i riskregistret.\nPluginet skapar även en "
+      + "incident kopplad till representationen om en PREMIS-fil finns men den tillhörande datafilen saknas. Inom arkivet "
+      + "används fixitetskontroll för att säkerställa att digitala filer inte har påverkats av dataruttna eller andra digitala bevaranderisker. "
+      + "Fixitetskontroll garanterar inte i sig bevarandet av en digital fil, men gör det möjligt för arkivet att identifiera "
+      + "korrupta filer som behöver ersättas med en ren kopia från producenten eller från en säkerhetskopia.";
   }
 
   @Override

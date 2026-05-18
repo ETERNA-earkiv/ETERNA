@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package config.i18n.client;
 
@@ -485,6 +485,21 @@ public interface ClientMessages extends Messages {
 
   String redactPdfButton();
 
+  String redactPdfToastTitle();
+
+  String redactPdfSaveSuccessDescription();
+
+  String redactPdfSaveErrorDescription();
+
+  String redactPdfOnlyPdfDialogMessage();
+
+  String redactPdfLogErrorDescription();
+
+  String redactPdfReasonTitle();
+
+  String redactPdfReasonPlaceholder();
+
+
   /*** Identify formats ***/
 
   String identifyFormatsButton();
@@ -508,6 +523,10 @@ public interface ClientMessages extends Messages {
   String viewRepresentationNotSupportedPreviewCentralInstance();
 
   String viewRepresentationNotSupportedPreviewShallowFile();
+
+  String viewRepresentationTiffLoading();
+
+  String viewRepresentationTiffError();
 
   String viewRepresentationFileDisseminationTitle();
 
@@ -1707,6 +1726,10 @@ public interface ClientMessages extends Messages {
 
   String showGroupEmptyPermissions();
 
+  String permissionsLoadError();
+
+  String permissionsReadOnly();
+
   // Edit Group
   String editGroupTitle();
 
@@ -1737,6 +1760,8 @@ public interface ClientMessages extends Messages {
   // Roles Title
 
   String roleTitle(@Select String role);
+
+  String permissionsSelectAll(String roleTitle);
 
   // Roles Description
 
@@ -1974,6 +1999,22 @@ public interface ClientMessages extends Messages {
   String exportListTitle();
 
   String exportListMessage(int limit);
+
+  @DefaultMessage("Export search results")
+  String exportSearchDialogTitle();
+
+  @DefaultMessage("Your search returned {0} items. All will be exported as CSV.")
+  String exportSearchDialogHitCount(long count);
+
+  @DefaultMessage("Select fields to include:")
+  String exportSearchDialogFieldsLabel();
+
+  @DefaultMessage("Start export")
+  String exportSearchDialogStartButton();
+
+  @DefaultMessage("Export started — download the result from Internal Actions when the job is complete.")
+  String exportSearchJobStarted();
+
 
   String representationInformationAssociationsTitle();
 
@@ -2592,6 +2633,14 @@ public interface ClientMessages extends Messages {
 
   String conversionProfileDescription();
 
+  String conversionOutcomeLabel();
+
+  String conversionOutcomeDescription();
+
+  String outcomeTypeRepresentation();
+
+  String outcomeTypeDissemination();
+
   /* Audit logs */
   String relatedAuditLogs();
 
@@ -2669,4 +2718,23 @@ public interface ClientMessages extends Messages {
 
   String xsltPrintError();
 
+  String redactPdfInvalidFormatMessage();
+
+  String redactPdfMissingIdentifiers();
+
+  String catalogTreeTitle();
+
+  String catalogTreeFilterPlaceholder();
+
+  String catalogTreeLoadingLabel();
+
+  String catalogTreeLoadError();
+
+  String catalogTreeRetry();
+
+  String catalogTreeRootLabel();
+
+  String catalogTreeCollapse();
+
+  String catalogTreeExpand();
 }

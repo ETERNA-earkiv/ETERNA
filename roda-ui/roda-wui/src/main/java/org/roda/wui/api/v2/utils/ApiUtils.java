@@ -3,13 +3,12 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.api.v2.utils;
 
 import java.time.Duration;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -55,7 +54,7 @@ public class ApiUtils {
     Date lastModifiedDate = streamResponse.getStream().getLastModified();
 
     if (lastModifiedDate != null) {
-      CacheControl cacheControl = CacheControl.maxAge(1, TimeUnit.HOURS).cachePrivate().noTransform();
+      CacheControl cacheControl = CacheControl.noCache().cachePrivate().noTransform();
       String eTag = lastModifiedDate.toInstant().toString();
       return ResponseEntity.ok().headers(responseHeaders).cacheControl(cacheControl).eTag(eTag).body(responseStream);
     }

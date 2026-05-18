@@ -3,13 +3,13 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.ingest.process;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -159,13 +159,13 @@ public class PluginParameterPanel extends Composite {
 
   private void createConversionLayout() {
     conversionPanel = true;
-    Label parameterName = new Label(parameter.getName());
+    Label parameterName = new Label(messages.conversionOutcomeLabel());
     final ListBox dropdown = new ListBox();
     dropdown.addStyleName(FORM_SELECTBOX);
     dropdown.addStyleName(FORM_TEXTBOX_SMALL);
 
-    dropdown.addItem("Representation", ConversionProfileOutcomeType.REPRESENTATION.toString());
-    dropdown.addItem("Dissemination", ConversionProfileOutcomeType.DISSEMINATION.toString());
+    dropdown.addItem(messages.outcomeTypeRepresentation(), ConversionProfileOutcomeType.REPRESENTATION.toString());
+    dropdown.addItem(messages.outcomeTypeDissemination(), ConversionProfileOutcomeType.DISSEMINATION.toString());
 
     value = dropdown.getSelectedValue();
     FlowPanel innerPanel = new FlowPanel();
@@ -213,7 +213,7 @@ public class PluginParameterPanel extends Composite {
 
     dropdown.setTitle(OBJECT_BOX);
     layout.add(parameterName);
-    addHelp();
+    addHelp(layout, messages.conversionOutcomeDescription());
     layout.add(dropdown);
     layout.add(innerPanel);
   }
@@ -485,7 +485,7 @@ public class PluginParameterPanel extends Composite {
   }
 
   private void createConversionProfileLayout(FlowPanel result, String repOrDip, String pluginId) {
-    Set<ConversionProfile> treeSet = new HashSet<>();
+    Set<ConversionProfile> treeSet = new LinkedHashSet<>();
     Label parameterName = new Label(messages.conversionProfileTitle());
     final Label description = new Label();
     final ListBox dropdown = new ListBox();

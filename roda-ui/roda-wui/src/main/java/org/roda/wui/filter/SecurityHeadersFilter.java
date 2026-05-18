@@ -2,12 +2,13 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
- * <p>
- * https://github.com/keeps/roda
+ *
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.filter;
 
 import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.configuration.Configuration;
 import org.roda.core.RodaCoreFactory;
@@ -18,8 +19,14 @@ import java.util.*;
 
 public class SecurityHeadersFilter implements Filter {
 
+  private static final String REPLAY_SW_PATH = "/replay/sw.js";
+  private static final String REPLAY_SW_ALLOWED_SCOPE = "/replay/";
+
   private Boolean contentSecurityPolicyEnabled = true;
   private String contentSecurityPolicy;
+  private String replayContentSecurityPolicy;
+  private String replayPathPrefix;
+  private String replayViewerPath;
 
   @Override
   public void init(final FilterConfig filterConfig) throws ServletException {
@@ -34,17 +41,40 @@ public class SecurityHeadersFilter implements Filter {
       if (!cspDirectives.isEmpty()) {
         contentSecurityPolicy = String.join("; ", cspDirectives) + ";";
       }
+
+      List<String> replayCspDirectives = RodaUtils.copyList(
+        configuration.getList(configPrefix + ".csp.replay.directives[]"));
+
+      if (!replayCspDirectives.isEmpty()) {
+        replayContentSecurityPolicy = String.join("; ", replayCspDirectives) + ";";
+      }
     }
+
+    replayPathPrefix = configuration.getString(
+      configPrefix + ".csp.replay.path-prefix", "/replay/");
+    replayViewerPath = configuration.getString(
+      configPrefix + ".csp.replay.viewer-path", "/replay-viewer.html");
   }
 
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
     HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+    HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+    String requestPath = getRequestPath(httpServletRequest);
 
     httpServletResponse.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
 
-    if (contentSecurityPolicyEnabled && contentSecurityPolicy != null) {
-      httpServletResponse.setHeader("Content-Security-Policy", contentSecurityPolicy);
+    if (contentSecurityPolicyEnabled) {
+      String effectiveCsp = pickContentSecurityPolicy(requestPath);
+      if (effectiveCsp != null) {
+        httpServletResponse.setHeader("Content-Security-Policy", effectiveCsp);
+      }
+    }
+
+    if (REPLAY_SW_PATH.equals(requestPath)) {
+      // Bound the replay service worker registration to /replay/ even if a future
+      // change moves the SW file or a wider scope is attempted from elsewhere.
+      httpServletResponse.setHeader("Service-Worker-Allowed", REPLAY_SW_ALLOWED_SCOPE);
     }
 
     httpServletResponse.setHeader("X-XSS-Protection", "1; mode=block");
@@ -56,6 +86,26 @@ public class SecurityHeadersFilter implements Filter {
     httpServletResponse.setHeader("Permissions-Policy", "geolocation=(self)");
 
     chain.doFilter(request, response);
+  }
+
+  private String getRequestPath(HttpServletRequest request) {
+    String contextPath = request.getContextPath();
+    String uri = request.getRequestURI();
+    if (uri == null) {
+      return "";
+    }
+    if (contextPath != null && !contextPath.isEmpty() && uri.startsWith(contextPath)) {
+      return uri.substring(contextPath.length());
+    }
+    return uri;
+  }
+
+  private String pickContentSecurityPolicy(String requestPath) {
+    if (replayContentSecurityPolicy != null && requestPath != null
+        && (requestPath.startsWith(replayPathPrefix) || requestPath.equals(replayViewerPath))) {
+      return replayContentSecurityPolicy;
+    }
+    return contentSecurityPolicy;
   }
 
   @Override

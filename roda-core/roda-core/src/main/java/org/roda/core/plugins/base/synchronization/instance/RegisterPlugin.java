@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.plugins.base.synchronization.instance;
 
@@ -46,7 +46,7 @@ public class RegisterPlugin extends AbstractPlugin<Void> {
   }
 
   public static String getStaticName() {
-    return "Subscription of Local Instance";
+    return "Prenumeration på lokal instans";
   }
 
   @Override
@@ -55,7 +55,7 @@ public class RegisterPlugin extends AbstractPlugin<Void> {
   }
 
   public static String getStaticDescription() {
-    return "Subscription of Local Instance";
+    return "Prenumeration på lokal instans";
   }
 
   @Override
@@ -70,17 +70,17 @@ public class RegisterPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Updated the instance identifier";
+    return "Uppdaterade instansidentifieraren";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "The instance identifier was updated successfully";
+    return "Instansidentifieraren uppdaterades.";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Could not update the instance identifier";
+    return "Kunde inte uppdatera instansidentifieraren.";
   }
 
   @Override

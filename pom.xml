@@ -418,6 +418,8 @@
                                 <goal>revision</goal>
                             </goals>
                             <configuration>
+                                <failOnNoGitDirectory>false</failOnNoGitDirectory>
+                                <failOnUnableToExtractRepoInfo>false</failOnUnableToExtractRepoInfo>
                                 <generateGitPropertiesFile>true</generateGitPropertiesFile>
                                 <generateGitPropertiesFilename>
                                     ${project.build.directory}/${project.build.finalName}/version.json
@@ -431,6 +433,8 @@
                                 <goal>revision</goal>
                             </goals>
                             <configuration>
+                                <failOnNoGitDirectory>false</failOnNoGitDirectory>
+                                <failOnUnableToExtractRepoInfo>false</failOnUnableToExtractRepoInfo>
                                 <generateGitPropertiesFile>true</generateGitPropertiesFile>
                                 <generateGitPropertiesFilename>
                                     ${project.build.directory}/classes/static/version.json

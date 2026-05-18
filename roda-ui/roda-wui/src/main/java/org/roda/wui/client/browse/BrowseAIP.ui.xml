@@ -2,12 +2,15 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:common="urn:import:org.roda.wui.client.common" xmlns:commoncards="urn:import:org.roda.wui.client.common.cards"
-	xmlns:tabs="urn:import:org.roda.wui.client.browse.tabs" xmlns:labels="urn:import:org.roda.wui.client.common.labels">
+	xmlns:tabs="urn:import:org.roda.wui.client.browse.tabs" xmlns:labels="urn:import:org.roda.wui.client.common.labels"
+	xmlns:browse="urn:import:org.roda.wui.client.browse">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
-	<g:FlowPanel styleName="contentWithSidePanel">
-		<g:FocusPanel ui:field="keyboardFocus">
+	<g:FlowPanel styleName="contentWithSidePanel catalogTreeLayout">
+		<g:FlowPanel ui:field="catalogTreeContainer" />
+		<g:FlowPanel ui:field="treeResizeHandle" styleName="catalogTreeResizeHandle" />
+		<g:FocusPanel ui:field="keyboardFocus" addStyleNames="catalogTreeMainContent">
 			<g:FlowPanel styleName="browse" addStyleNames="wrapper skip_padding">
 				<common:NavigationToolbar ui:field="navigationToolbar" />
 				<common:BrowseAIPActionsToolbar ui:field="objectToolbar" label="{messages.catalogueItemTitle}"/>
@@ -20,6 +23,13 @@
 							<!-- DESCRIPTIVE METADATA -->
 							<tabs:BrowseAIPTabs ui:field="browseTab" />
 						</g:FlowPanel>
+
+						<!-- REPRESENTATIONS & DISSEMINATIONS (inline under metadata) -->
+						<g:FlowPanel ui:field="representationSection" addStyleNames="representationSection" visible="false">
+							<g:FlowPanel ui:field="representationCards" addStyleNames="representationCardContainer"/>
+							<g:FlowPanel ui:field="disseminationCards" addStyleNames="representationCardContainer"/>
+						</g:FlowPanel>
+
 						<g:FlowPanel addStyleNames="lowerContent" ui:field="lowerContent">
 							<!-- AIP CHILDREN -->
 							<labels:Header ui:field="aipChildrenTitle" />
@@ -29,13 +39,5 @@
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FocusPanel>
-		<g:FlowPanel styleName="browseSidePanel" ui:field="sidePanel">
-			<g:FlowPanel>
-				<g:FlowPanel ui:field="representationCards"  addStyleNames="verticalThumbnailCardContainer"/>
-			</g:FlowPanel>
-			<g:FlowPanel>
-				<g:FlowPanel ui:field="disseminationCards" addStyleNames="verticalThumbnailCardContainer"/>
-			</g:FlowPanel>
-		</g:FlowPanel>
 	</g:FlowPanel>
 </ui:UiBinder>
