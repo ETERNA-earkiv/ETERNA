@@ -1221,10 +1221,6 @@ public final class RodaConstants {
   public static final String REPOSITORY_PERMISSIONS_LOCAL_INSTANCES_MANAGE = "local_instance_configuration.manage";
   public static final String REPOSITORY_PERMISSIONS_LOCAL_INSTANCES_READ = "local_instance_configuration.read";
 
-  public static final String REPOSITORY_PERMISSIONS_METADATA_TRANSFORM_XSLT = "metadata.transform.xslt";
-
-  public static final String PERMISSION_METHOD_TRANSFORM_DESCRIPTIVE_METADATA_WITH_XSLT = "org.roda.wui.api.v2.controller.AIPController.transformDescriptiveMetadataWithXslt";
-
   public static final String LOG_ACTION_COMPONENT = "actionComponent";
   public static final String LOG_ACTION_METHOD = "actionMethod";
   public static final String LOG_ADDRESS = "address";

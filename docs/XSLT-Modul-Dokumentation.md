@@ -7,13 +7,15 @@
 3. [Hur XSLT-stilmallar hittas](#hur-xslt-stilmallar-hittas)
 4. [Paketera XSLT i E-ARK SIP](#paketera-xslt-i-e-ark-sip)
 5. [Globala stilmallar](#globala-stilmallar)
-6. [Ladda upp egen XSLT](#ladda-upp-egen-xslt)
-7. [Skriv ut dokument](#skriv-ut-dokument)
-8. [Behörigheter](#behörigheter)
-9. [REST API](#rest-api)
-10. [Konfiguration](#konfiguration)
-11. [Tekniska detaljer](#tekniska-detaljer)
-12. [Kända begränsningar](#kända-begränsningar)
+6. [Välj stilmall via dropdown](#välj-stilmall-via-dropdown)
+7. [Visa original-XML](#visa-original-xml)
+8. [Ladda upp egen XSLT](#ladda-upp-egen-xslt)
+9. [Skriv ut dokument](#skriv-ut-dokument)
+10. [Behörigheter](#behörigheter)
+11. [REST API](#rest-api)
+12. [Konfiguration](#konfiguration)
+13. [Tekniska detaljer](#tekniska-detaljer)
+14. [Kända begränsningar](#kända-begränsningar)
 
 ---
 
@@ -24,6 +26,11 @@ XSLT-modulen gör det möjligt att visa XML-filer i ETERNA som formaterade, läs
 1. **AIP-bundna stilmallar** — XSLT-filer som paketeras tillsammans med XML-filerna i AIP:ets dokumentationsmapp. Varje XML-fil kan ha sin egen matchande stilmall.
 2. **Globala stilmallar** — Fördefinierade stilmallar som konfigureras i ETERNA och matchas via XML-namnrymd.
 3. **Användaruppladdade stilmallar** — Användare med rätt behörighet kan ladda upp en egen XSLT-fil direkt i gränssnittet för att tillfälligt transformera ett dokument.
+
+Utöver stilmallsval erbjuder modulen:
+
+- **Dropdown för flera stilmallar** — Om AIP:et innehåller fler än en XSLT-fil för en XML-fil visas en dropdown där användaren kan välja vilken stilmall som ska tillämpas.
+- **Visa original-XML** — En knapp låter användaren växla mellan renderad HTML-vy och oformaterad XML-källkod.
 
 ### Sökordning
 
@@ -268,6 +275,39 @@ ETERNA använder Saxon HE som stödjer XSLT 2.0. Stilmallar får tillgång till 
 
 ---
 
+## Välj stilmall via dropdown
+
+Om AIP:et innehåller **fler än en XSLT-fil** i dokumentationsmappen för en XML-fil visas en dropdown ovanför den renderade vyn. Dropdown:en är dold om bara en stilmall finns.
+
+### Så här gör du
+
+1. Navigera till en XML-fil vars AIP har flera XSLT-filer i dokumentationen
+2. Klicka på fliken **VISA** — dropdownen **"Välj stilmall:"** visas automatiskt
+3. Välj önskad stilmall — vyn uppdateras direkt
+
+### Tekniskt
+
+- En ny API-endpoint `GET /api/v2/files/{uuid}/preview/html/xslts` returnerar listan av tillgängliga stilmallar som JSON
+- GWT-klienten hämtar listan vid visning och visar `ListBox` om fler än ett alternativ finns
+- Vid val anropas `GET /api/v2/files/{uuid}/preview/html?xslt={id}` med stilmallens filnamn som `id`
+- Filnamnsträff har alltid högst prioritet och visas först i listan
+
+---
+
+## Visa original-XML
+
+Knappen **"Visa original-XML"** finns ovanför den renderade vyn och är tillgänglig för alla användare med läsbehörighet.
+
+### Så här gör du
+
+1. Navigera till en XML-fil med XSLT-renderad vy
+2. Klicka **Visa original-XML** — vyn ersätts med oformaterad XML-källkod
+3. Klicka **Visa renderad vy** för att återgå till XSLT-renderad HTML
+
+> **OBS:** Dropdown för stilmallsval döljs tillfälligt i XML-läge och visas igen när du återgår till renderad vy.
+
+---
+
 ## Ladda upp egen XSLT
 
 Användare med behörigheten **"Applicera egen XSLT-stilmall"** kan ladda upp en egen XSLT-fil direkt i gränssnittet för att tillfälligt transformera ett XML-dokument.
@@ -348,16 +388,31 @@ Rollen skapas automatiskt i LDAP vid ETERNA:s första start (bootstrap) baserat 
 
 ## REST API
 
+### Lista tillgängliga stilmallar
+
+```
+GET /api/v2/files/{uuid}/preview/html/xslts
+```
+
+| Parameter | Typ | Beskrivning |
+|-----------|-----|-------------|
+| `uuid` | Sökväg | Filens UUID |
+
+**Svar:** JSON-array med objekt `{id, label}` för varje tillgänglig stilmall.
+
+**Behörighet:** `representation.read`
+
 ### Förhandsvisning av XML som HTML
 
 ```
-GET /api/v2/files/{uuid}/preview/html?lang={locale}
+GET /api/v2/files/{uuid}/preview/html?lang={locale}&xslt={id}
 ```
 
 | Parameter | Typ | Beskrivning |
 |-----------|-----|-------------|
 | `uuid` | Sökväg | Filens UUID |
 | `lang` | Query (valfri, standard: `sv`) | Språk/locale |
+| `xslt` | Query (valfri) | Stilmallens ID från `/xslts`-endpointen — utelämnas för standardval |
 
 **Svar:**
 - `200 OK` — HTML-renderat dokument

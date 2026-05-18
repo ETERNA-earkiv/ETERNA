@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Map;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import java.util.List;
@@ -487,6 +488,28 @@ public class FilesController implements FileRestService, Exportable {
       }
     });
   }
+  @GetMapping(path = "/{uuid}/preview/html/xslts", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Lists available XSLT stylesheets for a file", description = "Returns all XSLT stylesheets available for the given XML file, from AIP documentation and global config.", responses = {
+    @ApiResponse(responseCode = "200", description = "Returns list of available XSLTs"),
+    @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  ResponseEntity<List<Map<String, String>>> listAvailableXslts(
+    @Parameter(description = "The file UUID", required = true) @PathVariable(name = "uuid") String fileUUID) {
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<ResponseEntity<List<Map<String, String>>>>() {
+      @Override
+      public ResponseEntity<List<Map<String, String>>> process(RequestContext requestContext,
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        controllerAssistant.setRelatedObjectId(fileUUID);
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_FILE_UUID_PARAM, fileUUID);
+        List<String> fileFields = new ArrayList<>(RodaConstants.FILE_FIELDS_TO_RETURN);
+        fileFields.add(RodaConstants.FILE_ISDIRECTORY);
+        IndexedFile file = indexService.retrieve(IndexedFile.class, fileUUID, fileFields);
+        controllerAssistant.checkObjectPermissions(requestContext.getUser(), file);
+        List<Map<String, String>> xslts = filesService.listAvailableXslts(requestContext, file);
+        return ResponseEntity.ok(xslts);
+      }
+    });
+  }
+
   @GetMapping(path = "/{uuid}/preview/html", produces = MediaType.TEXT_HTML_VALUE)
   @Operation(summary = "Renders file content as HTML", description = "Applies XSLT stylesheet to XML file content and returns rendered HTML. Returns 404 if no matching stylesheet is configured for the XML namespace.", responses = {
     @ApiResponse(responseCode = "200", description = "Returns rendered HTML", content = @Content(schema = @Schema(implementation = ResponseEntity.class))),
@@ -494,7 +517,8 @@ public class FilesController implements FileRestService, Exportable {
     @ApiResponse(responseCode = "404", description = "No stylesheet found for this file type", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   ResponseEntity<StreamingResponseBody> previewFileAsHTML(
     @Parameter(description = "The file UUID", required = true) @PathVariable(name = "uuid") String fileUUID,
-    @Parameter(description = "The language for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString) {
+    @Parameter(description = "The language for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString,
+    @Parameter(description = "ID of a specific XSLT to apply") @RequestParam(name = "xslt", required = false) String selectedXsltId) {
     return requestHandler.processRequest(new RequestHandler.RequestProcessor<ResponseEntity<StreamingResponseBody>>() {
       @Override
       public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
@@ -505,7 +529,7 @@ public class FilesController implements FileRestService, Exportable {
         fileFields.add(RodaConstants.FILE_ISDIRECTORY);
         IndexedFile file = indexService.retrieve(IndexedFile.class, fileUUID, fileFields);
         controllerAssistant.checkObjectPermissions(requestContext.getUser(), file);
-        StreamResponse streamResponse = filesService.retrieveFileContentHTML(requestContext, file, localeString);
+        StreamResponse streamResponse = filesService.retrieveFileContentHTML(requestContext, file, localeString, selectedXsltId);
         return ApiUtils.okResponse(streamResponse);
       }
     });

@@ -2702,8 +2702,6 @@ public interface ClientMessages extends Messages {
   /*** XSLT Transform ***/
   String applyXsltButton();
 
-  String xsltTransformError();
-
   String xsltLoading();
 
   String xsltPrintButton();
@@ -2717,6 +2715,12 @@ public interface ClientMessages extends Messages {
   String xsltTransformTimeout();
 
   String xsltPrintError();
+
+  String xsltSelectLabel();
+
+  String xsltViewOriginalButton();
+
+  String xsltViewRenderedButton();
 
   String redactPdfInvalidFormatMessage();
 

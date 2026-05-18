@@ -68,18 +68,6 @@ public final class HTMLUtils {
     }
   }
 
-  public static String descriptiveMetadataToHtmlWithCustomXslt(Binary binary, InputStream xsltInputStream,
-    String metadataType, String metadataVersion, final Locale locale) throws GenericException {
-    Map<String, String> translations = getTranslations(metadataType, metadataVersion, locale);
-    Reader reader = RodaUtils.applyCustomStylesheet(binary, xsltInputStream, translations);
-    try {
-      return sanitizeHtml(CharStreams.toString(reader));
-    } catch (IOException e) {
-      throw new GenericException("Could not transform metadata with custom XSLT", e);
-    }
-  }
-
-
   public static String technicalMetadataToHtml(Binary binary, String metadataType, String metadataVersion,
     final Locale locale) throws GenericException {
     Map<String, String> translations = getTranslations(metadataType, metadataVersion, locale);
