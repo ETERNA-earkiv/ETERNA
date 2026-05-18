@@ -390,7 +390,7 @@ Rollen skapas automatiskt i LDAP vid ETERNA:s första start (bootstrap) baserat 
 
 ### Lista tillgängliga stilmallar
 
-```
+```http
 GET /api/v2/files/{uuid}/preview/html/xslts
 ```
 
@@ -404,7 +404,7 @@ GET /api/v2/files/{uuid}/preview/html/xslts
 
 ### Förhandsvisning av XML som HTML
 
-```
+```http
 GET /api/v2/files/{uuid}/preview/html?lang={locale}&xslt={id}
 ```
 
@@ -423,7 +423,7 @@ GET /api/v2/files/{uuid}/preview/html?lang={locale}&xslt={id}
 
 ### Transformation med egen XSLT
 
-```
+```http
 POST /api/v2/files/{uuid}/preview/html/transform?lang={locale}
 Content-Type: multipart/form-data
 ```
