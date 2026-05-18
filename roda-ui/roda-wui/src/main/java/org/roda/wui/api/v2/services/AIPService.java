@@ -166,31 +166,6 @@ public class AIPService {
     return new StreamResponse(stream);
   }
 
-  public StreamResponse transformDescriptiveMetadataWithCustomXslt(RequestContext requestContext, String aipId,
-    String metadataId, InputStream xsltInputStream, String localeString)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-
-    ModelService model = requestContext.getModelService();
-    Binary descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aipId, metadataId);
-    DescriptiveMetadata descriptiveMetadata = model.retrieveDescriptiveMetadata(aipId, metadataId);
-    String filename = descriptiveMetadataBinary.getStoragePath().getName() + HTML_EXT;
-
-    String htmlResult = HTMLUtils.descriptiveMetadataToHtmlWithCustomXslt(descriptiveMetadataBinary,
-      xsltInputStream, descriptiveMetadata.getType(), descriptiveMetadata.getVersion(),
-      ServerTools.parseLocale(localeString));
-
-    ConsumesOutputStream stream = new DefaultConsumesOutputStream(filename, RodaConstants.MEDIA_TYPE_TEXT_HTML,
-      out -> {
-        PrintStream printStream = new PrintStream(out);
-        printStream.print(htmlResult);
-        printStream.close();
-      });
-
-    return new StreamResponse(stream);
-  }
-
-
-
   public StreamResponse downloadRepresentationDescriptiveMetadata(ModelService modelService, String aipId,
     String representationId, String metadataId, String versionId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {

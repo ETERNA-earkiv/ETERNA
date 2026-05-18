@@ -165,9 +165,6 @@ public class DescriptiveMetadataHistory extends Composite {
   Button buttonRevert;
 
   @UiField
-  Button buttonApplyXslt;
-
-  @UiField
   Button buttonRemove;
 
   @UiField
@@ -216,9 +213,6 @@ public class DescriptiveMetadataHistory extends Composite {
       RodaConstants.PERMISSION_METHOD_REVERT_DESCRIPTIVE_METADATA_VERSION);
     PermissionClientUtils.bindPermission(buttonRemove, descriptiveMetadataVersions.getPermissions(),
       RodaConstants.PERMISSION_METHOD_DELETE_DESCRIPTIVE_METADATA_VERSION);
-    PermissionClientUtils.bindPermission(buttonApplyXslt, descriptiveMetadataVersions.getPermissions(),
-      RodaConstants.REPOSITORY_PERMISSIONS_METADATA_TRANSFORM_XSLT);
-
     Element firstElement = showXml.getElement().getFirstChildElement();
     if ("input".equalsIgnoreCase(firstElement.getTagName())) {
       firstElement.setAttribute("title", "browse input");
@@ -375,61 +369,6 @@ public class DescriptiveMetadataHistory extends Composite {
   void buttonShowXmlHandler(ClickEvent e) {
     setInHTML(!isInHTML());
     updatePreview();
-  }
-
-  @UiHandler("buttonApplyXslt")
-  void buttonApplyXsltHandler(ClickEvent e) {
-    triggerXsltFileUpload();
-  }
-
-  private native void triggerXsltFileUpload() /*-{
-    var self = this;
-    var input = $doc.createElement('input');
-    input.type = 'file';
-    input.accept = '.xsl,.xslt,.xml';
-    input.onchange = function() {
-      if (input.files.length > 0) {
-        var file = input.files[0];
-        var formData = new $wnd.FormData();
-        formData.append('xslt', file);
-
-        var aipId = self.@org.roda.wui.client.browse.DescriptiveMetadataHistory::aipId;
-        var metadataId = self.@org.roda.wui.client.browse.DescriptiveMetadataHistory::descriptiveMetadataId;
-        var uri = @org.roda.wui.common.client.tools.RestUtils::createDescriptiveMetadataTransformUri(Ljava/lang/String;Ljava/lang/String;)(aipId, metadataId);
-
-        var xhr = new $wnd.XMLHttpRequest();
-        xhr.open('POST', uri, true);
-        xhr.onload = function() {
-          if (xhr.status === 200) {
-            self.@org.roda.wui.client.browse.DescriptiveMetadataHistory::showTransformResult(Ljava/lang/String;)(xhr.responseText);
-          } else {
-            var errorMsg = xhr.responseText || 'Error transforming metadata with XSLT';
-            self.@org.roda.wui.client.browse.DescriptiveMetadataHistory::showTransformError(Ljava/lang/String;)(errorMsg);
-          }
-        };
-        xhr.onerror = function() {
-          self.@org.roda.wui.client.browse.DescriptiveMetadataHistory::showTransformError(Ljava/lang/String;)('Network error');
-        };
-        xhr.send(formData);
-      }
-    };
-    input.click();
-  }-*/;
-
-  private void showTransformResult(String html) {
-    preview.setHTML(SafeHtmlUtils.fromTrustedString(html));
-    preview.removeStyleName("code-pre");
-  }
-
-  private void showTransformError(String errorMessage) {
-    SafeHtmlBuilder b = new SafeHtmlBuilder();
-    b.append(SafeHtmlUtils.fromSafeConstant("<div class='error'>"));
-    b.append(SafeHtmlUtils.fromString(messages.xsltTransformError()));
-    b.append(SafeHtmlUtils.fromSafeConstant("<pre><code>"));
-    b.append(SafeHtmlUtils.fromString(errorMessage));
-    b.append(SafeHtmlUtils.fromSafeConstant("</code></pre>"));
-    b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
-    preview.setHTML(b.toSafeHtml());
   }
 
   @UiHandler("buttonRevert")

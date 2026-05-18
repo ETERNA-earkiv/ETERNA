@@ -33,10 +33,7 @@
 							<g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonRevert">
 								<ui:text from='{messages.revertButton}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonApplyXslt">
-									<ui:text from='{messages.applyXsltButton}' />
-								</g:Button>
-								<g:Button addStyleNames="btn btn-block btn-danger btn-ban" ui:field="buttonRemove">
+<g:Button addStyleNames="btn btn-block btn-danger btn-ban" ui:field="buttonRemove">
 								<ui:text from='{messages.removeButton}' />
 							</g:Button>
 							<g:Button addStyleNames="btn btn-block btn-times-circle" ui:field="buttonCancel">

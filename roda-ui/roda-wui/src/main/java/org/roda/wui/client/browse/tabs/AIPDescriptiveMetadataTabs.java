@@ -128,16 +128,6 @@ public class AIPDescriptiveMetadataTabs extends Tabs {
                 }
               }, messages.downloadButton(), "btn-download");
 
-              // Apply XSLT button (permission-gated)
-              if (PermissionClientUtils.hasPermissions(aip.getPermissions(),
-                RodaConstants.PERMISSION_METHOD_TRANSFORM_DESCRIPTIVE_METADATA_WITH_XSLT)) {
-                descriptiveMetadataToolbar.addAction(new ClickHandler() {
-                  @Override
-                  public void onClick(ClickEvent event) {
-                    triggerXsltUpload(aip.getId(), metadataID, metadataHTML);
-                  }
-                }, messages.applyXsltButton(), "btn-upload");
-              }
               // HTML
               String html = response.getText();
               SafeHtmlBuilder b = new SafeHtmlBuilder();
@@ -191,38 +181,4 @@ public class AIPDescriptiveMetadataTabs extends Tabs {
     }
   }
 
-  private static native void triggerXsltUpload(String aipId, String metadataId, HTML metadataHTML) /*-{
-    var input = $doc.createElement('input');
-    input.type = 'file';
-    input.accept = '.xsl,.xslt,.xml';
-    input.onchange = function() {
-      if (input.files.length > 0) {
-        var file = input.files[0];
-        var formData = new $wnd.FormData();
-        formData.append('xslt', file);
-
-        var uri = @org.roda.wui.common.client.tools.RestUtils::createDescriptiveMetadataTransformUri(Ljava/lang/String;Ljava/lang/String;)(aipId, metadataId);
-
-        var xhr = new $wnd.XMLHttpRequest();
-        xhr.open('POST', uri, true);
-        xhr.onload = function() {
-          if (xhr.status === 200) {
-            metadataHTML.@com.google.gwt.user.client.ui.HTML::setHTML(Ljava/lang/String;)(
-              '<div class="descriptiveMetadataHTML">' + xhr.responseText + '</div>');
-          } else {
-            var errorMsg = xhr.responseText || 'Error transforming metadata';
-            var escaped = errorMsg.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-            metadataHTML.@com.google.gwt.user.client.ui.HTML::setHTML(Ljava/lang/String;)(
-              '<div class="error"><pre>' + escaped + '</pre></div>');
-          }
-        };
-        xhr.onerror = function() {
-          metadataHTML.@com.google.gwt.user.client.ui.HTML::setHTML(Ljava/lang/String;)(
-            '<div class="error">Network error during XSLT transform</div>');
-        };
-        xhr.send(formData);
-      }
-    };
-    input.click();
-  }-*/;
 }

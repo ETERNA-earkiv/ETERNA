@@ -2653,8 +2653,6 @@ public interface ClientMessages extends Messages {
   /*** XSLT Transform ***/
   String applyXsltButton();
 
-  String xsltTransformError();
-
   String xsltLoading();
 
   String xsltPrintButton();

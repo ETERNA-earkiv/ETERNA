@@ -80,14 +80,12 @@ import org.roda.wui.common.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
@@ -367,62 +365,6 @@ public class AIPController implements AIPRestService, Exportable {
     });
 
   }
-
-  @PostMapping(path = "/{id}/metadata/descriptive/{descriptive-metadata-id}/transform", produces = MediaType.TEXT_HTML_VALUE)
-  @Operation(summary = "Transform descriptive metadata with custom XSLT",
-    description = "Apply a user-provided XSLT stylesheet to transform descriptive metadata XML into HTML.",
-    responses = {
-      @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = MediaType.TEXT_HTML_VALUE)),
-      @ApiResponse(responseCode = "404", description = "Not found"),
-      @ApiResponse(responseCode = "403", description = "Forbidden")})
-  ResponseEntity<StreamingResponseBody> transformDescriptiveMetadataWithXslt(
-    @PathVariable(name = "id") String aipId,
-    @PathVariable(name = "descriptive-metadata-id") String descriptiveMetadataId,
-    @RequestPart(value = "xslt") MultipartFile xsltFile,
-    @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString)
-    throws RODAException, RESTException {
-
-    return requestHandler.processRequest(new RequestHandler.RequestProcessor<ResponseEntity<StreamingResponseBody>>() {
-      @Override
-      public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
-        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
-        try {
-          controllerAssistant.setParameters(RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
-            RodaConstants.CONTROLLER_METADATA_ID_PARAM, descriptiveMetadataId);
-
-          IndexedAIP indexedAIP = requestContext.getIndexService().retrieve(IndexedAIP.class, aipId,
-            RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
-          controllerAssistant.checkObjectPermissions(requestContext.getUser(), indexedAIP);
-
-          // Validate XSLT file size (max 1 MB)
-          long maxXsltSize = 1024 * 1024;
-          if (xsltFile.getSize() > maxXsltSize) {
-            throw new RequestNotValidException("XSLT file exceeds maximum size of 1 MB");
-          }
-
-          // Validate XSLT is well-formed XML
-          try (java.io.InputStream validationStream = xsltFile.getInputStream()) {
-            javax.xml.stream.XMLInputFactory xmlFactory = javax.xml.stream.XMLInputFactory.newInstance();
-            xmlFactory.setProperty(javax.xml.stream.XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
-            xmlFactory.setProperty(javax.xml.stream.XMLInputFactory.SUPPORT_DTD, false);
-            javax.xml.stream.XMLStreamReader xmlReader = xmlFactory.createXMLStreamReader(validationStream);
-            while (xmlReader.hasNext()) { xmlReader.next(); }
-            xmlReader.close();
-          } catch (Exception e) {
-            throw new RequestNotValidException("Uploaded file is not valid XML: " + e.getMessage());
-          }
-
-          StreamResponse streamResponse = aipService.transformDescriptiveMetadataWithCustomXslt(requestContext,
-            aipId, descriptiveMetadataId, xsltFile.getInputStream(), localeString);
-          return ApiUtils.okResponse(streamResponse);
-        } catch (java.io.IOException e) {
-          throw new GenericException("Could not read XSLT file", e);
-        }
-      }
-    });
-  }
-
-
 
   @GetMapping(path = "{id}/download/documentation", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
   @Operation(summary = "Downloads documentation", description = "Download AIP documentation", responses = {
