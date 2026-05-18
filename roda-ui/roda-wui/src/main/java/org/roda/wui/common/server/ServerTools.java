@@ -178,7 +178,7 @@ public class ServerTools {
     return values;
   }
 
-  public static String autoGenerateAIPValue(IndexedAIP aip, User user, String generator) {
+  public static String autoGenerateAIPValue(IndexedAIP aip, User user, String generator, Locale locale) {
     String result = null;
     switch (generator) {
       case "now":
@@ -191,7 +191,7 @@ public class ServerTools {
         result = aip.getTitle();
         break;
       case "language":
-        result = "Svenska";
+        result = locale.getDisplayLanguage(locale);
         break;
       case "parentid":
         result = aip.getParentID();
