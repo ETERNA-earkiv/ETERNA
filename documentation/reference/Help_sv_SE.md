@@ -24,6 +24,7 @@ Steg-för-steg guider för att använda ETERNA effektivt.
 - **[Avancerad Sökning](usage/Advanced_Search_sv_SE.md)** - Avancerade sökfunktioner
 - **[Inleverans](usage/Pre_Ingest_sv_SE.md)** - Förbereda data för arkivering
 - **[PDF-maskning](usage/PdfRedaction_sv_SE.md)** - Hur man maskerar känsligt innehåll i PDF-filer
+- **[Webbarkivvisaren](usage/WebArchiveViewer_sv_SE.md)** - Spela upp arkiverade webbsidor (WARC och WACZ)
 - **[Vanliga Frågor](usage/FAQ_sv_SE.md)** - Svar på ofta ställda frågor
 - **[README](usage/README.md)** - Övergripande information om ETERNA
 - **[Felsökning](usage/Troubleshooting_sv_SE.md)** - Felsökning

@@ -5679,6 +5679,12 @@ body.catalogTreeResizing * {
     */
 }
 
+.viewRepresentationWebArchiveFilePreview {
+    height: 100dvh;
+    box-sizing: border-box;
+    width: 100%;
+}
+
 .viewRepresentationHtmlFilePreview, .viewDIPPreview {
     width: 100%;
     height: 80vh;

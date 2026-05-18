@@ -25,6 +25,7 @@ Step-by-step guides for using ETERNA effectively.
 - **[Advanced Search](usage/Advanced_Search.md)** - Advanced search features
 - **[Pre-Ingest](usage/Pre_Ingest.md)** - Preparing data for archiving
 - **[PDF Redaction](usage/PdfRedaction.md)** - How to redact sensitive content in PDF files
+- **[Web Archive Viewer](usage/WebArchiveViewer.md)** - Play back archived web pages (WARC and WACZ)
 - **[Troubleshooting](usage/Troubleshooting.md)** - Solutions to common problems
 - **[FAQ](usage/FAQ.md)** - Answers to frequently asked questions
 - **[README](usage/README.md)** - General information about ETERNA
