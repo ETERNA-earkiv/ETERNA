@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
@@ -197,15 +198,15 @@ public class MembersController implements MembersRestService, Exportable {
       } catch (Exception e) {
         LOGGER.warn("Could not create PREMIS agent for CAS user '{}'", user.getName(), e);
       }
-    } else {
+    } else if (user != null) {
       // found user and authentication externally, so update user email, full name and
       // groups from cas principal attributes if they have changed
       if (attributes != null) {
-        if (attributes.get("email") instanceof String email && !user.getEmail().equals(attributes.get("email"))) {
+        if (attributes.get("email") instanceof String email && !Objects.equals(user.getEmail(), email)) {
           user.setEmail(email);
         }
         if (attributes.get("fullname") instanceof String fullname
-          && !user.getFullName().equals(attributes.get("fullname"))) {
+          && !Objects.equals(user.getFullName(), fullname)) {
           user.setFullName(fullname);
         }
         if (RodaCoreFactory.getRodaConfiguration().getBoolean(RodaConstants.CORE_EXTERNAL_AUTH_GROUP_MAPPING_ENABLED,
@@ -231,6 +232,8 @@ public class MembersController implements MembersRestService, Exportable {
       } catch (Exception e) {
         LOGGER.warn("Could not update PREMIS agent for CAS user '{}'", user.getName(), e);
       }
+    } else {
+      throw new AuthenticationDeniedException("CAS user could not be provisioned: no user found and no attributes released");
     }
 
     if (!user.isActive()) {

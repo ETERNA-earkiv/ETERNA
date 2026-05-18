@@ -1273,13 +1273,18 @@ public final class PluginHelper {
         jobUserDetails);
       if (pm != null) {
         agentIds.add(linkingIdentifierAgent);
-      } else if (model.existsInStorage(agentLite.get())) {
-        LOGGER.warn("PREMIS agent binary exists in storage but could not be created/updated (blank agent name?): {}",
-          linkingIdentifierAgent.getValue());
-        agentIds.add(linkingIdentifierAgent);
       } else {
-        LOGGER.warn("PREMIS agent binary could not be created and does not exist in storage: {}",
-          linkingIdentifierAgent.getValue());
+        try {
+          index.retrieve(IndexedPreservationAgent.class, linkingIdentifierAgent.getValue(), Collections.emptyList());
+          LOGGER.warn("PREMIS agent binary could not be created/updated (blank agent name?) but exists in index: {}",
+            linkingIdentifierAgent.getValue());
+          agentIds.add(linkingIdentifierAgent);
+        } catch (NotFoundException e) {
+          LOGGER.warn("PREMIS agent binary could not be created and does not exist in index: {}",
+            linkingIdentifierAgent.getValue());
+        } catch (GenericException e) {
+          LOGGER.warn("Could not check Solr index for PREMIS agent: {}", linkingIdentifierAgent.getValue(), e);
+        }
       }
     } catch (AlreadyExistsException e) {
       agentIds.add(linkingIdentifierAgent);
