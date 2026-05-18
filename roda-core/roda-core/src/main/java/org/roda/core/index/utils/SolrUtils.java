@@ -1547,6 +1547,39 @@ public class SolrUtils {
     return ret;
   }
 
+  /**
+   * Atomically increments or decrements numeric fields in a Solr document using Solr's "inc" modifier.
+   * This method is thread-safe and can be used to update counters (e.g., file counts, sizes) without 
+   * race conditions.
+   *
+   * `@param` <T> the indexed class type
+   * `@param` <S> the source object type
+   * `@param` index the Solr client
+   * `@param` classToCreate the class of the document to update
+   * `@param` uuid the document ID
+   * `@param` increments a map of field names to increment deltas (positive to increment, negative to decrement)
+   * `@param` source the source object for error tracking
+   * `@return` a ReturnWithExceptions containing any NotSupportedException that occurred
+   */
+  public static <T extends IsIndexed, S extends Object> ReturnWithExceptions<Void, S> atomicIncrement(
+    SolrClient index, Class<T> classToCreate, String uuid, Map<String, Long> increments, S source) {
+    ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>(source);
+    SolrInputDocument doc = new SolrInputDocument();
+    doc.addField(RodaConstants.INDEX_UUID, uuid);
+    increments.forEach((key, delta) -> {
+      Map<String, Object> modifier = new HashMap<>(1);
+      modifier.put("inc", delta);
+      doc.addField(key, modifier);
+    });
+    try {
+      create(index, SolrCollectionRegistry.getIndexName(classToCreate), doc, source).addTo(ret);
+    } catch (NotSupportedException e) {
+      LOGGER.error("Error incrementing document in index", e);
+      ret.add(e);
+    }
+    return ret;
+  }
+
   private static Map<String, Object> set(Object value) {
     Map<String, Object> fieldModifier = new HashMap<>(1);
     // 20160511 this workaround fixes solr wrong behaviour with partial update
