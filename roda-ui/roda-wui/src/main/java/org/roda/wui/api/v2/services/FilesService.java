@@ -563,7 +563,11 @@ public class FilesService {
    * call this so a stylesheet that appears in the UI can always be rendered.
    *
    * Lookup order (first non-empty layer wins):
-   *  1. directly beside the XML file (same folder under representations/rep_X/data/...)
+   *  1. directly beside the XML file (same folder under representations/rep_X/data/...),
+   *     but only when there is a filename-matched stylesheet (Foo.xml + Foo.xslt).
+   *     Unrelated .xslt siblings (e.g. B.xslt next to A.xml) do NOT block lower
+   *     layers — a wrongly-named neighbour would otherwise hide a properly-named
+   *     stylesheet that lives in documentation/ or in the global config.
    *  2. representation-level documentation (representations/rep_X/documentation/)
    *  3. AIP-root documentation (documentation/)
    *  4. global namespace mapping from configuration
@@ -572,7 +576,7 @@ public class FilesService {
     String namespace) {
     List<XsltSource> result = new ArrayList<>();
 
-    // Layer 1: beside the XML file in the representation data tree
+    // Layer 1: beside the XML file — filename match required
     if (indexedFile.getRepresentationId() != null) {
       result.addAll(toXsltSources(searchXsltsBesideXmlFile(model, indexedFile)));
     }
@@ -643,7 +647,11 @@ public class FilesService {
     if (xsltName == null || xmlBaseName == null) {
       return false;
     }
-    return xsltName.equals(xmlBaseName + ".xslt") || xsltName.equals(xmlBaseName + ".xsl");
+    // Normalize both sides through stripXsltExtension (case-insensitive on the
+    // extension) and compare the bare base name case-insensitively, so Foo.XSL
+    // matches Foo.xml and FOO.xslt matches foo.xml.
+    String xsltBase = stripXsltExtension(xsltName);
+    return xsltBase != null && xsltBase.equalsIgnoreCase(xmlBaseName);
   }
 
   private static XsltSource chooseXsltSource(List<XsltSource> sources, String requestedId) {
@@ -701,9 +709,12 @@ public class FilesService {
 
   /**
    * Look for XSLT files in the SAME folder as the supplied XML file inside
-   * the representation data tree. Non-recursive: only direct siblings. The
-   * XML file itself and other non-.xslt files are ignored. Filename-matched
-   * stylesheets (Foo.xml → Foo.xslt) are returned first.
+   * the representation data tree. Non-recursive: only direct siblings.
+   *
+   * Returns ONLY filename-matched stylesheets (Foo.xml → Foo.xslt or Foo.xsl,
+   * case-insensitive). Unrelated .xslt siblings are intentionally ignored so
+   * a B.xslt sitting next to A.xml cannot hide a correctly-named A.xslt in
+   * documentation/ or in the global namespace mapping.
    */
   private List<Binary> searchXsltsBesideXmlFile(ModelService model, IndexedFile indexedFile) {
     try {
@@ -714,12 +725,8 @@ public class FilesService {
         indexedFile.getRepresentationId(), indexedFile.getPath(), null);
       CloseableIterable<Resource> resources = model.getStorage().listResourcesUnderDirectory(parentDir, false);
       try {
-        String xmlFileName = indexedFile.getId();
-        String xmlBaseName = null;
-        if (xmlFileName != null && xmlFileName.toLowerCase(Locale.ROOT).endsWith(".xml")) {
-          xmlBaseName = xmlFileName.substring(0, xmlFileName.length() - 4);
-        }
-        return collectXsltBinaries(model, resources, xmlBaseName);
+        String xmlBaseName = xmlBaseName(indexedFile.getId());
+        return collectXsltBinaries(model, resources, xmlBaseName, true);
       } finally {
         resources.close();
       }
@@ -738,11 +745,7 @@ public class FilesService {
         : ModelUtils.getDocumentationStoragePath(aipId);
       CloseableIterable<Resource> resources = model.getStorage().listResourcesUnderDirectory(docPath, true);
       try {
-        String xmlBaseName = null;
-        if (xmlFileName != null && xmlFileName.toLowerCase(Locale.ROOT).endsWith(".xml")) {
-          xmlBaseName = xmlFileName.substring(0, xmlFileName.length() - 4);
-        }
-        return collectXsltBinaries(model, resources, xmlBaseName);
+        return collectXsltBinaries(model, resources, xmlBaseName(xmlFileName), false);
       } finally {
         resources.close();
       }
@@ -753,13 +756,24 @@ public class FilesService {
     return Collections.emptyList();
   }
 
+  private static String xmlBaseName(String xmlFileName) {
+    if (xmlFileName != null && xmlFileName.toLowerCase(Locale.ROOT).endsWith(".xml")) {
+      return xmlFileName.substring(0, xmlFileName.length() - 4);
+    }
+    return null;
+  }
+
   /**
    * Walk an iterable of storage resources and partition .xsl/.xslt files into
    * "filename matches the XML base" and "everything else". Matched files come
    * out first so the dropdown and the default-rendered stylesheet line up.
+   *
+   * When {@code matchedOnly} is true, only filename-matched stylesheets are
+   * returned and unrelated siblings are dropped — used by the beside-the-XML
+   * lookup so an unrelated neighbour cannot block lower discovery layers.
    */
   private static List<Binary> collectXsltBinaries(ModelService model, CloseableIterable<Resource> resources,
-    String xmlBaseName) throws Exception {
+    String xmlBaseName, boolean matchedOnly) throws Exception {
     List<Binary> matched = new ArrayList<>();
     List<Binary> others = new ArrayList<>();
     for (Resource resource : resources) {
@@ -768,11 +782,14 @@ public class FilesService {
         Binary b = model.getStorage().getBinary(resource.getStoragePath());
         if (xmlBaseName != null && isXsltMatchForXml(name, xmlBaseName)) {
           matched.add(b);
-        } else {
+        } else if (!matchedOnly) {
           others.add(b);
         }
       }
     }
+    // Filename-matched stylesheet wins regardless of order, the rest sort
+    // alphabetically so the dropdown is deterministic across runs.
+    others.sort((a, b) -> a.getStoragePath().getName().compareToIgnoreCase(b.getStoragePath().getName()));
     matched.addAll(others);
     return matched;
   }
