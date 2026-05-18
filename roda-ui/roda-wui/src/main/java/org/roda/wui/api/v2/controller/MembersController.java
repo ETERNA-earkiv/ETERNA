@@ -209,13 +209,18 @@ public class MembersController implements MembersRestService, Exportable {
         }
         if (RodaCoreFactory.getRodaConfiguration().getBoolean(RodaConstants.CORE_EXTERNAL_AUTH_GROUP_MAPPING_ENABLED,
           false)) {
-          if (attributes.get(groupsAttribute) instanceof Collection<?> memberOf) {
-            Set<String> casGroups = new HashSet<>();
+          Object groupsValue = attributes.get(groupsAttribute);
+          Set<String> casGroups = new HashSet<>();
+          if (groupsValue instanceof Collection<?> memberOf) {
             for (Object group : memberOf) {
               if (group instanceof String groupString) {
                 casGroups.add(groupString);
               }
             }
+          } else if (groupsValue instanceof String singleGroup) {
+            casGroups.add(singleGroup);
+          }
+          if (!casGroups.isEmpty()) {
             Set<String> rodaGroups = mapCasGroupstoRODAGroups(casGroups);
             if (!Objects.equals(user.getGroups(), rodaGroups)) {
               user.setGroups(rodaGroups);
