@@ -563,15 +563,24 @@ public class FilesService {
    * call this so a stylesheet that appears in the UI can always be rendered.
    *
    * Lookup order (first non-empty layer wins):
-   *  1. representation-level documentation (representations/rep_X/documentation/)
-   *  2. AIP-root documentation (documentation/)
-   *  3. global namespace mapping from configuration
+   *  1. directly beside the XML file (same folder under representations/rep_X/data/...)
+   *  2. representation-level documentation (representations/rep_X/documentation/)
+   *  3. AIP-root documentation (documentation/)
+   *  4. global namespace mapping from configuration
    */
   private List<XsltSource> resolveXsltSources(ModelService model, IndexedFile indexedFile, Binary binary,
     String namespace) {
     List<XsltSource> result = new ArrayList<>();
 
-    // Layer 1: representation-level documentation
+    // Layer 1: beside the XML file in the representation data tree
+    if (indexedFile.getRepresentationId() != null) {
+      result.addAll(toXsltSources(searchXsltsBesideXmlFile(model, indexedFile)));
+    }
+    if (!result.isEmpty()) {
+      return result;
+    }
+
+    // Layer 2: representation-level documentation
     if (indexedFile.getRepresentationId() != null) {
       result.addAll(toXsltSources(searchAllXsltsInDocumentation(model, indexedFile.getAipId(),
         indexedFile.getRepresentationId(), indexedFile.getId())));
@@ -580,14 +589,14 @@ public class FilesService {
       return result;
     }
 
-    // Layer 2: AIP-root documentation
+    // Layer 3: AIP-root documentation
     result.addAll(toXsltSources(searchAllXsltsInDocumentation(model, indexedFile.getAipId(),
       null, indexedFile.getId())));
     if (!result.isEmpty()) {
       return result;
     }
 
-    // Layer 3: global namespace mapping
+    // Layer 4: global namespace mapping
     if (namespace != null) {
       String xsltName = resolveXsltForNamespace(namespace);
       if (xsltName != null) {
@@ -661,6 +670,51 @@ public class FilesService {
         throw new GenericException("Failed to read bundled XSLT '" + id + "'", e);
       }
     }
+  }
+
+  /**
+   * Look for XSLT files in the SAME folder as the supplied XML file inside
+   * the representation data tree. Non-recursive: only direct siblings. The
+   * XML file itself and other non-.xslt files are ignored. Filename-matched
+   * stylesheets (Foo.xml → Foo.xslt) are returned first.
+   */
+  private List<Binary> searchXsltsBesideXmlFile(ModelService model, IndexedFile indexedFile) {
+    try {
+      // getFileStoragePath with a null fileId resolves to the parent directory
+      // (data/ + the file's path components), matching the existing storage
+      // pattern used by ModelUtils elsewhere.
+      StoragePath parentDir = ModelUtils.getFileStoragePath(indexedFile.getAipId(),
+        indexedFile.getRepresentationId(), indexedFile.getPath(), null);
+      CloseableIterable<Resource> resources = model.getStorage().listResourcesUnderDirectory(parentDir, false);
+      try {
+        String xmlFileName = indexedFile.getId();
+        String expectedXsltName = null;
+        if (xmlFileName != null && xmlFileName.endsWith(".xml")) {
+          expectedXsltName = xmlFileName.substring(0, xmlFileName.length() - 4) + ".xslt";
+        }
+        List<Binary> matched = new ArrayList<>();
+        List<Binary> others = new ArrayList<>();
+        for (Resource resource : resources) {
+          String name = resource.getStoragePath().getName();
+          if (name != null && name.endsWith(".xslt")) {
+            Binary b = model.getStorage().getBinary(resource.getStoragePath());
+            if (expectedXsltName != null && name.equals(expectedXsltName)) {
+              matched.add(b);
+            } else {
+              others.add(b);
+            }
+          }
+        }
+        matched.addAll(others);
+        return matched;
+      } finally {
+        resources.close();
+      }
+    } catch (Exception e) {
+      LOGGER.debug("Could not list XSLT siblings for file {} in rep {}: {}", indexedFile.getId(),
+        indexedFile.getRepresentationId(), e.getMessage());
+    }
+    return Collections.emptyList();
   }
 
   private List<Binary> searchAllXsltsInDocumentation(ModelService model, String aipId, String representationId,
