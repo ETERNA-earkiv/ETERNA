@@ -589,8 +589,9 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     String xsltsUrl = RestUtils.createRepresentationFileXsltsUri(fileUuid).asString();
 
     // Fetch the available-XSLT list FIRST. Branch the UI on the result:
-    //  - empty / error  → fall back to native textPreview only (no XSLT toolbars)
-    //  - non-empty      → build the XSLT viewer (toolbar + iframe + raw-XML container)
+    //  - empty / error  → native textPreview + upload toolbar (if user has the role),
+    //                     so a privileged user can still apply a custom XSLT
+    //  - non-empty      → full XSLT viewer (toolbar + dropdown + iframe + raw-XML container)
     RequestBuilder xsltsRequest = new RequestBuilder(RequestBuilder.GET, xsltsUrl);
     try {
       xsltsRequest.sendRequest(null, new RequestCallback() {
@@ -598,7 +599,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
         public void onResponseReceived(Request req, Response response) {
           JSONArray xslts = parseXsltArray(response);
           if (xslts == null || xslts.size() == 0) {
-            textPreview(panel);
+            buildUploadOnlyView(indexedFile, fileUuid, locale);
           } else {
             buildXsltViewer(indexedFile, fileUuid, locale, xslts);
           }
@@ -606,11 +607,11 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
 
         @Override
         public void onError(Request req, Throwable exception) {
-          textPreview(panel);
+          buildUploadOnlyView(indexedFile, fileUuid, locale);
         }
       });
     } catch (RequestException e) {
-      textPreview(panel);
+      buildUploadOnlyView(indexedFile, fileUuid, locale);
     }
   }
 
@@ -753,6 +754,68 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
 
     // Initial render of XSLT-transformed view
     loadXsltPreview(buildPreviewUrl(fileUuid, locale, currentXsltId[0]), xsltFrame);
+  }
+
+  /**
+   * No-XSLT path: render the native syntax-highlighted XML preview, and — for users
+   * with the apply_xslt role — show an upload toolbar so they can manually apply a
+   * custom XSLT. On successful upload the iframe takes over and the raw view is hidden.
+   */
+  private void buildUploadOnlyView(IndexedFile indexedFile, String fileUuid, String locale) {
+    String transformUrl = RestUtils.createRepresentationFileTransformUri(fileUuid, locale).asString();
+
+    // Upload toolbar — hidden until role check returns true
+    final FlowPanel uploadToolbar = new FlowPanel();
+    uploadToolbar.setStyleName("xmlPreviewToolbar");
+    uploadToolbar.setVisible(false);
+    FileUpload xsltUpload = new FileUpload();
+    xsltUpload.setName("xslt");
+    xsltUpload.getElement().setAttribute("accept", ".xslt,.xsl");
+    xsltUpload.setStyleName("xmlPreviewFileInput");
+    Button applyButton = new Button(messages.applyXsltButton());
+    applyButton.setStyleName("btn btn-play xmlPreviewApplyButton");
+    applyButton.setEnabled(false);
+    xsltUpload.addChangeHandler(event -> applyButton.setEnabled(true));
+    uploadToolbar.add(xsltUpload);
+    uploadToolbar.add(applyButton);
+    panel.add(uploadToolbar);
+
+    UserLogin.getInstance().checkRole(Arrays.asList("representation.apply_xslt"), new AsyncCallback<Boolean>() {
+      @Override
+      public void onSuccess(Boolean hasRole) {
+        uploadToolbar.setVisible(Boolean.TRUE.equals(hasRole));
+      }
+
+      @Override
+      public void onFailure(Throwable caught) {
+        uploadToolbar.setVisible(false);
+      }
+    });
+
+    // Container for the native text preview — always shown initially
+    final FlowPanel rawXmlContainer = new FlowPanel();
+    panel.add(rawXmlContainer);
+    textPreview(rawXmlContainer);
+
+    // Iframe for rendered HTML after a successful custom-XSLT upload — hidden until then
+    final Frame xsltFrame = new Frame();
+    xsltFrame.setStyleName("viewRepresentationHtmlFilePreview");
+    xsltFrame.getElement().setAttribute("sandbox", "allow-same-origin");
+    xsltFrame.setVisible(false);
+    panel.add(xsltFrame);
+
+    applyButton.addClickHandler(event -> {
+      applyButton.setEnabled(false);
+      applyButton.setText(messages.xsltLoading());
+      // Swap to the iframe before invoking the JSNI upload — applyCustomXslt sets
+      // srcdoc on the iframe directly, so the iframe must be in the document and
+      // visible for the result to be seen.
+      rawXmlContainer.setVisible(false);
+      xsltFrame.setVisible(true);
+      applyCustomXslt(xsltUpload.getElement(), transformUrl, xsltFrame.getElement(), applyButton.getElement(),
+        messages.applyXsltButton(), messages.xsltFileTooLarge(), messages.xsltTransformFailed(),
+        messages.xsltUploadError(), messages.xsltTransformTimeout());
+    });
   }
 
   private static String buildPreviewUrl(String fileUuid, String locale, String xsltId) {
