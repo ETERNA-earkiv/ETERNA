@@ -62,7 +62,7 @@ public final class HTMLUtils {
     Reader reader = RodaUtils.applyMetadataStylesheet(binary, RodaConstants.CROSSWALKS_DISSEMINATION_HTML_PATH,
       metadataType, metadataVersion, translations);
     try {
-      return sanitizeHtml(CharStreams.toString(reader));
+      return CharStreams.toString(reader);
     } catch (IOException e) {
       throw new GenericException("Could not transform PREMIS to HTML", e);
     }
@@ -92,7 +92,7 @@ public final class HTMLUtils {
         metadataVersion, translations);
     }
     try {
-      return sanitizeHtml(CharStreams.toString(reader));
+      return CharStreams.toString(reader);
     } catch (IOException e) {
       throw new GenericException("Could not transform PREMIS to HTML", e);
     }
@@ -107,7 +107,7 @@ public final class HTMLUtils {
       RodaConstants.CROSSWALKS_DISSEMINATION_HTML_EVENT_PATH);
 
     try {
-      return sanitizeHtml(CharStreams.toString(reader));
+      return CharStreams.toString(reader);
     } catch (IOException e) {
       throw new GenericException("Could not transform PREMIS to HTML", e);
     }
