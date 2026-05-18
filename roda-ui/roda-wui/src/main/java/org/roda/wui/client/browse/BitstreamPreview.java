@@ -53,6 +53,7 @@ import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.ComplexPanel;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FileUpload;
@@ -321,6 +322,10 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   }
 
   private void textPreview() {
+    textPreview(panel);
+  }
+
+  private void textPreview(ComplexPanel target) {
     if (StringUtils.isBlank(viewers.getTextLimit()) || size <= Long.parseLong(viewers.getTextLimit())) {
       RequestBuilder request = new RequestBuilder(RequestBuilder.GET, bitstreamDownloadUri.asString());
       try {
@@ -333,7 +338,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
               FlowPanel frame = new FlowPanel();
               frame.add(html);
 
-              panel.add(frame);
+              target.add(frame);
               frame.setStyleName("viewRepresentationTextFilePreview");
               JavascriptUtils.runHighlighter(html.getElement());
             } else {
