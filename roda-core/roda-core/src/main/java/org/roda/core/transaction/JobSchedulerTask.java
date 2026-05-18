@@ -167,8 +167,7 @@ public class JobSchedulerTask {
 
     } catch (NotFoundException e) {
       LOGGER.warn("Scheduled job {} no longer exists; skipping", templateJobId);
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException
-      | JobAlreadyStartedException e) {
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       LOGGER.error("Error firing scheduled job {}", templateJobId, e);
     }
   }

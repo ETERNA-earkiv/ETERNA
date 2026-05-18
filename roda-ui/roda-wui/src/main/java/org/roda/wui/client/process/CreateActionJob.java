@@ -119,6 +119,39 @@ public class CreateActionJob extends CreateSelectedJob<IsIndexed> {
   }
 
   @Override
+  public void buttonScheduleHandler(ClickEvent e) {
+    ScheduleJobDialog dialog = new ScheduleJobDialog(cronExpression -> {
+      if (cronExpression == null) {
+        return;
+      }
+      getButtonSchedule().setEnabled(false);
+
+      CreateJobRequest jobRequest = new CreateJobRequest();
+      jobRequest.setName(getName().getText());
+      jobRequest.setPlugin(getSelectedPlugin().getId());
+      jobRequest.setPluginParameters(getWorkflowOptions().getValue());
+      jobRequest.setSourceObjects(SelectedItemsUtils.convertToRESTRequest(getSelected()));
+      jobRequest.setPriority(getJobPriority().name());
+      jobRequest.setParallelism(getJobParallelism().name());
+      jobRequest.setSourceObjectsClass(getSelected().getSelectedClass());
+      jobRequest.setScheduleExpression(cronExpression);
+
+      Services services = new Services("Schedule job", "create");
+      services.jobsResource(s -> s.createJob(jobRequest)).whenComplete((job1, throwable) -> {
+        getButtonSchedule().setEnabled(true);
+        if (throwable != null) {
+          AsyncCallbackUtils.defaultFailureTreatment(throwable);
+        } else {
+          Toast.showInfo(messages.dialogDone(), messages.processCreated());
+          HistoryUtils.newHistory(ActionProcess.RESOLVER);
+        }
+      });
+    });
+    dialog.center();
+    dialog.show();
+  }
+
+  @Override
   public void buttonObtainCommandHandler(ClickEvent e) {
     String jobName = getName().getText();
 

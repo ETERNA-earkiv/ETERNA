@@ -97,6 +97,15 @@ public class JobStats implements Serializable {
     return this;
   }
 
+  public int getSourceObjectsProcessed() {
+    return sourceObjectsProcessedWithSuccess + sourceObjectsProcessedWithPartialSuccess
+      + sourceObjectsProcessedWithSkipped + sourceObjectsProcessedWithFailure;
+  }
+
+  public int getSourceObjectsWithErrors() {
+    return sourceObjectsProcessedWithFailure;
+  }
+
   public int getOutcomeObjectsWithManualIntervention() {
     return outcomeObjectsWithManualIntervention;
   }

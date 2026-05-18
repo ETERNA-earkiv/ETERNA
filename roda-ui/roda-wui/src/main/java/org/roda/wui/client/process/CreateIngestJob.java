@@ -58,6 +58,7 @@ public class CreateIngestJob extends CreateSelectedJob<TransferredResource> {
   public CreateIngestJob() {
     super(Arrays.asList(pluginTypes));
     super.setCategoryListBoxVisible(false);
+    super.getButtonSchedule().setVisible(false);
   }
 
   @Override
@@ -185,6 +186,11 @@ public class CreateIngestJob extends CreateSelectedJob<TransferredResource> {
           }
         });
     }
+  }
+
+  @Override
+  public void buttonScheduleHandler(ClickEvent e) {
+    // scheduling not supported for ingest jobs; button is hidden in constructor
   }
 
   @Override

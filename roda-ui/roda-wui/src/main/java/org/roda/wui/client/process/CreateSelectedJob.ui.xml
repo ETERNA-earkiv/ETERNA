@@ -102,6 +102,9 @@
 						<g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonCreate">
 							<ui:text from='{messages.createJobCreateTitle}' />
 						</g:Button>
+						<g:Button addStyleNames="btn btn-block btn-calendar" ui:field="buttonSchedule">
+							<ui:text from='{messages.createJobScheduleTitle}' />
+						</g:Button>
 						<g:Button addStyleNames="btn btn-block btn-download" ui:field="buttonObtainCommand">
 							<ui:text from='{messages.createJobObtainCommandTitle}' />
 						</g:Button>
