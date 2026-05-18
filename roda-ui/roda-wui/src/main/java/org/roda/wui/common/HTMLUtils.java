@@ -36,9 +36,18 @@ public final class HTMLUtils {
 
   // XSS defense-in-depth for XSLT-rendered HTML.
   //
-  // All toHtml() methods below feed their return value into client-side
-  // SafeHtmlUtils.fromTrustedString(...), which bypasses GWT's own escaping.
-  // XSLT input is derived from user-controllable artifacts (SIPs, metadata
+  // The toHtml() methods below feed their return value into trusted HTML
+  // sinks on the client side, where the browser bypasses normal escaping:
+  //
+  //   - descriptive/technical metadata + preservation event → wrapped by
+  //     SafeHtmlUtils.fromTrustedString(...) and inserted into the DOM
+  //     (AIPDescriptiveMetadataTabs, FileTechnicalMetadataTabs,
+  //      ShowPreservationEvent)
+  //   - representation file → returned over REST and assigned to an
+  //     iframe srcdoc attribute (BitstreamPreview.loadXsltPreview)
+  //
+  // Both sinks render the string as HTML without further escaping. XSLT
+  // input is derived from user-controllable artifacts (SIPs, metadata
   // files, custom uploaded stylesheets), so the rendered string must be
   // sanitized server-side to prevent stored-XSS via crafted XML/XSLT.
   //
