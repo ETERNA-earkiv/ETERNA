@@ -887,7 +887,7 @@ public class IndexModelObserver implements ModelObserver {
         indexRepresentation(aip, representation, ancestors).addTo(ret);
       }
       if (ret.isEmpty()) {
-        SolrUtils.commit(index, IndexedAIP.class);
+        SolrUtils.commit(index, descriptiveMetadata.isFromAIP() ? IndexedAIP.class : IndexedRepresentation.class);
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Failed to index AIP or representation when creating descriptive metadata", e);
@@ -918,7 +918,7 @@ public class IndexModelObserver implements ModelObserver {
         indexRepresentation(aip, representation, ancestors).addTo(ret);
       }
       if (ret.isEmpty()) {
-        SolrUtils.commit(index, IndexedAIP.class);
+        SolrUtils.commit(index, descriptiveMetadata.isFromAIP() ? IndexedAIP.class : IndexedRepresentation.class);
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Failed to index AIP or representation when updating descriptive metadata", e);

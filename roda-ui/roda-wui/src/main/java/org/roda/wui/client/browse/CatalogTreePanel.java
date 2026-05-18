@@ -151,6 +151,7 @@ public class CatalogTreePanel extends Composite {
   }
 
   private void loadRootNodes() {
+    clearSelection();
     treeBody.clear();
     rootNodes.clear();
     rootsLoaded = false;
