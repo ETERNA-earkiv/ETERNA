@@ -615,6 +615,37 @@ public class FilesService {
     return out;
   }
 
+  // XSLT files can use either of the two W3C-recognized extensions. Treat both
+  // identically across discovery, filename matching, and label extraction.
+  private static boolean isXsltFilename(String name) {
+    if (name == null) {
+      return false;
+    }
+    String lower = name.toLowerCase(Locale.ROOT);
+    return lower.endsWith(".xslt") || lower.endsWith(".xsl");
+  }
+
+  private static String stripXsltExtension(String name) {
+    if (name == null) {
+      return null;
+    }
+    String lower = name.toLowerCase(Locale.ROOT);
+    if (lower.endsWith(".xslt")) {
+      return name.substring(0, name.length() - 5);
+    }
+    if (lower.endsWith(".xsl")) {
+      return name.substring(0, name.length() - 4);
+    }
+    return name;
+  }
+
+  private static boolean isXsltMatchForXml(String xsltName, String xmlBaseName) {
+    if (xsltName == null || xmlBaseName == null) {
+      return false;
+    }
+    return xsltName.equals(xmlBaseName + ".xslt") || xsltName.equals(xmlBaseName + ".xsl");
+  }
+
   private static XsltSource chooseXsltSource(List<XsltSource> sources, String requestedId) {
     if (requestedId == null || requestedId.isEmpty()) {
       return sources.isEmpty() ? null : sources.get(0);
@@ -649,11 +680,7 @@ public class FilesService {
     }
 
     static XsltSource bundled(String filename, Binary binary) {
-      String label = filename;
-      if (filename.endsWith(".xslt")) {
-        label = filename.substring(0, filename.length() - 5);
-      }
-      return new XsltSource(filename, label, binary, null);
+      return new XsltSource(filename, stripXsltExtension(filename), binary, null);
     }
 
     static XsltSource global(String xsltName) {
@@ -688,25 +715,11 @@ public class FilesService {
       CloseableIterable<Resource> resources = model.getStorage().listResourcesUnderDirectory(parentDir, false);
       try {
         String xmlFileName = indexedFile.getId();
-        String expectedXsltName = null;
-        if (xmlFileName != null && xmlFileName.endsWith(".xml")) {
-          expectedXsltName = xmlFileName.substring(0, xmlFileName.length() - 4) + ".xslt";
+        String xmlBaseName = null;
+        if (xmlFileName != null && xmlFileName.toLowerCase(Locale.ROOT).endsWith(".xml")) {
+          xmlBaseName = xmlFileName.substring(0, xmlFileName.length() - 4);
         }
-        List<Binary> matched = new ArrayList<>();
-        List<Binary> others = new ArrayList<>();
-        for (Resource resource : resources) {
-          String name = resource.getStoragePath().getName();
-          if (name != null && name.endsWith(".xslt")) {
-            Binary b = model.getStorage().getBinary(resource.getStoragePath());
-            if (expectedXsltName != null && name.equals(expectedXsltName)) {
-              matched.add(b);
-            } else {
-              others.add(b);
-            }
-          }
-        }
-        matched.addAll(others);
-        return matched;
+        return collectXsltBinaries(model, resources, xmlBaseName);
       } finally {
         resources.close();
       }
@@ -725,26 +738,11 @@ public class FilesService {
         : ModelUtils.getDocumentationStoragePath(aipId);
       CloseableIterable<Resource> resources = model.getStorage().listResourcesUnderDirectory(docPath, true);
       try {
-        String expectedXsltName = null;
-        if (xmlFileName != null && xmlFileName.endsWith(".xml")) {
-          expectedXsltName = xmlFileName.substring(0, xmlFileName.length() - 4) + ".xslt";
+        String xmlBaseName = null;
+        if (xmlFileName != null && xmlFileName.toLowerCase(Locale.ROOT).endsWith(".xml")) {
+          xmlBaseName = xmlFileName.substring(0, xmlFileName.length() - 4);
         }
-        List<Binary> matched = new ArrayList<>();
-        List<Binary> others = new ArrayList<>();
-        for (Resource resource : resources) {
-          String name = resource.getStoragePath().getName();
-          if (name != null && name.endsWith(".xslt")) {
-            Binary b = model.getStorage().getBinary(resource.getStoragePath());
-            if (expectedXsltName != null && name.equals(expectedXsltName)) {
-              matched.add(b);
-            } else {
-              others.add(b);
-            }
-          }
-        }
-        // filename-matched first, then the rest alphabetically
-        matched.addAll(others);
-        return matched;
+        return collectXsltBinaries(model, resources, xmlBaseName);
       } finally {
         resources.close();
       }
@@ -753,6 +751,30 @@ public class FilesService {
         e.getMessage());
     }
     return Collections.emptyList();
+  }
+
+  /**
+   * Walk an iterable of storage resources and partition .xsl/.xslt files into
+   * "filename matches the XML base" and "everything else". Matched files come
+   * out first so the dropdown and the default-rendered stylesheet line up.
+   */
+  private static List<Binary> collectXsltBinaries(ModelService model, CloseableIterable<Resource> resources,
+    String xmlBaseName) throws Exception {
+    List<Binary> matched = new ArrayList<>();
+    List<Binary> others = new ArrayList<>();
+    for (Resource resource : resources) {
+      String name = resource.getStoragePath().getName();
+      if (isXsltFilename(name)) {
+        Binary b = model.getStorage().getBinary(resource.getStoragePath());
+        if (xmlBaseName != null && isXsltMatchForXml(name, xmlBaseName)) {
+          matched.add(b);
+        } else {
+          others.add(b);
+        }
+      }
+    }
+    matched.addAll(others);
+    return matched;
   }
 
   private String resolveXsltForNamespace(String namespace) {
