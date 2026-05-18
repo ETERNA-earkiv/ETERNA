@@ -346,15 +346,13 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
                             @Override
                             public void onFailure(Throwable caught) {
-                              CatalogTreePanel.getInstance().refreshSubtree(aip.getParentID());
-                              CatalogTreePanel.getInstance().refreshSubtree(parentId);
+                              CatalogTreePanel.getInstance().refreshAfterMove(aip.getParentID(), parentId);
                               doActionCallbackNone();
                             }
 
                             @Override
                             public void onSuccess(final Void nothing) {
-                              CatalogTreePanel.getInstance().refreshSubtree(aip.getParentID());
-                              CatalogTreePanel.getInstance().refreshSubtree(parentId);
+                              CatalogTreePanel.getInstance().refreshAfterMove(aip.getParentID(), parentId);
                               doActionCallbackNone();
                               HistoryUtils.newHistory(ShowJob.RESOLVER, value.getId());
                             }

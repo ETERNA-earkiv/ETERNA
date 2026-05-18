@@ -299,6 +299,17 @@ public class CatalogTreePanel extends Composite {
       });
   }
 
+  public void refreshAfterMove(String oldParentId, String newParentId) {
+    boolean rootInvolved = (oldParentId == null || oldParentId.isEmpty())
+      || (newParentId == null || newParentId.isEmpty());
+    if (rootInvolved) {
+      loadRootNodes();
+    } else {
+      refreshSubtree(oldParentId);
+      refreshSubtree(newParentId);
+    }
+  }
+
   public void refreshSubtree(String parentAipId) {
     if (parentAipId == null || parentAipId.isEmpty()) {
       rootNodes.clear();
