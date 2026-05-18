@@ -475,51 +475,23 @@ public class FilesService {
     }
 
     Locale locale = ServerTools.parseLocale(localeString);
-    String html = null;
 
-    // If a specific XSLT was requested, use it directly
-    if (selectedXsltId != null && !selectedXsltId.isEmpty()) {
-      if (selectedXsltId.startsWith("global:")) {
-        String xsltName = selectedXsltId.substring("global:".length());
-        LOGGER.info("Using selected global XSLT '{}' for file {}", xsltName, indexedFile.getId());
-        html = HTMLUtils.representationFileToHtml(binary, xsltName, locale);
-      } else {
-        Binary xsltBinary = findXsltInAipDocumentationByName(model, indexedFile.getAipId(),
-          indexedFile.getRepresentationId(), selectedXsltId);
-        if (xsltBinary != null) {
-          LOGGER.info("Using selected AIP-bundled XSLT '{}' for file {}", selectedXsltId, indexedFile.getId());
-          try (InputStream xsltStream = xsltBinary.getContent().createInputStream()) {
-            html = HTMLUtils.representationFileToHtmlWithCustomXslt(binary, xsltStream, locale);
-          } catch (Exception e) {
-            LOGGER.warn("Failed to apply selected XSLT '{}', falling through to default", selectedXsltId, e);
-          }
-        }
-      }
+    // Resolve the candidate XSLTs once. Both listAvailableXslts() and this
+    // method share the same resolver so a stylesheet that appears in the
+    // dropdown is guaranteed to be renderable.
+    List<XsltSource> sources = resolveXsltSources(model, indexedFile, binary, namespace);
+    if (sources.isEmpty()) {
+      throw new NotFoundException("No XSLT stylesheet available for file: " + indexedFile.getId()
+        + " (namespace: " + namespace + ")");
     }
 
-    // Strategy 1: Check AIP documentation for bundled XSLT stylesheet
-    if (html == null) {
-      try {
-        Binary xsltBinary = findXsltInAipDocumentation(model, indexedFile.getAipId(), indexedFile.getRepresentationId(), indexedFile.getId());
-        if (xsltBinary != null) {
-          LOGGER.info("Using AIP-bundled XSLT from documentation for AIP {}", indexedFile.getAipId());
-          try (InputStream xsltStream = xsltBinary.getContent().createInputStream()) {
-            html = HTMLUtils.representationFileToHtmlWithCustomXslt(binary, xsltStream, locale);
-          }
-        }
-      } catch (Exception e) {
-        LOGGER.debug("No bundled XSLT found in AIP documentation, falling back to config", e);
-      }
+    XsltSource chosen = chooseXsltSource(sources, selectedXsltId);
+    if (chosen == null) {
+      throw new NotFoundException("Requested XSLT '" + selectedXsltId
+        + "' is not available for file: " + indexedFile.getId());
     }
-
-    // Strategy 2: Fall back to namespace-based config lookup
-    if (html == null) {
-      String xsltName = resolveXsltForNamespace(namespace);
-      if (xsltName == null) {
-        throw new NotFoundException("No XSLT stylesheet configured for namespace: " + namespace);
-      }
-      html = HTMLUtils.representationFileToHtml(binary, xsltName, locale);
-    }
+    LOGGER.info("Rendering file {} with XSLT '{}'", indexedFile.getId(), chosen.id);
+    String html = chosen.render(binary, locale);
 
     String filename = indexedFile.getId() + HTML_EXT;
     final String finalHtml = html;
@@ -542,35 +514,18 @@ public class FilesService {
       throw new RequestNotValidException("Couldn't retrieve file with id: " + indexedFile.getId());
     }
 
-    List<Map<String, String>> result = new ArrayList<>();
+    Binary binary = model.getBinary(liteFile.get());
+    String namespace = detectXmlNamespace(binary);
 
-    // Collect all XSLTs from AIP documentation
-    List<Binary> aipXslts = findAllXsltsInAipDocumentation(model, indexedFile.getAipId(),
-      indexedFile.getRepresentationId(), indexedFile.getId());
-    for (Binary b : aipXslts) {
-      String name = b.getStoragePath().getName();
-      String label = name.endsWith(".xslt") ? name.substring(0, name.length() - 5) : name;
+    List<XsltSource> sources = resolveXsltSources(model, indexedFile, binary, namespace);
+
+    List<Map<String, String>> result = new ArrayList<>(sources.size());
+    for (XsltSource source : sources) {
       Map<String, String> entry = new HashMap<>();
-      entry.put("id", name);
-      entry.put("label", label);
+      entry.put("id", source.id);
+      entry.put("label", source.label);
       result.add(entry);
     }
-
-    // If no AIP XSLTs found, also check global namespace config
-    if (result.isEmpty()) {
-      Binary binary = model.getBinary(liteFile.get());
-      String namespace = detectXmlNamespace(binary);
-      if (namespace != null) {
-        String xsltName = resolveXsltForNamespace(namespace);
-        if (xsltName != null) {
-          Map<String, String> entry = new HashMap<>();
-          entry.put("id", "global:" + xsltName);
-          entry.put("label", xsltName);
-          result.add(entry);
-        }
-      }
-    }
-
     return result;
   }
 
@@ -602,64 +557,110 @@ public class FilesService {
 
 
 
-  private Binary findXsltInAipDocumentation(ModelService model, String aipId, String representationId, String xmlFileName) {
-    // Try representation-level documentation first, then package-level as fallback
-    Binary result = searchXsltInDocumentation(model, aipId, representationId, xmlFileName);
-    if (result == null && representationId != null) {
-      result = searchXsltInDocumentation(model, aipId, null, xmlFileName);
+  /**
+   * Single source of truth for the candidate XSLT list for a given file. Both
+   * listAvailableXslts() (dropdown) and retrieveFileContentHTML() (rendering)
+   * call this so a stylesheet that appears in the UI can always be rendered.
+   *
+   * Lookup order (first non-empty layer wins):
+   *  1. representation-level documentation (representations/rep_X/documentation/)
+   *  2. AIP-root documentation (documentation/)
+   *  3. global namespace mapping from configuration
+   */
+  private List<XsltSource> resolveXsltSources(ModelService model, IndexedFile indexedFile, Binary binary,
+    String namespace) {
+    List<XsltSource> result = new ArrayList<>();
+
+    // Layer 1: representation-level documentation
+    if (indexedFile.getRepresentationId() != null) {
+      result.addAll(toXsltSources(searchAllXsltsInDocumentation(model, indexedFile.getAipId(),
+        indexedFile.getRepresentationId(), indexedFile.getId())));
+    }
+    if (!result.isEmpty()) {
+      return result;
+    }
+
+    // Layer 2: AIP-root documentation
+    result.addAll(toXsltSources(searchAllXsltsInDocumentation(model, indexedFile.getAipId(),
+      null, indexedFile.getId())));
+    if (!result.isEmpty()) {
+      return result;
+    }
+
+    // Layer 3: global namespace mapping
+    if (namespace != null) {
+      String xsltName = resolveXsltForNamespace(namespace);
+      if (xsltName != null) {
+        result.add(XsltSource.global(xsltName));
+      }
     }
     return result;
   }
 
-  private Binary searchXsltInDocumentation(ModelService model, String aipId, String representationId,
-    String xmlFileName) {
-    try {
-      StoragePath docPath = representationId != null
-        ? ModelUtils.getDocumentationStoragePath(aipId, representationId)
-        : ModelUtils.getDocumentationStoragePath(aipId);
-      CloseableIterable<Resource> resources = model.getStorage().listResourcesUnderDirectory(docPath, true);
-      try {
-        String expectedXsltName = null;
-        if (xmlFileName != null && xmlFileName.endsWith(".xml")) {
-          expectedXsltName = xmlFileName.substring(0, xmlFileName.length() - 4) + ".xslt";
-        }
+  private static List<XsltSource> toXsltSources(List<Binary> binaries) {
+    List<XsltSource> out = new ArrayList<>(binaries.size());
+    for (Binary b : binaries) {
+      String name = b.getStoragePath().getName();
+      out.add(XsltSource.bundled(name, b));
+    }
+    return out;
+  }
 
-        Binary fallback = null;
-        for (Resource resource : resources) {
-          String name = resource.getStoragePath().getName();
-          if (name != null && name.endsWith(".xslt")) {
-            if (expectedXsltName != null && name.equals(expectedXsltName)) {
-              String level = representationId != null ? "representation" : "package";
-              LOGGER.info("Found filename-matched XSLT '{}' for XML '{}' at {} level", name, xmlFileName, level);
-              return model.getStorage().getBinary(resource.getStoragePath());
-            }
-            if (fallback == null) {
-              fallback = model.getStorage().getBinary(resource.getStoragePath());
-            }
-          }
-        }
-
-        if (fallback != null) {
-          String level = representationId != null ? "representation" : "package";
-          LOGGER.info("No filename-matched XSLT for '{}', using fallback XSLT at {} level", xmlFileName, level);
-        }
-        return fallback;
-      } finally {
-        resources.close();
+  private static XsltSource chooseXsltSource(List<XsltSource> sources, String requestedId) {
+    if (requestedId == null || requestedId.isEmpty()) {
+      return sources.isEmpty() ? null : sources.get(0);
+    }
+    for (XsltSource s : sources) {
+      if (requestedId.equals(s.id)) {
+        return s;
       }
-    } catch (Exception e) {
-      LOGGER.debug("Could not list documentation for aip={}, rep={}: {}", aipId, representationId, e.getMessage());
     }
     return null;
   }
 
-  private List<Binary> findAllXsltsInAipDocumentation(ModelService model, String aipId, String representationId,
-    String xmlFileName) {
-    List<Binary> result = searchAllXsltsInDocumentation(model, aipId, representationId, xmlFileName);
-    if (result.isEmpty() && representationId != null) {
-      result = searchAllXsltsInDocumentation(model, aipId, null, xmlFileName);
+  /**
+   * Internal value type representing a single XSLT candidate. Two flavors:
+   *  - bundled: a Binary from the AIP storage (rep or AIP documentation)
+   *  - global:  an XSLT name configured in roda-wui.properties, resolved by HTMLUtils
+   *
+   * The id field is what the client sends back in the xslt query parameter;
+   * the label is the user-visible string in the dropdown.
+   */
+  private static final class XsltSource {
+    final String id;
+    final String label;
+    private final Binary bundledBinary;
+    private final String globalXsltName;
+
+    private XsltSource(String id, String label, Binary bundledBinary, String globalXsltName) {
+      this.id = id;
+      this.label = label;
+      this.bundledBinary = bundledBinary;
+      this.globalXsltName = globalXsltName;
     }
-    return result;
+
+    static XsltSource bundled(String filename, Binary binary) {
+      String label = filename;
+      if (filename.endsWith(".xslt")) {
+        label = filename.substring(0, filename.length() - 5);
+      }
+      return new XsltSource(filename, label, binary, null);
+    }
+
+    static XsltSource global(String xsltName) {
+      return new XsltSource("global:" + xsltName, xsltName, null, xsltName);
+    }
+
+    String render(Binary inputBinary, Locale locale) throws GenericException {
+      if (globalXsltName != null) {
+        return HTMLUtils.representationFileToHtml(inputBinary, globalXsltName, locale);
+      }
+      try (InputStream xsltStream = bundledBinary.getContent().createInputStream()) {
+        return HTMLUtils.representationFileToHtmlWithCustomXslt(inputBinary, xsltStream, locale);
+      } catch (java.io.IOException e) {
+        throw new GenericException("Failed to read bundled XSLT '" + id + "'", e);
+      }
+    }
   }
 
   private List<Binary> searchAllXsltsInDocumentation(ModelService model, String aipId, String representationId,
@@ -698,38 +699,6 @@ public class FilesService {
         e.getMessage());
     }
     return Collections.emptyList();
-  }
-
-  private Binary findXsltInAipDocumentationByName(ModelService model, String aipId, String representationId,
-    String xsltName) {
-    Binary result = searchXsltByNameInDocumentation(model, aipId, representationId, xsltName);
-    if (result == null && representationId != null) {
-      result = searchXsltByNameInDocumentation(model, aipId, null, xsltName);
-    }
-    return result;
-  }
-
-  private Binary searchXsltByNameInDocumentation(ModelService model, String aipId, String representationId,
-    String xsltName) {
-    try {
-      StoragePath docPath = representationId != null
-        ? ModelUtils.getDocumentationStoragePath(aipId, representationId)
-        : ModelUtils.getDocumentationStoragePath(aipId);
-      CloseableIterable<Resource> resources = model.getStorage().listResourcesUnderDirectory(docPath, true);
-      try {
-        for (Resource resource : resources) {
-          if (xsltName.equals(resource.getStoragePath().getName())) {
-            return model.getStorage().getBinary(resource.getStoragePath());
-          }
-        }
-      } finally {
-        resources.close();
-      }
-    } catch (Exception e) {
-      LOGGER.debug("Could not find XSLT '{}' in documentation for aip={}, rep={}: {}", xsltName, aipId,
-        representationId, e.getMessage());
-    }
-    return null;
   }
 
   private String resolveXsltForNamespace(String namespace) {
