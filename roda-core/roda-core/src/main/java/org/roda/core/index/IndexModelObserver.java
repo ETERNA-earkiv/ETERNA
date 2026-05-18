@@ -131,10 +131,16 @@ public class IndexModelObserver implements ModelObserver {
           }
         }
       }
-      SolrUtils.commit(index, IndexedAIP.class);
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error getting ancestors when creating AIP", e);
       ret.add(e);
+    }
+    if (ret.isEmpty()) {
+      try {
+        SolrUtils.commit(index, IndexedAIP.class);
+      } catch (GenericException e) {
+        LOGGER.error("Error committing Solr after AIP creation", e);
+      }
     }
 
     return ret;
@@ -786,6 +792,7 @@ public class IndexModelObserver implements ModelObserver {
       SolrUtils.commit(index, IndexedAIP.class);
     } catch (GenericException e) {
       LOGGER.error("Error committing Solr after AIP move", e);
+      ret.add(e);
     }
 
     return ret;
@@ -848,6 +855,7 @@ public class IndexModelObserver implements ModelObserver {
       SolrUtils.commit(index, IndexedAIP.class);
     } catch (GenericException e) {
       LOGGER.error("Error committing Solr after AIP deletion", e);
+      ret.add(e);
     }
 
     return ret;
@@ -873,7 +881,9 @@ public class IndexModelObserver implements ModelObserver {
           descriptiveMetadata.getRepresentationId());
         indexRepresentation(aip, representation, ancestors).addTo(ret);
       }
-      SolrUtils.commit(index, IndexedAIP.class);
+      if (ret.isEmpty()) {
+        SolrUtils.commit(index, IndexedAIP.class);
+      }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Failed to index AIP or representation when creating descriptive metadata", e);
       ret.add(e);
@@ -902,7 +912,9 @@ public class IndexModelObserver implements ModelObserver {
           descriptiveMetadata.getRepresentationId());
         indexRepresentation(aip, representation, ancestors).addTo(ret);
       }
-      SolrUtils.commit(index, IndexedAIP.class);
+      if (ret.isEmpty()) {
+        SolrUtils.commit(index, IndexedAIP.class);
+      }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Failed to index AIP or representation when updating descriptive metadata", e);
       ret.add(e);
