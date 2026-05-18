@@ -34,6 +34,19 @@ import com.google.common.io.CharStreams;
  */
 public final class HTMLUtils {
 
+  // XSS defense-in-depth for XSLT-rendered HTML.
+  //
+  // All toHtml() methods below feed their return value into client-side
+  // SafeHtmlUtils.fromTrustedString(...), which bypasses GWT's own escaping.
+  // XSLT input is derived from user-controllable artifacts (SIPs, metadata
+  // files, custom uploaded stylesheets), so the rendered string must be
+  // sanitized server-side to prevent stored-XSS via crafted XML/XSLT.
+  //
+  // The policy below is intentionally permissive enough to render existing
+  // descriptive/technical/preservation metadata crosswalks unchanged
+  // (tables, lists, inline formatting, anchors, images, inline styles).
+  // If a future crosswalk needs an element/attribute not on this list,
+  // extend the policy here — do NOT bypass sanitization at call sites.
   private static final PolicyFactory HTML_SANITIZER = new HtmlPolicyBuilder()
     .allowCommonBlockElements()
     .allowCommonInlineFormattingElements()
