@@ -217,7 +217,7 @@ public class MembersController implements MembersRestService, Exportable {
               }
             }
             Set<String> rodaGroups = mapCasGroupstoRODAGroups(casGroups);
-            if (!user.getGroups().equals(rodaGroups)) {
+            if (!Objects.equals(user.getGroups(), rodaGroups)) {
               user.setGroups(rodaGroups);
             }
           }
