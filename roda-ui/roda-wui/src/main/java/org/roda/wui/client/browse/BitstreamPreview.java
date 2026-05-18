@@ -915,7 +915,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     var file = files[0];
     var maxSize = 1024 * 1024;
     if (file.size > maxSize) {
-      $wnd.alert("XSLT-filen är för stor (max 1 MB)");
+      $wnd.alert(fileTooLargeMsg);
       button.innerText = buttonLabel;
       button.disabled = false;
       return;
@@ -946,7 +946,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
       button.disabled = false;
     };
     xhr.ontimeout = function() {
-      $wnd.alert("XSLT-transformeringen tog för lång tid (timeout 30s)");
+      $wnd.alert(timeoutMsg);
       button.innerText = buttonLabel;
       button.disabled = false;
     };
