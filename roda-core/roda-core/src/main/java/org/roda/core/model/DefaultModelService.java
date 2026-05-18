@@ -2537,6 +2537,12 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
+  public PreservationMetadata createOrUpdateUserAgentBinary(String username) throws RODAException {
+    return PremisV3Utils.createOrUpdatePremisUserAgentBinary(
+      username, this, RodaCoreFactory.getIndexService(), true);
+  }
+
+  @Override
   public User deActivateUser(String id, boolean activate, boolean notify)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     return deActivateUser(id, activate, notify, false);

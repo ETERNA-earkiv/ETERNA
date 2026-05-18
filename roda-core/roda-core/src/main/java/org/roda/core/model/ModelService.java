@@ -430,6 +430,10 @@ public interface ModelService extends ModelObservable {
   CloseableIterable<OptionalWithCause<PreservationMetadata>> listPreservationAgents()
     throws RequestNotValidException, GenericException, AuthorizationDeniedException;
 
+  /** Creates or updates the PREMIS user agent binary for the given username,
+   * ensuring the agent is persisted and indexed in Solr. */
+  PreservationMetadata createOrUpdateUserAgentBinary(String username) throws RODAException;
+
   CloseableIterable<OptionalWithCause<PreservationMetadata>> listPreservationRepositoryEvents()
     throws RequestNotValidException, GenericException, AuthorizationDeniedException;
 

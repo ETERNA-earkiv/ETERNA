@@ -23,7 +23,6 @@ import javax.crypto.SecretKey;
 import org.apache.commons.lang3.StringUtils;
 import org.apereo.cas.client.authentication.AttributePrincipal;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.JwtUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.SecureString;
@@ -193,8 +192,7 @@ public class MembersController implements MembersRestService, Exportable {
 
       user = RodaCoreFactory.getModelService().createUser(user, true);
       try {
-        PremisV3Utils.createOrUpdatePremisUserAgentBinary(user.getName(),
-          RodaCoreFactory.getModelService(), RodaCoreFactory.getIndexService(), true);
+        RodaCoreFactory.getModelService().createOrUpdateUserAgentBinary(user.getName());
       } catch (Exception e) {
         LOGGER.warn("Could not create PREMIS agent for CAS user '{}'", user.getName(), e);
       }
@@ -227,8 +225,7 @@ public class MembersController implements MembersRestService, Exportable {
       }
       RodaCoreFactory.getModelService().updateUser(user, null, true);
       try {
-        PremisV3Utils.createOrUpdatePremisUserAgentBinary(user.getName(),
-          RodaCoreFactory.getModelService(), RodaCoreFactory.getIndexService(), true);
+        RodaCoreFactory.getModelService().createOrUpdateUserAgentBinary(user.getName());
       } catch (Exception e) {
         LOGGER.warn("Could not update PREMIS agent for CAS user '{}'", user.getName(), e);
       }

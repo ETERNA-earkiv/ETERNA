@@ -23,7 +23,6 @@ import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
-import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.notifications.EmailNotificationProcessor;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.SecureString;
@@ -248,7 +247,7 @@ public class MembersService {
     IndexService index = RodaCoreFactory.getIndexService();
     User addedUser = model.createUser(user, password, true);
     try {
-      PremisV3Utils.createOrUpdatePremisUserAgentBinary(user.getName(), model, index, true);
+      model.createOrUpdateUserAgentBinary(user.getName());
     } catch (Exception e) {
       LOGGER.warn("Could not create PREMIS agent for user '{}'", user.getName(), e);
     }
@@ -301,8 +300,7 @@ public class MembersService {
     User confirmedUser = RodaCoreFactory.getModelService().confirmUserEmail(username, email, emailConfirmationToken,
       true, true);
     try {
-      PremisV3Utils.createOrUpdatePremisUserAgentBinary(confirmedUser.getName(),
-        RodaCoreFactory.getModelService(), RodaCoreFactory.getIndexService(), true);
+      RodaCoreFactory.getModelService().createOrUpdateUserAgentBinary(confirmedUser.getName());
     } catch (Exception e) {
       LOGGER.warn("Could not create PREMIS agent for confirmed user '{}'", confirmedUser.getName(), e);
     }
@@ -311,12 +309,10 @@ public class MembersService {
 
   public User updateUser(UpdateUserRequest request) throws GenericException, AlreadyExistsException, NotFoundException,
     AuthorizationDeniedException, ValidationException, RequestNotValidException {
-    ModelService model = RodaCoreFactory.getModelService();
-    IndexService index = RodaCoreFactory.getIndexService();
     request.getUser().setExtra(request.getValues());
     User modifiedUser = RodaCoreFactory.getModelService().updateUser(request.getUser(), request.getPassword(), true);
     try {
-      PremisV3Utils.createOrUpdatePremisUserAgentBinary(request.getUser().getName(), model, index, true);
+      RodaCoreFactory.getModelService().createOrUpdateUserAgentBinary(request.getUser().getName());
     } catch (Exception e) {
       LOGGER.warn("Could not update PREMIS agent for user '{}'", request.getUser().getName(), e);
     }
@@ -340,7 +336,7 @@ public class MembersService {
 
     User finalModifiedUser = model.updateMyUser(resetUser, password, true);
     try {
-      PremisV3Utils.createOrUpdatePremisUserAgentBinary(resetUser.getName(), model, index, true);
+      model.createOrUpdateUserAgentBinary(resetUser.getName());
     } catch (Exception e) {
       LOGGER.warn("Could not update PREMIS agent for user '{}'", resetUser.getName(), e);
     }
