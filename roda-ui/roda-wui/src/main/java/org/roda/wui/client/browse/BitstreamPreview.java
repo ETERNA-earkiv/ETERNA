@@ -342,20 +342,20 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
               frame.setStyleName("viewRepresentationTextFilePreview");
               JavascriptUtils.runHighlighter(html.getElement());
             } else {
-              errorPreview();
+              errorPreview(target);
             }
           }
 
           @Override
           public void onError(Request request, Throwable exception) {
-            errorPreview();
+            errorPreview(target);
           }
         });
       } catch (RequestException e) {
-        errorPreview();
+        errorPreview(target);
       }
     } else {
-      errorPreview(messages.viewRepresentationTooLargeErrorPreview());
+      errorPreview(messages.viewRepresentationTooLargeErrorPreview(), target);
     }
   }
 
@@ -459,10 +459,18 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   }
 
   private void errorPreview() {
-    errorPreview(messages.viewRepresentationErrorPreview());
+    errorPreview(messages.viewRepresentationErrorPreview(), panel);
   }
 
   private void errorPreview(String errorPreview) {
+    errorPreview(errorPreview, panel);
+  }
+
+  private void errorPreview(ComplexPanel target) {
+    errorPreview(messages.viewRepresentationErrorPreview(), target);
+  }
+
+  private void errorPreview(String errorPreview, ComplexPanel target) {
     HTML html = new HTML();
     SafeHtmlBuilder b = new SafeHtmlBuilder();
 
@@ -481,8 +489,8 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     });
 
     html.setHTML(b.toSafeHtml());
-    panel.add(html);
-    panel.add(downloadButton);
+    target.add(html);
+    target.add(downloadButton);
     html.setStyleName("viewRepresentationErrorPreview");
     downloadButton.setStyleName("btn btn-donwload viewRepresentationNotSupportedDownloadButton");
 
