@@ -64,6 +64,7 @@ public final class HTMLUtils {
     .allowCommonInlineFormattingElements()
     .allowElements("table", "thead", "tbody", "tfoot", "tr", "th", "td", "caption", "col", "colgroup")
     .allowElements("dl", "dt", "dd", "pre", "code", "hr", "a", "img", "section", "header", "footer", "nav", "main")
+    .allowElements("blockquote", "small")
     .allowAttributes("class", "id", "style", "title", "lang").globally()
     .allowAttributes("href").onElements("a")
     .allowAttributes("src", "alt", "width", "height").onElements("img")
