@@ -265,6 +265,31 @@ public class CatalogTreePanel extends Composite {
     return null;
   }
 
+  public void removeNodeAnywhere(String aipId) {
+    CatalogTreeNode rootNode = rootNodes.remove(aipId);
+    if (rootNode != null) {
+      rootNode.removeFromParent();
+    } else {
+      removeNodeFromSubtree(aipId, rootNodes);
+    }
+    if (selectedNode != null && aipId.equals(selectedNode.getAipId())) {
+      selectedNode = null;
+    }
+  }
+
+  private boolean removeNodeFromSubtree(String aipId, Map<String, CatalogTreeNode> nodes) {
+    for (CatalogTreeNode node : nodes.values()) {
+      if (node.getChildNodes().containsKey(aipId)) {
+        node.removeChild(aipId);
+        return true;
+      }
+      if (removeNodeFromSubtree(aipId, node.getChildNodes())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public void removeNode(String aipId, String parentAipId) {
     if (parentAipId == null || parentAipId.isEmpty()) {
       CatalogTreeNode node = rootNodes.remove(aipId);
@@ -296,7 +321,12 @@ public class CatalogTreePanel extends Composite {
           return;
         }
         node.updateTitle(aip.getTitle());
+        node.updateLevel(aip.getLevel());
       });
+  }
+
+  public void reloadRootNodes() {
+    loadRootNodes();
   }
 
   public void refreshAfterMove(String oldParentId, String newParentId) {
@@ -312,12 +342,9 @@ public class CatalogTreePanel extends Composite {
 
   public void refreshSubtree(String parentAipId) {
     if (parentAipId == null || parentAipId.isEmpty()) {
-      rootNodes.clear();
-      treeBody.clear();
+      // Mark stale without clearing the visible tree. loadRootNodes() is triggered
+      // lazily by the next revealAip() call (e.g. after saving metadata in BrowseAIP).
       rootsLoaded = false;
-      rootsLoading = false;
-      pendingRevealAipId = null;
-      // Reload triggered lazily by next revealAip call (after metadata is saved)
     } else {
       CatalogTreeNode parent = findNode(parentAipId, rootNodes);
       if (parent != null) {
