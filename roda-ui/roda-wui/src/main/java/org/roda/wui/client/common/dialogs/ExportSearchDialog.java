@@ -19,7 +19,6 @@ import org.roda.core.data.v2.jobs.CreateJobRequest;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.ConfigurationManager;
-import org.roda.wui.common.client.widgets.Toast;
 
 import com.github.nmorel.gwtjackson.client.ObjectMapper;
 import com.google.gwt.core.client.GWT;
@@ -178,8 +177,9 @@ public class ExportSearchDialog {
       if (throwable != null) {
         AsyncCallbackUtils.defaultFailureTreatment(throwable);
       } else {
-        Toast.showInfo(messages.exportListTitle(), messages.exportSearchJobStarted());
         dialogBox.hide();
+        Dialogs.showInformationDialog(messages.exportListTitle(), messages.exportSearchJobStarted(),
+          messages.dialogOk(), false);
       }
     });
   }
