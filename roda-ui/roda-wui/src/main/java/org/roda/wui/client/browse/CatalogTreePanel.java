@@ -273,7 +273,7 @@ public class CatalogTreePanel extends Composite {
       removeNodeFromSubtree(aipId, rootNodes);
     }
     if (selectedNode != null && aipId.equals(selectedNode.getAipId())) {
-      selectedNode = null;
+      clearSelection();
     }
   }
 
@@ -303,7 +303,7 @@ public class CatalogTreePanel extends Composite {
       }
     }
     if (selectedNode != null && aipId.equals(selectedNode.getAipId())) {
-      selectedNode = null;
+      clearSelection();
     }
   }
 

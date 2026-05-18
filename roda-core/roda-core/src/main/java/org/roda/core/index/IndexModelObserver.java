@@ -140,6 +140,7 @@ public class IndexModelObserver implements ModelObserver {
         SolrUtils.commit(index, IndexedAIP.class);
       } catch (GenericException e) {
         LOGGER.error("Error committing Solr after AIP creation", e);
+        ret.add(e);
       }
     }
 
@@ -788,11 +789,13 @@ public class IndexModelObserver implements ModelObserver {
       ret.add(e);
     }
 
-    try {
-      SolrUtils.commit(index, IndexedAIP.class);
-    } catch (GenericException e) {
-      LOGGER.error("Error committing Solr after AIP move", e);
-      ret.add(e);
+    if (ret.isEmpty()) {
+      try {
+        SolrUtils.commit(index, IndexedAIP.class);
+      } catch (GenericException e) {
+        LOGGER.error("Error committing Solr after AIP move", e);
+        ret.add(e);
+      }
     }
 
     return ret;
@@ -851,11 +854,13 @@ public class IndexModelObserver implements ModelObserver {
         ret.add(e);
     }
 
-    try {
-      SolrUtils.commit(index, IndexedAIP.class);
-    } catch (GenericException e) {
-      LOGGER.error("Error committing Solr after AIP deletion", e);
-      ret.add(e);
+    if (ret.isEmpty()) {
+      try {
+        SolrUtils.commit(index, IndexedAIP.class);
+      } catch (GenericException e) {
+        LOGGER.error("Error committing Solr after AIP deletion", e);
+        ret.add(e);
+      }
     }
 
     return ret;
