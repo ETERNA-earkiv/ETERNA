@@ -672,7 +672,9 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     dropdownToolbar.setVisible(multipleXslts);
     panel.add(dropdownToolbar);
 
-    // Upload toolbar — visible only if the user has the representation.apply_xslt role
+    // Upload toolbar — visible only if the user has the representation.apply_xslt
+    // role AND the rendered view is active (raw-XML mode hides the iframe, so an
+    // upload would land in an invisible target and look like nothing happened).
     final FlowPanel uploadToolbar = new FlowPanel();
     uploadToolbar.setStyleName("xmlPreviewToolbar");
     uploadToolbar.setVisible(false);
@@ -688,14 +690,20 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     uploadToolbar.add(applyButton);
     panel.add(uploadToolbar);
 
+    // Toggle state shared between role-check, toggle handler, and visibility updates
+    final boolean[] showingRawXml = {false};
+    final boolean[] hasUploadRole = {false};
+
     UserLogin.getInstance().checkRole(Arrays.asList("representation.apply_xslt"), new AsyncCallback<Boolean>() {
       @Override
       public void onSuccess(Boolean hasRole) {
-        uploadToolbar.setVisible(Boolean.TRUE.equals(hasRole));
+        hasUploadRole[0] = Boolean.TRUE.equals(hasRole);
+        uploadToolbar.setVisible(hasUploadRole[0] && !showingRawXml[0]);
       }
 
       @Override
       public void onFailure(Throwable caught) {
+        hasUploadRole[0] = false;
         uploadToolbar.setVisible(false);
       }
     });
@@ -716,7 +724,10 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     applyButton.addClickHandler(event -> {
       applyButton.setEnabled(false);
       applyButton.setText(messages.xsltLoading());
+      // In the XSLT viewer the iframe is already the active view when the
+      // upload toolbar is visible, so no raw→iframe swap is needed.
       applyCustomXslt(xsltUpload.getElement(), transformUrl, xsltFrame.getElement(), applyButton.getElement(),
+        null,
         messages.applyXsltButton(), messages.xsltFileTooLarge(), messages.xsltTransformFailed(),
         messages.xsltUploadError(), messages.xsltTransformTimeout());
     });
@@ -725,8 +736,9 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
 
     // Toggle XSLT-rendered ↔ raw XML by flipping visibility on existing
     // widgets. The raw XML view is populated by textPreview(rawXmlContainer)
-    // exactly once, the first time the user requests it.
-    final boolean[] showingRawXml = {false};
+    // exactly once, the first time the user requests it. Upload toolbar and
+    // print button are also hidden in raw mode — neither has a meaningful
+    // target when the iframe is invisible.
     final boolean[] rawXmlLoaded = {false};
     final String[] currentXsltId = {multipleXslts ? xsltDropdown.getValue(0) : null};
 
@@ -735,6 +747,8 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
         showingRawXml[0] = true;
         toggleXmlButton.setText(messages.xsltViewRenderedButton());
         dropdownToolbar.setVisible(false);
+        uploadToolbar.setVisible(false);
+        printButton.setEnabled(false);
         xsltFrame.setVisible(false);
         rawXmlContainer.setVisible(true);
         if (!rawXmlLoaded[0]) {
@@ -748,6 +762,10 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
         if (multipleXslts) {
           dropdownToolbar.setVisible(true);
         }
+        if (hasUploadRole[0]) {
+          uploadToolbar.setVisible(true);
+        }
+        printButton.setEnabled(true);
         xsltFrame.setVisible(true);
       }
     });
@@ -815,12 +833,12 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     applyButton.addClickHandler(event -> {
       applyButton.setEnabled(false);
       applyButton.setText(messages.xsltLoading());
-      // Swap to the iframe before invoking the JSNI upload — applyCustomXslt sets
-      // srcdoc on the iframe directly, so the iframe must be in the document and
-      // visible for the result to be seen.
-      rawXmlContainer.setVisible(false);
-      xsltFrame.setVisible(true);
+      // The iframe is hidden until the upload succeeds. applyCustomXslt swaps
+      // raw container → iframe internally on HTTP 200 only, so a failed upload
+      // (network, timeout, 4xx/5xx, oversize file) leaves the user's raw-XML
+      // view intact instead of stranding them on a blank iframe.
       applyCustomXslt(xsltUpload.getElement(), transformUrl, xsltFrame.getElement(), applyButton.getElement(),
+        rawXmlContainer.getElement(),
         messages.applyXsltButton(), messages.xsltFileTooLarge(), messages.xsltTransformFailed(),
         messages.xsltUploadError(), messages.xsltTransformTimeout());
     });
@@ -885,6 +903,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   private native void applyCustomXslt(
     com.google.gwt.dom.client.Element fileInput, String url,
     com.google.gwt.dom.client.Element iframe, com.google.gwt.dom.client.Element button,
+    com.google.gwt.dom.client.Element rawContainerToHide,
     String buttonLabel, String fileTooLargeMsg, String transformFailedMsg,
     String uploadErrorMsg, String timeoutMsg) /*-{
     var files = fileInput.files;
@@ -909,6 +928,12 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     xhr.onload = function() {
       if (xhr.status === 200) {
         iframe.setAttribute("srcdoc", xhr.responseText);
+        // On success only: swap from raw-XML container to the iframe view.
+        // On failure the caller's current view (raw XML or previous render) is preserved.
+        if (rawContainerToHide) {
+          rawContainerToHide.style.display = "none";
+          iframe.style.display = "";
+        }
       } else {
         $wnd.alert(transformFailedMsg + xhr.statusText);
       }
