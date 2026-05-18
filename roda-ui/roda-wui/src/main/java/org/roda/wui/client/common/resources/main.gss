@@ -3356,6 +3356,9 @@ td.datePickerMonth, td.datePickerYear {
     flex-direction: column;
     overflow: hidden;
     position: relative;
+}
+
+.catalogTreePanel.animatingCollapse {
     transition: width 0.2s ease-in-out, min-width 0.2s ease-in-out;
 }
 

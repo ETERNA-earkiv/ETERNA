@@ -31,6 +31,7 @@ import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -114,6 +115,7 @@ public class CatalogTreePanel extends Composite {
   }
 
   private void setCollapsed(boolean collapse) {
+    addStyleName("animatingCollapse");
     if (collapse) {
       addStyleName("collapsed");
       getElement().getStyle().clearWidth();
@@ -122,6 +124,12 @@ public class CatalogTreePanel extends Composite {
     }
     collapseToggle.getElement().setAttribute("aria-expanded", collapse ? "false" : "true");
     expandButton.getElement().setAttribute("aria-expanded", collapse ? "false" : "true");
+    new Timer() {
+      @Override
+      public void run() {
+        removeStyleName("animatingCollapse");
+      }
+    }.schedule(220);
   }
 
   private void onFilterChanged(KeyUpEvent event) {
