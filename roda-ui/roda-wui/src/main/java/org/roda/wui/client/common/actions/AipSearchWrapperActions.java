@@ -335,6 +335,7 @@ public class AipSearchWrapperActions extends AbstractActionable<IndexedAIP> {
                             @Override
                             public void onFailure(Throwable caught) {
                               CatalogTreePanel.getInstance().refreshAfterMove(aip.getParentID(), parentId);
+                              CatalogTreePanel.getInstance().revealAip(aipId);
                               doActionCallbackNone();
                             }
 
