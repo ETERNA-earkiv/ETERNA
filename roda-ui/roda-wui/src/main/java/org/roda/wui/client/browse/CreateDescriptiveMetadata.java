@@ -489,6 +489,7 @@ public class CreateDescriptiveMetadata extends Composite {
           if (error != null) {
             HistoryUtils.newHistory(InternalProcess.RESOLVER);
           } else {
+            CatalogTreePanel.getInstance().removeNodeAnywhere(aipId);
             HistoryUtils.newHistory(LastSelectedItemsSingleton.getInstance().getLastHistory());
           }
         });

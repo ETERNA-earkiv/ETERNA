@@ -135,6 +135,14 @@ public class IndexModelObserver implements ModelObserver {
       LOGGER.error("Error getting ancestors when creating AIP", e);
       ret.add(e);
     }
+    if (ret.isEmpty()) {
+      try {
+        SolrUtils.commit(index, IndexedAIP.class);
+      } catch (GenericException e) {
+        LOGGER.error("Error committing Solr after AIP creation", e);
+        ret.add(e);
+      }
+    }
 
     return ret;
   }
@@ -781,6 +789,15 @@ public class IndexModelObserver implements ModelObserver {
       ret.add(e);
     }
 
+    if (ret.isEmpty()) {
+      try {
+        SolrUtils.commit(index, IndexedAIP.class);
+      } catch (GenericException e) {
+        LOGGER.error("Error committing Solr after AIP move", e);
+        ret.add(e);
+      }
+    }
+
     return ret;
   }
 
@@ -830,13 +847,22 @@ public class IndexModelObserver implements ModelObserver {
     	String parentAipId = model.retrieveAIP(aipId).getParentId();
         if (ret.getExceptions().isEmpty() && parentAipId != null) {
         	UpdateOriginalMETS.handleParentWhenRemovedAIP(model, aipId, parentAipId);
-        }  	
+        }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException | IOException | IPException | JAXBException | SAXException e) {
         LOGGER.error("Failed to updating parentAIP when removing AIP", e);
-        
-        ret.add(e);	
+
+        ret.add(e);
     }
-    
+
+    if (ret.isEmpty()) {
+      try {
+        SolrUtils.commit(index, IndexedAIP.class);
+      } catch (GenericException e) {
+        LOGGER.error("Error committing Solr after AIP deletion", e);
+        ret.add(e);
+      }
+    }
+
     return ret;
   }
 
@@ -859,6 +885,9 @@ public class IndexModelObserver implements ModelObserver {
         Representation representation = model.retrieveRepresentation(descriptiveMetadata.getAipId(),
           descriptiveMetadata.getRepresentationId());
         indexRepresentation(aip, representation, ancestors).addTo(ret);
+      }
+      if (ret.isEmpty()) {
+        SolrUtils.commit(index, descriptiveMetadata.isFromAIP() ? IndexedAIP.class : IndexedRepresentation.class);
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Failed to index AIP or representation when creating descriptive metadata", e);
@@ -887,6 +916,9 @@ public class IndexModelObserver implements ModelObserver {
         Representation representation = model.retrieveRepresentation(descriptiveMetadata.getAipId(),
           descriptiveMetadata.getRepresentationId());
         indexRepresentation(aip, representation, ancestors).addTo(ret);
+      }
+      if (ret.isEmpty()) {
+        SolrUtils.commit(index, descriptiveMetadata.isFromAIP() ? IndexedAIP.class : IndexedRepresentation.class);
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Failed to index AIP or representation when updating descriptive metadata", e);
