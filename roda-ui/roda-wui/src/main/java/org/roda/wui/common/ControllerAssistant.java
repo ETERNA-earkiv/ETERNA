@@ -90,9 +90,14 @@ public class ControllerAssistant {
 
   public void registerAction(final RequestContext requestContext, final String relatedObjectId,
     final LogEntryState state, final Object... parameters) {
+    registerAction(requestContext, relatedObjectId, null, state, parameters);
+  }
+
+  public void registerAction(final RequestContext requestContext, final String relatedObjectId,
+    final String relatedAipId, final LogEntryState state, final Object... parameters) {
     final long duration = new Date().getTime() - startDate.getTime();
     ControllerAssistantUtils.registerAction(requestContext, this.enclosingMethod.getDeclaringClass().getName(),
-      this.enclosingMethod.getName(), relatedObjectId, duration, state, parameters);
+      this.enclosingMethod.getName(), relatedObjectId, relatedAipId, duration, state, parameters);
   }
 
   public void registerAction(final RequestContext requestContext, final LogEntryState state,

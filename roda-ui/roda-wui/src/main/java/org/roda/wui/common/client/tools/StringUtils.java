@@ -28,7 +28,18 @@ public class StringUtils {
   public static String getPrettifiedActionMethod(String actionMethod) {
     String method = actionMethod.substring(0, 1).toUpperCase() + actionMethod.substring(1);
     method = method.replaceAll("([A-Z])", " $1").trim();
-    return method.replaceAll("A I P", "AIP");
+    method = method.replaceAll("A I P", "AIP");
+    method = method.replaceAll("H T M L", "HTML");
+    method = method.replaceAll("X S L T", "XSLT");
+    method = method.replaceAll("X M L", "XML");
+    method = method.replaceAll("U U I D", "UUID");
+    method = method.replaceAll("J S O N", "JSON");
+    method = method.replaceAll("P D F", "PDF");
+    method = method.replaceAll("U R L", "URL");
+    method = method.replaceAll("C S V", "CSV");
+    method = method.replaceAll("D I P", "DIP");
+    method = method.replaceAll("S I P", "SIP");
+    return method;
   }
 
   /**
