@@ -2722,6 +2722,18 @@ public interface ClientMessages extends Messages {
 
   String xsltViewRenderedButton();
 
+  String xsltSelectFileButton();
+
+  String xsltNoFileSelected();
+
+  String xsltUseLocalLabel();
+
+  String xsltLocalNotSaved();
+
+  String xsltDropdownEmpty();
+
+  String xsltLocalPrefix();
+
   String redactPdfInvalidFormatMessage();
 
   String redactPdfMissingIdentifiers();

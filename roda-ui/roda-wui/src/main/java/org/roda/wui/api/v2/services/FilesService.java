@@ -562,46 +562,32 @@ public class FilesService {
    * listAvailableXslts() (dropdown) and retrieveFileContentHTML() (rendering)
    * call this so a stylesheet that appears in the UI can always be rendered.
    *
-   * Lookup order (first non-empty layer wins):
-   *  1. directly beside the XML file (same folder under representations/rep_X/data/...),
-   *     but only when there is a filename-matched stylesheet (Foo.xml + Foo.xslt).
-   *     Unrelated .xslt siblings (e.g. B.xslt next to A.xml) do NOT block lower
-   *     layers — a wrongly-named neighbour would otherwise hide a properly-named
-   *     stylesheet that lives in documentation/ or in the global config.
+   * Discovery: every .xsl/.xslt bundled anywhere in the SIP is listed together,
+   * in this order:
+   *  1. directly beside the XML file (same folder under representations/rep_X/data/...)
    *  2. representation-level documentation (representations/rep_X/documentation/)
    *  3. AIP-root documentation (documentation/)
-   *  4. global namespace mapping from configuration
+   *
+   * Filename-matched stylesheets float to the top within each layer.
+   *
+   * Layer 4 (global namespace mapping from configuration) only kicks in when no
+   * SIP-bundled stylesheets were found — it's a fallback, not a complement.
    */
   private List<XsltSource> resolveXsltSources(ModelService model, IndexedFile indexedFile, Binary binary,
     String namespace) {
     List<XsltSource> result = new ArrayList<>();
 
-    // Layer 1: beside the XML file — filename match required
+    // Layers 1-3: every XSLT bundled inside the SIP
     if (indexedFile.getRepresentationId() != null) {
       result.addAll(toXsltSources(searchXsltsBesideXmlFile(model, indexedFile)));
-    }
-    if (!result.isEmpty()) {
-      return result;
-    }
-
-    // Layer 2: representation-level documentation
-    if (indexedFile.getRepresentationId() != null) {
       result.addAll(toXsltSources(searchAllXsltsInDocumentation(model, indexedFile.getAipId(),
         indexedFile.getRepresentationId(), indexedFile.getId())));
     }
-    if (!result.isEmpty()) {
-      return result;
-    }
-
-    // Layer 3: AIP-root documentation
     result.addAll(toXsltSources(searchAllXsltsInDocumentation(model, indexedFile.getAipId(),
       null, indexedFile.getId())));
-    if (!result.isEmpty()) {
-      return result;
-    }
 
-    // Layer 4: global namespace mapping
-    if (namespace != null) {
+    // Layer 4: global namespace mapping — only if the SIP contributed nothing
+    if (result.isEmpty() && namespace != null) {
       String xsltName = resolveXsltForNamespace(namespace);
       if (xsltName != null) {
         result.add(XsltSource.global(xsltName));
@@ -726,7 +712,7 @@ public class FilesService {
       CloseableIterable<Resource> resources = model.getStorage().listResourcesUnderDirectory(parentDir, false);
       try {
         String xmlBaseName = xmlBaseName(indexedFile.getId());
-        return collectXsltBinaries(model, resources, xmlBaseName, true);
+        return collectXsltBinaries(model, resources, xmlBaseName, false);
       } finally {
         resources.close();
       }

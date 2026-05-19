@@ -77,6 +77,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   private static final String VIEWER_TYPE_XML = "xml";
   private static final String VIEWER_TYPE_TIFF = "tiff";
   private static final String VIEWER_TYPE_WEBARCHIVE = "webarchive";
+  private static final String LOCAL_VALUE_PREFIX = "__local__:";
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -596,30 +597,26 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     final String locale = LocaleInfo.getCurrentLocale().getLocaleName();
     String xsltsUrl = RestUtils.createRepresentationFileXsltsUri(fileUuid).asString();
 
-    // Fetch the available-XSLT list FIRST. Branch the UI on the result:
-    //  - empty / error  → native textPreview + upload toolbar (if user has the role),
-    //                     so a privileged user can still apply a custom XSLT
-    //  - non-empty      → full XSLT viewer (toolbar + dropdown + iframe + raw-XML container)
+    // Fetch the available-XSLT list FIRST, then build the unified viewer regardless
+    // of whether anything was found. The toolbar always shows the same controls; an
+    // empty list just means the stylesheet dropdown shows "(None)" until a user
+    // with the apply_xslt role uploads a local one.
     RequestBuilder xsltsRequest = new RequestBuilder(RequestBuilder.GET, xsltsUrl);
     try {
       xsltsRequest.sendRequest(null, new RequestCallback() {
         @Override
         public void onResponseReceived(Request req, Response response) {
           JSONArray xslts = parseXsltArray(response);
-          if (xslts == null || xslts.size() == 0) {
-            buildUploadOnlyView(indexedFile, fileUuid, locale);
-          } else {
-            buildXsltViewer(indexedFile, fileUuid, locale, xslts);
-          }
+          buildXsltViewer(indexedFile, fileUuid, locale, xslts != null ? xslts : new JSONArray());
         }
 
         @Override
         public void onError(Request req, Throwable exception) {
-          buildUploadOnlyView(indexedFile, fileUuid, locale);
+          buildXsltViewer(indexedFile, fileUuid, locale, new JSONArray());
         }
       });
     } catch (RequestException e) {
-      buildUploadOnlyView(indexedFile, fileUuid, locale);
+      buildXsltViewer(indexedFile, fileUuid, locale, new JSONArray());
     }
   }
 
@@ -635,119 +632,202 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     }
   }
 
+  /**
+   * Unified XSLT viewer. Toolbar has the same controls regardless of whether any
+   * server-side stylesheets were found:
+   *
+   *   [Toggle XML/render] [Print]   "Stilmall:" [dropdown]   "Använd lokal stilmall:" [Välj fil]   [flagga]
+   *
+   * The dropdown lists every server-side stylesheet plus — once a privileged user
+   * picks one — a single "Local: filename" entry. Changing the dropdown applies
+   * the new stylesheet immediately; there is no separate Apply button.
+   *
+   * Local-upload widgets (label + file button + flag) are visible only to users
+   * with the representation.apply_xslt role. Everything else is always visible.
+   */
   private void buildXsltViewer(IndexedFile indexedFile, String fileUuid, String locale, JSONArray xslts) {
     String transformUrl = RestUtils.createRepresentationFileTransformUri(fileUuid, locale).asString();
 
-    // Render toolbar (print + toggle) — always visible when a renderable XSLT exists
-    FlowPanel printToolbar = new FlowPanel();
-    printToolbar.setStyleName("xmlPreviewToolbar");
-    Button printButton = new Button(messages.xsltPrintButton());
-    printButton.setStyleName("btn btn-play xmlPreviewPrintButton");
-    Button toggleXmlButton = new Button(messages.xsltViewOriginalButton());
-    toggleXmlButton.setStyleName("btn btn-play xmlPreviewToggleButton");
-    printToolbar.add(printButton);
-    printToolbar.add(toggleXmlButton);
-    panel.add(printToolbar);
+    final FlowPanel toolbar = new FlowPanel();
+    toolbar.setStyleName("xmlPreviewToolbar");
 
-    // Dropdown toolbar — only visible when more than one XSLT is available
-    FlowPanel dropdownToolbar = new FlowPanel();
-    dropdownToolbar.setStyleName("xmlPreviewToolbar");
+    // 1. Toggle (left-most) — switches iframe ↔ raw-XML
+    final Button toggleXmlButton = new Button(messages.xsltViewOriginalButton());
+    toggleXmlButton.setStyleName("btn btn-play xmlPreviewToggleButton");
+    toolbar.add(toggleXmlButton);
+
+    // 2. Print — prints iframe content
+    final Button printButton = new Button(messages.xsltPrintButton());
+    printButton.setStyleName("btn btn-play xmlPreviewPrintButton");
+    toolbar.add(printButton);
+
+    // 3-4. Stylesheet dropdown — applies on change. Empty list → single "(None)"
+    // placeholder with empty id, treated as "do nothing" by the change handler.
     Label dropdownLabel = new Label(messages.xsltSelectLabel());
     dropdownLabel.setStyleName("xmlPreviewSelectLabel");
-    ListBox xsltDropdown = new ListBox();
+    final ListBox xsltDropdown = new ListBox();
     xsltDropdown.setStyleName("xmlPreviewSelectDropdown");
-    dropdownToolbar.add(dropdownLabel);
-    dropdownToolbar.add(xsltDropdown);
-    final boolean multipleXslts = xslts.size() > 1;
-    if (multipleXslts) {
-      for (int i = 0; i < xslts.size(); i++) {
-        JSONObject obj = xslts.get(i).isObject();
-        if (obj != null) {
-          String id = obj.get("id").isString().stringValue();
-          String label = obj.get("label").isString().stringValue();
-          xsltDropdown.addItem(label, id);
-        }
+    for (int i = 0; i < xslts.size(); i++) {
+      JSONObject obj = xslts.get(i).isObject();
+      if (obj != null) {
+        String id = obj.get("id").isString().stringValue();
+        String label = obj.get("label").isString().stringValue();
+        xsltDropdown.addItem(label, id);
       }
     }
-    dropdownToolbar.setVisible(multipleXslts);
-    panel.add(dropdownToolbar);
+    if (xsltDropdown.getItemCount() == 0) {
+      xsltDropdown.addItem(messages.xsltDropdownEmpty(), "");
+    }
+    toolbar.add(dropdownLabel);
+    toolbar.add(xsltDropdown);
 
-    // Upload toolbar — visible only if the user has the representation.apply_xslt
-    // role AND the rendered view is active (raw-XML mode hides the iframe, so an
-    // upload would land in an invisible target and look like nothing happened).
-    final FlowPanel uploadToolbar = new FlowPanel();
-    uploadToolbar.setStyleName("xmlPreviewToolbar");
-    uploadToolbar.setVisible(false);
-    FileUpload xsltUpload = new FileUpload();
+    // 5-6. Local upload — hidden <input type="file"> + styled "Välj fil" button.
+    // Visible only if the user has the apply_xslt role.
+    Label localLabel = new Label(messages.xsltUseLocalLabel());
+    localLabel.setStyleName("xmlPreviewLocalLabel");
+    localLabel.setVisible(false);
+    final FileUpload xsltUpload = new FileUpload();
     xsltUpload.setName("xslt");
     xsltUpload.getElement().setAttribute("accept", ".xslt,.xsl");
     xsltUpload.setStyleName("xmlPreviewFileInput");
-    Button applyButton = new Button(messages.applyXsltButton());
-    applyButton.setStyleName("btn btn-play xmlPreviewApplyButton");
-    applyButton.setEnabled(false);
-    xsltUpload.addChangeHandler(event -> applyButton.setEnabled(true));
-    uploadToolbar.add(xsltUpload);
-    uploadToolbar.add(applyButton);
-    panel.add(uploadToolbar);
+    Button selectFileButton = new Button(messages.xsltSelectFileButton());
+    selectFileButton.setStyleName("btn-eterna-secondary xmlPreviewSelectFileButton");
+    selectFileButton.addClickHandler(event -> triggerClick(xsltUpload.getElement()));
+    selectFileButton.setVisible(false);
+    toolbar.add(localLabel);
+    toolbar.add(selectFileButton);
+    toolbar.add(xsltUpload);
 
-    // Toggle state shared between role-check, toggle handler, and visibility updates
-    final boolean[] showingRawXml = {false};
-    final boolean[] hasUploadRole = {false};
+    // 7. Flag (right-most) — informs that local uploads are session-only
+    Label flagLabel = new Label(messages.xsltLocalNotSaved());
+    flagLabel.setStyleName("xmlPreviewFlag");
+    flagLabel.setVisible(false);
+    toolbar.add(flagLabel);
+
+    panel.add(toolbar);
 
     UserLogin.getInstance().checkRole(Arrays.asList("representation.apply_xslt"), new AsyncCallback<Boolean>() {
       @Override
       public void onSuccess(Boolean hasRole) {
-        hasUploadRole[0] = Boolean.TRUE.equals(hasRole);
-        uploadToolbar.setVisible(hasUploadRole[0] && !showingRawXml[0]);
+        boolean show = Boolean.TRUE.equals(hasRole);
+        localLabel.setVisible(show);
+        selectFileButton.setVisible(show);
+        flagLabel.setVisible(show);
       }
 
       @Override
       public void onFailure(Throwable caught) {
-        hasUploadRole[0] = false;
-        uploadToolbar.setVisible(false);
+        localLabel.setVisible(false);
+        selectFileButton.setVisible(false);
+        flagLabel.setVisible(false);
       }
     });
 
-    // XSLT-rendered iframe — primary view
+    // XSLT-rendered iframe — primary view when something is selected
     final Frame xsltFrame = new Frame();
     xsltFrame.setStyleName("viewRepresentationHtmlFilePreview");
     xsltFrame.getElement().setAttribute("sandbox", "allow-same-origin");
     panel.add(xsltFrame);
 
-    // Raw XML container — built once, lazily populated on first toggle, then
-    // shown/hidden via setVisible. Avoids stacking new textPreview widgets on
-    // every toggle click.
+    // Raw XML container — lazily populated on first toggle, then shown/hidden
     final FlowPanel rawXmlContainer = new FlowPanel();
     rawXmlContainer.setVisible(false);
     panel.add(rawXmlContainer);
 
-    applyButton.addClickHandler(event -> {
-      applyButton.setEnabled(false);
-      applyButton.setText(messages.xsltLoading());
-      // In the XSLT viewer the iframe is already the active view when the
-      // upload toolbar is visible, so no raw→iframe swap is needed.
-      applyCustomXslt(xsltUpload.getElement(), transformUrl, xsltFrame.getElement(), applyButton.getElement(),
-        null,
-        messages.applyXsltButton(), messages.xsltFileTooLarge(), messages.xsltTransformFailed(),
+    final boolean[] rawXmlLoaded = {false};
+    final boolean noServerXslts = xslts.size() == 0;
+    // No stylesheets → start in raw-XML mode; toggle label reads "Show rendered view"
+    final boolean[] showingRawXml = {noServerXslts};
+    // Tracks whether the iframe holds anything renderable. Toggle and print are
+    // disabled when false — there is no rendered view to switch to/print.
+    final boolean[] iframeHasContent = {!noServerXslts};
+    if (noServerXslts) {
+      xsltFrame.setVisible(false);
+      rawXmlContainer.setVisible(true);
+      rawXmlLoaded[0] = true;
+      textPreview(rawXmlContainer);
+      toggleXmlButton.setText(messages.xsltViewRenderedButton());
+      toggleXmlButton.setEnabled(false);
+      printButton.setEnabled(false);
+    }
+
+    // Applies the currently-selected dropdown entry. Empty id = "(None)" = no-op.
+    // For local entries we hit the JS cache first (populated by applyCustomXslt on
+    // a previous successful POST) so revisiting a local stylesheet does not re-upload.
+    Runnable applyCurrentSelection = () -> {
+      int idx = xsltDropdown.getSelectedIndex();
+      if (idx < 0) return;
+      String selectedId = xsltDropdown.getValue(idx);
+      if (selectedId == null || selectedId.isEmpty()) return;
+      if (selectedId.startsWith(LOCAL_VALUE_PREFIX)) {
+        String fn = selectedId.substring(LOCAL_VALUE_PREFIX.length());
+        String cached = getCachedXslt(fn);
+        if (cached != null) {
+          applyCachedXslt(xsltFrame.getElement(), cached);
+        }
+        // No cache + the file isn't currently in xsltUpload.files → can't re-POST.
+        // This only happens for stale local entries from older session state; in
+        // practice the cache is populated the moment the user uploads the file.
+      } else {
+        loadXsltPreview(buildPreviewUrl(fileUuid, locale, selectedId), xsltFrame);
+      }
+      iframeHasContent[0] = true;
+      toggleXmlButton.setEnabled(true);
+      if (showingRawXml[0]) {
+        showingRawXml[0] = false;
+        toggleXmlButton.setText(messages.xsltViewOriginalButton());
+        rawXmlContainer.setVisible(false);
+        xsltFrame.setVisible(true);
+        printButton.setEnabled(true);
+      }
+    };
+
+    xsltDropdown.addChangeHandler(event -> applyCurrentSelection.run());
+
+    xsltUpload.addChangeHandler(event -> {
+      String filename = xsltUpload.getFilename();
+      int slash = Math.max(filename.lastIndexOf('/'), filename.lastIndexOf('\\'));
+      String shortName = slash >= 0 ? filename.substring(slash + 1) : filename;
+      String localValue = LOCAL_VALUE_PREFIX + shortName;
+
+      // Duplicate check: if this filename is already in the dropdown, just select it
+      // and let the dropdown change handler (cache-backed) re-apply. No new POST.
+      for (int i = 0; i < xsltDropdown.getItemCount(); i++) {
+        if (localValue.equals(xsltDropdown.getValue(i))) {
+          xsltDropdown.setSelectedIndex(i);
+          applyCurrentSelection.run();
+          return;
+        }
+      }
+
+      // New local file: replace "(None)" placeholder if present, else append
+      if (xsltDropdown.getItemCount() == 1 && "".equals(xsltDropdown.getValue(0))) {
+        xsltDropdown.removeItem(0);
+      }
+      xsltDropdown.addItem(messages.xsltLocalPrefix() + " " + shortName, localValue);
+      xsltDropdown.setSelectedIndex(xsltDropdown.getItemCount() - 1);
+      // POST + cache. applyCustomXslt JSNI populates the cache on HTTP 200, keyed
+      // by filename, so a later visit to the same dropdown entry resolves locally.
+      applyCustomXslt(xsltUpload.getElement(), transformUrl, xsltFrame.getElement(),
+        messages.xsltFileTooLarge(), messages.xsltTransformFailed(),
         messages.xsltUploadError(), messages.xsltTransformTimeout());
+      iframeHasContent[0] = true;
+      toggleXmlButton.setEnabled(true);
+      if (showingRawXml[0]) {
+        showingRawXml[0] = false;
+        toggleXmlButton.setText(messages.xsltViewOriginalButton());
+        rawXmlContainer.setVisible(false);
+        xsltFrame.setVisible(true);
+        printButton.setEnabled(true);
+      }
     });
 
     printButton.addClickHandler(event -> printIframeContent(xsltFrame.getElement(), messages.xsltPrintError()));
-
-    // Toggle XSLT-rendered ↔ raw XML by flipping visibility on existing
-    // widgets. The raw XML view is populated by textPreview(rawXmlContainer)
-    // exactly once, the first time the user requests it. Upload toolbar and
-    // print button are also hidden in raw mode — neither has a meaningful
-    // target when the iframe is invisible.
-    final boolean[] rawXmlLoaded = {false};
-    final String[] currentXsltId = {multipleXslts ? xsltDropdown.getValue(0) : null};
 
     toggleXmlButton.addClickHandler(event -> {
       if (!showingRawXml[0]) {
         showingRawXml[0] = true;
         toggleXmlButton.setText(messages.xsltViewRenderedButton());
-        dropdownToolbar.setVisible(false);
-        uploadToolbar.setVisible(false);
         printButton.setEnabled(false);
         xsltFrame.setVisible(false);
         rawXmlContainer.setVisible(true);
@@ -759,89 +839,15 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
         showingRawXml[0] = false;
         toggleXmlButton.setText(messages.xsltViewOriginalButton());
         rawXmlContainer.setVisible(false);
-        if (multipleXslts) {
-          dropdownToolbar.setVisible(true);
-        }
-        if (hasUploadRole[0]) {
-          uploadToolbar.setVisible(true);
-        }
-        printButton.setEnabled(true);
         xsltFrame.setVisible(true);
+        printButton.setEnabled(true);
       }
     });
 
-    if (multipleXslts) {
-      xsltDropdown.addChangeHandler(event -> {
-        String selectedId = xsltDropdown.getValue(xsltDropdown.getSelectedIndex());
-        currentXsltId[0] = selectedId;
-        loadXsltPreview(buildPreviewUrl(fileUuid, locale, selectedId), xsltFrame);
-      });
+    // Initial render: if any server-side XSLT exists, load the first one
+    if (!noServerXslts) {
+      loadXsltPreview(buildPreviewUrl(fileUuid, locale, xsltDropdown.getValue(0)), xsltFrame);
     }
-
-    // Initial render of XSLT-transformed view
-    loadXsltPreview(buildPreviewUrl(fileUuid, locale, currentXsltId[0]), xsltFrame);
-  }
-
-  /**
-   * No-XSLT path: render the native syntax-highlighted XML preview, and — for users
-   * with the apply_xslt role — show an upload toolbar so they can manually apply a
-   * custom XSLT. On successful upload the iframe takes over and the raw view is hidden.
-   */
-  private void buildUploadOnlyView(IndexedFile indexedFile, String fileUuid, String locale) {
-    String transformUrl = RestUtils.createRepresentationFileTransformUri(fileUuid, locale).asString();
-
-    // Upload toolbar — hidden until role check returns true
-    final FlowPanel uploadToolbar = new FlowPanel();
-    uploadToolbar.setStyleName("xmlPreviewToolbar");
-    uploadToolbar.setVisible(false);
-    FileUpload xsltUpload = new FileUpload();
-    xsltUpload.setName("xslt");
-    xsltUpload.getElement().setAttribute("accept", ".xslt,.xsl");
-    xsltUpload.setStyleName("xmlPreviewFileInput");
-    Button applyButton = new Button(messages.applyXsltButton());
-    applyButton.setStyleName("btn btn-play xmlPreviewApplyButton");
-    applyButton.setEnabled(false);
-    xsltUpload.addChangeHandler(event -> applyButton.setEnabled(true));
-    uploadToolbar.add(xsltUpload);
-    uploadToolbar.add(applyButton);
-    panel.add(uploadToolbar);
-
-    UserLogin.getInstance().checkRole(Arrays.asList("representation.apply_xslt"), new AsyncCallback<Boolean>() {
-      @Override
-      public void onSuccess(Boolean hasRole) {
-        uploadToolbar.setVisible(Boolean.TRUE.equals(hasRole));
-      }
-
-      @Override
-      public void onFailure(Throwable caught) {
-        uploadToolbar.setVisible(false);
-      }
-    });
-
-    // Container for the native text preview — always shown initially
-    final FlowPanel rawXmlContainer = new FlowPanel();
-    panel.add(rawXmlContainer);
-    textPreview(rawXmlContainer);
-
-    // Iframe for rendered HTML after a successful custom-XSLT upload — hidden until then
-    final Frame xsltFrame = new Frame();
-    xsltFrame.setStyleName("viewRepresentationHtmlFilePreview");
-    xsltFrame.getElement().setAttribute("sandbox", "allow-same-origin");
-    xsltFrame.setVisible(false);
-    panel.add(xsltFrame);
-
-    applyButton.addClickHandler(event -> {
-      applyButton.setEnabled(false);
-      applyButton.setText(messages.xsltLoading());
-      // The iframe is hidden until the upload succeeds. applyCustomXslt swaps
-      // raw container → iframe internally on HTTP 200 only, so a failed upload
-      // (network, timeout, 4xx/5xx, oversize file) leaves the user's raw-XML
-      // view intact instead of stranding them on a blank iframe.
-      applyCustomXslt(xsltUpload.getElement(), transformUrl, xsltFrame.getElement(), applyButton.getElement(),
-        rawXmlContainer.getElement(),
-        messages.applyXsltButton(), messages.xsltFileTooLarge(), messages.xsltTransformFailed(),
-        messages.xsltUploadError(), messages.xsltTransformTimeout());
-    });
   }
 
   private static String buildPreviewUrl(String fileUuid, String locale, String xsltId) {
@@ -878,6 +884,10 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     frame.getElement().setAttribute("srcdoc", errorHtml);
   }
 
+  private static native void triggerClick(com.google.gwt.dom.client.Element element) /*-{
+    element.click();
+  }-*/;
+
   private native void printIframeContent(com.google.gwt.dom.client.Element iframe, String errorMsg) /*-{
     try {
       var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
@@ -901,25 +911,19 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   }-*/;
 
   private native void applyCustomXslt(
-    com.google.gwt.dom.client.Element fileInput, String url,
-    com.google.gwt.dom.client.Element iframe, com.google.gwt.dom.client.Element button,
-    com.google.gwt.dom.client.Element rawContainerToHide,
-    String buttonLabel, String fileTooLargeMsg, String transformFailedMsg,
-    String uploadErrorMsg, String timeoutMsg) /*-{
+    com.google.gwt.dom.client.Element fileInput, String url, com.google.gwt.dom.client.Element iframe,
+    String fileTooLargeMsg, String transformFailedMsg, String uploadErrorMsg, String timeoutMsg) /*-{
     var files = fileInput.files;
     if (!files || files.length === 0) {
-      button.innerText = buttonLabel;
-      button.disabled = false;
       return;
     }
     var file = files[0];
     var maxSize = 1024 * 1024;
     if (file.size > maxSize) {
       $wnd.alert(fileTooLargeMsg);
-      button.innerText = buttonLabel;
-      button.disabled = false;
       return;
     }
+    var self = this;
     var formData = new FormData();
     formData.append("xslt", file);
     var xhr = new XMLHttpRequest();
@@ -928,29 +932,29 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     xhr.onload = function() {
       if (xhr.status === 200) {
         iframe.setAttribute("srcdoc", xhr.responseText);
-        // On success only: swap from raw-XML container to the iframe view.
-        // On failure the caller's current view (raw XML or previous render) is preserved.
-        if (rawContainerToHide) {
-          rawContainerToHide.style.display = "none";
-          iframe.style.display = "";
-        }
+        // Cache the rendered HTML keyed by filename so re-selecting this entry
+        // in the dropdown avoids a second POST.
+        self.__xsltCache = self.__xsltCache || {};
+        self.__xsltCache[file.name] = xhr.responseText;
       } else {
         $wnd.alert(transformFailedMsg + xhr.statusText);
       }
-      button.innerText = buttonLabel;
-      button.disabled = false;
     };
     xhr.onerror = function() {
       $wnd.alert(uploadErrorMsg);
-      button.innerText = buttonLabel;
-      button.disabled = false;
     };
     xhr.ontimeout = function() {
       $wnd.alert(timeoutMsg);
-      button.innerText = buttonLabel;
-      button.disabled = false;
     };
     xhr.send(formData);
+  }-*/;
+
+  private native String getCachedXslt(String filename) /*-{
+    return (this.__xsltCache && this.__xsltCache[filename]) || null;
+  }-*/;
+
+  private native void applyCachedXslt(com.google.gwt.dom.client.Element iframe, String html) /*-{
+    iframe.setAttribute("srcdoc", html);
   }-*/;
 
   private void downloadFile() {
