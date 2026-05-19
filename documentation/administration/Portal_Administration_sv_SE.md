@@ -36,7 +36,7 @@ Portal-API-användaren är ett särskilt användarkonto som skapats specifikt f�
 
 ### ⚠️ **OBS! Kritiska säkerhetsrisker**
 
-Att placera Portal-API-användaren i grupper med utökade behörigheter eller på fel del av katalogen utgör allvarliga säkerhetsrisker såsom: 
+Att placera Portal-API-användaren i grupper med utökade behörigheter eller på fel del av arkivbeståndet utgör allvarliga säkerhetsrisker såsom: 
 
 - **Dataexponering**: Om portalen komprometteras kan känsliga arkivdokument läckas.
 - **Efterlevnadsbrott**: Överträdelser av dataskyddsregler (Dataskyddslagen, GDPR, etc.)

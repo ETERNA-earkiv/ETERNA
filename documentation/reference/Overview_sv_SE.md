@@ -29,11 +29,11 @@ För mer information, besök gärna ETERNA:s webbplats:
 
 ## Funktioner i menyraden
 
-ETERNA har UI-stöd för följande funktionella enheter. Funktionerna är organiserade i menyn under följande huvudkategorier: **Katalog**, **Sök**, **Leverans** (Inleverans, Process, Ankomstkontroll), **Administration** (Arkivvårdsjobb, Interna åtgärder, Granskningslogg, Aviseringslogg, Rapportering, Användare och grupper), **Gallring** (Gallringspolicyer, Gallringsbekräftelse, Förfallna gallringar, Gallrade objekt) och **Planering** (Representationsnätverk, Riskregister, Bevarandehändelser, Bevarandeaktör).
+ETERNA har UI-stöd för följande funktionella enheter. Funktionerna är organiserade i menyn under följande huvudkategorier: **Arkivbestånd**, **Sök**, **Leverans** (Inleverans, Process, Ankomstkontroll), **Administration** (Arkivvårdsjobb, Interna åtgärder, Granskningslogg, Aviseringslogg, Rapportering, Användare och grupper), **Gallring** (Gallringspolicyer, Gallringsbekräftelse, Förfallna gallringar, Gallrade objekt) och **Planering** (Representationsnätverk, Riskregister, Bevarandehändelser, Bevarandeaktör).
 
-### Katalog
+### Arkivbestånd
 
-Katalogen är en inventering av alla handlingar och information i arkivet. En handling kan representera olika typer av information i arkivet (t ex böcker, elektroniska dokument, bilder, databaser export mm). Handlingar är vanligtvis samlat i en samling (eller arkivbestånd) och vidare indelat i undersamlingar, sektioner, serier, filer osv. Den här sidan listar alla samlingar på högsta nivå i arkivet. Du kan komma ner till undersamlingar genom att klicka på samlingens namn.
+Arkivbeståndet är en inventering av alla handlingar och information i arkivet. En handling kan representera olika typer av information i arkivet (t ex böcker, elektroniska dokument, bilder, databaser export mm). Handlingar är vanligtvis samlat i en samling (eller arkivbestånd) och vidare indelat i undersamlingar, sektioner, serier, filer osv. Den här sidan listar alla samlingar på högsta nivå i arkivet. Du kan komma ner till undersamlingar genom att klicka på samlingens namn.
 
 ### Sök & Avancerad sökning
 
