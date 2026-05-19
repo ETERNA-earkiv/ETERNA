@@ -13,10 +13,12 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
@@ -476,9 +478,6 @@ public class FilesService {
 
     Locale locale = ServerTools.parseLocale(localeString);
 
-    // Resolve the candidate XSLTs once. Both listAvailableXslts() and this
-    // method share the same resolver so a stylesheet that appears in the
-    // dropdown is guaranteed to be renderable.
     List<XsltSource> sources = resolveXsltSources(model, indexedFile, binary, namespace);
     if (sources.isEmpty()) {
       throw new NotFoundException("No XSLT stylesheet available for file: " + indexedFile.getId()
@@ -557,43 +556,59 @@ public class FilesService {
 
 
 
-  /**
-   * Single source of truth for the candidate XSLT list for a given file. Both
-   * listAvailableXslts() (dropdown) and retrieveFileContentHTML() (rendering)
-   * call this so a stylesheet that appears in the UI can always be rendered.
-   *
-   * Discovery: every .xsl/.xslt bundled anywhere in the SIP is listed together,
-   * in this order:
-   *  1. directly beside the XML file (same folder under representations/rep_X/data/...)
-   *  2. representation-level documentation (representations/rep_X/documentation/)
-   *  3. AIP-root documentation (documentation/)
-   *
-   * Filename-matched stylesheets float to the top within each layer.
-   *
-   * Layer 4 (global namespace mapping from configuration) only kicks in when no
-   * SIP-bundled stylesheets were found — it's a fallback, not a complement.
-   */
+  // Discovery order (per-SIP, dedup on base filename — first wins):
+  //   1. .xsl/.xslt beside the XML file
+  //   2. representation-level documentation/
+  //   3. AIP-root documentation/
+  //   4. global namespace mapping (only if no filename-matched stylesheet in 1-3)
   private List<XsltSource> resolveXsltSources(ModelService model, IndexedFile indexedFile, Binary binary,
     String namespace) {
-    List<XsltSource> result = new ArrayList<>();
+    List<XsltSource> raw = new ArrayList<>();
 
-    // Layers 1-3: every XSLT bundled inside the SIP
     if (indexedFile.getRepresentationId() != null) {
-      result.addAll(toXsltSources(searchXsltsBesideXmlFile(model, indexedFile)));
-      result.addAll(toXsltSources(searchAllXsltsInDocumentation(model, indexedFile.getAipId(),
+      raw.addAll(toXsltSources(searchXsltsBesideXmlFile(model, indexedFile)));
+      raw.addAll(toXsltSources(searchAllXsltsInDocumentation(model, indexedFile.getAipId(),
         indexedFile.getRepresentationId(), indexedFile.getId())));
     }
-    result.addAll(toXsltSources(searchAllXsltsInDocumentation(model, indexedFile.getAipId(),
+    raw.addAll(toXsltSources(searchAllXsltsInDocumentation(model, indexedFile.getAipId(),
       null, indexedFile.getId())));
 
-    // Layer 4: global namespace mapping — only if the SIP contributed nothing
-    if (result.isEmpty() && namespace != null) {
+    List<XsltSource> result = new ArrayList<>(raw.size());
+    Set<String> seen = new HashSet<>();
+    boolean filenameMatchedPresent = false;
+    String xmlBase = xmlBaseName(indexedFile.getId());
+    for (XsltSource s : raw) {
+      String key = dedupKey(s);
+      if (seen.add(key)) {
+        result.add(s);
+        if (!filenameMatchedPresent && xmlBase != null && isXsltMatchForXml(s.id, xmlBase)) {
+          filenameMatchedPresent = true;
+        }
+      }
+    }
+
+    if (!filenameMatchedPresent && namespace != null) {
       String xsltName = resolveXsltForNamespace(namespace);
       if (xsltName != null) {
-        result.add(XsltSource.global(xsltName));
+        XsltSource globalSource = XsltSource.global(xsltName);
+        if (seen.add(dedupKey(globalSource))) {
+          result.add(globalSource);
+        }
       }
     }
     return result;
+  }
+
+  // Base filename without extension, "global:" prefix stripped, lowercased.
+  private static String dedupKey(XsltSource s) {
+    if (s == null || s.id == null) {
+      return "";
+    }
+    if (s.id.startsWith("global:")) {
+      return s.id.substring("global:".length()).toLowerCase(Locale.ROOT);
+    }
+    String stripped = stripXsltExtension(s.id);
+    return stripped == null ? "" : stripped.toLowerCase(Locale.ROOT);
   }
 
   private static List<XsltSource> toXsltSources(List<Binary> binaries) {
@@ -605,8 +620,6 @@ public class FilesService {
     return out;
   }
 
-  // XSLT files can use either of the two W3C-recognized extensions. Treat both
-  // identically across discovery, filename matching, and label extraction.
   private static boolean isXsltFilename(String name) {
     if (name == null) {
       return false;
@@ -633,9 +646,6 @@ public class FilesService {
     if (xsltName == null || xmlBaseName == null) {
       return false;
     }
-    // Normalize both sides through stripXsltExtension (case-insensitive on the
-    // extension) and compare the bare base name case-insensitively, so Foo.XSL
-    // matches Foo.xml and FOO.xslt matches foo.xml.
     String xsltBase = stripXsltExtension(xsltName);
     return xsltBase != null && xsltBase.equalsIgnoreCase(xmlBaseName);
   }
@@ -652,14 +662,7 @@ public class FilesService {
     return null;
   }
 
-  /**
-   * Internal value type representing a single XSLT candidate. Two flavors:
-   *  - bundled: a Binary from the AIP storage (rep or AIP documentation)
-   *  - global:  an XSLT name configured in roda-wui.properties, resolved by HTMLUtils
-   *
-   * The id field is what the client sends back in the xslt query parameter;
-   * the label is the user-visible string in the dropdown.
-   */
+  // Bundled = Binary from AIP storage. Global = XSLT name from roda-wui.properties (id is "global:<name>").
   private static final class XsltSource {
     final String id;
     final String label;
@@ -693,26 +696,15 @@ public class FilesService {
     }
   }
 
-  /**
-   * Look for XSLT files in the SAME folder as the supplied XML file inside
-   * the representation data tree. Non-recursive: only direct siblings.
-   *
-   * Returns ONLY filename-matched stylesheets (Foo.xml → Foo.xslt or Foo.xsl,
-   * case-insensitive). Unrelated .xslt siblings are intentionally ignored so
-   * a B.xslt sitting next to A.xml cannot hide a correctly-named A.xslt in
-   * documentation/ or in the global namespace mapping.
-   */
+  // Direct .xsl/.xslt siblings in the XML's data/ folder. Non-recursive.
   private List<Binary> searchXsltsBesideXmlFile(ModelService model, IndexedFile indexedFile) {
     try {
-      // getFileStoragePath with a null fileId resolves to the parent directory
-      // (data/ + the file's path components), matching the existing storage
-      // pattern used by ModelUtils elsewhere.
+      // null fileId resolves to the parent directory
       StoragePath parentDir = ModelUtils.getFileStoragePath(indexedFile.getAipId(),
         indexedFile.getRepresentationId(), indexedFile.getPath(), null);
       CloseableIterable<Resource> resources = model.getStorage().listResourcesUnderDirectory(parentDir, false);
       try {
-        String xmlBaseName = xmlBaseName(indexedFile.getId());
-        return collectXsltBinaries(model, resources, xmlBaseName, false);
+        return collectXsltBinaries(model, resources, xmlBaseName(indexedFile.getId()), false);
       } finally {
         resources.close();
       }
@@ -749,15 +741,7 @@ public class FilesService {
     return null;
   }
 
-  /**
-   * Walk an iterable of storage resources and partition .xsl/.xslt files into
-   * "filename matches the XML base" and "everything else". Matched files come
-   * out first so the dropdown and the default-rendered stylesheet line up.
-   *
-   * When {@code matchedOnly} is true, only filename-matched stylesheets are
-   * returned and unrelated siblings are dropped — used by the beside-the-XML
-   * lookup so an unrelated neighbour cannot block lower discovery layers.
-   */
+  // Filename-matched first, others alphabetically. matchedOnly=true drops the others entirely.
   private static List<Binary> collectXsltBinaries(ModelService model, CloseableIterable<Resource> resources,
     String xmlBaseName, boolean matchedOnly) throws Exception {
     List<Binary> matched = new ArrayList<>();
@@ -773,8 +757,6 @@ public class FilesService {
         }
       }
     }
-    // Filename-matched stylesheet wins regardless of order, the rest sort
-    // alphabetically so the dropdown is deterministic across runs.
     others.sort((a, b) -> a.getStoragePath().getName().compareToIgnoreCase(b.getStoragePath().getName()));
     matched.addAll(others);
     return matched;
