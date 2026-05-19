@@ -22,9 +22,9 @@ Portal-API-användaren är ett särskilt användarkonto som skapats specifikt f�
 
 ### Specifika rekommenderade behörigheter
 
-#### Logiska enheter (AIP)
-- Hämta logiska enheter (AIP)
-- Lista och sök efter logiska enheter (AIP)
+#### Förvaringsenheter (AIP)
+- Hämta förvaringsenheter (AIP)
+- Lista och sök efter förvaringsenheter (AIP)
 
 #### Representationer och filer
 - Lista och sök i representationer och filer
