@@ -195,6 +195,11 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   }
 
   private void preview() {
+    // XSL/XSLT files: show raw XML, never apply a stylesheet
+    if (isXsltOrXslFile()) {
+      textPreview();
+      return;
+    }
     String type = viewerType();
     if (type != null) {
       if (type.equals(VIEWER_TYPE_IMAGE)) {
@@ -573,6 +578,22 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   }
 
 
+  private boolean isXsltOrXslFile() {
+    if (filename != null) {
+      String lower = filename.toLowerCase();
+      if (lower.endsWith(".xsl") || lower.endsWith(".xslt")) {
+        return true;
+      }
+    }
+    if (format != null && format.getMimeType() != null) {
+      String mime = format.getMimeType().toLowerCase();
+      if (mime.equals("application/xslt+xml") || mime.equals("text/xsl") || mime.equals("application/xsl+xml")) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   private boolean isXmlFile() {
     if (format != null && format.getMimeType() != null) {
       String mime = format.getMimeType().toLowerCase();
@@ -580,14 +601,22 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
         return true;
       }
     }
-    if (filename != null && filename.toLowerCase().endsWith(".xml")) {
-      return true;
+    if (filename != null) {
+      String lower = filename.toLowerCase();
+      if (lower.endsWith(".xml") || lower.endsWith(".xsl") || lower.endsWith(".xslt")) {
+        return true;
+      }
     }
     return false;
   }
 
   private void xmlHtmlPreview() {
     if (!(object instanceof IndexedFile)) {
+      textPreview();
+      return;
+    }
+
+    if (isXsltOrXslFile()) {
       textPreview();
       return;
     }
