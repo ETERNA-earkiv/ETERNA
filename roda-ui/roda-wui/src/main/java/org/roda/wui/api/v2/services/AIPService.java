@@ -812,7 +812,7 @@ public class AIPService {
         if (representation != null) {
           value = ServerTools.autoGenerateRepresentationValue(representation, generator);
         } else {
-          value = ServerTools.autoGenerateAIPValue(aip, user, generator);
+          value = ServerTools.autoGenerateAIPValue(aip, user, generator, locale);
         }
 
         if (value != null) {
