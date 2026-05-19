@@ -119,21 +119,3 @@ Gallringen genomförs via en kontrollerad process och kan tillfälligt stoppas g
 Läs mer om gallring under administrationsguiden "Gallringspolicyer."
 
 ### Planering
-
-#### Representationsnätverk
-
-Representationsinformation är all information som krävs för att kunna förstå och tolka både det digitala materialet samt tillhörande metadata. Digitala objekt lagras som bitströmmar som inte kan förstås av en människa om inte finns ytterligare data för att tolka dem. Representationsinformation är den tillkommande information om struktur eller semantik som omvandlar rådata till något mer meningsfullt.
-
-#### Riskregister
-
-Riskregistret listar alla identifierade risker som kan påverka systemet. Det bör vara så omfattande som möjligt och inkludera alla identifierade risker samt en uppskattad sannolikhet att respektive risk inträffar, hur risken kan påverka om den inträffar, när den kan inträffa och hur ofta. Riskhantering används för att minimera sannolikheten att risken inträffar. 
-
-#### Bevarandehändelser
-
-En bevarandehändelse samlar metadata om händelser, specificerar och dokumenterar vilka objekt som har påverkats och vilken person eller mjukvara som varit inblandad. Dokumentation av händelser som modifierar ett objekt är avgörande för att upprätthålla digital härkomst, en nyckelfaktor för äkthet. Händelser som skapar nya relationer eller ändrar befintliga relationer är viktiga för att förklara dessa relationer. Även händelser som inte förändrar någonting, såsom giltighet och integritetskontroller av objekt, kan vara viktiga att registrera för förvaltningsändamål.
-
-#### Bevarandeaktör
-
-Enligt PREMIS (Preservation Metadata Implementation Strategies) är bevarandeaktörer (Preservation Agents) personer eller system som ansvarar för att utföra uppgifter eller roller relaterade till bevarandet av digitala objekt. Bevarandeaktörer kan omfatta både mänskliga aktörer (t.ex. arkivarier, kuratorer eller bevarandeadministratörer) och mjukvaruverktyg eller system (t.ex. innehållshanteringssystem, digitala bevarandesystem eller migrationsverktyg).
-
-I bevarandemetadata kopplas bevarandeaktörer ofta till specifika händelser eller åtgärder som sker under ett digitalt objekts livscykel. Genom att dokumentera dessa aktörer och deras roller kan organisationer upprätthålla en tydlig dokumentation över vem eller vad som har utfört olika bevarandeåtgärder och därigenom bidra till att säkerställa digitala resursernas långsiktiga tillgänglighet och integritet.
