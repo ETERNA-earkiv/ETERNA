@@ -37,34 +37,19 @@ import com.google.common.io.CharStreams;
  */
 public final class HTMLUtils {
 
-  // XSS defense-in-depth for XSLT-rendered HTML.
-  //
-  // The toHtml() methods below feed their return value into trusted HTML
-  // sinks on the client side, where the browser bypasses normal escaping:
-  //
-  //   - descriptive/technical metadata + preservation event → wrapped by
-  //     SafeHtmlUtils.fromTrustedString(...) and inserted into the DOM
-  //     (AIPDescriptiveMetadataTabs, FileTechnicalMetadataTabs,
-  //      ShowPreservationEvent)
-  //   - representation file → returned over REST and assigned to an
-  //     iframe srcdoc attribute (BitstreamPreview.loadXsltPreview)
-  //
-  // Both sinks render the string as HTML without further escaping. XSLT
-  // input is derived from user-controllable artifacts (SIPs, metadata
-  // files, custom uploaded stylesheets), so the rendered string must be
-  // sanitized server-side to prevent stored-XSS via crafted XML/XSLT.
-  //
-  // The policy below is intentionally permissive enough to render existing
-  // descriptive/technical/preservation metadata crosswalks unchanged
-  // (tables, lists, inline formatting, anchors, images, inline styles).
-  // If a future crosswalk needs an element/attribute not on this list,
-  // extend the policy here — do NOT bypass sanitization at call sites.
+  // Output of toHtml() methods reaches trusted HTML sinks (SafeHtmlUtils.fromTrustedString,
+  // iframe srcdoc). XSLT input is user-controllable (SIPs, custom uploads), so sanitize
+  // server-side. Extend the policy here if a crosswalk needs more — never bypass.
   private static final PolicyFactory HTML_SANITIZER = new HtmlPolicyBuilder()
     .allowCommonBlockElements()
     .allowCommonInlineFormattingElements()
     .allowElements("table", "thead", "tbody", "tfoot", "tr", "th", "td", "caption", "col", "colgroup")
     .allowElements("dl", "dt", "dd", "pre", "code", "hr", "a", "img", "section", "header", "footer", "nav", "main")
     .allowElements("blockquote", "small")
+    // <style> for XSL-authored CSS; sandbox=allow-same-origin on the iframe limits
+    // CSS attacks. allowTextIn is required — OWASP strips text inside <style> by default.
+    .allowElements("style")
+    .allowTextIn("style")
     .allowAttributes("class", "id", "style", "title", "lang").globally()
     .allowAttributes("href").onElements("a")
     .allowAttributes("src", "alt", "width", "height").onElements("img")
@@ -77,9 +62,7 @@ public final class HTMLUtils {
     return HTML_SANITIZER.sanitize(html);
   }
 
-  // Cache the preview stylesheet contents on first use. The config file is
-  // looked up via RODA's configuration mechanism so deployments can override
-  // it by placing a file at $RODA_HOME/config/theme/xslt-preview.css.
+  // Override at $RODA_HOME/config/theme/xslt-preview.css
   private static final AtomicReference<String> CACHED_XSLT_PREVIEW_CSS = new AtomicReference<>();
 
   private static String loadXsltPreviewCss() {
@@ -95,21 +78,13 @@ public final class HTMLUtils {
         }
       }
     } catch (IOException e) {
-      // Fall back to no styling — the iframe will render unstyled HTML.
-      // Logging would require a logger import; the empty fallback is safe.
       content = "";
     }
     CACHED_XSLT_PREVIEW_CSS.compareAndSet(null, content);
     return content;
   }
 
-  /**
-   * Wraps an XSLT-rendered HTML fragment in a complete HTML document with an inline
-   * stylesheet, so the result renders with ETERNA-style typography when assigned to
-   * an iframe srcdoc attribute. Default XSLT crosswalks emit a bare fragment
-   * (e.g. {@code <div class="descriptiveMetadata">…</div>}) — without this wrapper
-   * the iframe shows unstyled HTML because srcdoc is isolated from the parent page.
-   */
+  // Wraps a bare HTML fragment in a complete document so iframe srcdoc renders styled.
   static String wrapXsltHtml(String renderedFragment) {
     String css = loadXsltPreviewCss();
     StringBuilder b = new StringBuilder(renderedFragment.length() + css.length() + 256);
