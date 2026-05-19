@@ -1091,6 +1091,10 @@ public interface ClientMessages extends Messages {
 
   String logParameter(String name, String value);
 
+  String logParameterName(@Select String name);
+
+  String logActionMethod(@Select String method);
+
   String windowTitle(String history);
 
   /************* User management Messages ****************/

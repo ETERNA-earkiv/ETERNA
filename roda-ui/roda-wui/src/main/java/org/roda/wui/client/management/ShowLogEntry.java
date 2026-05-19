@@ -168,9 +168,14 @@ public class ShowLogEntry extends Composite {
     logComponentLabel.setVisible(StringUtils.isNotBlank(logEntry.getActionComponent()));
     logComponentValue.setVisible(StringUtils.isNotBlank(logEntry.getActionComponent()));
 
-    logMethodValue.setText(logEntry.getActionMethod());
-    logMethodLabel.setVisible(StringUtils.isNotBlank(logEntry.getActionMethod()));
-    logMethodValue.setVisible(StringUtils.isNotBlank(logEntry.getActionMethod()));
+    String actionMethod = logEntry.getActionMethod();
+    String actionMethodLabel = messages.logActionMethod(actionMethod);
+    if (actionMethod != null && actionMethod.equals(actionMethodLabel)) {
+      actionMethodLabel = StringUtils.getPrettifiedActionMethod(actionMethod);
+    }
+    logMethodValue.setText(actionMethodLabel);
+    logMethodLabel.setVisible(StringUtils.isNotBlank(actionMethod));
+    logMethodValue.setVisible(StringUtils.isNotBlank(actionMethod));
 
     logAddressValue.setText(logEntry.getAddress());
     logAddressLabel.setVisible(StringUtils.isNotBlank(logEntry.getAddress()));
@@ -195,7 +200,7 @@ public class ShowLogEntry extends Composite {
     if (parameters != null && !parameters.isEmpty()) {
       for (LogEntryParameter par : parameters) {
         HTML parPanel = new HTML();
-        parPanel.setHTML(SafeHtmlUtils.fromString(messages.logParameter(par.getName(), par.getValue())));
+        parPanel.setHTML(SafeHtmlUtils.fromString(messages.logParameter(messages.logParameterName(par.getName()), par.getValue())));
         logParametersValue.add(parPanel);
       }
       logParametersLabel.setVisible(true);

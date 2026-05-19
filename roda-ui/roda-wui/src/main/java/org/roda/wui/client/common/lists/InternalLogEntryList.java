@@ -87,7 +87,9 @@ public class InternalLogEntryList extends AsyncTableCell<LogEntry> {
           return null;
         }
 
-        return StringUtils.getPrettifiedActionMethod(logEntry.getActionMethod());
+        String method = logEntry.getActionMethod();
+        String translated = messages.logActionMethod(method);
+        return method.equals(translated) ? StringUtils.getPrettifiedActionMethod(method) : translated;
       }
     };
 
