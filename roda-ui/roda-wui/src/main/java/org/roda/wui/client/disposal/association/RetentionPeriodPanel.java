@@ -98,7 +98,7 @@ public class RetentionPeriodPanel extends Composite {
       retentionOverdueDateLabel.setVisible(false);
       disposalRetentionDueDate.setVisible(false);
       disposalRetentionPeriod.setVisible(false);
-      disposalRetentionStartDate.setText(aip.getRetentionPeriodDetails());
+      disposalRetentionStartDate.setText(translateRetentionPeriodDetails(aip.getRetentionPeriodDetails()));
     }
   }
 
@@ -120,6 +120,15 @@ public class RetentionPeriodPanel extends Composite {
       }
 
     }
+  }
+
+  private String translateRetentionPeriodDetails(String details) {
+    if ("MISSING_START_DATE".equals(details)) {
+      return messages.retentionPeriodStartDateMissing();
+    } else if ("INVALID_START_DATE_TYPE".equals(details)) {
+      return messages.retentionPeriodStartDateInvalidType();
+    }
+    return details;
   }
 
   interface MyUiBinder extends UiBinder<Widget, RetentionPeriodPanel> {
