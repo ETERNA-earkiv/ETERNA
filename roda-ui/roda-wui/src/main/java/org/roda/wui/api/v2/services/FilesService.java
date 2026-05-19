@@ -470,11 +470,9 @@ public class FilesService {
 
     Binary binary = model.getBinary(liteFile.get());
 
-    // Detect XML namespace from the file content
+    // namespace may be null (XML without xmlns or unusual prolog); resolveXsltSources
+    // simply skips the global-mapping layer in that case — bundled XSLTs still work.
     String namespace = detectXmlNamespace(binary);
-    if (namespace == null) {
-      throw new RequestNotValidException("File is not XML or has no namespace: " + indexedFile.getId());
-    }
 
     Locale locale = ServerTools.parseLocale(localeString);
 
