@@ -165,7 +165,7 @@ public class CatalogTreePanel extends Composite {
       .withSublist(new Sublist(0, TREE_MAX_CHILDREN))
       .build();
 
-    Services service = new Services(messages.catalogTreeLoadingLabel(), "get");
+    Services service = new Services("List root AIPs", "get");
     service.rodaEntityRestService(
       s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
       IndexedAIP.class)
@@ -209,7 +209,7 @@ public class CatalogTreePanel extends Composite {
   }
 
   private void doRevealAip(String aipId) {
-    Services service = new Services(messages.catalogTreeLoadingLabel(), "get");
+    Services service = new Services("Get AIP ancestors", "get");
     service.aipResource(s -> s.getAncestors(aipId))
       .whenComplete((ancestors, error) -> {
         if (error != null) {
@@ -311,7 +311,7 @@ public class CatalogTreePanel extends Composite {
   public void refreshNodeTitle(String aipId) {
     CatalogTreeNode node = findNode(aipId, rootNodes);
     if (node == null) return;
-    Services service = new Services(messages.catalogTreeLoadingLabel(), "get");
+    Services service = new Services("Retrieve AIP", "get");
     service.rodaEntityRestService(
       s -> s.findByUuid(aipId, LocaleInfo.getCurrentLocale().getLocaleName()),
       IndexedAIP.class)
