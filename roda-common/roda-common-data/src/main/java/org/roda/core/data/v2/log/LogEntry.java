@@ -40,6 +40,7 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId, SetsUUID {
   private String actionComponent;
   private String actionMethod;
   private String relatedObjectID;
+  private String relatedAipId;
   private long duration;
 
   // REST API requests
@@ -351,6 +352,14 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId, SetsUUID {
    */
   public void setRelatedObjectID(String relatedObjectID) {
     this.relatedObjectID = relatedObjectID;
+  }
+
+  public String getRelatedAipId() {
+    return relatedAipId;
+  }
+
+  public void setRelatedAipId(String relatedAipId) {
+    this.relatedAipId = relatedAipId;
   }
 
   /**

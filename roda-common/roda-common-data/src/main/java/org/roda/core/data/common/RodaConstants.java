@@ -712,6 +712,10 @@ public final class RodaConstants {
   public static final String CONTROLLER_FILE_PARAM = RODA_OBJECT_FILE;
   public static final String CONTROLLER_FILE_ID_PARAM = "fileId";
   public static final String CONTROLLER_FILE_UUID_PARAM = "fileUUID";
+  public static final String CONTROLLER_XSLT_ID_PARAM = "xsltId";
+  public static final String CONTROLLER_XSLT_FILENAME_PARAM = "xsltFilename";
+  public static final String CONTROLLER_XSLT_SIZE_PARAM = "xsltSize";
+  public static final String CONTROLLER_LANG_PARAM = "lang";
   public static final String CONTROLLER_METADATA_ID_PARAM = "metadataId";
   public static final String CONTROLLER_INDEX_PRESERVATION_EVENT_ID_PARAM = "indexedPreservationEventId";
   public static final String CONTROLLER_VERSION_ID_PARAM = "versionId";
@@ -1228,6 +1232,7 @@ public final class RodaConstants {
   public static final String LOG_DURATION = "duration";
   public static final String LOG_ID = "id";
   public static final String LOG_RELATED_OBJECT_ID = "relatedObject";
+  public static final String LOG_RELATED_AIP_ID = "relatedAipId";
   public static final String LOG_USERNAME = "username";
   public static final String LOG_PARAMETERS = "parameters";
   public static final String LOG_STATE = "state";

@@ -73,6 +73,7 @@ public class LogEntryCollection extends AbstractSolrCollection<LogEntry, LogEntr
     fields.add(new Field(RodaConstants.LOG_DATETIME, Field.TYPE_DATE));
     fields.add(new Field(RodaConstants.LOG_DURATION, Field.TYPE_LONG).setRequired(true));
     fields.add(new Field(RodaConstants.LOG_RELATED_OBJECT_ID, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.LOG_RELATED_AIP_ID, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.LOG_USERNAME, Field.TYPE_STRING).setRequired(true));
     fields.add(new Field(RodaConstants.LOG_STATE, Field.TYPE_STRING).setRequired(true));
     fields.add(new Field(RodaConstants.LOG_PARAMETERS, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
@@ -102,6 +103,7 @@ public class LogEntryCollection extends AbstractSolrCollection<LogEntry, LogEntr
     doc.addField(RodaConstants.LOG_DURATION, logEntry.getDuration());
     doc.addField(RodaConstants.LOG_PARAMETERS, JsonUtils.getJsonFromObject(logEntry.getParameters()));
     doc.addField(RodaConstants.LOG_RELATED_OBJECT_ID, logEntry.getRelatedObjectID());
+    doc.addField(RodaConstants.LOG_RELATED_AIP_ID, logEntry.getRelatedAipId());
     doc.addField(RodaConstants.LOG_USERNAME, logEntry.getUsername());
     doc.addField(RodaConstants.LOG_STATE, logEntry.getState().toString());
     doc.addField(RodaConstants.INDEX_INSTANCE_ID, logEntry.getInstanceId());
@@ -126,6 +128,7 @@ public class LogEntryCollection extends AbstractSolrCollection<LogEntry, LogEntr
 
     final String parameters = SolrUtils.objectToString(doc.get(RodaConstants.LOG_PARAMETERS), null);
     final String relatedObjectId = SolrUtils.objectToString(doc.get(RodaConstants.LOG_RELATED_OBJECT_ID), null);
+    final String relatedAipId = SolrUtils.objectToString(doc.get(RodaConstants.LOG_RELATED_AIP_ID), null);
     final String username = SolrUtils.objectToString(doc.get(RodaConstants.LOG_USERNAME), null);
     final String requestHeaderUUID = SolrUtils.objectToString(doc.get(RodaConstants.LOG_REQUEST_HEADER_UUID), "");
     final String requestHeaderReason = SolrUtils.objectToString(doc.get(RodaConstants.LOG_REQUEST_HEADER_REASON), "");
@@ -156,6 +159,7 @@ public class LogEntryCollection extends AbstractSolrCollection<LogEntry, LogEntr
     }
 
     entry.setRelatedObjectID(relatedObjectId);
+    entry.setRelatedAipId(relatedAipId);
     entry.setUsername(username);
     entry.setInstanceId(instanceId);
     entry.setLineNumber(lineNumber);
