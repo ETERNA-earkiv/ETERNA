@@ -224,7 +224,7 @@ public class JobService {
       ZonedDateTime next = cron.next(ZonedDateTime.now());
       return next != null ? Date.from(next.toInstant()) : null;
     } catch (IllegalArgumentException e) {
-      throw new RequestNotValidException("Invalid cron expression: " + cronExpression);
+      throw new RequestNotValidException("Invalid cron expression: " + cronExpression, e);
     }
   }
 

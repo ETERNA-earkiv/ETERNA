@@ -397,6 +397,7 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
       workflowOptions.setPluginInfo(null);
     } else {
       buttonCreate.setEnabled(shouldEnableCreateButton());
+      buttonSchedule.setEnabled(shouldEnableCreateButton());
       buildPluginHeader();
       buildPluginStatusPanel();
 

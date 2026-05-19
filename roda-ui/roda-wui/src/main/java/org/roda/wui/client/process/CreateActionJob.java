@@ -95,6 +95,7 @@ public class CreateActionJob extends CreateSelectedJob<IsIndexed> {
   @Override
   public void buttonCreateHandler(ClickEvent e) {
     getButtonCreate().setEnabled(false);
+    getButtonSchedule().setEnabled(false);
     String jobName = getName().getText();
 
     CreateJobRequest jobRequest = new CreateJobRequest();
@@ -110,6 +111,7 @@ public class CreateActionJob extends CreateSelectedJob<IsIndexed> {
     services.jobsResource(s -> s.createJob(jobRequest)).whenComplete((job1, throwable) -> {
       if (throwable != null) {
         getButtonCreate().setEnabled(true);
+        getButtonSchedule().setEnabled(true);
         AsyncCallbackUtils.defaultFailureTreatment(throwable);
       } else {
         Toast.showInfo(messages.dialogDone(), messages.processCreated());
@@ -124,6 +126,7 @@ public class CreateActionJob extends CreateSelectedJob<IsIndexed> {
       if (cronExpression == null) {
         return;
       }
+      getButtonCreate().setEnabled(false);
       getButtonSchedule().setEnabled(false);
 
       CreateJobRequest jobRequest = new CreateJobRequest();
@@ -138,6 +141,7 @@ public class CreateActionJob extends CreateSelectedJob<IsIndexed> {
 
       Services services = new Services("Schedule job", "create");
       services.jobsResource(s -> s.createJob(jobRequest)).whenComplete((job1, throwable) -> {
+        getButtonCreate().setEnabled(true);
         getButtonSchedule().setEnabled(true);
         if (throwable != null) {
           AsyncCallbackUtils.defaultFailureTreatment(throwable);
