@@ -503,6 +503,8 @@ public class FilesController implements FileRestService, Exportable {
         List<String> fileFields = new ArrayList<>(RodaConstants.FILE_FIELDS_TO_RETURN);
         fileFields.add(RodaConstants.FILE_ISDIRECTORY);
         IndexedFile file = indexService.retrieve(IndexedFile.class, fileUUID, fileFields);
+        controllerAssistant.setRelatedAipId(file.getAipId());
+        controllerAssistant.addParameters(RodaConstants.CONTROLLER_AIP_ID_PARAM, file.getAipId());
         controllerAssistant.checkObjectPermissions(requestContext.getUser(), file);
         List<Map<String, String>> xslts = filesService.listAvailableXslts(requestContext, file);
         return ResponseEntity.ok(xslts);
@@ -515,7 +517,7 @@ public class FilesController implements FileRestService, Exportable {
     @ApiResponse(responseCode = "200", description = "Returns rendered HTML", content = @Content(schema = @Schema(implementation = ResponseEntity.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "404", description = "No stylesheet found for this file type", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  ResponseEntity<StreamingResponseBody> previewFileAsHTML(
+  ResponseEntity<StreamingResponseBody> renderXmlWithXslt(
     @Parameter(description = "The file UUID", required = true) @PathVariable(name = "uuid") String fileUUID,
     @Parameter(description = "The language for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString,
     @Parameter(description = "ID of a specific XSLT to apply") @RequestParam(name = "xslt", required = false) String selectedXsltId) {
@@ -524,10 +526,15 @@ public class FilesController implements FileRestService, Exportable {
       public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
         controllerAssistant.setRelatedObjectId(fileUUID);
-        controllerAssistant.setParameters(RodaConstants.CONTROLLER_FILE_UUID_PARAM, fileUUID);
+        controllerAssistant.setParameters(
+          RodaConstants.CONTROLLER_FILE_UUID_PARAM, fileUUID,
+          RodaConstants.CONTROLLER_XSLT_ID_PARAM, selectedXsltId != null ? selectedXsltId : "default",
+          RodaConstants.CONTROLLER_LANG_PARAM, localeString);
         List<String> fileFields = new ArrayList<>(RodaConstants.FILE_FIELDS_TO_RETURN);
         fileFields.add(RodaConstants.FILE_ISDIRECTORY);
         IndexedFile file = indexService.retrieve(IndexedFile.class, fileUUID, fileFields);
+        controllerAssistant.setRelatedAipId(file.getAipId());
+        controllerAssistant.addParameters(RodaConstants.CONTROLLER_AIP_ID_PARAM, file.getAipId());
         controllerAssistant.checkObjectPermissions(requestContext.getUser(), file);
         StreamResponse streamResponse = filesService.retrieveFileContentHTML(requestContext, file, localeString, selectedXsltId);
         return ApiUtils.okResponse(streamResponse);
@@ -540,7 +547,7 @@ public class FilesController implements FileRestService, Exportable {
     @ApiResponse(responseCode = "200", description = "Returns rendered HTML", content = @Content(schema = @Schema(implementation = ResponseEntity.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "404", description = "File not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  ResponseEntity<StreamingResponseBody> previewFileWithCustomXSLT(
+  ResponseEntity<StreamingResponseBody> renderXmlWithLocalXslt(
     @Parameter(description = "The file UUID", required = true) @PathVariable(name = "uuid") String fileUUID,
     @Parameter(description = "The language for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString,
     @Parameter(content = @Content(mediaType = "multipart/form-data", schema = @Schema(implementation = MultipartFile.class)), description = "XSLT stylesheet file") @RequestPart(value = "xslt") MultipartFile xsltFile) {
@@ -549,10 +556,16 @@ public class FilesController implements FileRestService, Exportable {
       public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
         controllerAssistant.setRelatedObjectId(fileUUID);
-        controllerAssistant.setParameters(RodaConstants.CONTROLLER_FILE_UUID_PARAM, fileUUID);
+        controllerAssistant.setParameters(
+          RodaConstants.CONTROLLER_FILE_UUID_PARAM, fileUUID,
+          RodaConstants.CONTROLLER_XSLT_FILENAME_PARAM, xsltFile.getOriginalFilename(),
+          RodaConstants.CONTROLLER_XSLT_SIZE_PARAM, xsltFile.getSize(),
+          RodaConstants.CONTROLLER_LANG_PARAM, localeString);
         List<String> fileFields = new ArrayList<>(RodaConstants.FILE_FIELDS_TO_RETURN);
         fileFields.add(RodaConstants.FILE_ISDIRECTORY);
         IndexedFile file = indexService.retrieve(IndexedFile.class, fileUUID, fileFields);
+        controllerAssistant.setRelatedAipId(file.getAipId());
+        controllerAssistant.addParameters(RodaConstants.CONTROLLER_AIP_ID_PARAM, file.getAipId());
         controllerAssistant.checkObjectPermissions(requestContext.getUser(), file);
 
         // Validate XSLT file size (max 1 MB)
