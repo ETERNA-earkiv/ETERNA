@@ -9,7 +9,7 @@ ETERNA implementerar också en rad specifikationer och standarder. För att veta
 
 * Användarvänligt grafiskt användargränssnitt baserat på HTML 5 och CSS 3
 * Lagring och hantering av digitala objekt
-* Katalog baserad på omfattande metadata (stödjer alla XML-baserade format som beskrivande metadata)
+* Arkivbestånd baserat på omfattande metadata (stödjer alla XML-baserade format som beskrivande metadata)
 * Full support för Dublin Core och Encoded Archival Description.
 * Konfigurerbart arbetsflöde för inleverans i flera steg
 * PREMIS 3 för metadata

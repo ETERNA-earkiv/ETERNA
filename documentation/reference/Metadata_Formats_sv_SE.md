@@ -2,7 +2,7 @@
 
 ETERNA stödjer alla beskrivande metadataformat (dvs. beskrivande information enligt OAIS) så länge som det representeras av en XML-fil. Om man har ett beskrivande metadataformat som inte är baserat på XML (t.ex. CSV, JSON, MARC21, etc.), måste man konvertera det till XML innan man kan använda det i ETERNA. Det finns flera verktyg på webben som kan konvertera de flesta dataformat till XML.
 
-När metadatan finns i en XML är den redo att paketeras i ett Submission Information Package (SIP) och levereras in till arkivet. Alternativt kanske du vill skapa en metadatafil direkt i arkivet genom att använda funktionaliteten som tillhandahålls i katalogen. När metadataformatet är nytt för ETERNA kommer systemet att göra sitt bästa för att stödja utan att behöva göra någon omkonfigurering av systemet, dock gäller följande begränsningar:
+När metadatan finns i en XML är den redo att paketeras i ett Submission Information Package (SIP) och levereras in till arkivet. Alternativt kanske du vill skapa en metadatafil direkt i arkivet genom att använda funktionaliteten som tillhandahålls i arkivbeståndet. När metadataformatet är nytt för ETERNA kommer systemet att göra sitt bästa för att stödja utan att behöva göra någon omkonfigurering av systemet, dock gäller följande begränsningar:
 
 #### Validering
 
@@ -28,7 +28,7 @@ För att förbättra metadataupplevelsen i ETERNA finns det 4 filer som måste l
 
 ### Validering
 
-ETERNA använder ett [XML-schema](http://www.w3.org/standards/xml/schema) för att validera strukturen och datatyperna för den tillhandahållna metadatafilen. Valideringsschemat kommer att användas under inleveransprocessen för att kontrollera om metadata som ingår i SIP är giltiga enligt de fastställda begränsningarna samt när metadata redigeras via katalogen.
+ETERNA använder ett [XML-schema](http://www.w3.org/standards/xml/schema) för att validera strukturen och datatyperna för den tillhandahållna metadatafilen. Valideringsschemat kommer att användas under inleveransprocessen för att kontrollera om metadata som ingår i SIP är giltiga enligt de fastställda begränsningarna samt när metadata redigeras via arkivbeståndet.
 
 Du kan använda en standardschemafil för valideringsändamål alternativt skapa en specifik fil som verifierar alla särskilda villkor som du behöver för att kontrollera i din systeminstallation, t.ex. obligatoriska fält, slutna vokabulärer för vissa elements värden osv.
 
@@ -304,7 +304,7 @@ Utdatan som produceras av denna visningsmall är ett [Solr dokument](https://wik
 
 ### Visualisering
 
-Aktiviteten _visualisering_ stöds av en [XSLT (eXtensible Stylesheet Language Transformations)](http://www.w3.org/standards/xml/transformation.html) som omvandlar den XML-baserade metadatafilen till HTML för presentationsändamål. Denna åtgärd ger en HTML-fil som kommer att visas för användaren när ett befintlig AIP i katalogen visas.
+Aktiviteten _visualisering_ stöds av en [XSLT (eXtensible Stylesheet Language Transformations)](http://www.w3.org/standards/xml/transformation.html) som omvandlar den XML-baserade metadatafilen till HTML för presentationsändamål. Denna åtgärd ger en HTML-fil som kommer att visas för användaren när ett befintlig AIP i arkivbeståndet visas.
 
 Visualiseringsmappningsfilen bör läggas till i konfigurationsmappen under `[RODA_HOME]/config/crosswalks/dissemination/html/`.
 
