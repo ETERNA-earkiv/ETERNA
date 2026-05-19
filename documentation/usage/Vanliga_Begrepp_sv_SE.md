@@ -30,21 +30,3 @@ Här hittar du förklaringar till vanliga begrepp som används i ETERNA och inom
 | Informationssäkerhet | Skydd av information utifrån konfidentialitet, riktighet och tillgänglighet. |
 | Handling | Något som innehåller information. I ETERNA utgörs en handling av en eller flera filer. |
 | Ärende | En samling handlingar, t.ex. ett bygglovsärende innehåller handlingarna: begäran om bygglov och beslut om bygglov. |
-
-## Beskrivningsnivåer (EAD3)
-
-Dessa nivåer används för att beskriva arkivhierarkin i ETERNA och är hämtade från standarden EAD3.
-
-| Engelska (EAD3) | Svenska | Förklaring |
-|---|---|---|
-| Fonds | Bestånd | En hel samling. Till exempel: Riksarkivet har Myndighet X:s och Myndighet Y:s arkivbestånd. De finns i samma arkivlokal men är olika arkivbestånd. |
-| Class | Klass | Högsta roten i en hierarki. Används sällan i svenska arkiv. |
-| Collection | Samling | Annat ord för bestånd. Ett bestånd kan också ha samlingar, t.ex. om ett personarkiv för en författare har en samling brev med en annan kändis. Används främst i Allmänna Arkivschemat. |
-| Record group | Volym | Också ett annat ord för bestånd, vanligt i USA och andra engelskspråkiga länder. OBS: En volym för en svensk arkivarie är en fysisk enhet, t.ex. en kartong som innehåller ärende 1251–1284. |
-| Subgroup | Process | En grupp relaterade handlingar inom en volym eller samling. I svensk arkivterminologi passar "process" bäst, även om grupperingen kan vara geografisk eller administrativ. |
-| Subfonds | Delbestånd | En del av ett bestånd. Används på liknande sätt som samling men för processbaserad arkivredovisning. |
-| Serie | Serie | En gruppering bestående av volymer i ett fysiskt arkiv. I ett e-arkiv består en serie förmodligen av underserier. |
-| Subseries | Underserie | En gruppering av serier som finns inuti en serie. |
-| File | Ärende/Akt | Ett ärende är en avgränsad process inom verksamhetsbaserad arkivredovisning. Inom Allmänna Arkivschemat används nivån Akt för samma struktur. |
-| Item | Handling | En informationsbärare – kan vara vad som helst: PDF, film, DNA-prov. Det är i denna förvaringsenhet som representationen ska ligga. Övriga nivåer ska inte ha handlingar direkt i sig. |
-| Other level | Annan nivå | Används om övriga strukturenheter inte kan beskriva materialet på rätt sätt. |
