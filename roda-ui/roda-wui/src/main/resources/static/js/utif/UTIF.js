@@ -987,8 +987,7 @@ UTIF.toRGBA8 = function(out)
 	// 0: WhiteIsZero, 1: BlackIsZero, 2: RGB, 3: Palette color, 4: Transparency mask, 5: CMYK
 	var intp = (out["t262"] ? out["t262"][0]: 2), bps = (out["t258"]?Math.min(32,out["t258"][0]):1);
 	//log("interpretation: ", intp, "bps", bps, out);
-	if(false) {}
-	else if(intp==0)
+	if(intp==0)
 	{
 		var bpl = Math.ceil(bps*w/8);
 		for(var y=0; y<h; y++) {
