@@ -724,14 +724,12 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
         boolean show = Boolean.TRUE.equals(hasRole);
         localLabel.setVisible(show);
         selectFileButton.setVisible(show);
-        flagLabel.setVisible(show);
       }
 
       @Override
       public void onFailure(Throwable caught) {
         localLabel.setVisible(false);
         selectFileButton.setVisible(false);
-        flagLabel.setVisible(false);
       }
     });
 
@@ -775,8 +773,13 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
       int idx = xsltDropdown.getSelectedIndex();
       if (idx < 0) return;
       String selectedId = xsltDropdown.getValue(idx);
-      if (selectedId == null || selectedId.isEmpty()) return;
-      if (selectedId.startsWith(LOCAL_VALUE_PREFIX)) {
+      if (selectedId == null || selectedId.isEmpty()) {
+        flagLabel.setVisible(false);
+        return;
+      }
+      boolean isLocal = selectedId.startsWith(LOCAL_VALUE_PREFIX);
+      flagLabel.setVisible(isLocal);
+      if (isLocal) {
         String fn = selectedId.substring(LOCAL_VALUE_PREFIX.length());
         String cached = getCachedXslt(fn);
         if (cached != null) {

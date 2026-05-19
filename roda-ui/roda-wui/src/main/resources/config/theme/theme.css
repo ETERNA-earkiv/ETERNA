@@ -1595,7 +1595,7 @@ a.btn-hero:visited, a.btn-welcome:visited {
 
 .xmlPreviewFlag {
   margin-left: auto;
-  color: var(--eterna-muted);
+  color: var(--eterna-red);
   font-style: italic;
 }
 
