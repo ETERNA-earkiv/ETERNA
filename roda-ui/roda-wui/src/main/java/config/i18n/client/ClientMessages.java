@@ -2734,6 +2734,8 @@ public interface ClientMessages extends Messages {
 
   String xsltLocalPrefix();
 
+  String xsltGlobalPrefix();
+
   String redactPdfInvalidFormatMessage();
 
   String redactPdfMissingIdentifiers();
