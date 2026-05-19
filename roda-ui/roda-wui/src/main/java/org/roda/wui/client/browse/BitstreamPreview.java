@@ -793,27 +793,40 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
 
     xsltUpload.addChangeHandler(event -> {
       String filename = xsltUpload.getFilename();
+      if (filename == null || filename.isEmpty()) {
+        return;
+      }
       int slash = Math.max(filename.lastIndexOf('/'), filename.lastIndexOf('\\'));
       String shortName = slash >= 0 ? filename.substring(slash + 1) : filename;
       String localValue = LOCAL_VALUE_PREFIX + shortName;
 
-      // Same filename already in dropdown → re-select, no new POST
-      for (int i = 0; i < xsltDropdown.getItemCount(); i++) {
-        if (localValue.equals(xsltDropdown.getValue(i))) {
-          xsltDropdown.setSelectedIndex(i);
-          applyCurrentSelection.run();
-          return;
+      // Always POST — even if filename matches an existing entry, the user may have
+      // picked a different file with the same name. The success callback either
+      // re-selects the existing entry (cache is overwritten in the JSNI on HTTP 200)
+      // or appends a new one. Failed POSTs leave the UI untouched.
+      final String localShortName = shortName;
+      final String localId = localValue;
+      com.google.gwt.user.client.Command onUploadSuccess = () -> {
+        int existingIdx = -1;
+        for (int i = 0; i < xsltDropdown.getItemCount(); i++) {
+          if (localId.equals(xsltDropdown.getValue(i))) {
+            existingIdx = i;
+            break;
+          }
         }
-      }
-
-      if (xsltDropdown.getItemCount() == 1 && "".equals(xsltDropdown.getValue(0))) {
-        xsltDropdown.removeItem(0);
-      }
-      xsltDropdown.addItem(messages.xsltLocalPrefix() + " " + shortName, localValue);
-      xsltDropdown.setSelectedIndex(xsltDropdown.getItemCount() - 1);
-      // View flips to rendered only on HTTP 200; on failure the raw view stays
+        if (existingIdx < 0) {
+          if (xsltDropdown.getItemCount() == 1 && "".equals(xsltDropdown.getValue(0))) {
+            xsltDropdown.removeItem(0);
+          }
+          xsltDropdown.addItem(messages.xsltLocalPrefix() + " " + localShortName, localId);
+          existingIdx = xsltDropdown.getItemCount() - 1;
+        }
+        xsltDropdown.setSelectedIndex(existingIdx);
+        flagLabel.setVisible(true);
+        enterRenderedView.execute();
+      };
       applyCustomXslt(xsltUpload.getElement(), transformUrl, xsltFrame.getElement(),
-        enterRenderedView,
+        onUploadSuccess,
         messages.xsltFileTooLarge(), messages.xsltTransformFailed(),
         messages.xsltUploadError(), messages.xsltTransformTimeout());
     });
