@@ -434,8 +434,7 @@ UTIF.decode._decodeNewJPEG = function(img, data, off, len, tgt, toff)
 		var bps = img["t258"][0];//, dcdr = new LosslessJpegDecoder();
 		var out = UTIF.LosslessJpegDecode(buff), olen=out.length;  //console.log(olen);
 		
-		if(false) {}
-		else if(bps==16) {
+		if(bps==16) {
 			if(img.isLE) for(var i=0; i<olen; i++ ) {  tgt[toff+(i<<1)] = (out[i]&255);  tgt[toff+(i<<1)+1] = (out[i]>>>8);  }
 			else         for(var i=0; i<olen; i++ ) {  tgt[toff+(i<<1)] = (out[i]>>>8);  tgt[toff+(i<<1)+1] = (out[i]&255);  }
 		}
