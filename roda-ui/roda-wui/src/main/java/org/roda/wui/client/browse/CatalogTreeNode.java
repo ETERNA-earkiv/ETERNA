@@ -155,7 +155,7 @@ public class CatalogTreeNode extends Composite {
       .withSublist(new Sublist(0, TREE_MAX_CHILDREN))
       .build();
 
-    Services service = new Services("List AIP children", "get");
+    Services service = new Services(messages.catalogTreeReasonListChildren(), "get");
     service.rodaEntityRestService(
       s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
       IndexedAIP.class)
