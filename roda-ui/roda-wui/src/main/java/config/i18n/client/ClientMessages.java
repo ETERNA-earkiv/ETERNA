@@ -2726,4 +2726,6 @@ public interface ClientMessages extends Messages {
   String catalogTreeReasonGetAncestors();
 
   String catalogTreeReasonRetrieveAIP();
+
+  String catalogTreeGhostNodeLabel();
 }
