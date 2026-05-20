@@ -64,7 +64,7 @@ public class StaticCacheFilter implements Filter {
 
   // HTML shells and GWT bootstrap must never be served from cache after a deploy
   private boolean isNeverCache(String path) {
-    return path.endsWith(".html") || path.endsWith(".nocache.js");
+    return "/".equals(path) || path.endsWith(".html") || path.endsWith(".nocache.js");
   }
 
   // Content-hashed files are safe to cache indefinitely
