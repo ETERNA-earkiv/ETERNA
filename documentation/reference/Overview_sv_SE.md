@@ -29,7 +29,7 @@ För mer information, besök gärna ETERNA:s webbplats:
 
 ## Funktioner i menyraden
 
-ETERNA har UI-stöd för följande funktionella enheter. Funktionerna är organiserade i menyn under följande huvudkategorier: **Arkivbestånd**, **Sök**, **Leverans** (Inleverans, Process, Ankomstkontroll), **Administration** (Arkivvårdsjobb, Interna åtgärder, Granskningslogg, Aviseringslogg, Rapportering, Användare och grupper), **Gallring** (Gallringspolicyer, Gallringsbekräftelse, Förfallna gallringar, Gallrade objekt) och **Planering** (Representationsnätverk, Riskregister, Bevarandehändelser, Bevarandeaktör).
+ETERNA har UI-stöd för följande funktionella enheter. Funktionerna är organiserade i menyn under följande huvudkategorier: **Arkivbestånd**, **Sök**, **Leverans** (Inleverans, Process, Ankomstkontroll), **Administration** (Arkivvårdsjobb, Interna åtgärder, Granskningslogg, Aviseringslogg, Rapportering, Användare och grupper), **Gallring** (Gallringspolicyer, Gallringsbekräftelse, Förfallna gallringar, Gallrade objekt).
 
 ### Arkivbestånd
 
@@ -117,5 +117,3 @@ Gallringen genomförs via en kontrollerad process och kan tillfälligt stoppas g
 Översikter i ETERNA visar enheter som är redo för gallring, redo för granskning, redan gallrade eller där beräkning av gallringsfrist har misslyckats. Metadata om gallrade objekt bevaras för att visa att gallringen har skett korrekt enligt gällande gallringsschema.
 
 Läs mer om gallring under administrationsguiden "Gallringspolicyer."
-
-### Planering
