@@ -29,7 +29,7 @@ För mer information, besök gärna ETERNA:s webbplats:
 
 ## Funktioner i menyraden
 
-ETERNA har UI-stöd för följande funktionella enheter. Funktionerna är organiserade i menyn under följande huvudkategorier: **Arkivbestånd**, **Sök**, **Leverans** (Inleverans, Process, Ankomstkontroll), **Administration** (Arkivvårdsjobb, Interna åtgärder, Granskningslogg, Aviseringslogg, Rapportering, Användare och grupper), **Gallring** (Gallringspolicyer, Gallringsbekräftelse, Förfallna gallringar, Gallrade objekt).
+ETERNA har UI-stöd för följande funktionella enheter. Funktionerna är organiserade i menyn under följande huvudkategorier: **Arkivbestånd**, **Sök**, **Leverans** (Inleverans, Process, Leveranskontroll), **Administration** (Arkivvårdsjobb, Interna åtgärder, Granskningslogg, Aviseringslogg, Rapportering, Användare och grupper), **Gallring** (Gallringspolicyer, Gallringsbekräftelse, Förfallna gallringar, Gallrade objekt) och **Planering** (Representationsnätverk, Riskregister, Bevarandehändelser, Bevarandeaktör).
 
 ### Arkivbestånd
 
@@ -51,9 +51,9 @@ Inleveransytan är en tillfällig lagringsyta för att ta emot inlämningsinform
 
 Inleveransprocessen innehåller funktioner för att acceptera inlämningspaket (SIP) från producenter, förbereda arkivpaket (AIP) för lagring och säkerställa att arkivpaket och deras stödjande beskrivande information etableras i e-arkivet. Den här sidan listar alla inleveranser som för närvarande körs och alla leveranser som har körts tidigare. I den högra sidopanelen är det möjligt att filtrera jobb baserat på deras tillstånd och vilken användare som initierade jobbet. Genom att klicka på ett objekt i tabellen är det möjligt att se hur arbetet fortskrider samt ytterligare detaljer.
 
-#### Ankomstkontroll
+#### Leveranskontroll
 
-Ankomstkontroll är en process för att avgöra om informationen och annat material har bevarandevärde. Bedömning kan göras på samling-, skapar-, serie-, fil- eller objektsnivå. Ankomstkontrollen kan ske före eller efter överföringen. Grunden för beslut kan omfatta ett antal faktorer inklusive informationens härkomst, innehåll, autenticitet, tillförlitlighet, ordning, fullständighet, skick, kostnader för bevarandet samt informationens egenvärde.
+Leveranskontroll är en process för att avgöra om informationen och annat material har bevarandevärde. Bedömning kan göras på samling-, skapar-, serie-, fil- eller objektsnivå. Leveranskontrollen kan ske före eller efter överföringen. Grunden för beslut kan omfatta ett antal faktorer inklusive informationens härkomst, innehåll, autenticitet, tillförlitlighet, ordning, fullständighet, skick, kostnader för bevarandet samt informationens egenvärde.
 
 ### Administration
 
