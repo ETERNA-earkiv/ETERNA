@@ -74,7 +74,13 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
     eventTypeColumn = new TextColumn<IndexedPreservationEvent>() {
       @Override
       public String getValue(IndexedPreservationEvent event) {
-        return event != null ? event.getEventType() : null;
+        if (event == null) {
+          return null;
+        }
+        String normalizedEventType = event.getEventType() == null
+          ? "other"
+          : event.getEventType().trim().toLowerCase().replace(' ', '_');
+        return messages.preservationEventTypeValue(normalizedEventType);
       }
     };
 

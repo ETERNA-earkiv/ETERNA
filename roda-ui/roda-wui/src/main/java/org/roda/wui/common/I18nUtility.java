@@ -60,8 +60,16 @@ public class I18nUtility {
   private static <T extends Serializable> String getFacetTranslation(String facetField, String facetValue,
     Locale locale, Class<T> resultClass) {
     String ret;
+    String normalizedValue;
+    if (facetValue == null || facetValue.trim().isEmpty()) {
+      normalizedValue = "other";
+    } else if (RodaConstants.PRESERVATION_EVENT_TYPE.equals(facetField)) {
+      normalizedValue = facetValue.trim().toLowerCase(Locale.ROOT).replace(' ', '_');
+    } else {
+      normalizedValue = facetValue.trim();
+    }
     String bundleKey = RodaConstants.I18N_UI_FACETS_PREFIX + "." + resultClass.getSimpleName() + "." + facetField
-      + (facetValue == null || facetValue.trim().length() == 0 ? "other" : "." + facetValue.trim());
+      + "." + normalizedValue;
 
     try {
       if (resultClass.equals(LogEntry.class) && facetField.equals(RodaConstants.LOG_ACTION_METHOD)

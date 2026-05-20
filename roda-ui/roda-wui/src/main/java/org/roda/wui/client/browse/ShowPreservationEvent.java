@@ -185,7 +185,10 @@ public class ShowPreservationEvent extends Composite {
 
   public void viewAction() {
     eventIdValue.setText(preservationEvent.getId());
-    eventTypeLabel.setText(preservationEvent.getEventType());
+    String normalizedEventType = preservationEvent.getEventType() == null
+      ? "other"
+      : preservationEvent.getEventType().trim().toLowerCase().replace(' ', '_');
+    eventTypeLabel.setText(messages.preservationEventTypeValue(normalizedEventType));
     eventDetailLabel.setText(preservationEvent.getEventDetail());
     eventDatetimeLabel.setText(Humanize.formatDateTime(preservationEvent.getEventDateTime()));
 
