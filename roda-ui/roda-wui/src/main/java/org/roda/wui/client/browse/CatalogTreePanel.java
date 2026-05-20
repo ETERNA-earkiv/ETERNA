@@ -84,6 +84,7 @@ public class CatalogTreePanel extends Composite {
   private CatalogTreeNode selectedNode = null;
   private boolean rootsLoaded = false;
   private boolean rootsLoading = false;
+  private int loadGeneration = 0;
   private String pendingRevealAipId = null;
 
   public CatalogTreePanel() {
@@ -157,6 +158,7 @@ public class CatalogTreePanel extends Composite {
   }
 
   private void loadRootNodes() {
+    loadGeneration++;
     clearSelection();
     treeBody.clear();
     rootNodes.clear();
@@ -208,7 +210,10 @@ public class CatalogTreePanel extends Composite {
   }
 
   private void loadFallbackGhostTree() {
+    final int myGeneration = loadGeneration;
     rootsLoading = true;
+    // 200-gräns: varje AIP genererar ett getAncestors()-anrop — begränsa för att hålla nere fan-out.
+    // Användare med fler än 200 tillgängliga AIPs ser de 200 första (sorterade på titel).
     FindRequest findRequest = new FindRequest.FindRequestBuilder(
       new Filter(new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file")),
       false)
@@ -223,15 +228,20 @@ public class CatalogTreePanel extends Composite {
       .whenComplete((result, error) -> {
         if (error != null) {
           LOGGER.error("Fallback ghost tree query failed", error);
+          if (myGeneration != loadGeneration) return;
           rootsLoading = false;
           rootsLoaded = true;
           return;
         }
         List<IndexedAIP> aips = result.getResults();
         if (aips.isEmpty()) {
+          if (myGeneration != loadGeneration) return;
           rootsLoading = false;
           rootsLoaded = true;
           return;
+        }
+        if (aips.size() == 200) {
+          LOGGER.warn("Fallback ghost tree capped at 200 AIPs; some accessible objects may not be shown");
         }
 
         Map<String, CatalogTreeNode> nodeMap = new LinkedHashMap<>();
@@ -250,7 +260,7 @@ public class CatalogTreePanel extends Composite {
               }
               remaining[0]--;
               if (remaining[0] == 0) {
-                finalizeFallbackTree(roots);
+                finalizeFallbackTree(roots, myGeneration);
               }
             });
         }
@@ -296,7 +306,8 @@ public class CatalogTreePanel extends Composite {
     }
   }
 
-  private void finalizeFallbackTree(List<CatalogTreeNode> roots) {
+  private void finalizeFallbackTree(List<CatalogTreeNode> roots, int expectedGeneration) {
+    if (expectedGeneration != loadGeneration) return;
     for (CatalogTreeNode root : roots) {
       rootNodes.put(root.getAipId(), root);
       treeBody.add(root);
