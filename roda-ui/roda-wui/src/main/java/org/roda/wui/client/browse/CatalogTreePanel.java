@@ -7,8 +7,10 @@
  */
 package org.roda.wui.client.browse;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -141,11 +143,15 @@ public class CatalogTreePanel extends Composite {
   }
 
   private boolean applyFilter(CatalogTreeNode node, String query) {
-    boolean selfMatches = query.isEmpty() || (node.getTitle() != null && node.getTitle().toLowerCase().contains(query));
     boolean childMatches = false;
     for (CatalogTreeNode child : node.getChildNodes().values()) {
       if (applyFilter(child, query)) childMatches = true;
     }
+    if (node.isGhostNode()) {
+      node.setVisible(query.isEmpty() || childMatches);
+      return query.isEmpty() || childMatches;
+    }
+    boolean selfMatches = query.isEmpty() || (node.getTitle() != null && node.getTitle().toLowerCase().contains(query));
     node.setVisible(selfMatches || childMatches);
     return selfMatches || childMatches;
   }
@@ -183,6 +189,10 @@ public class CatalogTreePanel extends Composite {
           treeBody.add(errorPanel);
           return;
         }
+        if (result.getResults().isEmpty()) {
+          loadFallbackGhostTree();
+          return;
+        }
         for (IndexedAIP aip : result.getResults()) {
           CatalogTreeNode node = new CatalogTreeNode(aip.getId(), aip.getTitle(), aip.getLevel(), 0);
           rootNodes.put(aip.getId(), node);
@@ -195,6 +205,109 @@ public class CatalogTreePanel extends Composite {
           doRevealAip(id);
         }
       });
+  }
+
+  private void loadFallbackGhostTree() {
+    rootsLoading = true;
+    FindRequest findRequest = new FindRequest.FindRequestBuilder(
+      new Filter(new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file")),
+      false)
+      .withSorter(new Sorter(new SortParameter(RodaConstants.AIP_TITLE_SORT, false)))
+      .withSublist(new Sublist(0, 200))
+      .build();
+
+    Services service = new Services(messages.catalogTreeReasonListRoots(), "get");
+    service.rodaEntityRestService(
+      s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
+      IndexedAIP.class)
+      .whenComplete((result, error) -> {
+        if (error != null) {
+          LOGGER.error("Fallback ghost tree query failed", error);
+          rootsLoading = false;
+          rootsLoaded = true;
+          return;
+        }
+        List<IndexedAIP> aips = result.getResults();
+        if (aips.isEmpty()) {
+          rootsLoading = false;
+          rootsLoaded = true;
+          return;
+        }
+
+        Map<String, CatalogTreeNode> nodeMap = new LinkedHashMap<>();
+        List<CatalogTreeNode> roots = new ArrayList<>();
+        int[] remaining = {aips.size()};
+
+        for (IndexedAIP aip : aips) {
+          Services s2 = new Services(messages.catalogTreeReasonGetAncestors(), "get");
+          s2.aipResource(srv -> srv.getAncestors(aip.getId()))
+            .whenComplete((ancestors, err) -> {
+              if (err != null) {
+                LOGGER.warn("Could not get ancestors for fallback AIP " + aip.getId() + ", skipping");
+              } else {
+                Collections.reverse(ancestors);
+                insertFallbackChain(ancestors, aip, nodeMap, roots);
+              }
+              remaining[0]--;
+              if (remaining[0] == 0) {
+                finalizeFallbackTree(roots);
+              }
+            });
+        }
+      });
+  }
+
+  private void insertFallbackChain(List<IndexedAIP> ancestors, IndexedAIP targetAip,
+      Map<String, CatalogTreeNode> nodeMap, List<CatalogTreeNode> roots) {
+    CatalogTreeNode parent = null;
+
+    for (int i = 0; i < ancestors.size(); i++) {
+      IndexedAIP anc = ancestors.get(i);
+      CatalogTreeNode node;
+
+      if (anc == null) {
+        node = CatalogTreeNode.createGhostNode(i);
+      } else if (nodeMap.containsKey(anc.getId())) {
+        parent = nodeMap.get(anc.getId());
+        continue;
+      } else {
+        node = new CatalogTreeNode(anc.getId(), anc.getTitle(), anc.getLevel(), i);
+        nodeMap.put(anc.getId(), node);
+      }
+
+      if (parent == null) {
+        roots.add(node);
+      } else {
+        parent.addPrebuiltChild(node);
+      }
+      parent = node;
+    }
+
+    if (nodeMap.containsKey(targetAip.getId())) {
+      return;
+    }
+    CatalogTreeNode targetNode = new CatalogTreeNode(
+      targetAip.getId(), targetAip.getTitle(), targetAip.getLevel(), ancestors.size());
+    nodeMap.put(targetAip.getId(), targetNode);
+    if (parent == null) {
+      roots.add(targetNode);
+    } else {
+      parent.addPrebuiltChild(targetNode);
+    }
+  }
+
+  private void finalizeFallbackTree(List<CatalogTreeNode> roots) {
+    for (CatalogTreeNode root : roots) {
+      rootNodes.put(root.getAipId(), root);
+      treeBody.add(root);
+    }
+    rootsLoading = false;
+    rootsLoaded = true;
+    if (pendingRevealAipId != null) {
+      String id = pendingRevealAipId;
+      pendingRevealAipId = null;
+      doRevealAip(id);
+    }
   }
 
   public void revealAip(String aipId) {
@@ -226,7 +339,12 @@ public class CatalogTreePanel extends Composite {
       selectNode(targetId);
       return;
     }
-    CatalogTreeNode node = findNode(ancestors.get(index).getId(), rootNodes);
+    IndexedAIP ancestor = ancestors.get(index);
+    if (ancestor == null) {
+      expandChain(ancestors, index + 1, targetId);
+      return;
+    }
+    CatalogTreeNode node = findNode(ancestor.getId(), rootNodes);
     if (node == null) {
       selectNode(targetId);
       return;
