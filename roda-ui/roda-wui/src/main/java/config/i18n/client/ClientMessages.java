@@ -830,6 +830,8 @@ public interface ClientMessages extends Messages {
 
   String preservationEventType();
 
+  String preservationEventTypeValue(@Select String eventType);
+
   String preservationEventDetail();
 
   String preservationEventAgentsHeader();
