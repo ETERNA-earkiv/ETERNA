@@ -143,6 +143,7 @@ public class CatalogTreeNode extends Composite {
       rowPanel.add(indent);
     }
 
+    // Ghost-noder är alltid utfällda och icke-interaktiva — toggle lämnas tom avsiktligt.
     toggleHtml = new HTML("");
     toggleHtml.setStyleName("catalogTreeToggle");
     rowPanel.add(toggleHtml);
