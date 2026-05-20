@@ -64,8 +64,11 @@ public class CatalogTreeNode extends Composite {
   private boolean loaded = false;
   private boolean isLeaf = false;
   private Command pendingOnComplete = null;
+  private final boolean ghost;
+  private static int ghostCounter = 0;
 
   public CatalogTreeNode(String aipId, String title, String level, int depth) {
+    this.ghost = false;
     this.aipId = aipId;
     this.title = title;
     this.depth = depth;
@@ -118,8 +121,55 @@ public class CatalogTreeNode extends Composite {
     initWidget(rootPanel);
   }
 
+  /** Skapar en ghost-nod som representerar ett AIP utan behörighet. */
+  public static CatalogTreeNode createGhostNode(int depth) {
+    return new CatalogTreeNode(depth);
+  }
+
+  private CatalogTreeNode(int depth) {
+    this.ghost = true;
+    this.aipId = "__ghost__" + (ghostCounter++);
+    this.title = messages.catalogTreeGhostNodeLabel();
+    this.depth = depth;
+
+    rootPanel = new FlowPanel();
+
+    rowPanel = new FlowPanel();
+    rowPanel.setStyleName("catalogTreeNode ghost");
+
+    for (int i = 0; i < depth; i++) {
+      FlowPanel indent = new FlowPanel();
+      indent.setStyleName("catalogTreeIndent");
+      rowPanel.add(indent);
+    }
+
+    toggleHtml = new HTML("");
+    toggleHtml.setStyleName("catalogTreeToggle");
+    rowPanel.add(toggleHtml);
+
+    iconHtml = new HTML(DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.AIP_GHOST, false));
+    iconHtml.setStyleName("catalogTreeIcon");
+    rowPanel.add(iconHtml);
+
+    titleLabel = new Label(this.title);
+    titleLabel.setStyleName("catalogTreeLabel");
+    rowPanel.add(titleLabel);
+
+    childrenPanel = new FlowPanel();
+    childrenPanel.setStyleName("catalogTreeNodeChildren");
+    childrenPanel.setVisible(true);
+
+    rootPanel.add(rowPanel);
+    rootPanel.add(childrenPanel);
+
+    loaded = true;
+    expanded = true;
+
+    initWidget(rootPanel);
+  }
+
   public void toggle() {
-    if (isLeaf) return;
+    if (ghost || isLeaf) return;
     if (expanded) {
       collapse();
     } else {
@@ -128,6 +178,10 @@ public class CatalogTreeNode extends Composite {
   }
 
   public void expand(Command onComplete) {
+    if (ghost) {
+      if (onComplete != null) onComplete.execute();
+      return;
+    }
     if (isLeaf) {
       if (onComplete != null) onComplete.execute();
       return;
@@ -208,9 +262,32 @@ public class CatalogTreeNode extends Composite {
   }
 
   public void collapse() {
+    if (ghost) return;
     childrenPanel.setVisible(false);
     expanded = false;
     toggleHtml.setHTML(ICON_TOGGLE_COLLAPSED);
+  }
+
+  /**
+   * Lägger till ett förkonstruerat barn (används vid fallback ghost-träd).
+   * Sätter noden som laddad och utfälld.
+   */
+  public void addPrebuiltChild(CatalogTreeNode child) {
+    if (childNodes.containsKey(child.getAipId())) {
+      return;
+    }
+    childNodes.put(child.getAipId(), child);
+    childrenPanel.add(child);
+    if (!ghost) {
+      loaded = true;
+      expanded = true;
+      childrenPanel.setVisible(true);
+      toggleHtml.setHTML(ICON_TOGGLE_EXPANDED);
+    }
+  }
+
+  public boolean isGhostNode() {
+    return ghost;
   }
 
   public void select() {
@@ -253,6 +330,7 @@ public class CatalogTreeNode extends Composite {
   }
 
   public void invalidateChildren() {
+    if (ghost) return;
     loaded = false;
     expanded = false;
     isLeaf = false;
