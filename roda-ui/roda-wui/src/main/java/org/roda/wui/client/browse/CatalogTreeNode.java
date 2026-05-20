@@ -50,13 +50,15 @@ public class CatalogTreeNode extends Composite {
   private static final String ICON_TOGGLE_LOADING = "<span class='fas fa-circle-notch fa-spin'></span>";
 
   private final String aipId;
-  private final String title;
+  private String title;
   private final int depth;
   private final FlowPanel rootPanel;
   private final FlowPanel rowPanel;
   private final FlowPanel childrenPanel;
   private final HTML toggleHtml;
+  private HTML iconHtml;
   private final Map<String, CatalogTreeNode> childNodes = new HashMap<>();
+  private Label titleLabel;
 
   private boolean expanded = false;
   private boolean loaded = false;
@@ -83,13 +85,13 @@ public class CatalogTreeNode extends Composite {
     toggleHtml.setStyleName("catalogTreeToggle");
     rowPanel.add(toggleHtml);
 
-    HTML iconHtml = new HTML(DescriptionLevelUtils.getElementLevelIconSafeHtml(level, false));
+    iconHtml = new HTML(DescriptionLevelUtils.getElementLevelIconSafeHtml(level, false));
     iconHtml.setStyleName("catalogTreeIcon");
     rowPanel.add(iconHtml);
 
-    Label labelWidget = new Label(title);
-    labelWidget.setStyleName("catalogTreeLabel");
-    rowPanel.add(labelWidget);
+    titleLabel = new Label(title);
+    titleLabel.setStyleName("catalogTreeLabel");
+    rowPanel.add(titleLabel);
 
     childrenPanel = new FlowPanel();
     childrenPanel.setStyleName("catalogTreeNodeChildren");
@@ -229,5 +231,34 @@ public class CatalogTreeNode extends Composite {
 
   public Map<String, CatalogTreeNode> getChildNodes() {
     return childNodes;
+  }
+
+  public void updateTitle(String newTitle) {
+    title = newTitle != null ? newTitle : "";
+    titleLabel.setText(title);
+  }
+
+  public void updateLevel(String level) {
+    iconHtml.setHTML(DescriptionLevelUtils.getElementLevelIconSafeHtml(level, false));
+  }
+
+  public void removeChild(String aipId) {
+    CatalogTreeNode child = childNodes.remove(aipId);
+    if (child != null) {
+      child.removeFromParent();
+    }
+    if (childNodes.isEmpty() && loaded) {
+      markAsLeaf();
+    }
+  }
+
+  public void invalidateChildren() {
+    loaded = false;
+    expanded = false;
+    isLeaf = false;
+    childNodes.clear();
+    childrenPanel.clear();
+    childrenPanel.setVisible(false);
+    toggleHtml.setHTML(ICON_TOGGLE_COLLAPSED);
   }
 }

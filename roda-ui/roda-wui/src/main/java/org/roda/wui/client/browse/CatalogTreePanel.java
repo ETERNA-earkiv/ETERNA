@@ -81,6 +81,7 @@ public class CatalogTreePanel extends Composite {
   private final Map<String, CatalogTreeNode> rootNodes = new HashMap<>();
   private CatalogTreeNode selectedNode = null;
   private boolean rootsLoaded = false;
+  private boolean rootsLoading = false;
   private String pendingRevealAipId = null;
 
   public CatalogTreePanel() {
@@ -150,10 +151,11 @@ public class CatalogTreePanel extends Composite {
   }
 
   private void loadRootNodes() {
+    clearSelection();
     treeBody.clear();
     rootNodes.clear();
     rootsLoaded = false;
-
+    rootsLoading = true;
     FindRequest findRequest = new FindRequest.FindRequestBuilder(
       new Filter(
         new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID),
@@ -168,6 +170,7 @@ public class CatalogTreePanel extends Composite {
       s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
       IndexedAIP.class)
       .whenComplete((result, error) -> {
+        rootsLoading = false;
         if (error != null) {
           LOGGER.error("Failed to load catalog tree root nodes", error);
           treeBody.clear();
@@ -197,6 +200,9 @@ public class CatalogTreePanel extends Composite {
   public void revealAip(String aipId) {
     if (!rootsLoaded) {
       pendingRevealAipId = aipId;
+      if (!rootsLoading) {
+        loadRootNodes();
+      }
       return;
     }
     doRevealAip(aipId);
@@ -258,5 +264,93 @@ public class CatalogTreePanel extends Composite {
       if (found != null) return found;
     }
     return null;
+  }
+
+  public void removeNodeAnywhere(String aipId) {
+    CatalogTreeNode rootNode = rootNodes.remove(aipId);
+    if (rootNode != null) {
+      rootNode.removeFromParent();
+    } else {
+      removeNodeFromSubtree(aipId, rootNodes);
+    }
+    if (selectedNode != null && aipId.equals(selectedNode.getAipId())) {
+      clearSelection();
+    }
+  }
+
+  private boolean removeNodeFromSubtree(String aipId, Map<String, CatalogTreeNode> nodes) {
+    for (CatalogTreeNode node : nodes.values()) {
+      if (node.getChildNodes().containsKey(aipId)) {
+        node.removeChild(aipId);
+        return true;
+      }
+      if (removeNodeFromSubtree(aipId, node.getChildNodes())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public void removeNode(String aipId, String parentAipId) {
+    if (parentAipId == null || parentAipId.isEmpty()) {
+      CatalogTreeNode node = rootNodes.remove(aipId);
+      if (node != null) {
+        node.removeFromParent();
+      }
+    } else {
+      CatalogTreeNode parent = findNode(parentAipId, rootNodes);
+      if (parent != null) {
+        parent.removeChild(aipId);
+      }
+    }
+    if (selectedNode != null && aipId.equals(selectedNode.getAipId())) {
+      clearSelection();
+    }
+  }
+
+  public void refreshNodeTitle(String aipId) {
+    CatalogTreeNode node = findNode(aipId, rootNodes);
+    if (node == null) return;
+    Services service = new Services(messages.catalogTreeLoadingLabel(), "get");
+    service.rodaEntityRestService(
+      s -> s.findByUuid(aipId, LocaleInfo.getCurrentLocale().getLocaleName()),
+      IndexedAIP.class)
+      .whenComplete((aip, error) -> {
+        if (error != null) {
+          // Node keeps its current title as fallback — non-critical background refresh
+          LOGGER.error("Could not refresh title for AIP " + aipId + ": " + error.getMessage(), error);
+          return;
+        }
+        node.updateTitle(aip.getTitle());
+        node.updateLevel(aip.getLevel());
+      });
+  }
+
+  public void reloadRootNodes() {
+    loadRootNodes();
+  }
+
+  public void refreshAfterMove(String oldParentId, String newParentId) {
+    boolean rootInvolved = (oldParentId == null || oldParentId.isEmpty())
+      || (newParentId == null || newParentId.isEmpty());
+    if (rootInvolved) {
+      loadRootNodes();
+    } else {
+      refreshSubtree(oldParentId);
+      refreshSubtree(newParentId);
+    }
+  }
+
+  public void refreshSubtree(String parentAipId) {
+    if (parentAipId == null || parentAipId.isEmpty()) {
+      // Mark stale without clearing the visible tree. loadRootNodes() is triggered
+      // lazily by the next revealAip() call (e.g. after saving metadata in BrowseAIP).
+      rootsLoaded = false;
+    } else {
+      CatalogTreeNode parent = findNode(parentAipId, rootNodes);
+      if (parent != null) {
+        parent.invalidateChildren();
+      }
+    }
   }
 }

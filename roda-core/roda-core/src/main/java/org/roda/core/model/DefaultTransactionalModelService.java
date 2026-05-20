@@ -1913,6 +1913,11 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   @Override
+  public PreservationMetadata createOrUpdateUserAgentBinary(String username) throws RODAException {
+    return mainModelService.createOrUpdateUserAgentBinary(username);
+  }
+
+  @Override
   public User deActivateUser(String id, boolean activate, boolean notify)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     return mainModelService.deActivateUser(id, activate, notify);

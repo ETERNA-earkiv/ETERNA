@@ -2536,6 +2536,20 @@ public class DefaultModelService implements ModelService {
     }
   }
 
+  /**
+   * Creates or updates the PREMIS user agent binary for the given username,
+   * ensuring the agent is persisted and indexed in Solr.
+   *
+   * @param username the username of the agent to create or update
+   * @return the created or updated {@link PreservationMetadata}, or null if the username is blank
+   * @throws RODAException if an error occurs during creation or update
+   */
+  @Override
+  public PreservationMetadata createOrUpdateUserAgentBinary(String username) throws RODAException {
+    return PremisV3Utils.createOrUpdatePremisUserAgentBinary(
+      username, this, RodaCoreFactory.getIndexService(), true);
+  }
+
   @Override
   public User deActivateUser(String id, boolean activate, boolean notify)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
