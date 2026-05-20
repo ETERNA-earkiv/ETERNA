@@ -9,11 +9,10 @@ services:
     volumes:
       - zookeeper_data:/data
       - zookeeper_datalog:/datalog
-
   solr:
     image: ghcr.io/eterna-earkiv/solr:9.10.1
-    user: "8983"
     restart: unless-stopped
+    user: solr
     ports:
       - "8983:8983"
     environment:
@@ -23,8 +22,7 @@ services:
       SOLR_OPTS: "-Dsolr.environment=dev,label=DEV+ENV"
     depends_on:
       - zoo
-    command:
-      - -c
+    command: -c
     volumes:
       - solr_data:/var/solr
 
@@ -36,8 +34,7 @@ services:
     volumes:
       - clam_data:/var/lib/clamav
       # Mapping $HOME/.roda to enable usage with spring-boot mode
-      - ${HOME}/.roda/data/storage:${HOME}/.roda/data/storage:ro
-      - ${HOME}/.roda/data/staging-storage:${HOME}/.roda/data/staging-storage:ro
+      - $HOME/.roda/data/storage:$HOME/.roda/data/storage:ro
       # Mapping /tmp to enable usage with local testing via mvn test
       - /tmp:/tmp
 
@@ -52,11 +49,9 @@ services:
     volumes:
       - siegfried_data:/root/siegfried/
       # Mapping $HOME/.roda to enable usage with spring-boot mode
-      - ${HOME}/.roda/data/storage:${HOME}/.roda/data/storage:ro
-      - ${HOME}/.roda/data/staging-storage:${HOME}/.roda/data/staging-storage:ro
+      - $HOME/.roda/data/storage:$HOME/.roda/data/storage:ro
       # Mapping /tmp to enable usage with local testing via mvn test
       - /tmp:/tmp:ro
-
   swagger:
     image: docker.io/swaggerapi/swagger-ui:latest
     restart: on-failure
@@ -66,47 +61,9 @@ services:
       - URL=http://localhost:8080/api/openapi.json
       - DOC_EXPANSION=none
       - VALIDATOR_URL=none
-
-  mailpit:
-    image: axllent/mailpit:v1.24
-    restart: unless-stopped
-    ports:
-      - "1025:1025" # smtp server
-      - "8025:8025" # web ui
-
-  openldap:
-    image: docker.io/bitnamilegacy/openldap:2.6
-    restart: unless-stopped
-    user: 1001:root
-    ports:
-      - "1389:1389"
-      - "1636:1636"
-    environment:
-      - BITNAMI_DEBUG=true
-      - LDAP_ROOT=dc=roda,dc=org
-      - LDAP_SKIP_DEFAULT_TREE=yes
-      - LDAP_ADMIN_USERNAME=admin
-      - LDAP_ADMIN_PASSWORD=eterna
-      - LDAP_EXTRA_SCHEMAS=cosine,inetorgperson,nis,pbkdf2
-    volumes:
-      - ./ldap/ldif/pbkdf2.ldif:/opt/bitnami/openldap/etc/schema/pbkdf2.ldif
-
-  postgres:
-    image: postgres:17
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: roda
-      POSTGRES_DB: roda_core_db
-    ports:
-      - "5432:5432"
-    volumes:
-      - pg_data:/var/lib/postgresql/data
-
 volumes:
   zookeeper_data:
   zookeeper_datalog:
   solr_data:
   clam_data:
   siegfried_data:
-  pg_data:

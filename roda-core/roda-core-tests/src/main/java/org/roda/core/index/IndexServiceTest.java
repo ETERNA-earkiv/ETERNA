@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/ETERNA-earkiv/ETERNA
+ * https://github.com/keeps/roda
  */
 package org.roda.core.index;
 
@@ -13,6 +13,7 @@ import static org.testng.AssertJUnit.fail;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
@@ -38,7 +39,6 @@ import org.hamcrest.collection.IsCollectionWithSize;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
-import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.notifications.EmailNotificationProcessor;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -48,7 +48,6 @@ import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -81,7 +80,6 @@ import org.roda.core.index.schema.SolrCollectionRegistry;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
-import org.roda.core.security.LdapUtilityTestHelper;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -95,13 +93,12 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-@Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
+@Test(groups = { RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS })
 public class IndexServiceTest {
   private static Path basePath;
   private static Path logPath;
   private static ModelService model;
   private static IndexService index;
-  private static LdapUtilityTestHelper ldapUtilityTestHelper;
 
   private static StorageService corporaService;
 
@@ -110,7 +107,6 @@ public class IndexServiceTest {
   @BeforeClass
   public static void setUp() throws Exception {
     basePath = TestsHelper.createBaseTempDir(IndexServiceTest.class, true);
-    ldapUtilityTestHelper = new LdapUtilityTestHelper();
 
     boolean deploySolr = true;
     boolean deployLdap = true;
@@ -119,7 +115,7 @@ public class IndexServiceTest {
     boolean deployPluginManager = false;
     boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
-      deployPluginManager, deployDefaultResources, false, ldapUtilityTestHelper.getLdapUtility());
+        deployPluginManager, deployDefaultResources, false);
 
     logPath = RodaCoreFactory.getLogPath();
     model = RodaCoreFactory.getModelService();
@@ -134,29 +130,27 @@ public class IndexServiceTest {
   @AfterClass
   public static void tearDown() throws Exception {
     IndexTestUtils.resetIndex();
-    ldapUtilityTestHelper.shutdown();
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
   }
 
   @AfterMethod
   public void cleanUp() throws RODAException {
-    try (
-      IterableIndexResult<IndexedAIP> result = index.findAll(IndexedAIP.class, Filter.ALL, Collections.emptyList())) {
-      for (IndexedAIP aip : result) {
-        try {
-          model.deleteAIP(aip.getId());
-        } catch (NotFoundException e) {
-          // do nothing
-        }
-      }
-
-      // last attempt to delete everything (for model/index inconsistencies)
+    try {
       index.clearAIPs();
-    } catch (IOException e) {
-      LOGGER.error("Error getting AIPs when cleaning up", e);
+      resetAipStorage();
     } finally {
       index.commitAIPs();
+    }
+  }
+
+  private void resetAipStorage() {
+    Path aipStoragePath = RodaCoreFactory.getStoragePath().resolve(RodaConstants.STORAGE_CONTAINER_AIP);
+    try {
+      FSUtils.deletePath(aipStoragePath);
+      Files.createDirectories(aipStoragePath);
+    } catch (IOException | NotFoundException | GenericException e) {
+      LOGGER.error("Error resetting AIP storage during cleanup", e);
     }
   }
 
@@ -193,8 +187,8 @@ public class IndexServiceTest {
 
     // Create AIP
     final AIP aip = model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
-      RodaConstants.ADMIN);
+        DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+        RodaConstants.ADMIN);
 
     index.commitAIPs();
 
@@ -203,7 +197,7 @@ public class IndexServiceTest {
     compareAIPWithIndexedAIP(aip, indexedAip);
 
     final IndexResult<IndexedAIP> indexAips = index.find(IndexedAIP.class, Filter.ALL, null, new Sublist(0, 10),
-      Collections.emptyList());
+        Collections.emptyList());
     assertEquals(1, indexAips.getTotalCount());
     assertEquals(1, indexAips.getLimit());
     assertEquals(0, indexAips.getOffset());
@@ -224,13 +218,13 @@ public class IndexServiceTest {
     // Retrieve, count and list SRO
     String rep1Id = aip.getRepresentations().get(0).getId();
     IndexedRepresentation rep1 = index.retrieve(IndexedRepresentation.class, IdUtils.getRepresentationId(aipId, rep1Id),
-      new ArrayList<>());
+        new ArrayList<>());
     assertEquals(rep1Id, rep1.getId());
 
     Filter filterParentTheAIP = new Filter();
     filterParentTheAIP.add(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aipId));
     IndexResult<IndexedRepresentation> sros = index.find(IndexedRepresentation.class, filterParentTheAIP, null,
-      new Sublist(0, 10), Collections.emptyList());
+        new Sublist(0, 10), Collections.emptyList());
     assertEquals(aip.getRepresentations().size(), sros.getTotalCount());
 
     List<String> sroIDs = new ArrayList<>();
@@ -239,7 +233,7 @@ public class IndexServiceTest {
     }
 
     MatcherAssert.assertThat(sroIDs,
-      Matchers.contains(aip.getRepresentations().stream().map(Representation::getId).toArray()));
+        Matchers.containsInAnyOrder(aip.getRepresentations().stream().map(Representation::getId).toArray()));
 
     model.deleteAIP(aipId);
     try {
@@ -249,7 +243,7 @@ public class IndexServiceTest {
       // do nothing as it was the expected exception
     } catch (RODAException e) {
       Assert.fail("AIP was deleted and therefore a " + NotFoundException.class.getName()
-        + " should have been thrown instead of a " + e.getClass().getName());
+          + " should have been thrown instead of a " + e.getClass().getName());
     }
   }
 
@@ -258,15 +252,15 @@ public class IndexServiceTest {
     final String aipId = IdUtils.createUUID();
 
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID_3),
-      RodaConstants.ADMIN);
+        DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID_3),
+        RodaConstants.ADMIN);
 
     index.commitAIPs();
 
     Filter filter = new Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.INDEX_UUID, aipId));
     List<IndexedAIP> results = index.find(IndexedAIP.class, filter, null, new Sublist(0, 10), Collections.emptyList())
-      .getResults();
+        .getResults();
 
     Assert.assertEquals(results.size(), 1);
     IndexedAIP indexedAip = results.get(0);
@@ -290,11 +284,11 @@ public class IndexServiceTest {
 
     // testing AIP
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
-      RodaConstants.ADMIN);
+        DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+        RodaConstants.ADMIN);
 
     final StoragePath otherAipPath = DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER,
-      CorporaConstants.OTHER_AIP_ID);
+        CorporaConstants.OTHER_AIP_ID);
     final AIP updatedAIP = model.updateAIP(aipId, corporaService, otherAipPath, RodaConstants.ADMIN);
 
     final IndexedAIP indexedAIP = index.retrieve(IndexedAIP.class, aipId, new ArrayList<>());
@@ -311,11 +305,11 @@ public class IndexServiceTest {
 
     // set up
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
-      RodaConstants.ADMIN);
+        DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+        RodaConstants.ADMIN);
     model.createAIP(CorporaConstants.OTHER_AIP_ID, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.OTHER_AIP_ID),
-      RodaConstants.ADMIN);
+        DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.OTHER_AIP_ID),
+        RodaConstants.ADMIN);
 
     index.commitAIPs();
 
@@ -326,7 +320,7 @@ public class IndexServiceTest {
     assertEquals(1, aipCount);
 
     final IndexResult<IndexedAIP> aips = index.find(IndexedAIP.class, fondsFilter, null, new Sublist(0, 10),
-      Collections.emptyList());
+        Collections.emptyList());
 
     assertEquals(1, aips.getLimit());
     assertEquals(aipId, aips.getResults().get(0).getId());
@@ -339,11 +333,11 @@ public class IndexServiceTest {
   public void testSubElements() throws RODAException {
     // set up
     model.createAIP(CorporaConstants.SOURCE_AIP_ID, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
-      RodaConstants.ADMIN);
+        DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+        RodaConstants.ADMIN);
     model.createAIP(CorporaConstants.OTHER_AIP_ID, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.OTHER_AIP_ID),
-      RodaConstants.ADMIN);
+        DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.OTHER_AIP_ID),
+        RodaConstants.ADMIN);
 
     index.commitAIPs();
 
@@ -354,7 +348,7 @@ public class IndexServiceTest {
     assertEquals(1, aipCount);
 
     final IndexResult<IndexedAIP> aips = index.find(IndexedAIP.class, filter, null, new Sublist(0, 10),
-      Collections.emptyList());
+        Collections.emptyList());
 
     assertEquals(1, aips.getLimit());
     assertEquals(CorporaConstants.OTHER_AIP_ID, aips.getResults().get(0).getId());
@@ -367,18 +361,18 @@ public class IndexServiceTest {
   public void testGetAncestors() throws RODAException {
     // set up
     model.createAIP(CorporaConstants.SOURCE_AIP_ID, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
-      RodaConstants.ADMIN);
+        DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+        RodaConstants.ADMIN);
     model.createAIP(CorporaConstants.OTHER_AIP_ID, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.OTHER_AIP_ID),
-      RodaConstants.ADMIN);
+        DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.OTHER_AIP_ID),
+        RodaConstants.ADMIN);
 
     index.commitAIPs();
 
     IndexedAIP aip = index.retrieve(IndexedAIP.class, CorporaConstants.OTHER_AIP_ID, new ArrayList<>());
     List<IndexedAIP> ancestors = index.retrieveAncestors(aip, new User("admin"), new ArrayList<>());
     MatcherAssert.assertThat(ancestors,
-      Matchers.hasItem(Matchers.<IndexedAIP> hasProperty("id", Matchers.equalTo(CorporaConstants.SOURCE_AIP_ID))));
+        Matchers.hasItem(Matchers.<IndexedAIP>hasProperty("id", Matchers.equalTo(CorporaConstants.SOURCE_AIP_ID))));
   }
 
   @Test
@@ -388,8 +382,8 @@ public class IndexServiceTest {
 
     // Create AIP
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
-      RodaConstants.ADMIN);
+        DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+        RodaConstants.ADMIN);
 
     index.commitAIPs();
 
@@ -397,7 +391,7 @@ public class IndexServiceTest {
     filter.add(new SimpleFilterParameter(RodaConstants.AIP_LEVEL, "fonds"));
     filter.add(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
     IndexResult<IndexedAIP> findDescriptiveMetadata = index.find(IndexedAIP.class, filter, null, new Sublist(),
-      Collections.emptyList());
+        Collections.emptyList());
 
     assertNotNull(findDescriptiveMetadata);
     MatcherAssert.assertThat(findDescriptiveMetadata.getResults(), IsCollectionWithSize.hasSize(1));
@@ -408,7 +402,7 @@ public class IndexServiceTest {
 
   @Test
   public void testGetLogEntriesCount()
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+      throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     // cleaning up action log entries on index (if any)
     index.deleteAllActionLog();
 
@@ -442,7 +436,7 @@ public class IndexServiceTest {
 
   @Test
   public void testFindLogEntry()
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+      throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     LogEntry entry = new LogEntry();
     entry.setActionComponent(RodaConstants.LOG_ACTION_COMPONENT);
     entry.setActionMethod("Method");
@@ -466,7 +460,7 @@ public class IndexServiceTest {
     filterDescription.add(new SimpleFilterParameter(RodaConstants.INDEX_UUID, "id"));
 
     IndexResult<LogEntry> entries = index.find(LogEntry.class, filterDescription, null, new Sublist(),
-      Collections.emptyList());
+        Collections.emptyList());
     assertEquals(entries.getTotalCount(), 1);
     assertEquals(entries.getResults().get(0).getActionComponent(), RodaConstants.LOG_ACTION_COMPONENT);
 
@@ -474,13 +468,13 @@ public class IndexServiceTest {
     filterDescription2.add(new SimpleFilterParameter(RodaConstants.INDEX_UUID, "id2"));
 
     IndexResult<LogEntry> entries2 = index.find(LogEntry.class, filterDescription2, null, new Sublist(),
-      Collections.emptyList());
+        Collections.emptyList());
     assertEquals(entries2.getTotalCount(), 0);
   }
 
   @Test
   public void testReindexLogEntry()
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException, IOException {
+      throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     long number = 10L;
 
     for (int i = 0; i < number; i++) {
@@ -509,12 +503,7 @@ public class IndexServiceTest {
     index.commit(LogEntry.class);
 
     model.findOldLogsAndMoveThemToStorage(logPath, null);
-
-    try (CloseableIterable<OptionalWithCause<LogEntry>> logs = model.listLogEntries()) {
-      for (OptionalWithCause<LogEntry> log : logs) {
-        index.reindexActionLog(log.get());
-      }
-    }
+    index.reindexActionLogs();
 
     index.commit(LogEntry.class);
 
@@ -530,14 +519,14 @@ public class IndexServiceTest {
 
   @Test
   public void testReindexAIP() throws RequestNotValidException, GenericException, AuthorizationDeniedException,
-    AlreadyExistsException, NotFoundException, ValidationException {
+      AlreadyExistsException, NotFoundException, ValidationException {
     index.clearIndex(RodaConstants.INDEX_AIP);
 
     for (int i = 0; i < 10; i++) {
       final String aipId = IdUtils.createUUID();
       model.createAIP(aipId, corporaService,
-        DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), false,
-        RodaConstants.ADMIN);
+          DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), false,
+          RodaConstants.ADMIN);
     }
 
     index.reindexAIPs();
@@ -547,7 +536,7 @@ public class IndexServiceTest {
 
   @Test
   public void indexMembers() throws AlreadyExistsException, GenericException, RequestNotValidException,
-    IllegalOperationException, NotFoundException, AuthorizationDeniedException {
+      IllegalOperationException, NotFoundException, AuthorizationDeniedException {
     Set<String> groups = new HashSet<>();
     groups.add("administrators");
 
@@ -563,7 +552,7 @@ public class IndexServiceTest {
         user.setAllRoles(roles);
         user.setDirectRoles(roles);
         user.setGuest(false);
-        user.setId("NAMEUSER" + i);
+        user.setId("USER" + i);
         user.setName("NAMEUSER" + i);
         user.setFullName("NAMEUSER" + i);
 
@@ -575,7 +564,7 @@ public class IndexServiceTest {
         group.setActive(true);
         group.setAllRoles(roles);
         group.setDirectRoles(roles);
-        group.setId("NAMEGROUP" + i);
+        group.setId("GROUP" + i);
         group.setName("NAMEGROUP" + i);
         group.setFullName("NAMEGROUP" + i);
 
@@ -606,13 +595,13 @@ public class IndexServiceTest {
 
     // Create AIP
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
-      RodaConstants.ADMIN);
+        DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+        RodaConstants.ADMIN);
 
     index.commitAIPs();
 
     IndexResult<IndexedAIP> find = index.find(IndexedAIP.class, Filter.ALL, null, new Sublist(0, 10),
-      Collections.emptyList());
+        Collections.emptyList());
     assertEquals(1, find.getTotalCount());
 
     IndexedAIP aip = index.retrieve(IndexedAIP.class, aipId, new ArrayList<>());
@@ -665,7 +654,7 @@ public class IndexServiceTest {
       assertEquals(risk.getName(), risk2.getName());
 
       IndexResult<IndexedRisk> find = index.find(IndexedRisk.class, Filter.ALL, null, new Sublist(0, 10),
-        Collections.emptyList());
+          Collections.emptyList());
       assertEquals(1, find.getTotalCount());
 
       Risk risk3 = index.retrieve(IndexedRisk.class, risk.getId(), new ArrayList<>());
@@ -708,7 +697,7 @@ public class IndexServiceTest {
     assertEquals(ri.getName(), ri2.getName());
 
     IndexResult<RepresentationInformation> find = index.find(RepresentationInformation.class, Filter.ALL, null,
-      new Sublist(0, 10), Collections.emptyList());
+        new Sublist(0, 10), Collections.emptyList());
     assertEquals(1, find.getTotalCount());
 
     RepresentationInformation ri3 = index.retrieve(RepresentationInformation.class, ri.getId(), new ArrayList<>());
@@ -729,7 +718,6 @@ public class IndexServiceTest {
 
   @Test
   public void testMessageIndex() throws RODAException {
-    IndexTestUtils.resetIndex();
     Notification notification = new Notification();
     notification.setSubject("Message subject");
     notification.setBody("Message body");
@@ -739,7 +727,7 @@ public class IndexServiceTest {
     Notification n = model.createNotification(notification, new EmailNotificationProcessor("test-email-template.vm"));
     // notification state must be FAILED because SMTP is not configured on test
     // environment
-    Assert.assertEquals(n.getState(), NotificationState.COMPLETED);
+    Assert.assertEquals(n.getState(), NotificationState.FAILED);
     index.commit(Notification.class);
 
     Notification message2 = model.retrieveNotification(notification.getId());
@@ -748,7 +736,7 @@ public class IndexServiceTest {
     assertEquals(notification.getSubject(), message2.getSubject());
 
     IndexResult<Notification> find = index.find(Notification.class, Filter.ALL, null, new Sublist(0, 10),
-      Collections.emptyList());
+        Collections.emptyList());
     assertEquals(1, find.getTotalCount());
 
     Notification message3 = index.retrieve(Notification.class, notification.getId(), new ArrayList<>());
@@ -781,7 +769,7 @@ public class IndexServiceTest {
       aip.setPermissions(new Permissions());
 
       index.getSolrClient().add(SolrCollectionRegistry.getIndexName(IndexedAIP.class),
-        SolrCollectionRegistry.toSolrDocument(IndexedAIP.class, model, aip));
+          SolrCollectionRegistry.toSolrDocument(IndexedAIP.class, aip));
 
       index.commit(IndexedAIP.class);
 
@@ -794,7 +782,7 @@ public class IndexServiceTest {
     int blockSize = 100;
     do {
       find = RodaCoreFactory.getIndexService().find(IndexedAIP.class, Filter.ALL, Sorter.NONE,
-        new Sublist((int) offset, blockSize), Collections.emptyList());
+          new Sublist((int) offset, blockSize), Collections.emptyList());
       offset += find.getLimit();
 
       // Add all ids to result list

@@ -56,9 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     async function loadVersionInfo() {
-        const pathname = window.location.pathname;
         try {
-            const response = await fetch(pathname + "version.json");
+            const response = await fetch("api/v1/theme?resource_id=version.json");
             if (!response.ok) {
                 throw new Error('Failed to load version.json');
             }

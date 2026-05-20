@@ -1,9 +1,52 @@
 # ETERNA Changelog
+## v0.6.1 (2026-04-20)
+#### Bug fixes
+- Fixed clamd.conf path from `/etc/clamav/clamd.conf` to `/etc/clamd.conf` for correct ClamAV detection
+- Fixed clamd.conf to be written from environment variables so clamdscan uses TCP socket
+- Ensured `UTF8MultiPartReader` takes priority over Jersey's built-in reader to handle multipart uploads correctly
+- Set UTF-8 locale in Docker image to handle Swedish filenames with special characters (å, ä, ö)
+- Fixed Solr container to run as `solr` user in docker-compose configurations
 
-## v1.0.0-SNAPSHOT
-#### WIP
-- Restored PDF redactor compatibility by realigning the integration with [`eterna-pdf-redactor@v1.0.1`](https://github.com/ETERNA-earkiv/eterna-pdf-redactor). [#142](https://github.com/ETERNA-earkiv/ETERNA/issues/142)
+## v0.6.0 (2026-03-26)
+#### Bug fixes
+- Fixed null URL handling in Theme controller to return INITIAL_DATE when file is not found
+- Fixed malformed UTF-8 encoding in file uploads and improved filename validation in TransferredResource
+- Fixed Jersey classpath conflict between versions 3.1.6 and 4.0.2
+- Fixed compilation warnings regarding plural i18n by updating pluralization rule syntax from `[one]` to `[=1]` for single items
+- Added missing `[one]` pluralization keys in Swedish localization file and corrected a typo
+- Replaced Unicode escapes with literal HTML tags in Swedish client messages
 
+#### Improvements
+- Added healthcheck to Dockerfile and docker-compose for improved service reliability
+- Hardened Docker image security: pinned base images to specific digest hashes and adjusted permissions on critical binaries
+- Migrated from `commons-configuration` to `commons-configuration2`
+- Bumped container image versions and updated ZooKeeper dependency
+- Fixed version display by adding `version.json` resource files and updating build configurations
+- Fixed dependency scope for `jakarta.servlet-api` and excluded conflicting Jackson dependencies
+
+#### Infrastructure
+- Added GitHub Actions workflows for development builds on AMD64 and ARM64 architectures
+- Added OpenSSF Best Practices badge to README
+- Refactored GitHub Actions workflows for issue labeling
+
+#### Security
+- Upgraded Spring Framework 6.1.12 → 7.0.5
+- Upgraded Spring Boot 3.4.0 → 4.0.3
+- Upgraded Jersey (JAX-RS) 3.1.6 → 4.0.2
+- Upgraded Jackson 2.17.0 → 2.18.6
+- Upgraded Apache Pekko 1.0.2 → 1.1.4
+- Upgraded Apache Solr client 9.7.0 → 9.10.1
+- Upgraded GWT 2.11.0 → 2.13.0
+- Upgraded Logback 1.5.13 → 1.5.25
+- Upgraded commons-lang3 3.14.0 → 3.18.0
+- Upgraded commons-fileupload 1.5 → 1.6.0
+- Upgraded angus-mail 2.0.3 → 2.0.4
+- Upgraded BouncyCastle (bcprov/bcpkix/bcutil) 1.70 (jdk15on) → 1.79 (jdk18on)
+- Upgraded ZooKeeper 3.9.3 → 3.9.5
+- Pinned nimbus-jose-jwt transitive dependency to 9.37.4
+- Pinned protobuf-java transitive dependency to 3.25.5
+- Pinned mina-core transitive dependency to 2.2.5
+- Pinned Jetty http2-common transitive dependency to 10.0.26
 
 ## v0.5.0 (2025-12-16)
 #### Updates
@@ -115,39 +158,6 @@
 ---
 
 # RODA Changelog
-## v6.0.0 (2025-07-29)
-### :warning: Breaking Changes
-
-- Due to various dependency changes in this release, it is strongly recommended to back up all data and configurations before performing the upgrade. After upgrading, a complete reindexing of all data is required to maintain system integrity and performance.
-- The embedded ApacheDS has been replaced by an external LDAP server running in an OpenLDAP container. Due to this change, starting RODA will cause previously stored user data to be lost. We recommend backing up all user information before upgrading. A migration process to transfer existing user data will be provided as soon as possible.
-- The legacy REST API (v1) has been fully removed. All external integrations must now use the new REST API (v2)
-
-#### New features:
-- Major Web UI redesign: The RODA interface has been completely reimagined to deliver a cleaner, more intuitive, and user-friendly experience. This overhaul touches nearly every aspect of the UI, streamlining workflows, improving accessibility, and aligning with modern design standards. [3330](https://github.com/keeps/roda/issues/3330)
-- Introduced a transactional storage mechanism that stages most write operations before committing them to the main storage, enabling rollback in case of errors and improving data integrity and reliability. [102](https://github.com/keeps/roda/issues/102)[1224](https://github.com/keeps/roda/issues/1224)
-- The user database service has been upgraded from embedded ApacheDS to an external LDAP server with Spring LDAP integration, enhancing security, performance, and maintainability. [3115](https://github.com/keeps/roda/issues/3115)
-- Added support for manual override of file format identification via the Web UI, allowing users to correct misidentified formats when automatic detection fails. [3256](https://github.com/keeps/roda/issues/3256)
-- File format identification warnings now generate risk incidents, visible in the file information panel, allowing users to assess and accept potential issues like format mismatches or multiple matches.  [3259](https://github.com/keeps/roda/issues/3259)
-- Improved audit log presentation by grouping related REST-API calls under single user actions and allowing inspection of detailed calls, enhancing clarity and reducing noise in the Web UI. [3383](https://github.com/keeps/roda/issues/3383)
-- Added support for advanced search over nested items using Solr block join queries, enabling more precise queries across hierarchical metadata structures via new filter parameters: ParentWhichFilterParameter and ChildOfFilterParameter [3322](https://github.com/keeps/roda/issues/3322)
-- Added support for external user group mapping by allowing administrators to define mappings between CAS attributes and RODA groups through configuration. User group membership is now resolved dynamically at login based on the external attribute (e.g. memberOf) and assigned to corresponding RODA groups [3499](https://github.com/keeps/roda/pull/3499)
-
-#### Changes:
-- Migrated all GWT-RPC interface methods to REST API, reducing dependency on GWT and aligning with modern web architecture practices. [2060](https://github.com/keeps/roda/issues/2060)
-- Removed the sourceObjects field from the JobCollections index to prevent Solr overload caused by large identifier lists, improving system scalability and stability. Adjusted interface components to retrieve object data from the model instead of the index as needed.  [3307](https://github.com/keeps/roda/issues/3307)
-- Added welcome pages for languages other than English and Portuguese, improving user onboarding for a wider audience. [7c506370f](https://github.com/keeps/roda/commit/7c506370f22fd598ecaa48f5b26714ca4e3dbb8e)
-- Reviewed and updated pre-ingest text [3412](https://github.com/keeps/roda/pull/3412)
-- Improve support for E-ARK SIP administrative metadata (amdSec) [3380](https://github.com/keeps/roda/issues/3380)
-- Added detailed prompts and outcome tracking for lifting disposal holds, including preservation event generation via ModelService. Replaced liftDisposalHoldBySelectedItems API calls with dissociateDisposalHold for disposal hold removal.  [3235](https://github.com/keeps/roda/pull/3235)
-- Added indexing support for technical metadata to improve searchability and metadata management. [0723959e](https://github.com/keeps/roda/commit/0723959e45f137fee982d67450058fc8e757426a)
-
-#### Security:
-- Several dependency major upgrades to fix security vulnerabilities
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
 ## v5.7.6 (2025-06-02)
 #### Security
 - Updated dependency of jaxb for glassfish

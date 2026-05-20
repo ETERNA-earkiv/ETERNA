@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <name>ETERNA</name>
     <url>https://www.whitered.se/eterna</url>
     <groupId>org.roda-project</groupId>
     <artifactId>eterna</artifactId>
-    <version>1.0.0-alpha-SNAPSHOT</version>
+    <version>0.6.1</version>
     <packaging>pom</packaging>
     <description>ETERNA is a full-featured open-source digital preservation repository providing all the
         functionality
@@ -41,83 +41,11 @@
     </repositories>
     <developers>
         <developer>
-            <id>filiph-schaaf</id>
-            <name>Filiph Schaaf</name>
-            <email>filiph.schaaf@whitered.se</email>
+            <id>white-red</id>
+            <name>White Red Consulting AB</name>
+            <email>earkiv@whitered.se</email>
             <organization>White Red Consulting AB</organization>
             <organizationUrl>https://www.whitered.se/</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>lfaria</id>
-            <name>Luis Faria</name>
-            <email>lfaria@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>hsilva</id>
-            <name>Helder Silva</name>
-            <email>hsilva@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>mguimaraes</id>
-            <name>Miguel Guimarães</name>
-            <email>mguimaraes@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>gbarros</id>
-            <name>Gabriel Barros</name>
-            <email>gbarros@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>jgomes</id>
-            <name>João Gomes</name>
-            <email>jgomes@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>syusupov</id>
-            <name>Shahzod Yusupov</name>
-            <email>syusupov@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>alindo</id>
-            <name>António Lindo</name>
-            <email>alindo@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>cafonso</id>
-            <name>Carlos Afonso</name>
-            <email>cafonso@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>aflores</id>
-            <name>Alexandre Flores</name>
-            <email>aflores@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
             <timezone>0</timezone>
         </developer>
     </developers>
@@ -128,21 +56,23 @@
         <maven.compiler.release>21</maven.compiler.release>
         <roda.temporary.repository>${user.dir}</roda.temporary.repository>
         <java_version>21</java_version>
-        <gwt.version>2.12.2</gwt.version>
+        <gwt.version>2.13.0</gwt.version>
         <cas.client.version>4.0.4</cas.client.version>
-        <swagger.version>2.2.34</swagger.version>
-        <jackson.version>2.19.1</jackson.version>
-        <spring.version>6.2.11</spring.version>
-        <solr.version>9.8.1</solr.version>
+        <jersey.version>4.0.2</jersey.version>
+        <swagger.version>2.2.21</swagger.version>
+        <jackson.version>2.18.6</jackson.version>
+        <spring.version>7.0.5</spring.version>
         <pekko.version>1.1.4</pekko.version>
-        <httpcomponents.version>5.5</httpcomponents.version>
-        <commons_ip2.version>2.10.0</commons_ip2.version>
+        <solr.version>9.8.1</solr.version>
+        <apacheds.version>2.0.0.AM27</apacheds.version>
+        <httpcomponents.version>4.5.14</httpcomponents.version>
+        <commons_ip2.version>2.8.2</commons_ip2.version>
         <metrics.version>3.2.6</metrics.version>
         <roda_community_url>https://www.whitered.se/eterna</roda_community_url>
         <testng.groups>all</testng.groups>
-        <springboot.version>3.4.10</springboot.version>
+        <springboot.version>4.0.3</springboot.version>
         <scope.gwt-dev>provided</scope.gwt-dev>
-        <logback.version>1.5.18</logback.version>
+        <jetty.version>12.0.12</jetty.version>
     </properties>
     <profiles>
         <profile>
@@ -285,7 +215,7 @@
                 <artifactId>license-maven-plugin</artifactId>
                 <version>3.0</version>
                 <configuration>
-                    <!-- <header>com/mycila/maven/plugin/license/templates/LGPL-3.txt</header> -->
+                    <!--<header>com/mycila/maven/plugin/license/templates/LGPL-3.txt</header> -->
                     <header>LICENSE_HEADER.txt</header>
                     <keywords>
                         <keyword>license</keyword>
@@ -363,7 +293,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.22.2</version>
+                    <version>3.2.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -408,6 +338,11 @@
                     <version>3.2.4</version>
                 </plugin>
                 <plugin>
+                    <groupId>io.fabric8</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <version>0.44.0</version>
+                </plugin>
+                <plugin>
                     <groupId>pl.project13.maven</groupId>
                     <artifactId>git-commit-id-plugin</artifactId>
                     <version>4.0.0</version>
@@ -418,8 +353,6 @@
                                 <goal>revision</goal>
                             </goals>
                             <configuration>
-                                <failOnNoGitDirectory>false</failOnNoGitDirectory>
-                                <failOnUnableToExtractRepoInfo>false</failOnUnableToExtractRepoInfo>
                                 <generateGitPropertiesFile>true</generateGitPropertiesFile>
                                 <generateGitPropertiesFilename>
                                     ${project.build.directory}/${project.build.finalName}/version.json
@@ -433,11 +366,9 @@
                                 <goal>revision</goal>
                             </goals>
                             <configuration>
-                                <failOnNoGitDirectory>false</failOnNoGitDirectory>
-                                <failOnUnableToExtractRepoInfo>false</failOnUnableToExtractRepoInfo>
                                 <generateGitPropertiesFile>true</generateGitPropertiesFile>
                                 <generateGitPropertiesFilename>
-                                    ${project.build.directory}/classes/static/version.json
+                                    ${project.build.directory}/classes/version.json
                                 </generateGitPropertiesFilename>
                                 <format>json</format>
                             </configuration>
@@ -452,14 +383,18 @@
             <dependency>
                 <groupId>jakarta.servlet</groupId>
                 <artifactId>jakarta.servlet-api</artifactId>
-                <version>6.1.0</version>
+                <version>6.0.0</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.persistence</groupId>
                 <artifactId>jakarta.persistence-api</artifactId>
                 <version>3.1.0</version>
             </dependency>
-            <!-- https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-util -->
+            <!-- Pin Jetty 10.x client artifacts used transitively by SolrJ.
+                 These must stay at 10.x: Jetty 12 reorganised the client packages
+                 (removed the util sub-package) which breaks binary compatibility.
+                 GHSA-qh8g-58pp-2wxh only affects the Jetty 12.x branch and does
+                 not apply to these Jetty 10.x artifacts. -->
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-client</artifactId>
@@ -485,6 +420,18 @@
                 <artifactId>jetty-alpn-java-client</artifactId>
                 <version>10.0.19</version>
             </dependency>
+            <!-- Override commons-beanutils to fix GHSA-wxr5-93ph-8wr9 -->
+            <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>1.11.0</version>
+            </dependency>
+            <!-- Override protobuf-java to fix GHSA-wrvw-hg22-4m67, GHSA-h4h5-3hr4-j3g2, GHSA-735f-pc8j-v9w8 -->
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>3.25.5</version>
+            </dependency>
             <dependency>
                 <groupId>jakarta.xml.bind</groupId>
                 <artifactId>jakarta.xml.bind-api</artifactId>
@@ -495,18 +442,19 @@
                 <artifactId>jaxb-runtime</artifactId>
                 <version>4.0.5</version>
             </dependency>
-            <dependency>
-                <!-- Import dependency management from Spring Boot -->
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${springboot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
+            <!-- Override Jackson versions BEFORE Spring Boot BOM to ensure 2.x wins over any 3.x in the BOM.
+                 In Maven, for BOM imports the first occurrence wins; explicit entries here come BEFORE
+                 the imported BOM entries, guaranteeing ${jackson.version} is used. -->
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
                 <version>${jackson.version}</version>
+            </dependency>
+            <!-- Override tools.jackson.core (Jackson 3.x groupId) to fix GHSA-72hv-8253-57qq (jackson-core < 3.1.0) -->
+            <dependency>
+                <groupId>tools.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>3.1.0</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
@@ -529,9 +477,12 @@
                 <version>${jackson.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.datatype</groupId>
-                <artifactId>jackson-datatype-jsr310</artifactId>
-                <version>${jackson.version}</version>
+                <!-- Import dependency management from Spring Boot -->
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${springboot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.gwtproject</groupId>
@@ -557,7 +508,7 @@
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>1.18.0</version>
+                <version>1.17.0</version>
             </dependency>
             <dependency>
                 <groupId>commons-collections</groupId>
@@ -565,9 +516,9 @@
                 <version>3.2.2</version>
             </dependency>
             <dependency>
-                <groupId>commons-configuration</groupId>
-                <artifactId>commons-configuration</artifactId>
-                <version>1.10</version>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-configuration2</artifactId>
+                <version>2.12.0</version>
             </dependency>
             <dependency>
                 <groupId>commons-fileupload</groupId>
@@ -577,7 +528,7 @@
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
-                <version>2.19.0</version>
+                <version>2.16.0</version>
             </dependency>
             <dependency>
                 <groupId>commons-logging</groupId>
@@ -608,7 +559,7 @@
             <dependency>
                 <groupId>org.eclipse.angus</groupId>
                 <artifactId>angus-mail</artifactId>
-                <version>2.0.3</version>
+                <version>2.0.4</version>
             </dependency>
             <dependency>
                 <groupId>javax.transaction</groupId>
@@ -629,22 +580,22 @@
             <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
-                <version>7.11.0</version>
+                <version>7.9.0</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>2.0.17</version>
+                <version>2.0.12</version>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>${logback.version}</version>
+                <version>1.5.25</version>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-core</artifactId>
-                <version>${logback.version}</version>
+                <version>1.5.25</version>
             </dependency>
             <dependency>
                 <groupId>org.bluestemsoftware.open.maven.plugin</groupId>
@@ -662,34 +613,34 @@
                 <groupId>org.roda-project</groupId>
                 <artifactId>roda-common-data</artifactId>
                 <classifier>sources</classifier>
-                <version>1.0.0-alpha-SNAPSHOT</version>
+                <version>0.6.1</version>
             </dependency>
             <dependency>
                 <groupId>org.roda-project</groupId>
                 <artifactId>roda-common-data</artifactId>
-                <version>1.0.0-alpha-SNAPSHOT</version>
+                <version>0.6.1</version>
             </dependency>
             <dependency>
                 <groupId>org.roda-project</groupId>
                 <artifactId>roda-common-utils</artifactId>
-                <version>1.0.0-alpha-SNAPSHOT</version>
+                <version>0.6.1</version>
             </dependency>
             <dependency>
                 <groupId>org.roda-project</groupId>
                 <artifactId>roda-core</artifactId>
-                <version>1.0.0-alpha-SNAPSHOT</version>
+                <version>0.6.1</version>
             </dependency>
             <dependency>
                 <groupId>org.roda-project</groupId>
                 <artifactId>roda-core-tests</artifactId>
-                <version>1.0.0-alpha-SNAPSHOT</version>
+                <version>0.6.1</version>
             </dependency>
             <dependency>
                 <groupId>org.roda-project</groupId>
                 <artifactId>roda-core-tests</artifactId>
                 <type>test-jar</type>
                 <scope>test</scope>
-                <version>1.0.0-alpha-SNAPSHOT</version>
+                <version>0.6.1</version>
             </dependency>
             <!-- RODA own modules dependencies - end -->
             <dependency>
@@ -745,12 +696,134 @@
                 <artifactId>cas-client-core</artifactId>
                 <version>${cas.client.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.fusesource.restygwt</groupId>
-                <artifactId>restygwt</artifactId>
-                <version>2.2.12-ETERNA</version>
-            </dependency>
             <!-- CAS related dependencies - end -->
+            <!-- ApacheDS related dependencies - start -->
+            <dependency>
+                <groupId>org.apache.directory.server</groupId>
+                <artifactId>apacheds-core</artifactId>
+                <version>${apacheds.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.directory.server</groupId>
+                <artifactId>apacheds-core-annotations</artifactId>
+                <version>${apacheds.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.directory.server</groupId>
+                <artifactId>apacheds-core-api</artifactId>
+                <version>${apacheds.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.directory.server</groupId>
+                <artifactId>apacheds-core-avl</artifactId>
+                <version>${apacheds.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.directory.server</groupId>
+                <artifactId>apacheds-core-constants</artifactId>
+                <version>${apacheds.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.directory.server</groupId>
+                <artifactId>apacheds-core-jndi</artifactId>
+                <version>${apacheds.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.directory.server</groupId>
+                <artifactId>apacheds-interceptor-kerberos</artifactId>
+                <version>${apacheds.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.directory.server</groupId>
+                <artifactId>apacheds-jdbm-partition</artifactId>
+                <version>${apacheds.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.directory.server</groupId>
+                <artifactId>apacheds-kerberos-codec</artifactId>
+                <version>${apacheds.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.directory.server</groupId>
+                <artifactId>apacheds-ldif-partition</artifactId>
+                <version>${apacheds.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.directory.server</groupId>
+                <artifactId>apacheds-protocol-dhcp</artifactId>
+                <version>${apacheds.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.directory.server</groupId>
+                <artifactId>apacheds-protocol-dns</artifactId>
+                <version>${apacheds.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.directory.server</groupId>
+                <artifactId>apacheds-protocol-kerberos</artifactId>
+                <version>2.0.0.AM26</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.directory.server</groupId>
+                <artifactId>apacheds-protocol-ldap</artifactId>
+                <version>${apacheds.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.directory.server</groupId>
+                <artifactId>apacheds-protocol-ntp</artifactId>
+                <version>${apacheds.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.directory.server</groupId>
+                <artifactId>apacheds-protocol-shared</artifactId>
+                <version>${apacheds.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.directory.server</groupId>
+                <artifactId>apacheds-server-annotations</artifactId>
+                <version>${apacheds.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.directory.server</groupId>
+                <artifactId>apacheds-server-config</artifactId>
+                <version>${apacheds.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.directory.server</groupId>
+                <artifactId>apacheds-server-jndi</artifactId>
+                <version>${apacheds.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.directory.server</groupId>
+                <artifactId>apacheds-test-framework</artifactId>
+                <version>${apacheds.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.directory.server</groupId>
+                <artifactId>apacheds-xdbm-partition</artifactId>
+                <version>${apacheds.version}</version>
+            </dependency>
+            <!-- ApacheDS related dependencies - end -->
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
@@ -759,7 +832,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-text</artifactId>
-                <version>1.13.1</version>
+                <version>1.12.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -785,7 +858,7 @@
             <dependency>
                 <groupId>net.sf.saxon</groupId>
                 <artifactId>Saxon-HE</artifactId>
-                <version>12.7</version>
+                <version>11.6</version>
             </dependency>
             <dependency>
                 <groupId>org.hamcrest</groupId>
@@ -800,7 +873,7 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.18.0</version>
+                <version>5.12.0</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -817,9 +890,65 @@
             </dependency>
             <!-- REST API related dependencies - start -->
             <dependency>
+                <groupId>org.glassfish.jersey</groupId>
+                <artifactId>jersey-bom</artifactId>
+                <version>${jersey.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.ext</groupId>
+                <artifactId>jersey-spring6</artifactId>
+                <version>${jersey.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring-context</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/jakarta.ws.rs/jakarta.ws.rs-api -->
+            <dependency>
                 <groupId>jakarta.ws.rs</groupId>
                 <artifactId>jakarta.ws.rs-api</artifactId>
-                <version>3.1.0</version>
+                <version>4.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.core</groupId>
+                <artifactId>jersey-server</artifactId>
+                <version>${jersey.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.media</groupId>
+                <artifactId>jersey-media-moxy</artifactId>
+                <version>${jersey.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.media</groupId>
+                <artifactId>jersey-media-multipart</artifactId>
+                <version>${jersey.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.core</groupId>
+                <artifactId>jersey-client</artifactId>
+                <version>${jersey.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.hk2</groupId>
+                <artifactId>osgi-resource-locator</artifactId>
+                <version>1.0.3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.test-framework</groupId>
+                <artifactId>jersey-test-framework-core</artifactId>
+                <version>${jersey.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.test-framework.providers</groupId>
+                <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
+                <version>${jersey.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
@@ -829,11 +958,6 @@
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-jaxrs2-servlet-initializer-v2</artifactId>
-                <version>${swagger.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.swagger.core.v3</groupId>
-                <artifactId>swagger-annotations-jakarta</artifactId>
                 <version>${swagger.version}</version>
             </dependency>
             <!-- REST API related dependencies - end -->
@@ -900,9 +1024,14 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>org.apache.httpcomponents.client5</groupId>
-                <artifactId>httpclient5</artifactId>
-                <version>5.5</version>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${httpcomponents.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpmime</artifactId>
+                <version>${httpcomponents.version}</version>
             </dependency>
             <!-- Templating system dependencies -->
             <dependency>
@@ -918,7 +1047,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-csv</artifactId>
-                <version>1.14.0</version>
+                <version>1.11.0</version>
             </dependency>
             <dependency>
                 <groupId>org.jdom</groupId>
@@ -928,7 +1057,7 @@
             <dependency>
                 <groupId>org.seleniumhq.selenium</groupId>
                 <artifactId>selenium-java</artifactId>
-                <version>4.33.0</version>
+                <version>4.27.0</version>
             </dependency>
             <dependency>
                 <groupId>io.dropwizard.metrics</groupId>
@@ -953,17 +1082,19 @@
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt</artifactId>
-                <version>0.12.6</version>
+                <version>0.12.5</version>
             </dependency>
             <!-- lfaria: 2022-12-07 -->
             <!-- Forcing transitive dependencies upgrade due to vulnerabilities -->
+            <!-- Forcing apacheds 2.0.0.AM26 dependency upgrade -->
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk18on</artifactId>
-                <version>1.80</version>
+                <artifactId>bcprov-jdk15on</artifactId>
+                <version>1.70</version>
             </dependency>
             <!-- mguimaraes: 2022-12-15 -->
             <!-- Forcing transitive dependencies upgrade due to vulnerabilities -->
+            <!-- Forcing apacheds 2.0.0.AM26 dependency upgrade -->
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
@@ -977,18 +1108,34 @@
                 <artifactId>icu4j</artifactId>
                 <version>63.2</version>
             </dependency>
-
+            <!-- jerrymalmstrom: 2026-02-26 -->
+            <!-- Forcing transitive dependencies upgrade due to vulnerabilities -->
+            <!-- Forcing GWT dependency upgrade -->
             <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-tomcat</artifactId>
-                <scope>provided</scope>
+                <groupId>org.apache.mina</groupId>
+                <artifactId>mina-core</artifactId>
+                <version>2.2.5</version>
             </dependency>
 
-            <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
             <dependency>
-                <groupId>com.google.code.gson</groupId>
-                <artifactId>gson</artifactId>
-                <version>2.11.0</version>
+                <groupId>org.eclipse.jetty.http2</groupId>
+                <artifactId>http2-common</artifactId>
+                <version>10.0.26</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper</artifactId>
+                <version>3.9.5</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper-jute</artifactId>
+                <version>3.9.5</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nimbusds</groupId>
+                <artifactId>nimbus-jose-jwt</artifactId>
+                <version>9.37.4</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

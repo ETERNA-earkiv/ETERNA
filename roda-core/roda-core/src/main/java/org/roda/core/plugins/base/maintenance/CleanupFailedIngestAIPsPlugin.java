@@ -3,11 +3,16 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/ETERNA-earkiv/ETERNA
+ * https://github.com/keeps/roda
  */
 package org.roda.core.plugins.base.maintenance;
 
-import org.apache.commons.lang.StringUtils;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -22,7 +27,6 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -33,16 +37,12 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
+import org.roda.core.plugins.PluginHelper;
+import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
   private static final Logger LOGGER = LoggerFactory.getLogger(CleanupFailedIngestAIPsPlugin.class);
@@ -59,14 +59,14 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getName() {
-    return "Ta bort AIP(er) vars ingest misslyckades";
+    return "Remove AIP(s) whose ingest failed";
   }
 
   @Override
   public String getDescription() {
-    return "Tar permanent bort AIP(er) från arkivet vars ingest misslyckades (status="
+    return "Permanently removes AIP(s) from the repository whose ingest failed (state="
       + AIPState.INGEST_PROCESSING.toString()
-      + "). Data, metadata och händelsehistorik raderas permanent. VARNING: Denna åtgärd kan inte ångras. Använd med yttersta försiktighet.";
+      + "). Data, metadata and event history will be deleted permanently. WARNING: This operation cannot be undone. Use with extreme caution.";
   }
 
   @Override
@@ -75,11 +75,11 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model,
+  public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> objects) throws PluginException {
     return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
       @Override
-      public void process(IndexService index, ModelService model, Report report, Job cachedJob,
+      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
         try {
           processAIPs(index, model, report, cachedJob, jobPluginInfo);
@@ -87,7 +87,7 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
           LOGGER.error("Could not update Job information");
         }
       }
-    }, index, model);
+    }, index, model, storage);
   }
 
   private void processAIPs(IndexService index, ModelService model, Report report, Job job, JobPluginInfo jobPluginInfo)
@@ -138,7 +138,7 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
     }
 
     List<String> activeJobsIds = new ArrayList<>();
-    try (IterableIndexResult<IndexedJob> result = index.findAll(IndexedJob.class, activeJobsViaStateFilter,
+    try (IterableIndexResult<Job> result = index.findAll(Job.class, activeJobsViaStateFilter,
       Arrays.asList(RodaConstants.INDEX_UUID))) {
       result.forEach(e -> activeJobsIds.add(e.getId()));
     } catch (IOException | GenericException | RequestNotValidException e) {
@@ -159,12 +159,13 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
     return new Report();
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     return new Report();
   }
 

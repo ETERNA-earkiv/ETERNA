@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.roda-project</groupId>
     <artifactId>roda-common</artifactId>
-    <version>1.0.0-alpha-SNAPSHOT</version>
+    <version>0.6.1</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <build>
@@ -37,16 +37,12 @@
       <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.httpcomponents.client5</groupId>
-      <artifactId>httpclient5</artifactId>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
     </dependency>
-      <dependency>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-web</artifactId>
-      </dependency>
-      <dependency>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-test</artifactId>
-      </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpmime</artifactId>
+    </dependency>
   </dependencies>
 </project>

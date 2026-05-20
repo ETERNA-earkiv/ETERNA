@@ -10,7 +10,7 @@ package org.roda.wui.filter;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.RodaUtils;
 

@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/ETERNA-earkiv/ETERNA
+ * https://github.com/keeps/roda
  */
 package org.roda.core.storage;
 
@@ -29,7 +29,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.Matchers;
 import org.roda.core.common.iterables.CloseableIterable;
-import org.roda.core.config.TestConfig;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
@@ -38,11 +37,11 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.storage.fs.FSUtils;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
+
+import com.google.common.collect.Iterables;
 
 /**
  *
@@ -56,8 +55,7 @@ import org.testng.annotations.Test;
  */
 
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
-@SpringBootTest(classes = {TestConfig.class})
-public abstract class AbstractStorageServiceTest<T extends StorageService> extends AbstractTestNGSpringContextTests {
+public abstract class AbstractStorageServiceTest<T extends StorageService> {
 
   /**
    * Get current instance of storage.
@@ -197,7 +195,14 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> exten
     getStorage().deleteContainer(containerStoragePath);
 
     // 2) delete container that no longer exists
-    getStorage().deleteContainer(containerStoragePath);
+    try {
+      getStorage().deleteContainer(containerStoragePath);
+      Assert.fail(
+        "An exception should have been thrown while deleting a container that no longer exists but it didn't happened!");
+    } catch (NotFoundException e) {
+      // do nothing
+    }
+
   }
 
   public void testDeleteNonEmptyContainer() throws RODAException {
@@ -534,14 +539,12 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> exten
     final Binary binaryCreated = getStorage().getBinary(binaryStoragePath);
     assertNotNull(binaryCreated);
 
-    final Path original = Files.createTempFile(FilenameUtils.normalize(binaryCreated.getStoragePath().getName()),
-      ".tmp");
+    final Path original = Files.createTempFile(FilenameUtils.normalize(binaryCreated.getStoragePath().getName()), ".tmp");
     binaryCreated.getContent().writeToPath(original);
 
     // 1) update binary content
     final ContentPayload newPayload = new RandomMockContentPayload();
-    final Binary binaryUpdated = getStorage().updateBinaryContent(binaryStoragePath, newPayload, false, false, false,
-      null);
+    final Binary binaryUpdated = getStorage().updateBinaryContent(binaryStoragePath, newPayload, false, false);
     assertNotNull(binaryUpdated);
 
     try (InputStream stream = Files.newInputStream(original)) {
@@ -565,7 +568,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> exten
     final ContentPayload payload = new RandomMockContentPayload();
     final boolean asReference = false;
     try {
-      getStorage().updateBinaryContent(binaryStoragePath, payload, asReference, false, false, null);
+      getStorage().updateBinaryContent(binaryStoragePath, payload, asReference, false);
       Assert.fail(
         "An exception should have been thrown while updating a binary that doesn't exist but it didn't happened!");
     } catch (NotFoundException e) {
@@ -573,8 +576,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> exten
     }
 
     // update binary content now with createIfNotExists=true
-    Binary updatedBinaryContent = getStorage().updateBinaryContent(binaryStoragePath, payload, asReference, true,
-      false, null);
+    Binary updatedBinaryContent = getStorage().updateBinaryContent(binaryStoragePath, payload, asReference, true);
     testBinaryContent(updatedBinaryContent, payload);
 
     // cleanup
@@ -891,51 +893,60 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> exten
     final ContentPayload payload1 = new RandomMockContentPayload();
     getStorage().createBinary(binaryStoragePath, payload1, false);
 
-    // 2) update binary
+    // 2) create binary version
     String message1 = "v1";
     properties.put(RodaConstants.VERSION_MESSAGE, message1);
-    final ContentPayload payload2 = new RandomMockContentPayload();
-    getStorage().updateBinaryContent(binaryStoragePath, payload2, false, false, true, properties);
+    BinaryVersion v1 = getStorage().createBinaryVersion(binaryStoragePath, properties);
 
-    // 3) list binary versions
+    // 3) update binary
+    final ContentPayload payload2 = new RandomMockContentPayload();
+    getStorage().updateBinaryContent(binaryStoragePath, payload2, false, false);
+
+    // 4) create binary version 2
+    String message2 = "v2";
+    properties.put(RodaConstants.VERSION_MESSAGE, message2);
+    getStorage().createBinaryVersion(binaryStoragePath, properties);
+
+    // 5) create a version with a message that already exists
+    getStorage().createBinaryVersion(binaryStoragePath, properties);
+
+    // 6) list binary versions
     CloseableIterable<BinaryVersion> binaryVersions = getStorage().listBinaryVersions(binaryStoragePath);
     List<BinaryVersion> reusableBinaryVersions = new ArrayList<>();
-    // Iterables.addAll(reusableBinaryVersions, binaryVersions);
+    Iterables.addAll(reusableBinaryVersions, binaryVersions);
 
-    binaryVersions.forEach(reusableBinaryVersions::add);
+    assertEquals(3, reusableBinaryVersions.size());
 
-    assertEquals(1, reusableBinaryVersions.size());
-
-    // 4) get binary version
-    BinaryVersion binaryVersion1 = reusableBinaryVersions.getFirst();
+    // 7) get binary version
+    BinaryVersion binaryVersion1 = getStorage().getBinaryVersion(binaryStoragePath, v1.getId());
     // TODO compare properties
+    assertEquals(message1, binaryVersion1.getProperties().get(RodaConstants.VERSION_MESSAGE));
     assertNotNull(binaryVersion1.getCreatedDate());
-    ;
 
     assertTrue(
       IOUtils.contentEquals(payload1.createInputStream(), binaryVersion1.getBinary().getContent().createInputStream()));
 
-    // 5) revert to previous version
-    getStorage().revertBinaryVersion(binaryStoragePath, binaryVersion1.getId(), null);
+    // 8) revert to previous version
+    getStorage().revertBinaryVersion(binaryStoragePath, v1.getId());
 
     Binary binary = getStorage().getBinary(binaryStoragePath);
     testBinaryContent(binary, payload1);
 
-    // 6) delete binary version
-    getStorage().deleteBinaryVersion(binaryStoragePath, binaryVersion1.getId());
+    // 9) delete binary version
+    getStorage().deleteBinaryVersion(binaryStoragePath, v1.getId());
 
     try {
-      getStorage().getBinaryVersion(binaryStoragePath, binaryVersion1.getId());
+      getStorage().getBinaryVersion(binaryStoragePath, v1.getId());
       Assert.fail("Should have thrown NotFoundException");
     } catch (NotFoundException e) {
       // do nothing
     }
 
-    // 7) delete binary and all its history
+    // 10) delete binary and all its history
     getStorage().deleteResource(binaryStoragePath);
 
     try {
-      getStorage().getBinaryVersion(binaryStoragePath, binaryVersion1.getId());
+      getStorage().getBinaryVersion(binaryStoragePath, v1.getId());
       Assert.fail("Should have thrown NotFoundException");
     } catch (NotFoundException e) {
       // do nothing
@@ -944,4 +955,5 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> exten
     // cleanup
     getStorage().deleteContainer(containerStoragePath);
   }
+
 }

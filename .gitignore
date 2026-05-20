@@ -15,5 +15,5 @@ jar_plugins/
 roda-cas/overlays/
 **/.factorypath
 .vscode/
-**/**/*.log.txt
-.worktrees/
+.claude
+.gitnexus

@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/ETERNA-earkiv/ETERNA
+ * https://github.com/keeps/roda
  */
 package org.roda.core.plugins;
 
@@ -27,10 +27,12 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.ModelService;
+import org.roda.core.plugins.base.antivirus.AntivirusPlugin;
 import org.roda.core.plugins.base.multiple.MultiplePlugin;
-import org.roda.core.security.LdapUtilityTestHelper;
+import org.roda.core.plugins.base.antivirus.TestAntiVirus;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -50,14 +52,12 @@ public class MultiplePluginTest {
   private static Path basePath;
   private static ModelService model;
   private static IndexService index;
-  private static LdapUtilityTestHelper ldapUtilityTestHelper;
   private static StorageService corporaService;
   private static Path corporaPath;
 
   @BeforeClass
   public void setUp() throws Exception {
     basePath = TestsHelper.createBaseTempDir(getClass(), true);
-    ldapUtilityTestHelper = new LdapUtilityTestHelper();
 
     boolean deploySolr = true;
     boolean deployLdap = true;
@@ -66,7 +66,11 @@ public class MultiplePluginTest {
     boolean deployPluginManager = true;
     boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
-      deployPluginManager, deployDefaultResources, false, ldapUtilityTestHelper.getLdapUtility());
+      deployPluginManager, deployDefaultResources, false);
+    RodaCoreFactory.getRodaConfiguration().setProperty("core.plugins.internal.virus_check.antiVirusClassname",
+      TestAntiVirus.class.getName());
+    RodaCoreFactory.getRodaConfiguration().setProperty("core.plugins.internal.take_precedence_over_external", false);
+    RodaCoreFactory.getPluginManager().registerPlugin(new AntivirusPlugin());
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
 
@@ -82,7 +86,6 @@ public class MultiplePluginTest {
   @AfterClass
   public void tearDown() throws Exception {
     IndexTestUtils.resetIndex();
-    ldapUtilityTestHelper.shutdown();
     RodaCoreFactory.shutdown();
   }
 

@@ -6,20 +6,26 @@ on:
       - "v*"
     branches-ignore:
       - "**"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Skip deploy, Docker push, and release upload (build and test still run)'
+        type: boolean
+        default: true
 
 permissions:
-  actions: write
   attestations: write
-  checks: write
   contents: write
-  deployments: write
+  id-token: write
   packages: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     env:
       MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     services:
       zookeeper:
@@ -33,33 +39,9 @@ jobs:
         env:
           ZK_HOST: zookeeper:2181
         options: -e cloud
-      postgres:
-        image: postgres:17
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_USER: admin
-          POSTGRES_PASSWORD: roda
-          POSTGRES_DB: roda_core_db
-      mailhog:
-        image: mailhog/mailhog:v1.0.1
-        ports:
-          - 1025:1025
-      openldap:
-        image: docker.io/bitnamilegacy/openldap:2.6
-        ports:
-          - 1389:1389
-          - 1636:1636
-        env:
-          BITNAMI_DEBUG: true
-          LDAP_ROOT: dc=roda,dc=org
-          LDAP_SKIP_DEFAULT_TREE: yes
-          LDAP_ADMIN_USERNAME: admin
-          LDAP_ADMIN_PASSWORD: eterna
-          LDAP_EXTRA_SCHEMAS: cosine,inetorgperson,nis,pbkdf2
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Set up JDK 21
@@ -67,12 +49,21 @@ jobs:
         with:
           java-version: 21
           distribution: "temurin"
+          server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: GITHUB_TOKEN
       - name: Set up Maven
-        uses: stCarolas/setup-maven@v5
-        with:
-          maven-version: 3.9.10
+        run: |
+          MVN_VERSION=3.9.10
+          curl -fsSL "https://archive.apache.org/dist/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.tar.gz" \
+            -o /tmp/apache-maven-${MVN_VERSION}-bin.tar.gz
+          curl -fsSL "https://archive.apache.org/dist/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.tar.gz.sha512" \
+            -o /tmp/apache-maven-${MVN_VERSION}-bin.tar.gz.sha512
+          (cd /tmp && echo "$(cat apache-maven-${MVN_VERSION}-bin.tar.gz.sha512)  apache-maven-${MVN_VERSION}-bin.tar.gz" | sha512sum -c -)
+          sudo tar -xz -C /opt -f /tmp/apache-maven-${MVN_VERSION}-bin.tar.gz
+          sudo ln -sf /opt/apache-maven-${MVN_VERSION}/bin/mvn /usr/local/bin/mvn
       - name: Cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -92,29 +83,28 @@ jobs:
           sudo cp .github/workflows/bin/clamscan /usr/bin/clamdscan
           sudo chmod a+rx /usr/bin/clamscan /usr/bin/clamdscan
       - name: Get release version
-        run: echo "release_version=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
+        run: |
+          if [[ "${GITHUB_REF_NAME}" == v* ]]; then
+            echo "release_version=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+          else
+            echo "release_version=$(mvn -f pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+          fi
       - name: Run tests & install
         run:
-          mvn $MAVEN_CLI_OPTS -Dtestng.groups="travis" -Denforcer.skip=true clean org.jacoco:jacoco-maven-plugin:prepare-agent install
+          mvn $MAVEN_CLI_OPTS -Dtestng.groups="travis" clean org.jacoco:jacoco-maven-plugin:prepare-agent install
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RODA_CORE_SOLR_TYPE: CLOUD
           RODA_CORE_SOLR_CLOUD_URLS: localhost:2181
-          SIEGFRIED_MODE: standalone
-          LDAP_SERVER_URL: ldap://localhost
-          LDAP_SERVER_PORT: 1389
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/roda_core_db
       - name: Deploy to GitHub packages
-        run: mvn $MAVEN_CLI_OPTS clean deploy -Dmaven.test.skip=true -Pcore
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ !inputs.dry_run }}
+        run: mvn $MAVEN_CLI_OPTS deploy -Dmaven.test.skip=true -Pcore
       - name: Copy target to docker context
         run: |
           mkdir -p docker/target
-          cp -r roda-ui/roda-wui/target/roda-wui-${{ env.release_version }}.jar docker/target
+          cp -r roda-ui/roda-wui/target/roda-wui-${{ env.release_version }}/* docker/target
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: |
             ghcr.io/ETERNA-earkiv/ETERNA
@@ -124,23 +114,33 @@ jobs:
             type=semver,pattern=v{{major}}
           flavor: |
             latest=false
+      - name: Set up QEMU
+        if: ${{ !inputs.dry_run }}
+        uses: docker/setup-qemu-action@v4
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        if: ${{ !inputs.dry_run }}
+        uses: docker/setup-buildx-action@v4
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
+        if: ${{ !inputs.dry_run }}
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build docker image
-        uses: docker/build-push-action@v6
+        if: ${{ !inputs.dry_run }}
+        uses: docker/build-push-action@v7
         with:
           push: true
           context: docker
+          platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           sbom: true
           provenance: mode=max
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
       - name: Upload artifact to release
+        if: ${{ !inputs.dry_run }}
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
