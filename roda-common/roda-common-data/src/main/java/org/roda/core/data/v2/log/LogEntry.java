@@ -73,6 +73,7 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId, SetsUUID {
       logEntry.getActionComponent(), logEntry.getActionMethod(), logEntry.getParameters(),
       logEntry.getRelatedObjectID(), logEntry.getDuration(), logEntry.getState(), logEntry.getInstanceId(),
       logEntry.getLineNumber());
+    this.relatedAipId = logEntry.getRelatedAipId();
   }
 
   /**

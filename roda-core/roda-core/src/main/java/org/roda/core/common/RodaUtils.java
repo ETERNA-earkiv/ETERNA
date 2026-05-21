@@ -329,7 +329,8 @@ public class RodaUtils {
   public static Reader applyCustomStylesheet(Binary binary, InputStream xsltInputStream,
     Map<String, String> parameters) throws GenericException {
     try (
-      Reader descMetadataReader = new InputStreamReader(new BOMInputStream(binary.getContent().createInputStream()))) {
+      Reader descMetadataReader = new InputStreamReader(new BOMInputStream(binary.getContent().createInputStream()));
+      InputStream xsltStream = xsltInputStream) {
 
       XMLReader xmlReader = XMLReaderFactory.createXMLReader();
       xmlReader.setEntityResolver(new RodaEntityResolver());
@@ -338,7 +339,7 @@ public class RodaUtils {
 
       XsltCompiler compiler = PROCESSOR.newXsltCompiler();
       compiler.setURIResolver(new RodaURIFileResolver());
-      XsltExecutable xsltExecutable = compiler.compile(new StreamSource(xsltInputStream));
+      XsltExecutable xsltExecutable = compiler.compile(new StreamSource(xsltStream));
 
       XsltTransformer transformer = xsltExecutable.load();
       LimitedCharArrayWriter transformerResult = new LimitedCharArrayWriter(MAX_OUTPUT_SIZE);

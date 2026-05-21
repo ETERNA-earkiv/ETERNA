@@ -97,6 +97,9 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
         }
 
         String method = logEntry.getActionMethod();
+        if (method == null || method.isEmpty()) {
+          return null;
+        }
         String translated = messages.logActionMethod(method);
         return method.equals(translated) ? StringUtils.getPrettifiedActionMethod(method) : translated;
       }

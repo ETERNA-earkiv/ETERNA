@@ -47,6 +47,7 @@ import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.safehtml.shared.UriUtils;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Command;
+import org.roda.wui.common.client.widgets.Toast;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
@@ -787,8 +788,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
           enterRenderedView.execute();
         }
       } else {
-        loadXsltPreview(buildPreviewUrl(fileUuid, locale, selectedId), xsltFrame);
-        enterRenderedView.execute();
+        loadXsltPreview(buildPreviewUrl(fileUuid, locale, selectedId), xsltFrame, enterRenderedView);
       }
     };
 
@@ -858,7 +858,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
 
     // Initial render: if any server-side XSLT exists, load the first one
     if (!noServerXslts) {
-      loadXsltPreview(buildPreviewUrl(fileUuid, locale, xsltDropdown.getValue(0)), xsltFrame);
+      loadXsltPreview(buildPreviewUrl(fileUuid, locale, xsltDropdown.getValue(0)), xsltFrame, null);
     }
   }
 
@@ -866,7 +866,9 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     return RestUtils.createRepresentationFileHtmlPreviewUri(fileUuid, locale, xsltId).asString();
   }
 
-  private void loadXsltPreview(String url, Frame frame) {
+  // On HTTP 200: write srcdoc and run onSuccess. On error: show toast and leave
+  // the iframe/raw-XML state untouched so the previous working preview survives.
+  private void loadXsltPreview(String url, Frame frame, Command onSuccess) {
     RequestBuilder request = new RequestBuilder(RequestBuilder.GET, url);
     try {
       request.sendRequest(null, new RequestCallback() {
@@ -874,26 +876,22 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
         public void onResponseReceived(Request req, Response response) {
           if (response.getStatusCode() == HttpStatus.SC_OK) {
             frame.getElement().setAttribute("srcdoc", response.getText());
+            if (onSuccess != null) {
+              onSuccess.execute();
+            }
           } else {
-            showXsltErrorInFrame(frame, messages.xsltTransformFailed() + response.getStatusCode());
+            Toast.showError(messages.xsltTransformFailed() + response.getStatusCode());
           }
         }
 
         @Override
         public void onError(Request req, Throwable exception) {
-          showXsltErrorInFrame(frame, messages.xsltTransformFailed() + exception.getMessage());
+          Toast.showError(messages.xsltTransformFailed() + exception.getMessage());
         }
       });
     } catch (RequestException e) {
-      showXsltErrorInFrame(frame, messages.xsltTransformFailed() + e.getMessage());
+      Toast.showError(messages.xsltTransformFailed() + e.getMessage());
     }
-  }
-
-  private static void showXsltErrorInFrame(Frame frame, String message) {
-    String escaped = SafeHtmlUtils.htmlEscape(message);
-    String errorHtml = "<html><body style=\"margin:0;padding:16px;font-family:sans-serif;color:#a33;\">"
-      + escaped + "</body></html>";
-    frame.getElement().setAttribute("srcdoc", errorHtml);
   }
 
   private static native void triggerClick(com.google.gwt.dom.client.Element element) /*-{

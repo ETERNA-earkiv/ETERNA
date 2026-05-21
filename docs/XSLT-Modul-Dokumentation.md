@@ -442,13 +442,16 @@ Content-Type: multipart/form-data
 
 ### Exempel med curl
 
+> **OBS:** Använd dina egna inloggningsuppgifter — använd aldrig standardlösenord
+> i produktion. `$RODA_USER` och `$RODA_PASSWORD` används som platshållare nedan.
+
 ```bash
 # Förhandsvisning med standard-XSLT
-curl -u admin:eterna \
+curl -u "$RODA_USER:$RODA_PASSWORD" \
   'http://localhost:8080/api/v2/files/{uuid}/preview/html?lang=sv'
 
 # Transformation med egen XSLT
-curl -u admin:eterna \
+curl -u "$RODA_USER:$RODA_PASSWORD" \
   -X POST \
   -F 'xslt=@min_stilmall.xslt' \
   'http://localhost:8080/api/v2/files/{uuid}/preview/html/transform?lang=sv'
