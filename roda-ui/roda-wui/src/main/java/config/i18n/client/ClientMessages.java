@@ -2774,4 +2774,6 @@ public interface ClientMessages extends Messages {
   String catalogTreeReasonRetrieveAIP();
 
   String catalogTreeGhostNodeLabel();
+
+  String browseAIPReasonViewAIP();
 }

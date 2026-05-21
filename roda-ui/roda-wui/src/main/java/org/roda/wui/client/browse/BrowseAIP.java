@@ -289,7 +289,7 @@ public class BrowseAIP extends Composite {
 
   private static void refresh(String id, AsyncCallback<IndexedAIP> callback) {
 
-    Services service = new Services("Retrieve AIP", "get");
+    Services service = new Services(messages.browseAIPReasonViewAIP(), "get");
     service
       .rodaEntityRestService(s -> s.findByUuid(id, LocaleInfo.getCurrentLocale().getLocaleName()), IndexedAIP.class)
       .whenComplete((aip, error) -> {
