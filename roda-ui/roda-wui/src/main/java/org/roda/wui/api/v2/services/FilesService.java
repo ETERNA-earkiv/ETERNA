@@ -81,10 +81,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
-import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.storage.Resource;
-import org.roda.core.model.utils.ModelUtils;
-import org.roda.core.common.iterables.CloseableIterable;
+import org.roda.core.common.XsltDiscoveryHelper;
 
 @Service
 public class FilesService {
@@ -563,22 +560,22 @@ public class FilesService {
     List<XsltSource> raw = new ArrayList<>();
 
     if (indexedFile.getRepresentationId() != null) {
-      raw.addAll(toXsltSources(searchXsltsBesideXmlFile(model, indexedFile)));
-      raw.addAll(toXsltSources(searchAllXsltsInDocumentation(model, indexedFile.getAipId(),
+      raw.addAll(toXsltSources(XsltDiscoveryHelper.searchXsltsBesideXmlFile(model, indexedFile)));
+      raw.addAll(toXsltSources(XsltDiscoveryHelper.searchAllXsltsInDocumentation(model, indexedFile.getAipId(),
         indexedFile.getRepresentationId(), indexedFile.getId())));
     }
-    raw.addAll(toXsltSources(searchAllXsltsInDocumentation(model, indexedFile.getAipId(),
+    raw.addAll(toXsltSources(XsltDiscoveryHelper.searchAllXsltsInDocumentation(model, indexedFile.getAipId(),
       null, indexedFile.getId())));
 
     List<XsltSource> result = new ArrayList<>(raw.size());
     Set<String> seen = new HashSet<>();
     boolean filenameMatchedPresent = false;
-    String xmlBase = xmlBaseName(indexedFile.getId());
+    String xmlBase = XsltDiscoveryHelper.xmlBaseName(indexedFile.getId());
     for (XsltSource s : raw) {
       String key = dedupKey(s);
       if (seen.add(key)) {
         result.add(s);
-        if (!filenameMatchedPresent && xmlBase != null && isXsltMatchForXml(s.id, xmlBase)) {
+        if (!filenameMatchedPresent && xmlBase != null && XsltDiscoveryHelper.isXsltMatchForXml(s.id, xmlBase)) {
           filenameMatchedPresent = true;
         }
       }
@@ -604,7 +601,7 @@ public class FilesService {
     if (s.id.startsWith("global:")) {
       return s.id.substring("global:".length()).toLowerCase(Locale.ROOT);
     }
-    String stripped = stripXsltExtension(s.id);
+    String stripped = XsltDiscoveryHelper.stripXsltExtension(s.id);
     return stripped == null ? "" : stripped.toLowerCase(Locale.ROOT);
   }
 
@@ -615,36 +612,6 @@ public class FilesService {
       out.add(XsltSource.bundled(name, b));
     }
     return out;
-  }
-
-  private static boolean isXsltFilename(String name) {
-    if (name == null) {
-      return false;
-    }
-    String lower = name.toLowerCase(Locale.ROOT);
-    return lower.endsWith(".xslt") || lower.endsWith(".xsl");
-  }
-
-  private static String stripXsltExtension(String name) {
-    if (name == null) {
-      return null;
-    }
-    String lower = name.toLowerCase(Locale.ROOT);
-    if (lower.endsWith(".xslt")) {
-      return name.substring(0, name.length() - 5);
-    }
-    if (lower.endsWith(".xsl")) {
-      return name.substring(0, name.length() - 4);
-    }
-    return name;
-  }
-
-  private static boolean isXsltMatchForXml(String xsltName, String xmlBaseName) {
-    if (xsltName == null || xmlBaseName == null) {
-      return false;
-    }
-    String xsltBase = stripXsltExtension(xsltName);
-    return xsltBase != null && xsltBase.equalsIgnoreCase(xmlBaseName);
   }
 
   private static XsltSource chooseXsltSource(List<XsltSource> sources, String requestedId) {
@@ -674,7 +641,7 @@ public class FilesService {
     }
 
     static XsltSource bundled(String filename, Binary binary) {
-      return new XsltSource(filename, stripXsltExtension(filename), binary, null);
+      return new XsltSource(filename, XsltDiscoveryHelper.stripXsltExtension(filename), binary, null);
     }
 
     static XsltSource global(String xsltName) {
@@ -691,72 +658,6 @@ public class FilesService {
         throw new GenericException("Failed to read bundled XSLT '" + id + "'", e);
       }
     }
-  }
-
-  // Direct .xsl/.xslt siblings in the XML's data/ folder. Non-recursive.
-  private List<Binary> searchXsltsBesideXmlFile(ModelService model, IndexedFile indexedFile) {
-    try {
-      // null fileId resolves to the parent directory
-      StoragePath parentDir = ModelUtils.getFileStoragePath(indexedFile.getAipId(),
-        indexedFile.getRepresentationId(), indexedFile.getPath(), null);
-      CloseableIterable<Resource> resources = model.getStorage().listResourcesUnderDirectory(parentDir, false);
-      try {
-        return collectXsltBinaries(model, resources, xmlBaseName(indexedFile.getId()), false);
-      } finally {
-        resources.close();
-      }
-    } catch (Exception e) {
-      LOGGER.debug("Could not list XSLT siblings for file {} in rep {}: {}", indexedFile.getId(),
-        indexedFile.getRepresentationId(), e.getMessage());
-    }
-    return Collections.emptyList();
-  }
-
-  private List<Binary> searchAllXsltsInDocumentation(ModelService model, String aipId, String representationId,
-    String xmlFileName) {
-    try {
-      StoragePath docPath = representationId != null
-        ? ModelUtils.getDocumentationStoragePath(aipId, representationId)
-        : ModelUtils.getDocumentationStoragePath(aipId);
-      CloseableIterable<Resource> resources = model.getStorage().listResourcesUnderDirectory(docPath, true);
-      try {
-        return collectXsltBinaries(model, resources, xmlBaseName(xmlFileName), false);
-      } finally {
-        resources.close();
-      }
-    } catch (Exception e) {
-      LOGGER.debug("Could not list all XSLTs in documentation for aip={}, rep={}: {}", aipId, representationId,
-        e.getMessage());
-    }
-    return Collections.emptyList();
-  }
-
-  private static String xmlBaseName(String xmlFileName) {
-    if (xmlFileName != null && xmlFileName.toLowerCase(Locale.ROOT).endsWith(".xml")) {
-      return xmlFileName.substring(0, xmlFileName.length() - 4);
-    }
-    return null;
-  }
-
-  // Filename-matched first, others alphabetically. matchedOnly=true drops the others entirely.
-  private static List<Binary> collectXsltBinaries(ModelService model, CloseableIterable<Resource> resources,
-    String xmlBaseName, boolean matchedOnly) throws Exception {
-    List<Binary> matched = new ArrayList<>();
-    List<Binary> others = new ArrayList<>();
-    for (Resource resource : resources) {
-      String name = resource.getStoragePath().getName();
-      if (isXsltFilename(name)) {
-        Binary b = model.getStorage().getBinary(resource.getStoragePath());
-        if (xmlBaseName != null && isXsltMatchForXml(name, xmlBaseName)) {
-          matched.add(b);
-        } else if (!matchedOnly) {
-          others.add(b);
-        }
-      }
-    }
-    others.sort((a, b) -> a.getStoragePath().getName().compareToIgnoreCase(b.getStoragePath().getName()));
-    matched.addAll(others);
-    return matched;
   }
 
   private String resolveXsltForNamespace(String namespace) {

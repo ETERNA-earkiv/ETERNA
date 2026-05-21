@@ -788,7 +788,8 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
           enterRenderedView.execute();
         }
       } else {
-        loadXsltPreview(buildPreviewUrl(fileUuid, locale, selectedId), xsltFrame, enterRenderedView);
+        XsltPreviewService.loadPreview(
+          XsltPreviewService.buildPreviewUrl(fileUuid, locale, selectedId), xsltFrame, enterRenderedView);
       }
     };
 
@@ -858,39 +859,8 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
 
     // Initial render: if any server-side XSLT exists, load the first one
     if (!noServerXslts) {
-      loadXsltPreview(buildPreviewUrl(fileUuid, locale, xsltDropdown.getValue(0)), xsltFrame, null);
-    }
-  }
-
-  private static String buildPreviewUrl(String fileUuid, String locale, String xsltId) {
-    return RestUtils.createRepresentationFileHtmlPreviewUri(fileUuid, locale, xsltId).asString();
-  }
-
-  // On HTTP 200: write srcdoc and run onSuccess. On error: show toast and leave
-  // the iframe/raw-XML state untouched so the previous working preview survives.
-  private void loadXsltPreview(String url, Frame frame, Command onSuccess) {
-    RequestBuilder request = new RequestBuilder(RequestBuilder.GET, url);
-    try {
-      request.sendRequest(null, new RequestCallback() {
-        @Override
-        public void onResponseReceived(Request req, Response response) {
-          if (response.getStatusCode() == HttpStatus.SC_OK) {
-            frame.getElement().setAttribute("srcdoc", response.getText());
-            if (onSuccess != null) {
-              onSuccess.execute();
-            }
-          } else {
-            Toast.showError(messages.xsltTransformFailed() + response.getStatusCode());
-          }
-        }
-
-        @Override
-        public void onError(Request req, Throwable exception) {
-          Toast.showError(messages.xsltTransformFailed() + exception.getMessage());
-        }
-      });
-    } catch (RequestException e) {
-      Toast.showError(messages.xsltTransformFailed() + e.getMessage());
+      XsltPreviewService.loadPreview(
+        XsltPreviewService.buildPreviewUrl(fileUuid, locale, xsltDropdown.getValue(0)), xsltFrame, null);
     }
   }
 
