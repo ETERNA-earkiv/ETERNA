@@ -120,17 +120,17 @@ public class InstanceIdentifierAIPEventPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Uppdaterade instansidentifieraren för AIP-bevarandehändelser";
+    return "Updated the AIP preservation events instance identifier";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Instansidentifieraren för AIP-bevarandehändelsen uppdaterades.";
+    return "The AIP preservation event instance identifier was updated successfully";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Kunde inte uppdatera instansidentifieraren för AIP-bevarandehändelsen.";
+    return "Could not update the AIP preservation event instance identifier";
   }
 
   @Override
