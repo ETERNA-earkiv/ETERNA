@@ -46,6 +46,7 @@ import org.roda.core.data.v2.jobs.CreateJobRequest;
 import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.JobStats;
 import org.roda.core.data.v2.jobs.JobMixIn;
 import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
@@ -202,6 +203,9 @@ public class JobService {
     job.setScheduleExpression(cronExpression);
     job.setState(Job.JOB_STATE.SCHEDULED);
     job.setEndDate(null);
+    // Template must not carry stats from a previous run; the execution clone
+    // would otherwise start with non-zero counters.
+    job.setJobStats(new JobStats());
     job.setNextScheduledRun(nextRun);
     RodaCoreFactory.getModelService().createOrUpdateJob(job);
     RodaCoreFactory.getIndexService().commit(IndexedJob.class);
