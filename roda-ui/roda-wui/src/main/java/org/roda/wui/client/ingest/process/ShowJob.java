@@ -532,7 +532,7 @@ public class ShowJob extends Composite {
         Label objectLabel = new Label();
         objectLabel.addStyleName("value");
 
-        if (!StringUtils.isBlank(selected.getSelectedClass())) {
+        if (StringUtils.isBlank(selected.getSelectedClass())) {
           objectLabel.setText(messages.noItemsToDisplay(messages.someOfAObject(selected.getSelectedClass())));
         } else if (AIP.class.getName().equals(selected.getSelectedClass())
           || IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
