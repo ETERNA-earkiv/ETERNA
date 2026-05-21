@@ -208,18 +208,4 @@ public class JobSchedulerTask {
       LOGGER.error("Error firing scheduled job {}", templateJobId, e);
     }
   }
-
-  /**
-   * Returns the due scheduled jobs as a list. Exposed for testing.
-   */
-  List<IndexedJob> findDueJobs() throws GenericException, RequestNotValidException {
-    Filter filter = new Filter(
-      new SimpleFilterParameter(RodaConstants.JOB_STATE, Job.JOB_STATE.SCHEDULED.name()),
-      new DateRangeFilterParameter(RodaConstants.JOB_NEXT_SCHEDULED_RUN, null, new Date(), DateGranularity.MILLISECOND));
-
-    return RodaCoreFactory.getIndexService()
-      .find(IndexedJob.class, filter, Sorter.NONE, new Sublist(0, RodaConstants.DEFAULT_PAGINATION_VALUE),
-        Collections.emptyList())
-      .getResults();
-  }
 }

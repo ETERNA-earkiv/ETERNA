@@ -183,11 +183,8 @@ public class JobService {
     return job;
   }
 
-  // scheduleJob is reschedule-only: it changes the cron on a SCHEDULED job.
-  // Initial scheduling happens via createJob with a scheduleExpression set.
-  // Any other state (CREATED, STARTED, STOPPED, COMPLETED, FAILED_*, etc.) is
-  // either historical record or under orchestrator control — rejecting them
-  // here means no execution history can be overwritten by an API caller.
+  // Reschedule is only allowed on SCHEDULED templates; any other state is either
+  // history or under orchestrator control and must not be overwritten.
   private static boolean isSchedulable(Job job) {
     return job.getState() == Job.JOB_STATE.SCHEDULED;
   }
