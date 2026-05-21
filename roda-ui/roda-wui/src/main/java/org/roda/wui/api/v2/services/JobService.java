@@ -14,7 +14,6 @@ import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -184,11 +183,17 @@ public class JobService {
     return job;
   }
 
-  // Allowlist to avoid rewriting history of finished/rejected runs (COMPLETED,
-  // FAILED_*, REJECTED) into SCHEDULED. SCHEDULED is allowed to support
-  // reschedule (changing the cron on a pending template).
-  private static final Set<Job.JOB_STATE> SCHEDULABLE_STATES = EnumSet.of(Job.JOB_STATE.CREATED,
-    Job.JOB_STATE.STOPPED, Job.JOB_STATE.SCHEDULED);
+  // STOPPED is allowed only when the job never ran (0% completion) — covers
+  // @once templates after firing and manually unscheduled jobs. STOPPED with
+  // prior execution is historical record and rejecting it avoids overwriting
+  // that history.
+  private static boolean isSchedulable(Job job) {
+    Job.JOB_STATE state = job.getState();
+    if (state == Job.JOB_STATE.CREATED || state == Job.JOB_STATE.SCHEDULED) {
+      return true;
+    }
+    return state == Job.JOB_STATE.STOPPED && job.getJobStats().getCompletionPercentage() == 0;
+  }
 
   public Job scheduleJob(String jobId, String cronExpression)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
@@ -197,7 +202,7 @@ public class JobService {
       throw new RequestNotValidException("Schedule expression is invalid or resolves to a past date: " + cronExpression);
     }
     Job job = RodaCoreFactory.getModelService().retrieveJob(jobId);
-    if (!SCHEDULABLE_STATES.contains(job.getState())) {
+    if (!isSchedulable(job)) {
       throw new RequestNotValidException("Cannot schedule job in state: " + job.getState());
     }
     job.setScheduleExpression(cronExpression);

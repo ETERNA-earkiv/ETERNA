@@ -183,7 +183,7 @@ public class JobSchedulerTask {
         RodaCoreFactory.getPluginOrchestrator().createAndExecuteJobs(execution, true);
         LOGGER.info("Fired scheduled execution {} from template job {}", execution.getId(), templateJobId);
       } catch (JobAlreadyStartedException | AuthorizationDeniedException | GenericException
-        | RequestNotValidException e) {
+        | RequestNotValidException | NotFoundException e) {
         LOGGER.error("Failed to start execution for scheduled job {}", templateJobId, e);
         // Roll back the @once template so the next poll can retry it. For recurring
         // jobs the template already has nextScheduledRun advanced to the next
