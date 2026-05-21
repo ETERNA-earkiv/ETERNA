@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.config.ConfigurationManager;
@@ -57,6 +59,10 @@ public class JobSchedulerTask {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerTask.class);
 
+  // Per-template-id lock to serialize fireScheduledJob within this JVM.
+  // Clustered deployments require a distributed claim (see issue tracker).
+  private static final ConcurrentMap<String, Object> FIRING_LOCKS = new ConcurrentHashMap<>();
+
   /**
    * Runs every minute (configurable via {@code jobs.scheduler.interval.millis}).
    * Finds all SCHEDULED jobs whose {@code nextScheduledRun} is in the past and
@@ -64,7 +70,9 @@ public class JobSchedulerTask {
    */
   @Scheduled(fixedDelayString = "${jobs.scheduler.interval.millis:60000}")
   public void executeScheduledJobs() {
-    if (!ConfigurationManager.getInstance().isInstantiated()) {
+    if (!ConfigurationManager.getInstance().isInstantiated()
+      || RodaCoreFactory.getIndexService() == null
+      || RodaCoreFactory.getModelService() == null) {
       return;
     }
 
@@ -98,11 +106,19 @@ public class JobSchedulerTask {
   }
 
   private void fireScheduledJob(String templateJobId) {
+    Object lock = FIRING_LOCKS.computeIfAbsent(templateJobId, k -> new Object());
+    synchronized (lock) {
+      fireScheduledJobLocked(templateJobId);
+    }
+  }
+
+  private void fireScheduledJobLocked(String templateJobId) {
     try {
       Job template = RodaCoreFactory.getModelService().retrieveJob(templateJobId);
 
-      // Non-atomic guard against double-firing when pollers race or the
-      // template was rescheduled/unscheduled between query and retrieve.
+      // Guard against double-firing when pollers race or the template was
+      // rescheduled/unscheduled between query and retrieve. Same-JVM safety
+      // comes from the per-id lock above; cross-JVM requires a distributed claim.
       if (template.getState() != Job.JOB_STATE.SCHEDULED) {
         LOGGER.info("Scheduled job {} no longer in SCHEDULED state ({}); skipping",
           templateJobId, template.getState());

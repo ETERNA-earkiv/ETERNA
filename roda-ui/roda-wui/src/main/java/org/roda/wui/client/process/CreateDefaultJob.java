@@ -708,6 +708,7 @@ public class CreateDefaultJob extends Composite {
       if (cronExpression == null) {
         return;
       }
+      buttonCreate.setEnabled(false);
       buttonSchedule.setEnabled(false);
 
       CreateJobRequest jobRequest = new CreateJobRequest();
@@ -723,6 +724,7 @@ public class CreateDefaultJob extends Composite {
 
       Services services = new Services("Schedule job", "create");
       services.jobsResource(s -> s.createJob(jobRequest)).whenComplete((job1, throwable) -> {
+        buttonCreate.setEnabled(true);
         buttonSchedule.setEnabled(true);
         if (throwable != null) {
           Toast.showError(messages.dialogFailure(), throwable.getMessage());
