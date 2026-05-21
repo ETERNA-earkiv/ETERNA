@@ -9,7 +9,7 @@ ETERNA implementerar också en rad specifikationer och standarder. För att veta
 
 * Användarvänligt grafiskt användargränssnitt baserat på HTML 5 och CSS 3
 * Lagring och hantering av digitala objekt
-* Katalog baserad på omfattande metadata (stödjer alla XML-baserade format som beskrivande metadata)
+* Arkivbestånd baserat på omfattande metadata (stödjer alla XML-baserade format som beskrivande metadata)
 * Full support för Dublin Core och Encoded Archival Description.
 * Konfigurerbart arbetsflöde för inleverans i flera steg
 * PREMIS 3 för metadata
@@ -29,15 +29,15 @@ För mer information, besök gärna ETERNA:s webbplats:
 
 ## Funktioner i menyraden
 
-ETERNA har UI-stöd för följande funktionella enheter. Funktionerna är organiserade i menyn under följande huvudkategorier: **Katalog**, **Sök**, **Leverans** (Inleverans, Process, Leveranskontroll), **Administration** (Arkivvårdsjobb, Interna åtgärder, Granskningslogg, Aviseringslogg, Rapportering, Användare och grupper), **Gallring** (Gallringspolicyer, Gallringsbekräftelse, Förfallna gallringar, Gallrade objekt) och **Planering** (Representationsnätverk, Riskregister, Bevarandehändelser, Bevarandeaktör).
+ETERNA har UI-stöd för följande funktionella enheter. Funktionerna är organiserade i menyn under följande huvudkategorier: **Arkivbestånd**, **Sök**, **Leverans** (Inleverans, Process, Leveranskontroll), **Administration** (Arkivvårdsjobb, Interna åtgärder, Granskningslogg, Aviseringslogg, Rapportering, Användare och grupper), **Gallring** (Gallringspolicyer, Gallringsbekräftelse, Förfallna gallringar, Gallrade objekt) och **Planering** (Representationsnätverk, Riskregister, Bevarandehändelser, Bevarandeaktör).
 
-### Katalog
+### Arkivbestånd
 
-Katalogen är en inventering av alla handlingar och information i arkivet. En handling kan representera olika typer av information i arkivet (t ex böcker, elektroniska dokument, bilder, databaser export mm). Handlingar är vanligtvis samlat i en samling (eller arkivbestånd) och vidare indelat i undersamlingar, sektioner, serier, filer osv. Den här sidan listar alla samlingar på högsta nivå i arkivet. Du kan komma ner till undersamlingar genom att klicka på samlingens namn.
+Arkivbeståndet är en inventering av alla handlingar och information i arkivet. En handling kan representera olika typer av information i arkivet (t ex böcker, elektroniska dokument, bilder, databaser export mm). Handlingar är vanligtvis samlat i en samling (eller arkivbestånd) och vidare indelat i undersamlingar, sektioner, serier, filer osv. Den här sidan listar alla samlingar på högsta nivå i arkivet. Du kan komma ner till undersamlingar genom att klicka på samlingens namn.
 
 ### Sök & Avancerad sökning
 
-På söksidan kan du söka efter logiska enheter, representationer eller filer (använd nedåtpilen för att välja sökdomän). För var och en av dessa domäner kan du söka i alla dess egenskaper eller i specifika egenskaper (använd nedåtpilen för att utöka den avancerade sökningen). Om du till exempel väljer logiska enheter kan du söka i ett specifikt fält av beskrivande metadata, eller hitta filer av ett visst format om filer avancerad sökning är vald.
+På söksidan kan du söka efter förvaringsenheter, representationer eller filer (använd nedåtpilen för att välja sökdomän). För var och en av dessa domäner kan du söka i alla dess egenskaper eller i specifika egenskaper (använd nedåtpilen för att utöka den avancerade sökningen). Om du till exempel väljer förvaringsenheter kan du söka i ett specifikt fält av beskrivande metadata, eller hitta filer av ett visst format om avancerad sökning för filer är vald.
 
 Sökmotorn hittar endast hela ord. Om du vill söka efter delar av ord så använd '*'-tecken. För mer information om sökverktyg, se nästa sektion.
 
@@ -110,30 +110,10 @@ När en ny användare skapas skickar systemet normalt ett aktiveringsmail med en
 
 ### Gallring
 
-Gallring i ETERNA innebär att information tas bort enligt fastställda gallringsregler och gallringsscheman, till exempel när en lagringstid har löpt ut. Varje logisk enhet är kopplad till ett gallringsschema som styr hur länge den bevaras och när gallring får ske.
+Gallring i ETERNA innebär att information tas bort enligt fastställda gallringsregler och gallringsscheman, till exempel när en lagringstid har löpt ut. Varje förvaringsenhet är kopplad till ett gallringsschema som styr hur länge den bevaras och när gallring får ske.
 
 Gallringen genomförs via en kontrollerad process och kan tillfälligt stoppas genom ett gallringsstopp. Inför gallring skapas en gallringsbekräftelse som innehåller en rapport över berörda enheter. Gallringen måste startas explicit och kan efteråt antingen återställas eller genomföras permanent.
 
 Översikter i ETERNA visar enheter som är redo för gallring, redo för granskning, redan gallrade eller där beräkning av gallringsfrist har misslyckats. Metadata om gallrade objekt bevaras för att visa att gallringen har skett korrekt enligt gällande gallringsschema.
 
 Läs mer om gallring under administrationsguiden "Gallringspolicyer."
-
-### Planering
-
-#### Representationsnätverk
-
-Representationsinformation är all information som krävs för att kunna förstå och tolka både det digitala materialet samt tillhörande metadata. Digitala objekt lagras som bitströmmar som inte kan förstås av en människa om inte finns ytterligare data för att tolka dem. Representationsinformation är den tillkommande information om struktur eller semantik som omvandlar rådata till något mer meningsfullt.
-
-#### Riskregister
-
-Riskregistret listar alla identifierade risker som kan påverka systemet. Det bör vara så omfattande som möjligt och inkludera alla identifierade risker samt en uppskattad sannolikhet att respektive risk inträffar, hur risken kan påverka om den inträffar, när den kan inträffa och hur ofta. Riskhantering används för att minimera sannolikheten att risken inträffar. 
-
-#### Bevarandehändelser
-
-En bevarandehändelse samlar metadata om händelser, specificerar och dokumenterar vilka objekt som har påverkats och vilken person eller mjukvara som varit inblandad. Dokumentation av händelser som modifierar ett objekt är avgörande för att upprätthålla digital härkomst, en nyckelfaktor för äkthet. Händelser som skapar nya relationer eller ändrar befintliga relationer är viktiga för att förklara dessa relationer. Även händelser som inte förändrar någonting, såsom giltighet och integritetskontroller av objekt, kan vara viktiga att registrera för förvaltningsändamål.
-
-#### Bevarandeaktör
-
-Enligt PREMIS (Preservation Metadata Implementation Strategies) är bevarandeaktörer (Preservation Agents) personer eller system som ansvarar för att utföra uppgifter eller roller relaterade till bevarandet av digitala objekt. Bevarandeaktörer kan omfatta både mänskliga aktörer (t.ex. arkivarier, kuratorer eller bevarandeadministratörer) och mjukvaruverktyg eller system (t.ex. innehållshanteringssystem, digitala bevarandesystem eller migrationsverktyg).
-
-I bevarandemetadata kopplas bevarandeaktörer ofta till specifika händelser eller åtgärder som sker under ett digitalt objekts livscykel. Genom att dokumentera dessa aktörer och deras roller kan organisationer upprätthålla en tydlig dokumentation över vem eller vad som har utfört olika bevarandeåtgärder och därigenom bidra till att säkerställa digitala resursernas långsiktiga tillgänglighet och integritet.
