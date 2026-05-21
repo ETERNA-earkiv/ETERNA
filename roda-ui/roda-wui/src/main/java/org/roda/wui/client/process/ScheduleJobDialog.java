@@ -173,12 +173,13 @@ public class ScheduleJobDialog extends DialogBox {
     dowLabel.addStyleName("form-label");
     dayOfWeekList.addStyleName("form-listbox");
     DateTimeFormat dowFmt = DateTimeFormat.getFormat("EEEE");
-    int[] weekdayCron = {1, 2, 3, 4, 5, 6, 0};
-    // Jan 3, 2000 is a Monday; iterate Mon–Sun using epoch offsets
+    // Names rather than numbers — Spring and cron-expression-descriptor disagree
+    // on numeric DoW (0=Sun vs 1=Sun); names are unambiguous in both.
+    String[] weekdayCron = {"MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"};
     Date monday = new Date(2000 - 1900, 0, 3, 12, 0, 0);
     for (int i = 0; i < 7; i++) {
       Date weekday = new Date(monday.getTime() + (long) i * 86400000L);
-      dayOfWeekList.addItem(dowFmt.format(weekday), String.valueOf(weekdayCron[i]));
+      dayOfWeekList.addItem(dowFmt.format(weekday), weekdayCron[i]);
     }
     dowRow.add(dowLabel);
     dowRow.add(dayOfWeekList);
