@@ -110,4 +110,17 @@ public interface JobsRestService extends RODAEntityRestService<IndexedJob> {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = PluginInfo.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   List<PluginInfo> getJobPluginInfo(PluginInfoRequest pluginInfoRequest);
+
+  @RequestMapping(method = RequestMethod.POST, path = "/{id}/schedule", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Schedule job", description = "Assigns a cron schedule to an existing job so it runs recurrently.", responses = {
+    @ApiResponse(responseCode = "200", description = "Job scheduled successfully", content = @Content(schema = @Schema(implementation = Job.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  Job scheduleJob(@PathVariable(name = "id") String jobId,
+    @Parameter(description = "6-field Spring cron expression defining the recurrence schedule (e.g. \"0 0 8 * * MON\")") @RequestParam(name = RodaConstants.API_QUERY_PARAM_SCHEDULE_EXPRESSION) String cronExpression);
+
+  @RequestMapping(method = RequestMethod.DELETE, path = "/{id}/schedule", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Unschedule job", description = "Removes the recurrence schedule from a job.", responses = {
+    @ApiResponse(responseCode = "200", description = "Job unscheduled successfully", content = @Content(schema = @Schema(implementation = Job.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  Job unscheduleJob(@PathVariable(name = "id") String jobId);
 }

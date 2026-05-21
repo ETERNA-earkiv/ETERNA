@@ -28,6 +28,7 @@ public class CreateJobRequest implements Serializable {
   private String sourceObjectsClass;
   private String priority;
   private String parallelism;
+  private String scheduleExpression;
 
   public CreateJobRequest() {
     // do nothing
@@ -87,5 +88,13 @@ public class CreateJobRequest implements Serializable {
 
   public void setSourceObjectsClass(String sourceObjectsClass) {
     this.sourceObjectsClass = sourceObjectsClass;
+  }
+
+  public String getScheduleExpression() {
+    return scheduleExpression;
+  }
+
+  public void setScheduleExpression(String scheduleExpression) {
+    this.scheduleExpression = scheduleExpression;
   }
 }

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -44,6 +45,7 @@ import org.roda.core.data.v2.jobs.CreateJobRequest;
 import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.JobStats;
 import org.roda.core.data.v2.jobs.JobMixIn;
 import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
@@ -62,6 +64,7 @@ import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v2.utils.ApiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.support.CronExpression;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -96,6 +99,7 @@ public class JobService {
     createJobRequest.setSourceObjectsClass(job.getSourceObjects().getSelectedClass());
     createJobRequest.setPriority(job.getPriority().toString());
     createJobRequest.setParallelism(job.getParallelism().toString());
+    createJobRequest.setScheduleExpression(job.getScheduleExpression());
 
     return createJobRequest;
   }
@@ -104,7 +108,18 @@ public class JobService {
     RequestNotValidException, AuthorizationDeniedException {
     Job updatedJob = new Job(job);
 
-    RodaCoreFactory.getPluginOrchestrator().createAndExecuteJobs(updatedJob, async);
+    String scheduleExpression = updatedJob.getScheduleExpression();
+    if (StringUtils.isNotBlank(scheduleExpression)) {
+      Date nextRun = computeNextRun(scheduleExpression);
+      if (nextRun == null || !nextRun.after(new Date())) {
+        throw new RequestNotValidException("Schedule expression is invalid or resolves to a past date: " + scheduleExpression);
+      }
+      updatedJob.setState(Job.JOB_STATE.SCHEDULED);
+      updatedJob.setNextScheduledRun(nextRun);
+      RodaCoreFactory.getModelService().createOrUpdateJob(updatedJob);
+    } else {
+      RodaCoreFactory.getPluginOrchestrator().createAndExecuteJobs(updatedJob, async);
+    }
 
     // force commit
     RodaCoreFactory.getIndexService().commit(IndexedJob.class);
@@ -166,6 +181,70 @@ public class JobService {
     RodaCoreFactory.getModelService().createOrUpdateJob(job);
 
     return job;
+  }
+
+  // Reschedule is only allowed on SCHEDULED templates; any other state is either
+  // history or under orchestrator control and must not be overwritten.
+  private static boolean isSchedulable(Job job) {
+    return job.getState() == Job.JOB_STATE.SCHEDULED;
+  }
+
+  public Job scheduleJob(String jobId, String cronExpression)
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    Date nextRun = computeNextRun(cronExpression);
+    if (nextRun == null || !nextRun.after(new Date())) {
+      throw new RequestNotValidException("Schedule expression is invalid or resolves to a past date: " + cronExpression);
+    }
+    Job job = RodaCoreFactory.getModelService().retrieveJob(jobId);
+    if (!isSchedulable(job)) {
+      throw new RequestNotValidException("Cannot schedule job in state: " + job.getState());
+    }
+    job.setScheduleExpression(cronExpression);
+    job.setState(Job.JOB_STATE.SCHEDULED);
+    job.setEndDate(null);
+    // Template must not carry stats from a previous run; the execution clone
+    // would otherwise start with non-zero counters.
+    job.setJobStats(new JobStats());
+    job.setNextScheduledRun(nextRun);
+    RodaCoreFactory.getModelService().createOrUpdateJob(job);
+    RodaCoreFactory.getIndexService().commit(IndexedJob.class);
+    return job;
+  }
+
+  public Job unscheduleJob(String jobId)
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    Job job = RodaCoreFactory.getModelService().retrieveJob(jobId);
+    if (job.getState() != Job.JOB_STATE.SCHEDULED) {
+      throw new RequestNotValidException("Job is not scheduled (state: " + job.getState() + ")");
+    }
+    job.setScheduleExpression(null);
+    job.setNextScheduledRun(null);
+    job.setState(Job.JOB_STATE.STOPPED);
+    job.setEndDate(new Date());
+    RodaCoreFactory.getModelService().createOrUpdateJob(job);
+    RodaCoreFactory.getIndexService().commit(IndexedJob.class);
+    return job;
+  }
+
+  public Date computeNextRun(String cronExpression) throws RequestNotValidException {
+    if (cronExpression == null) {
+      return null;
+    }
+    if (cronExpression.startsWith("@once:")) {
+      try {
+        long millis = Long.parseLong(cronExpression.substring(6));
+        return new Date(millis);
+      } catch (NumberFormatException e) {
+        return null;
+      }
+    }
+    try {
+      CronExpression cron = CronExpression.parse(cronExpression);
+      ZonedDateTime next = cron.next(ZonedDateTime.now());
+      return next != null ? Date.from(next.toInstant()) : null;
+    } catch (IllegalArgumentException e) {
+      throw new RequestNotValidException("Invalid cron expression: " + cronExpression, e);
+    }
   }
 
   public void deleteJob(String jobId)

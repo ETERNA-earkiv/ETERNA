@@ -48,7 +48,7 @@
 								</g:Label>
 								<g:Label styleName="value" ui:field="dateEnded" />
 							</g:FlowPanel>
-							<g:FlowPanel styleName="field">
+							<g:FlowPanel styleName="field" ui:field="durationPanel">
 								<g:Label addStyleNames="label">
 									<ui:text from='{messages.jobDuration}' />
 								</g:Label>
@@ -65,6 +65,12 @@
 									<ui:text from='{messages.reportScheduleInfo}' />
 								</g:Label>
 								<g:Label styleName="value" ui:field="scheduleInfo" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field" ui:field="nextRunPanel">
+								<g:Label addStyleNames="label" ui:field="nextRunLabel">
+									<ui:text from='{messages.jobNextScheduledRun}' />
+								</g:Label>
+								<g:Label styleName="value" ui:field="nextRun" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label addStyleNames="label" ui:field="stateDetailsLabel">

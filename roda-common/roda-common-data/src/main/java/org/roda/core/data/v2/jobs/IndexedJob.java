@@ -76,6 +76,9 @@ public class IndexedJob implements IsIndexed, HasId, HasInstanceID, HasInstanceN
 
   private Map<String, Object> fields;
 
+  // next time this scheduled job should fire (null for non-scheduled jobs)
+  private Date nextScheduledRun = null;
+
   private JobPriority priority;
 
   private JobParallelism parallelism;
@@ -102,6 +105,8 @@ public class IndexedJob implements IsIndexed, HasId, HasInstanceID, HasInstanceN
     this.instanceName = indexedJob.getInstanceName();
     this.attachmentsList = indexedJob.getAttachmentsList();
     this.jobUsersDetails = indexedJob.getJobUsersDetails();
+    this.nextScheduledRun = indexedJob.getNextScheduledRun();
+    this.fields = indexedJob.getFields() != null ? new HashMap<>(indexedJob.getFields()) : null;
   }
 
   @Override
@@ -307,5 +312,13 @@ public class IndexedJob implements IsIndexed, HasId, HasInstanceID, HasInstanceN
    */
   public void setFields(Map<String, Object> fields) {
     this.fields = fields;
+  }
+
+  public Date getNextScheduledRun() {
+    return nextScheduledRun;
+  }
+
+  public void setNextScheduledRun(Date nextScheduledRun) {
+    this.nextScheduledRun = nextScheduledRun;
   }
 }

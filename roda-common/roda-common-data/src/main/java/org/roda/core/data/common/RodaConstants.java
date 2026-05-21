@@ -498,6 +498,7 @@ public final class RodaConstants {
   public static final String API_QUERY_KEY_CLASS = "class";
   public static final String API_QUERY_KEY_TYPE = "type";
   public static final String API_QUERY_JOB_DETAILS = "details";
+  public static final String API_QUERY_PARAM_SCHEDULE_EXPRESSION = "cronExpression";
   // "http path param" related strings
   public static final String API_PATH_PARAM_AIP_ID = "aip_id";
   public static final String API_PATH_PARAM_REPRESENTATION_ID = "representation_id";
@@ -1273,6 +1274,7 @@ public final class RodaConstants {
   public static final String JOB_END_DATE = "endDate";
   public static final String JOB_STATE = "state";
   public static final String JOB_SCHEDULE_INFO = "scheduleInfo";
+  public static final String JOB_NEXT_SCHEDULED_RUN = "nextScheduledRun";
   public static final String JOB_EXECUTION_TYPE_APPROVAL = "APPROVAL";
   public static final String JOB_PARALLELISM = "parallelism";
   public static final String JOB_PRIORITY = "priority";
@@ -2196,6 +2198,10 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_APPROVE_JOB = "org.roda.wui.api.v2.controller.JobsController.approveJob";
 
   public static final String PERMISSION_METHOD_REJECT_JOB = "org.roda.wui.api.v2.controller.JobsController.rejectJob";
+
+  public static final String PERMISSION_METHOD_SCHEDULE_JOB = "org.roda.wui.api.v2.controller.JobsController.scheduleJob";
+
+  public static final String PERMISSION_METHOD_UNSCHEDULE_JOB = "org.roda.wui.api.v2.controller.JobsController.unscheduleJob";
 
   public static final String ENV_CONFIG_SYMBOLIC_LINKS_FORBIDDEN = "RODA_CONFIG_SYMBOLIC_LINKS_FORBIDDEN";
 

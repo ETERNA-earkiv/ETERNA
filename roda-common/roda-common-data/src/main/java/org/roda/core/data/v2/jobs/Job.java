@@ -80,6 +80,9 @@ public class Job implements IsModelObject, HasId, HasInstanceID, HasInstanceName
 
   private Map<String, Object> fields;
 
+  // next time this scheduled job should fire (null for non-scheduled jobs)
+  private Date nextScheduledRun = null;
+
   private JobPriority priority;
 
   private JobParallelism parallelism;
@@ -110,6 +113,8 @@ public class Job implements IsModelObject, HasId, HasInstanceID, HasInstanceName
     this.instanceName = job.getInstanceName();
     this.attachmentsList = job.getAttachmentsList();
     this.jobUsersDetails = job.getJobUsersDetails();
+    this.fields = job.getFields() != null ? new HashMap<>(job.getFields()) : null;
+    this.nextScheduledRun = job.getNextScheduledRun();
   }
 
   @JsonIgnore
@@ -336,6 +341,32 @@ public class Job implements IsModelObject, HasId, HasInstanceID, HasInstanceName
     this.fields = fields;
   }
 
+  public Date getNextScheduledRun() {
+    return nextScheduledRun;
+  }
+
+  public void setNextScheduledRun(Date nextScheduledRun) {
+    this.nextScheduledRun = nextScheduledRun;
+  }
+
+  public String getScheduleExpression() {
+    if (fields == null) {
+      return null;
+    }
+    return (String) fields.get(RodaConstants.JOB_SCHEDULE_INFO);
+  }
+
+  public void setScheduleExpression(String cronExpression) {
+    if (fields == null) {
+      fields = new HashMap<>();
+    }
+    if (cronExpression == null) {
+      fields.remove(RodaConstants.JOB_SCHEDULE_INFO);
+    } else {
+      fields.put(RodaConstants.JOB_SCHEDULE_INFO, cronExpression);
+    }
+  }
+
   public Job clone() {
     final Job newJob = new Job();
     newJob.setName(getName());
@@ -365,6 +396,10 @@ public class Job implements IsModelObject, HasId, HasInstanceID, HasInstanceName
     newJob.getJobStats().setSourceObjectsProcessedWithSuccess(getJobStats().getSourceObjectsProcessedWithSuccess());
     newJob.getJobStats().setSourceObjectsProcessedWithFailure(getJobStats().getSourceObjectsProcessedWithFailure());
     newJob.getJobStats().setSourceObjectsWaitingToBeProcessed(getJobStats().getSourceObjectsWaitingToBeProcessed());
+    newJob.setNextScheduledRun(getNextScheduledRun());
+    if (getFields() != null) {
+      newJob.setFields(new HashMap<>(getFields()));
+    }
     return newJob;
   }
 }
