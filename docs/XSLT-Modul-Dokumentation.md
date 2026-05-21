@@ -131,7 +131,7 @@ Namnrymdsdetekteringen:
 2. Använder `XMLStreamReader` för att hitta rotelementets namnrymd
 3. Matchar mot konfigurerade regler i `ui.viewer.xslt.representation.rules`
 
-Exempel: En XML-fil med namnrymden `http://www.cgm.com/sv/pmo/v1` matchas mot stilmallen `cgm_pmo_journal.xslt`.
+Exempel: En XML-fil med namnrymden `http://www.example.org/ns/v1` matchas mot stilmallen `example_v1.xslt`.
 
 ### Steg 4: Ingen stilmall
 
@@ -152,7 +152,7 @@ SIP-200801010141-xxxxxxxx/
 ├── METS.xml                                    (rot-METS)
 ├── metadata/
 │   └── descriptive/
-│       ├── 200801010141.xml                    (CGM PMO-metadata)
+│       ├── 200801010141.xml                    (verksamhets-XML)
 │       └── dc.xml                              (Dublin Core-metadata)
 ├── schemas/
 │   └── ...
@@ -230,7 +230,6 @@ config/crosswalks/dissemination/html/representation/  (för representationsfiler
 
 | Stilmall | Beskrivning |
 |----------|-------------|
-| `cgm_pmo_v1.xslt` | CGM PMO v1 — patientjournaler (beskrivande metadata) |
 | `dc.xslt` | Dublin Core |
 | `ead_2002.xslt` | Encoded Archival Description 2002 |
 | `ead_3.xslt` | Encoded Archival Description 3 |
@@ -259,14 +258,14 @@ ETERNA använder Saxon HE som stödjer XSLT 2.0. Stilmallar får tillgång till 
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="2.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:pmo="http://www.cgm.com/sv/pmo/v1">
+    xmlns:ex="http://www.example.org/ns/v1">
 
   <xsl:output method="xml" indent="yes" omit-xml-declaration="yes"/>
   <xsl:param name="i18n" as="map(xs:string, xs:string)?" xmlns:xs="http://www.w3.org/2001/XMLSchema"/>
 
   <xsl:template match="/">
     <div class="descriptiveMetadata">
-      <h1><xsl:value-of select="//pmo:CaseBookName"/></h1>
+      <h1><xsl:value-of select="//ex:Title"/></h1>
       <!-- mer transformation... -->
     </div>
   </xsl:template>
@@ -464,9 +463,9 @@ curl -u admin:eterna \
 I `roda-wui.properties` kan man konfigurera vilken global stilmall som ska användas för en viss XML-namnrymd:
 
 ```properties
-ui.viewer.xslt.representation.rules = cgm_pmo
-ui.viewer.xslt.representation.rules.cgm_pmo.namespace = http://www.cgm.com/sv/pmo/v1
-ui.viewer.xslt.representation.rules.cgm_pmo.xslt = cgm_pmo_journal
+ui.viewer.xslt.representation.rules = example
+ui.viewer.xslt.representation.rules.example.namespace = http://www.example.org/ns/v1
+ui.viewer.xslt.representation.rules.example.xslt = example_v1
 ```
 
 ### Stilmallsplacering
