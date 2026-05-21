@@ -10,15 +10,19 @@ package org.roda.wui.client.browse;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
+import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
@@ -195,25 +199,132 @@ public class CatalogTreePanel extends Composite {
           loadFallbackGhostTree();
           return;
         }
+        final int myGeneration = loadGeneration;
+        Set<String> accessibleRootIds = new HashSet<>();
         for (IndexedAIP aip : result.getResults()) {
           CatalogTreeNode node = new CatalogTreeNode(aip.getId(), aip.getTitle(), aip.getLevel(), 0);
           rootNodes.put(aip.getId(), node);
           treeBody.add(node);
+          accessibleRootIds.add(aip.getId());
         }
-        rootsLoaded = true;
-        if (pendingRevealAipId != null) {
-          String id = pendingRevealAipId;
-          pendingRevealAipId = null;
-          doRevealAip(id);
-        }
+        // Stay in loading state until supplementary ghost-root check completes.
+        rootsLoading = true;
+        loadSupplementaryGhostRoots(accessibleRootIds, myGeneration);
       });
+  }
+
+  /**
+   * Körs efter att loadRootNodes() hittat tillgängliga toppnoder.
+   * Söker tillgängliga AIP:er vars rot-förfader INTE finns bland de tillgängliga toppnoderna
+   * och bygger ghost-kedjor för dessa så att de syns i trädet.
+   * Använder max 2 nätverksanrop oavsett antalet AIP:er.
+   */
+  private void loadSupplementaryGhostRoots(Set<String> accessibleRootIds, int myGeneration) {
+    FindRequest findRequest = new FindRequest.FindRequestBuilder(
+      new Filter(new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file")),
+      false)
+      .withSorter(new Sorter(new SortParameter(RodaConstants.AIP_TITLE_SORT, false)))
+      .withSublist(new Sublist(0, 200))
+      .build();
+
+    Services service = new Services(messages.catalogTreeReasonListRoots(), "get");
+    service.rodaEntityRestService(
+      s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
+      IndexedAIP.class)
+      .whenComplete((result, error) -> {
+        if (myGeneration != loadGeneration) return;
+        if (error != null) {
+          LOGGER.warn("Supplementary ghost-root query failed; tree may be incomplete: " + error.getMessage());
+          finalizeFallbackTree(new ArrayList<>(), myGeneration);
+          return;
+        }
+        List<IndexedAIP> allAccessible = result.getResults();
+
+        // Hitta AIP:er vars yttersta förfader INTE finns bland tillgängliga toppnoder
+        List<IndexedAIP> needsGhostRoot = new ArrayList<>();
+        for (IndexedAIP aip : allAccessible) {
+          List<String> ancestors = aip.getAncestors();
+          if (ancestors == null || ancestors.isEmpty()) {
+            // AIP:et är självt en toppnod — redan hanterat av loadRootNodes()
+            continue;
+          }
+          // ancestors är bottom-to-top: sista elementet är yttersta förfadern (roten)
+          String rootAncestorId = ancestors.get(ancestors.size() - 1);
+          if (!accessibleRootIds.contains(rootAncestorId)) {
+            needsGhostRoot.add(aip);
+          }
+        }
+
+        if (needsGhostRoot.isEmpty()) {
+          finalizeFallbackTree(new ArrayList<>(), myGeneration);
+          return;
+        }
+
+        // Bygg resolvedAncestors: börja med alla tillgängliga AIP:er
+        final Map<String, IndexedAIP> resolvedAncestors = new HashMap<>();
+        for (IndexedAIP aip : allAccessible) {
+          resolvedAncestors.put(aip.getId(), aip);
+        }
+
+        // Samla förfäder-ID:n som ännu inte är kända
+        Set<String> ancestorIdsToResolve = new LinkedHashSet<>();
+        for (IndexedAIP aip : needsGhostRoot) {
+          if (aip.getAncestors() != null) {
+            for (String ancId : aip.getAncestors()) {
+              if (!resolvedAncestors.containsKey(ancId)) {
+                ancestorIdsToResolve.add(ancId);
+              }
+            }
+          }
+        }
+
+        if (ancestorIdsToResolve.isEmpty()) {
+          buildAndMergeGhostRoots(needsGhostRoot, resolvedAncestors, myGeneration);
+          return;
+        }
+
+        FindRequest ancestorRequest = new FindRequest.FindRequestBuilder(
+          new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID,
+            new ArrayList<>(ancestorIdsToResolve))),
+          false)
+          .withSublist(new Sublist(0, ancestorIdsToResolve.size()))
+          .build();
+
+        Services s2 = new Services(messages.catalogTreeReasonGetAncestors(), "get");
+        s2.rodaEntityRestService(
+          s -> s.find(ancestorRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
+          IndexedAIP.class)
+          .whenComplete((ancResult, err) -> {
+            if (myGeneration != loadGeneration) return;
+            if (err == null) {
+              for (IndexedAIP anc : ancResult.getResults()) {
+                resolvedAncestors.put(anc.getId(), anc);
+              }
+            } else {
+              LOGGER.warn("Could not batch-resolve ghost ancestors; inaccessible intermediates become ghost nodes");
+            }
+            buildAndMergeGhostRoots(needsGhostRoot, resolvedAncestors, myGeneration);
+          });
+      });
+  }
+
+  private void buildAndMergeGhostRoots(List<IndexedAIP> aips,
+      Map<String, IndexedAIP> resolvedAncestors, int expectedGeneration) {
+    Map<String, CatalogTreeNode> nodeMap = new LinkedHashMap<>();
+    List<CatalogTreeNode> newRoots = new ArrayList<>();
+    for (IndexedAIP aip : aips) {
+      List<String> ancestorIds = aip.getAncestors() != null
+        ? new ArrayList<>(aip.getAncestors())
+        : new ArrayList<>();
+      Collections.reverse(ancestorIds);
+      insertChain(ancestorIds, aip, resolvedAncestors, nodeMap, newRoots);
+    }
+    finalizeFallbackTree(newRoots, expectedGeneration);
   }
 
   private void loadFallbackGhostTree() {
     final int myGeneration = loadGeneration;
     rootsLoading = true;
-    // 200-gräns: varje AIP genererar ett getAncestors()-anrop — begränsa för att hålla nere fan-out.
-    // Användare med fler än 200 tillgängliga AIPs ser de 200 första (sorterade på titel).
     FindRequest findRequest = new FindRequest.FindRequestBuilder(
       new Filter(new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file")),
       false)
@@ -244,66 +355,101 @@ public class CatalogTreePanel extends Composite {
           LOGGER.warn("Fallback ghost tree capped at 200 AIPs; some accessible objects may not be shown");
         }
 
-        Map<String, CatalogTreeNode> nodeMap = new LinkedHashMap<>();
-        List<CatalogTreeNode> roots = new ArrayList<>();
-        int[] remaining = {aips.size()};
-
+        // Bygg resolvedAncestors: börja med alla tillgängliga AIP:er
+        final Map<String, IndexedAIP> resolvedAncestors = new HashMap<>();
         for (IndexedAIP aip : aips) {
-          Services s2 = new Services(messages.catalogTreeReasonGetAncestors(), "get");
-          s2.aipResource(srv -> srv.getAncestors(aip.getId()))
-            .whenComplete((ancestors, err) -> {
-              if (err != null) {
-                LOGGER.warn("Could not get ancestors for fallback AIP " + aip.getId() + ", skipping");
-              } else {
-                Collections.reverse(ancestors);
-                insertFallbackChain(ancestors, aip, nodeMap, roots);
-              }
-              remaining[0]--;
-              if (remaining[0] == 0) {
-                finalizeFallbackTree(roots, myGeneration);
-              }
-            });
+          resolvedAncestors.put(aip.getId(), aip);
         }
+
+        // Samla förfäder-ID:n som ännu inte är kända
+        Set<String> ancestorIdsToResolve = new LinkedHashSet<>();
+        for (IndexedAIP aip : aips) {
+          if (aip.getAncestors() != null) {
+            for (String ancId : aip.getAncestors()) {
+              if (!resolvedAncestors.containsKey(ancId)) {
+                ancestorIdsToResolve.add(ancId);
+              }
+            }
+          }
+        }
+
+        if (ancestorIdsToResolve.isEmpty()) {
+          buildAndFinalizeFallbackTree(aips, resolvedAncestors, myGeneration);
+          return;
+        }
+
+        // Hämta data för okända förfäder i ett enda batch-anrop
+        FindRequest ancestorRequest = new FindRequest.FindRequestBuilder(
+          new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID,
+            new ArrayList<>(ancestorIdsToResolve))),
+          false)
+          .withSublist(new Sublist(0, ancestorIdsToResolve.size()))
+          .build();
+
+        Services s2 = new Services(messages.catalogTreeReasonGetAncestors(), "get");
+        s2.rodaEntityRestService(
+          s -> s.find(ancestorRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
+          IndexedAIP.class)
+          .whenComplete((ancestorResult, err) -> {
+            if (myGeneration != loadGeneration) return;
+            if (err == null) {
+              for (IndexedAIP anc : ancestorResult.getResults()) {
+                resolvedAncestors.put(anc.getId(), anc);
+              }
+            } else {
+              LOGGER.warn("Could not batch-resolve ancestors; inaccessible intermediates become ghost nodes");
+            }
+            buildAndFinalizeFallbackTree(aips, resolvedAncestors, myGeneration);
+          });
       });
   }
 
-  private void insertFallbackChain(List<IndexedAIP> ancestors, IndexedAIP targetAip,
-      Map<String, CatalogTreeNode> nodeMap, List<CatalogTreeNode> roots) {
+  private void buildAndFinalizeFallbackTree(List<IndexedAIP> aips,
+      Map<String, IndexedAIP> resolvedAncestors, int expectedGeneration) {
+    Map<String, CatalogTreeNode> nodeMap = new LinkedHashMap<>();
+    List<CatalogTreeNode> roots = new ArrayList<>();
+    for (IndexedAIP aip : aips) {
+      List<String> ancestorIds = aip.getAncestors() != null
+        ? new ArrayList<>(aip.getAncestors())
+        : new ArrayList<>();
+      Collections.reverse(ancestorIds);
+      insertChain(ancestorIds, aip, resolvedAncestors, nodeMap, roots);
+    }
+    finalizeFallbackTree(roots, expectedGeneration);
+  }
+
+  /**
+   * Bygger en nod-kedja top-till-bottom. Förfäder vars ID finns i resolvedAncestors
+   * får riktiga noder; övriga blir ghost-noder. Noder dedupliceras via nodeMap.
+   */
+  private void insertChain(List<String> ancestorIds, IndexedAIP targetAip,
+      Map<String, IndexedAIP> resolvedAncestors, Map<String, CatalogTreeNode> nodeMap,
+      List<CatalogTreeNode> roots) {
     CatalogTreeNode parent = null;
-
-    for (int i = 0; i < ancestors.size(); i++) {
-      IndexedAIP anc = ancestors.get(i);
-      CatalogTreeNode node;
-
-      if (anc == null) {
-        node = CatalogTreeNode.createGhostNode(i);
-      } else if (nodeMap.containsKey(anc.getId())) {
-        parent = nodeMap.get(anc.getId());
+    for (int i = 0; i < ancestorIds.size(); i++) {
+      String ancId = ancestorIds.get(i);
+      if (nodeMap.containsKey(ancId)) {
+        parent = nodeMap.get(ancId);
         continue;
-      } else {
+      }
+      CatalogTreeNode node;
+      if (resolvedAncestors.containsKey(ancId)) {
+        IndexedAIP anc = resolvedAncestors.get(ancId);
         node = new CatalogTreeNode(anc.getId(), anc.getTitle(), anc.getLevel(), i);
-        nodeMap.put(anc.getId(), node);
-      }
-
-      if (parent == null) {
-        roots.add(node);
       } else {
-        parent.addPrebuiltChild(node);
+        node = CatalogTreeNode.createGhostNode(i);
       }
+      nodeMap.put(ancId, node);
+      if (parent == null) roots.add(node);
+      else parent.addPrebuiltChild(node);
       parent = node;
     }
-
-    if (nodeMap.containsKey(targetAip.getId())) {
-      return;
-    }
+    if (nodeMap.containsKey(targetAip.getId())) return;
     CatalogTreeNode targetNode = new CatalogTreeNode(
-      targetAip.getId(), targetAip.getTitle(), targetAip.getLevel(), ancestors.size());
+      targetAip.getId(), targetAip.getTitle(), targetAip.getLevel(), ancestorIds.size());
     nodeMap.put(targetAip.getId(), targetNode);
-    if (parent == null) {
-      roots.add(targetNode);
-    } else {
-      parent.addPrebuiltChild(targetNode);
-    }
+    if (parent == null) roots.add(targetNode);
+    else parent.addPrebuiltChild(targetNode);
   }
 
   private void finalizeFallbackTree(List<CatalogTreeNode> roots, int expectedGeneration) {
@@ -333,37 +479,48 @@ public class CatalogTreePanel extends Composite {
   }
 
   private void doRevealAip(String aipId) {
+    // Hämta AIP:et för att få Solr-fältets förfäder-ID:n (fullständig kedja, inklusive otillgängliga)
     Services service = new Services(messages.catalogTreeReasonGetAncestors(), "get");
-    service.aipResource(s -> s.getAncestors(aipId))
-      .whenComplete((ancestors, error) -> {
+    service.rodaEntityRestService(
+      s -> s.findByUuid(aipId, LocaleInfo.getCurrentLocale().getLocaleName()),
+      IndexedAIP.class)
+      .whenComplete((aip, error) -> {
         if (error != null) {
-          LOGGER.warn("Could not fetch ancestors for AIP " + aipId + ", auto-sync skipped");
+          LOGGER.warn("Could not fetch AIP " + aipId + " for tree sync, skipping");
           return;
         }
-        Collections.reverse(ancestors);
-        expandChain(ancestors, 0, aipId);
+        List<String> ancestorIds = aip.getAncestors(); // bottom-to-top från Solr
+        if (ancestorIds == null || ancestorIds.isEmpty()) {
+          selectNode(aipId);
+          return;
+        }
+        List<String> topToBottom = new ArrayList<>(ancestorIds);
+        Collections.reverse(topToBottom);
+        expandChainByIds(topToBottom, 0, aipId);
       });
   }
 
-  private void expandChain(List<IndexedAIP> ancestors, int index, String targetId) {
-    if (index >= ancestors.size()) {
+  /**
+   * Expanderar förfäder i trädet baserat på ID-lista (top-till-bottom).
+   * Otillgängliga förfäder (ghost-noder) hoppas över — de är alltid expanderade.
+   * Reala noder expanderas i ordning; när sista förfadern är klar väljs målnoden.
+   */
+  private void expandChainByIds(List<String> ancestorIds, int index, String targetId) {
+    if (index >= ancestorIds.size()) {
       selectNode(targetId);
       return;
     }
-    IndexedAIP ancestor = ancestors.get(index);
-    if (ancestor == null) {
-      expandChain(ancestors, index + 1, targetId);
-      return;
-    }
-    CatalogTreeNode node = findNode(ancestor.getId(), rootNodes);
-    if (node == null) {
-      selectNode(targetId);
+    String ancestorId = ancestorIds.get(index);
+    CatalogTreeNode node = findNode(ancestorId, rootNodes);
+    if (node == null || node.isGhostNode()) {
+      // Antingen otillgänglig (ghost, redan expanderad) eller ännu inte synlig — fortsätt
+      expandChainByIds(ancestorIds, index + 1, targetId);
       return;
     }
     node.expand(new com.google.gwt.user.client.Command() {
       @Override
       public void execute() {
-        expandChain(ancestors, index + 1, targetId);
+        expandChainByIds(ancestorIds, index + 1, targetId);
       }
     });
   }

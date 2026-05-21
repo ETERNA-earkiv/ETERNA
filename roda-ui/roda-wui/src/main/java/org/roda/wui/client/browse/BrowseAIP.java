@@ -24,7 +24,9 @@ import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -287,6 +289,38 @@ public class BrowseAIP extends Composite {
     });
   }
 
+  /**
+   * Hämtar förfäder för ett AIP baserat på Solr-fältets förfäder-ID:n.
+   * Använder ett enda batch-anrop och returnerar en ordnad lista (top-till-bottom)
+   * där otillgängliga förfäder representeras av null.
+   */
+  private static CompletableFuture<List<IndexedAIP>> buildAncestorsFuture(Services service, IndexedAIP aip) {
+    List<String> ancestorIds = aip.getAncestors(); // bottom-to-top from Solr
+    if (ancestorIds == null || ancestorIds.isEmpty()) {
+      return CompletableFuture.completedFuture(new ArrayList<>());
+    }
+    FindRequest batchRequest = new FindRequest.FindRequestBuilder(
+      new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, new ArrayList<>(ancestorIds))),
+      false)
+      .withSublist(new Sublist(0, ancestorIds.size()))
+      .build();
+    return service.rodaEntityRestService(
+      s -> s.find(batchRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
+      IndexedAIP.class)
+      .thenApply(result -> {
+        Map<String, IndexedAIP> accessibleMap = new HashMap<>();
+        for (IndexedAIP anc : result.getResults()) {
+          accessibleMap.put(anc.getId(), anc);
+        }
+        // Bevara bottom-to-top ordning (som BreadcrumbUtils.getAipBreadcrumbs förväntar sig)
+        List<IndexedAIP> ordered = new ArrayList<>();
+        for (String ancId : ancestorIds) {
+          ordered.add(accessibleMap.get(ancId)); // null om otillgänglig
+        }
+        return ordered;
+      });
+  }
+
   private static void refresh(String id, AsyncCallback<IndexedAIP> callback) {
 
     Services service = new Services(messages.browseAIPReasonViewAIP(), "get");
@@ -301,7 +335,7 @@ public class BrowseAIP extends Composite {
             AsyncCallbackUtils.defaultFailureTreatment(error);
           }
         } else {
-          CompletableFuture<List<IndexedAIP>> futureAncestors = service.aipResource(s -> s.getAncestors(id));
+          CompletableFuture<List<IndexedAIP>> futureAncestors = buildAncestorsFuture(service, aip);
 
           CompletableFuture<List<String>> futureRepFields = service
             .aipResource(AIPRestService::retrieveAIPRuleProperties);
