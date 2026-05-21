@@ -183,24 +183,13 @@ public class JobService {
     return job;
   }
 
-  // STOPPED is allowed only when the job never touched any objects — covers
-  // @once templates after firing and manually unscheduled jobs. Jobs stopped
-  // early after actually starting can also have completionPercentage == 0,
-  // so the broader counter check is required. Mirrors the isEmptyStopped
-  // heuristic in ShowJob.
+  // scheduleJob is reschedule-only: it changes the cron on a SCHEDULED job.
+  // Initial scheduling happens via createJob with a scheduleExpression set.
+  // Any other state (CREATED, STARTED, STOPPED, COMPLETED, FAILED_*, etc.) is
+  // either historical record or under orchestrator control — rejecting them
+  // here means no execution history can be overwritten by an API caller.
   private static boolean isSchedulable(Job job) {
-    Job.JOB_STATE state = job.getState();
-    if (state == Job.JOB_STATE.CREATED || state == Job.JOB_STATE.SCHEDULED) {
-      return true;
-    }
-    if (state != Job.JOB_STATE.STOPPED) {
-      return false;
-    }
-    JobStats stats = job.getJobStats();
-    return stats.getCompletionPercentage() == 0
-      && stats.getSourceObjectsBeingProcessed() == 0
-      && stats.getSourceObjectsProcessed() == 0
-      && stats.getSourceObjectsWithErrors() == 0;
+    return job.getState() == Job.JOB_STATE.SCHEDULED;
   }
 
   public Job scheduleJob(String jobId, String cronExpression)
