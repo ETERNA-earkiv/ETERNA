@@ -89,6 +89,7 @@ public class CatalogTreePanel extends Composite {
   private boolean rootsLoaded = false;
   private boolean rootsLoading = false;
   private int loadGeneration = 0;
+  private int revealGeneration = 0;
   private String pendingRevealAipId = null;
 
   public CatalogTreePanel() {
@@ -224,7 +225,7 @@ public class CatalogTreePanel extends Composite {
       new Filter(new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file")),
       false)
       .withSorter(new Sorter(new SortParameter(RodaConstants.AIP_TITLE_SORT, false)))
-      .withSublist(new Sublist(0, 200))
+      .withSublist(new Sublist(0, TREE_MAX_CHILDREN))
       .build();
 
     Services service = new Services(messages.catalogTreeReasonListRoots(), "get");
@@ -329,7 +330,7 @@ public class CatalogTreePanel extends Composite {
       new Filter(new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file")),
       false)
       .withSorter(new Sorter(new SortParameter(RodaConstants.AIP_TITLE_SORT, false)))
-      .withSublist(new Sublist(0, 200))
+      .withSublist(new Sublist(0, TREE_MAX_CHILDREN))
       .build();
 
     Services service = new Services(messages.catalogTreeReasonListRoots(), "get");
@@ -351,8 +352,8 @@ public class CatalogTreePanel extends Composite {
           rootsLoaded = true;
           return;
         }
-        if (aips.size() == 200) {
-          LOGGER.warn("Fallback ghost tree capped at 200 AIPs; some accessible objects may not be shown");
+        if (aips.size() == TREE_MAX_CHILDREN) {
+          LOGGER.warn("Fallback ghost tree capped at " + TREE_MAX_CHILDREN + " AIPs; some accessible objects may not be shown");
         }
 
         // Bygg resolvedAncestors: börja med alla tillgängliga AIP:er
@@ -479,12 +480,14 @@ public class CatalogTreePanel extends Composite {
   }
 
   private void doRevealAip(String aipId) {
+    final int myRevealGen = ++revealGeneration;
     // Hämta AIP:et för att få Solr-fältets förfäder-ID:n (fullständig kedja, inklusive otillgängliga)
     Services service = new Services(messages.catalogTreeReasonGetAncestors(), "get");
     service.rodaEntityRestService(
       s -> s.findByUuid(aipId, LocaleInfo.getCurrentLocale().getLocaleName()),
       IndexedAIP.class)
       .whenComplete((aip, error) -> {
+        if (myRevealGen != revealGeneration) return;
         if (error != null) {
           LOGGER.warn("Could not fetch AIP " + aipId + " for tree sync, skipping");
           return;

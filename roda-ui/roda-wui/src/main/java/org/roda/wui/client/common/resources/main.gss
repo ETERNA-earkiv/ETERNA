@@ -3571,7 +3571,7 @@ body.catalogTreeResizing * {
 
 .catalogTreeNode.ghost {
     cursor: default;
-    color: #aaaaaa;
+    color: COLOR_GREY_DARK;
     font-style: italic;
 }
 
@@ -3580,7 +3580,7 @@ body.catalogTreeResizing * {
 }
 
 .catalogTreeNode.ghost .catalogTreeIcon {
-    color: #cccccc;
+    color: COLOR_GREY_MEDIUM;
 }
 
 .browseSidePanel .actionable-menu {
