@@ -45,6 +45,7 @@ import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.ExportSearchDialog;
 import org.roda.wui.client.common.lists.pagination.ListSelectionState;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
@@ -59,7 +60,6 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.MyCellTableResources;
-import org.roda.wui.common.client.widgets.Toast;
 import org.roda.wui.common.client.widgets.wcag.AccessibleCellTable;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 import org.roda.wui.common.client.widgets.wcag.AccessibleSimplePager;
@@ -423,10 +423,17 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
             if (throwable != null) {
               AsyncCallbackUtils.defaultFailureTreatment(throwable);
             } else {
-              Toast.showInfo(messages.exportListTitle(), messages.exportListMessage(limit.getResult().intValue()));
-              RestUtils.requestCSVExport(getClassToReturn(), getFilter(), dataProvider.getSorter(),
-                new Sublist(0, limit.getResult().intValue()), getFacets(), getJustActive(), false,
-                notNullSummary + ".csv");
+              final int exportLimit = limit.getResult().intValue();
+              Dialogs.showInformationDialog(messages.exportListTitle(),
+                messages.exportListMessage(exportLimit), messages.dialogOk(), false,
+                new NoAsyncCallback<Void>() {
+                  @Override
+                  public void onSuccess(Void result) {
+                    RestUtils.requestCSVExport(getClassToReturn(), getFilter(), dataProvider.getSorter(),
+                      new Sublist(0, exportLimit), getFacets(), getJustActive(), false,
+                      notNullSummary + ".csv");
+                  }
+                });
             }
           });
       }

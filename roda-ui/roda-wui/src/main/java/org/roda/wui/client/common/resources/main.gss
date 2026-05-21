@@ -5191,6 +5191,37 @@ body.catalogTreeResizing * {
     margin-bottom: 10px;
 }
 
+.export-search-dialog {
+    padding: 10px;
+    min-width: 400px;
+    max-width: 700px;
+}
+
+.export-search-dialog-hitcount {
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
+.export-search-dialog-fields-label {
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+.export-search-dialog-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 16px;
+}
+
+.export-search-dialog .wui-dialog-layout-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    padding-top: 8px;
+}
+
 .pull-right {
     float: right;
 }

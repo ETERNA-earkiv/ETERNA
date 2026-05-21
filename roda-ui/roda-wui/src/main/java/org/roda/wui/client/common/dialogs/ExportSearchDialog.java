@@ -19,7 +19,6 @@ import org.roda.core.data.v2.jobs.CreateJobRequest;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.ConfigurationManager;
-import org.roda.wui.common.client.widgets.Toast;
 
 import com.github.nmorel.gwtjackson.client.ObjectMapper;
 import com.google.gwt.core.client.GWT;
@@ -107,18 +106,18 @@ public class ExportSearchDialog {
 
     // Buttons panel
     FlowPanel buttonsPanel = new FlowPanel();
-    buttonsPanel.addStyleName("export-search-dialog-buttons");
+    buttonsPanel.addStyleName("wui-dialog-layout-footer");
+
+    Button cancelButton = new Button(messages.dialogCancel());
+    cancelButton.addStyleName("btn btn-default btn-times-circle");
+    cancelButton.addClickHandler(event -> dialogBox.hide());
+    buttonsPanel.add(cancelButton);
 
     startButton = new Button(messages.exportSearchDialogStartButton());
-    startButton.addStyleName("btn btn-primary");
+    startButton.addStyleName("btn btn-play");
     startButton.addClickHandler(event -> onStartExport(filter, exportFilename, exportClass));
     updateStartButtonState();
     buttonsPanel.add(startButton);
-
-    Button cancelButton = new Button(messages.dialogCancel());
-    cancelButton.addStyleName("btn btn-default");
-    cancelButton.addClickHandler(event -> dialogBox.hide());
-    buttonsPanel.add(cancelButton);
 
     content.add(buttonsPanel);
     dialogBox.setWidget(content);
@@ -178,8 +177,9 @@ public class ExportSearchDialog {
       if (throwable != null) {
         AsyncCallbackUtils.defaultFailureTreatment(throwable);
       } else {
-        Toast.showInfo(messages.exportListTitle(), messages.exportSearchJobStarted());
         dialogBox.hide();
+        Dialogs.showInformationDialog(messages.exportListTitle(), messages.exportSearchJobStarted(),
+          messages.dialogOk(), false);
       }
     });
   }

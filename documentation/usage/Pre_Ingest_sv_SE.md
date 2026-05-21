@@ -30,7 +30,7 @@ Informationen paketeras till E-ARK CSIP utifrån information som framkommit unde
 
 SIP:ar kan överföras till ETERNA på flera sätt. Val av metod ska vara överenskommen i förväg. Överföring kan göras via webbgränssnitt, via SFTP eller via API:er.
 
-När SIP:arna har överförts väljer arkivarien, eller ansvarig funktion, vilka paket som ska levereras in. ETERNA kontrollerar SIP:arna, kvalitetssäkrar innehållet, skapar AIP:ar och uppdaterar katalog, lagring och datahantering.
+När SIP:arna har överförts väljer arkivarien, eller ansvarig funktion, vilka paket som ska levereras in. ETERNA kontrollerar SIP:arna, kvalitetssäkrar innehållet, skapar AIP:ar och uppdaterar arkivbeståndet, lagring och datahantering.
 
 ### Fas 4: Arkivera
 
