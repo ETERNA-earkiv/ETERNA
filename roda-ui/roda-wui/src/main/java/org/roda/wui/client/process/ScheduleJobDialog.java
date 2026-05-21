@@ -118,11 +118,9 @@ public class ScheduleJobDialog extends DialogBox {
       monthRef.setMonth(m - 1);
       monthList.addItem(monthFmt.format(monthRef), String.valueOf(m));
     }
-    for (int d = 1; d <= 31; d++) {
-      onceDayList.addItem(String.valueOf(d), String.valueOf(d));
-    }
     monthList.setSelectedIndex(currentMonth - 1);
-    onceDayList.setSelectedIndex(currentDay - 1);
+    repopulateOnceDayList();
+    onceDayList.setSelectedIndex(Math.min(currentDay, onceDayList.getItemCount()) - 1);
     yearList.getElement().getStyle().setWidth(70, Style.Unit.PX);
     monthList.getElement().getStyle().setWidth(60, Style.Unit.PX);
     onceDayList.getElement().getStyle().setWidth(55, Style.Unit.PX);
@@ -229,13 +227,21 @@ public class ScheduleJobDialog extends DialogBox {
         refreshPreview();
       }
     };
+    ChangeHandler dateChangeHandler = new ChangeHandler() {
+      @Override
+      public void onChange(ChangeEvent event) {
+        repopulateOnceDayList();
+        updateVisibility();
+        refreshPreview();
+      }
+    };
     frequencyList.addChangeHandler(updateHandler);
     hourList.addChangeHandler(updateHandler);
     minuteList.addChangeHandler(updateHandler);
     dayOfWeekList.addChangeHandler(updateHandler);
     dayOfMonthList.addChangeHandler(updateHandler);
-    yearList.addChangeHandler(updateHandler);
-    monthList.addChangeHandler(updateHandler);
+    yearList.addChangeHandler(dateChangeHandler);
+    monthList.addChangeHandler(dateChangeHandler);
     onceDayList.addChangeHandler(updateHandler);
 
     cancelButton.addClickHandler(new ClickHandler() {
@@ -283,6 +289,23 @@ public class ScheduleJobDialog extends DialogBox {
     timeRow.setVisible(freq != FREQ_HOURLY);
     dowRow.setVisible(freq == FREQ_WEEKLY);
     domRow.setVisible(freq == FREQ_MONTHLY);
+  }
+
+  @SuppressWarnings("deprecation")
+  private void repopulateOnceDayList() {
+    int year = Integer.parseInt(yearList.getSelectedValue());
+    int month = Integer.parseInt(monthList.getSelectedValue());
+    int previousDay = onceDayList.getItemCount() > 0
+      ? Integer.parseInt(onceDayList.getSelectedValue())
+      : 1;
+    // new Date(year, month, 0) returns the last day of the previous month, i.e.
+    // the day count of the month before `month` (month is 1-indexed here).
+    int daysInMonth = new Date(year - 1900, month, 0).getDate();
+    onceDayList.clear();
+    for (int d = 1; d <= daysInMonth; d++) {
+      onceDayList.addItem(String.valueOf(d), String.valueOf(d));
+    }
+    onceDayList.setSelectedIndex(Math.min(previousDay, daysInMonth) - 1);
   }
 
   @SuppressWarnings("deprecation")
