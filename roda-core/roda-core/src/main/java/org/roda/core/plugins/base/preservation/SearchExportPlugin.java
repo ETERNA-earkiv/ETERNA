@@ -262,8 +262,6 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
     try (OutputStream fileOut = Files.newOutputStream(csvFile);
       BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fileOut, StandardCharsets.UTF_8));
       CSVPrinter printer = new CSVPrinter(writer, csvFormat)) {
-      fileOut.write(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
-
       printer.printRecord(headers);
 
       Map<String, String> parentTitleCache = new HashMap<>();

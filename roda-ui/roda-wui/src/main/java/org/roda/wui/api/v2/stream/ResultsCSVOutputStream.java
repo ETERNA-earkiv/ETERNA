@@ -48,7 +48,6 @@ public class ResultsCSVOutputStream<T extends IsIndexed> extends CSVOutputStream
 
   @Override
   public void consumeOutputStream(final OutputStream out) throws IOException {
-    out.write(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
     final OutputStreamWriter writer = new OutputStreamWriter(out, StandardCharsets.UTF_8);
     CSVPrinter printer = null;
     boolean isFirst = true;
