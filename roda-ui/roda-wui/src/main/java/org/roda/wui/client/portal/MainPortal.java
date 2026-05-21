@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 /**
  *
@@ -83,7 +83,10 @@ public class MainPortal extends Composite implements EntryPoint {
     HistoryUtils.initEndpoint(true);
 
     // Remove loading image
-    RootPanel.getBodyElement().removeChild(DOM.getElementById("loading"));
+    Element loadingEl = DOM.getElementById("loading");
+    if (loadingEl != null) {
+      RootPanel.getBodyElement().removeChild(loadingEl);
+    }
     NodeList<Element> bodyChilds = RootPanel.getBodyElement().getElementsByTagName("iframe");
 
     for (int i = 0; i < bodyChilds.getLength(); i++) {

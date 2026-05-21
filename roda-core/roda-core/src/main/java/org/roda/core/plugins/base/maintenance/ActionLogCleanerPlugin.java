@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.plugins.base.maintenance;
 
@@ -44,9 +44,11 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
 
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS,
-      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS,
-        "Delete older than X days", PluginParameterType.INTEGER).withDefaultValue("90").isMandatory(false)
-        .isReadOnly(false).withDescription("The plugin will delete all logs older than the specified number of days.")
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS, "Radera äldre än X dagar",
+          PluginParameterType.INTEGER)
+        .withDefaultValue("90").isMandatory(false).isReadOnly(false)
+        .withDescription("Insticksprogrammet raderar alla loggposter som är äldre än det angivna antalet dagar.")
         .build());
   }
 
@@ -64,7 +66,7 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getName() {
-    return "Audit Log Truncator";
+    return "Granskningsloggsrensare";
   }
 
   @Override
@@ -74,10 +76,10 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getDescription() {
-    return "The Audit Log Truncator removes all entries in the audit log that are older than the specified number of"
-      + " days. The log is preserved as external physical files, however older entries will not be displayed in the graphical user interface. "
-      + "To access older log entries, one needs access to the storage layer of the repository server.\nAudit log truncation "
-      + "automatically frees index space and improves performance of the repository as a whole.";
+    return "Granskningsloggsrensaren tar bort alla poster i granskningsloggen som är äldre än det angivna antalet"
+      + " dagar. Loggen bevaras som externa fysiska filer, men äldre poster visas inte i det grafiska gränssnittet. "
+      + "För att komma åt äldre loggposter krävs tillgång till arkivsystemets lagringslager.\nRensning av granskningsloggen "
+      + "frigör automatiskt indexutrymme och förbättrar arkivets prestanda som helhet.";
   }
 
   @Override
@@ -102,8 +104,8 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model,
-    List<LiteOptionalWithCause> entries) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> entries)
+    throws PluginException {
 
     Report report = PluginHelper.initPluginReportItem(this, Report.NO_OUTCOME_OBJECT_ID, Report.NO_SOURCE_OBJECT_ID);
     report.setPluginState(PluginState.SUCCESS);
@@ -127,8 +129,7 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }

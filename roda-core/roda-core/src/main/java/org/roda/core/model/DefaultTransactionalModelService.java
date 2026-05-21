@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.model;
 
@@ -1910,6 +1910,11 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public User updateUser(User user, SecureString password, boolean notify, boolean isHandlingEvent)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     return mainModelService.updateUser(user, password, notify, isHandlingEvent);
+  }
+
+  @Override
+  public PreservationMetadata createOrUpdateUserAgentBinary(String username) throws RODAException {
+    return mainModelService.createOrUpdateUserAgentBinary(username);
   }
 
   @Override

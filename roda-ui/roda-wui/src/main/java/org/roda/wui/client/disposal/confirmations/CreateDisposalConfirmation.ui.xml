@@ -8,7 +8,7 @@
 
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_12 content" ui:field="content">
-				<common:TitlePanel text="{messages.createDisposalConfirmationTitle}" iconClass="DisposalConfirmations" />
+				<common:TitlePanel text="{messages.createDisposalConfirmationTitle}" iconClass="DisposalConfirmations" ui:field="title" />
 				<g:FlowPanel addStyleNames="page-description" ui:field="createDisposalConfirmationDescription" />
 				<g:FlowPanel addStyleNames="disposal-confirmation-select">
 					<g:RadioButton name="disposalAction" ui:field="destroyScheduleOpt" checked="true" />

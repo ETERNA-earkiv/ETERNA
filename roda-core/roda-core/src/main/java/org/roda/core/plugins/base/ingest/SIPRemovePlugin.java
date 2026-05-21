@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.plugins.base.ingest;
 
@@ -48,7 +48,7 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
   }
 
   public static String getStaticName() {
-    return "Radera SIP från överföringsyta";
+    return "Ta bort SIP från överföringsområdet";
   }
 
   @Override
@@ -57,7 +57,7 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
   }
 
   public static String getStaticDescription() {
-    return "Raderar SIP:et från överföringsytan om inleveransprocessen lyckades.";
+    return "Tar bort SIP från överföringsområdet om inleveransprocessen lyckades.";
   }
 
   @Override
@@ -94,8 +94,8 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
 
       if (createEvent) {
         model.createRepositoryEvent(PreservationEventType.DELETION,
-          "Processen att radera ett objekt från arkivet", PluginState.SUCCESS,
-          "Den överförda resursen " + transferredResource.getId() + " har raderats.", "", job.getUsername(),
+          "The process of deleting an object of the repository", PluginState.SUCCESS,
+          "The transferred resource " + transferredResource.getId() + " has been deleted.", "", job.getUsername(),
           true, null);
       }
 
@@ -103,8 +103,8 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
     } catch (RuntimeException | GenericException | AuthorizationDeniedException e) {
       if (createEvent) {
         model.createRepositoryEvent(PreservationEventType.DELETION,
-          "Processen att radera ett objekt från arkivet", PluginState.SUCCESS,
-          "Den överförda resursen " + transferredResource.getId() + " har inte raderats.", "", job.getUsername(),
+          "The process of deleting an object of the repository", PluginState.SUCCESS,
+          "The transferred resource " + transferredResource.getId() + " has not been deleted.", "", job.getUsername(),
           true, null);
       }
 
@@ -139,17 +139,17 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Raderade SIP från överföringsytan.";
+    return "Deleted SIP from the transfer area.";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Det ursprungliga SIP:et har raderats från överföringsytan.";
+    return "The original SIP has been deleted from the transfer area.";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Misslyckades med att radera det ursprungliga SIP:et från överföringsytan.";
+    return "Failed to delete the original SIP from the transfer area.";
   }
 
   @Override

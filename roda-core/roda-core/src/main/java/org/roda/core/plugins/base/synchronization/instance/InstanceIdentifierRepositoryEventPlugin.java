@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.plugins.base.synchronization.instance;
 
@@ -61,10 +61,10 @@ public class InstanceIdentifierRepositoryEventPlugin extends AbstractPlugin<Void
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, "Instance Identifier",
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, "Instansidentifierare",
           PluginParameter.PluginParameterType.STRING)
         .withDefaultValue(RODAInstanceUtils.retrieveLocalInstanceIdentifierToPlugin()).isReadOnly(true)
-        .withDescription("Identifier from the RODA local instance").build());
+        .withDescription("Identifierare från den lokala RODA-instansen").build());
   }
 
   private String instanceId;
@@ -75,7 +75,7 @@ public class InstanceIdentifierRepositoryEventPlugin extends AbstractPlugin<Void
   }
 
   public static String getStaticName() {
-    return "Instance identifier repository preservation events";
+    return "Instansidentifierare för arkivets bevarandehändelser";
   }
 
   @Override
@@ -84,11 +84,11 @@ public class InstanceIdentifierRepositoryEventPlugin extends AbstractPlugin<Void
   }
 
   public static String getStaticDescription() {
-    return "Add the instance identifier on the data that exists on the storage as also on the index. "
-      + "If an object already has an instance identifier it will be updated by the new one. "
-      + "This task aims to help the synchronization between a RODA central instance and the RODA local instance, "
-      + "since when an local object is accessed in RODA Central it should have the instance identifier in order to "
-      + "inform from which source is it from.";
+    return "Lägger till instansidentifieraren på data i lagringen och i indexet. "
+      + "Om ett objekt redan har en instansidentifierare uppdateras den med den nya. "
+      + "Denna uppgift syftar till att underlätta synkroniseringen mellan en central RODA-instans och en lokal RODA-instans, "
+      + "eftersom ett lokalt objekt som nås i RODA Central ska ha instansidentifieraren för att "
+      + "ange varifrån det härstammar.";
   }
 
   @Override
@@ -118,17 +118,17 @@ public class InstanceIdentifierRepositoryEventPlugin extends AbstractPlugin<Void
 
   @Override
   public String getPreservationEventDescription() {
-    return "Updated the repository preservation events instance identifier";
+    return "Uppdaterade instansidentifieraren för arkivets bevarandehändelser";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "The repository preservation event instance identifier was updated successfully";
+    return "Instansidentifieraren för arkivets bevarandehändelse uppdaterades.";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Could not update the repository preservation event instance identifier";
+    return "Kunde inte uppdatera instansidentifieraren för arkivets bevarandehändelse.";
   }
 
   @Override
@@ -221,13 +221,13 @@ public class InstanceIdentifierRepositoryEventPlugin extends AbstractPlugin<Void
     StringBuilder details = new StringBuilder();
     if (countFail > 0) {
       pluginState = PluginState.FAILURE;
-      details.append("Updated the instance identifier on ").append(countSuccess).append(" Skipped ")
+      details.append("Uppdaterade instansidentifieraren på ").append(countSuccess).append(" Skipped ")
         .append(countSkipped).append(" Repository preservation events, ")
         .append("Repository Preservation event and failed to update ").append(countFail).append(".\n")
         .append(LocalInstanceRegisterUtils.getDetailsFromList(detailsList));
     } else if (countSuccess > 0) {
       pluginState = PluginState.SUCCESS;
-      details.append("Updated the instance identifier on ").append(countSuccess).append(", Skipped ")
+      details.append("Uppdaterade instansidentifieraren på ").append(countSuccess).append(", Skipped ")
         .append(countSkipped).append(" Repository preservation events.\n ")
         .append(LocalInstanceRegisterUtils.getDetailsFromList(detailsList));
     } else {

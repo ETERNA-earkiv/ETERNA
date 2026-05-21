@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.actions;
 
@@ -41,6 +41,7 @@ import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.client.redact.PDFRedactor;
 import org.roda.wui.client.services.Services;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
@@ -243,14 +244,10 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
   }
 
   // ACTIONS
-    private void redactPdf(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
+  private void redactPdf(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     if (!FileFormatSharedUtils.hasFileFormat(file, FileFormatSharedUtils.MIMETYPE_PDF, FileFormatSharedUtils.EXTENSION_PDF)) {
-      Dialogs.showInformationDialog(
-              messages.alertErrorTitle(),
-              messages.redactPdfInvalidFormatMessage(),// or a more specific key if available
-              messages.dialogOk(),
-              false
-      );
+      Dialogs.showInformationDialog(messages.redactPdfToastTitle(),
+          messages.redactPdfOnlyPdfDialogMessage(), messages.dialogOk(), false);
       callback.onSuccess(ActionImpact.NONE);
       return;
     }
@@ -267,10 +264,10 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
     }
 
     List<String> historyItems = ListUtils.concat(
-            ListUtils.concat(Arrays.asList(aipId, representationId), path), fileId);
+        ListUtils.concat(Arrays.asList(aipId, representationId), path), fileId);
 
-    callback.onSuccess(ActionImpact.NONE);
     HistoryUtils.newHistory(PDFRedactor.RESOLVER, historyItems.toArray(new String[0]));
+    callback.onSuccess(ActionImpact.NONE);
   }
 
   private void move(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {

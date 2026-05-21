@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.actions;
 
@@ -39,6 +39,7 @@ import org.roda.core.data.v2.ip.disposalhold.DisassociateDisposalHoldRequest;
 import org.roda.core.data.v2.representation.ChangeTypeRequest;
 import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowseTop;
+import org.roda.wui.client.browse.CatalogTreePanel;
 import org.roda.wui.client.browse.CreateDescriptiveMetadata;
 import org.roda.wui.client.browse.EditPermissions;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
@@ -361,6 +362,7 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
 
     service.aipResource(s -> s.createAIP(parentAipId, aipType)).whenComplete((value, error) -> {
       if (value != null) {
+        CatalogTreePanel.getInstance().refreshSubtree(parentAipId);
         LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
         callback.onSuccess(ActionImpact.NONE);
         HistoryUtils.newHistory(CreateDescriptiveMetadata.RESOLVER, RodaConstants.RODA_OBJECT_AIP, value.getId(),
@@ -449,11 +451,14 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
 
                             @Override
                             public void onFailure(Throwable caught) {
+                              CatalogTreePanel.getInstance().refreshAfterMove(aip.getParentID(), parentId);
+                              CatalogTreePanel.getInstance().revealAip(aipId);
                               doActionCallbackNone();
                             }
 
                             @Override
                             public void onSuccess(final Void nothing) {
+                              CatalogTreePanel.getInstance().refreshAfterMove(aip.getParentID(), parentId);
                               doActionCallbackNone();
                               HistoryUtils.newHistory(ShowJob.RESOLVER, value.getId());
                             }
@@ -594,11 +599,13 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
                         @Override
                         public void onFailure(Throwable caught) {
                           Toast.showInfo(messages.removingSuccessTitle(), messages.removingSuccessMessage(1L));
+                          CatalogTreePanel.getInstance().removeNode(aip.getId(), aip.getParentID());
                           doActionCallbackDestroyed();
                         }
 
                         @Override
                         public void onSuccess(final Void nothing) {
+                          CatalogTreePanel.getInstance().removeNode(aip.getId(), aip.getParentID());
                           doActionCallbackNone();
                           HistoryUtils.newHistory(ShowJob.RESOLVER, value.getId());
                         }

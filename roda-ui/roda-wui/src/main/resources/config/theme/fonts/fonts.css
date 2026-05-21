@@ -133,3 +133,27 @@
   font-weight: 1 1000;
   src: url(../../api/v2/themes?resource-id=fonts/Material_Icons/Material_Icons_Outlined/MaterialIconsOutlined-Regular.otf) format("truetype");
 }
+
+/* === ETERNA facelift: Barlow Condensed (display) + Inter (body) === */
+@font-face {
+  font-family: 'Barlow Condensed';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(../../api/v2/themes?resource-id=fonts/BarlowCondensed/BarlowCondensed-Medium.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Barlow Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(../../api/v2/themes?resource-id=fonts/BarlowCondensed/BarlowCondensed-SemiBold.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Barlow Condensed';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(../../api/v2/themes?resource-id=fonts/BarlowCondensed/BarlowCondensed-Bold.woff2) format('woff2');
+}
+

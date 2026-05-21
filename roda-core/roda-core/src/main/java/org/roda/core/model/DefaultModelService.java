@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.model;
 
@@ -2534,6 +2534,20 @@ public class DefaultModelService implements ModelService {
     } catch (IllegalOperationException e) {
       throw new AuthorizationDeniedException("Illegal operation", e);
     }
+  }
+
+  /**
+   * Creates or updates the PREMIS user agent binary for the given username,
+   * ensuring the agent is persisted and indexed in Solr.
+   *
+   * @param username the username of the agent to create or update
+   * @return the created or updated {@link PreservationMetadata}, or null if the username is blank
+   * @throws RODAException if an error occurs during creation or update
+   */
+  @Override
+  public PreservationMetadata createOrUpdateUserAgentBinary(String username) throws RODAException {
+    return PremisV3Utils.createOrUpdatePremisUserAgentBinary(
+      username, this, RodaCoreFactory.getIndexService(), true);
   }
 
   @Override

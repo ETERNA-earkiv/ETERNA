@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.plugins.base.ingest;
 
@@ -54,7 +54,7 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
   private static final String METADATA_TYPE = "key-value";
   private static final String METADATA_VERSION = null;
   private static final String METADATA_FILE = "metadata.xml";
-  private static final String UNPACK_DESCRIPTION = "Extracted objects from package in file/folder format.";
+  private static final String UNPACK_DESCRIPTION = "Extraherade objekt från paketet i fil/mappformat.";
 
   private boolean createSubmission = false;
   private Optional<String> computedSearchScope;

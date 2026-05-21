@@ -3,9 +3,8 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
-
 /**
  *
  */
@@ -131,6 +130,10 @@ public class Header extends Composite {
    */
   public Header() {
     initWidget(uiBinder.createAndBindUi(this));
+  }
+
+  public AcessibleMenuBar getNavigationMenu() {
+    return navigationMenu;
   }
 
   public void init() {
@@ -269,52 +272,68 @@ public class Header extends Composite {
     // TODO make creating sync (not async)
 
     // Home
-    updateResolverTopItemVisibility(Welcome.RESOLVER, about, 0);
+    if (!ConfigurationManager.getBoolean(false, RodaConstants.UI_MAINMENU_HIDE_HOME)) {
+      updateResolverTopItemVisibility(Welcome.RESOLVER, about, 0);
+    }
 
     // Dissemination
-    updateResolverTopItemVisibility(BrowseTop.RESOLVER, disseminationBrowse, 1);
-    updateResolverTopItemVisibility(Search.RESOLVER, disseminationSearchBasic, 2);
+    if (!ConfigurationManager.getBoolean(false, RodaConstants.UI_MAINMENU_HIDE_BROWSE)) {
+      updateResolverTopItemVisibility(BrowseTop.RESOLVER, disseminationBrowse, 1);
+    }
+    if (!ConfigurationManager.getBoolean(false, RodaConstants.UI_MAINMENU_HIDE_SEARCH)) {
+      updateResolverTopItemVisibility(Search.RESOLVER, disseminationSearchBasic, 2);
+    }
 
     // Ingest
-    updateResolverSubItemVisibility(IngestTransfer.RESOLVER, ingestTransfer);
-    updateResolverSubItemVisibility(IngestProcess.RESOLVER, ingestList);
-    updateResolverSubItemVisibility(IngestAppraisal.RESOLVER, ingestAppraisal);
+    if (!ConfigurationManager.getBoolean(false, RodaConstants.UI_MAINMENU_HIDE_INGEST)) {
+      updateResolverSubItemVisibility(IngestTransfer.RESOLVER, ingestTransfer);
+      updateResolverSubItemVisibility(IngestProcess.RESOLVER, ingestList);
+      updateResolverSubItemVisibility(IngestAppraisal.RESOLVER, ingestAppraisal);
 
-    MenuItem ingestItem = new MenuItem(messages.title("ingest"), ingestMenu);
-    ingestItem.addStyleName("ingest_menu_item");
-    updateResolverTopItemVisibility(Ingest.RESOLVER, ingestItem, 3);
+      MenuItem ingestItem = new MenuItem(messages.title("ingest"), ingestMenu);
+      ingestItem.addStyleName("ingest_menu_item");
+      updateResolverTopItemVisibility(Ingest.RESOLVER, ingestItem, 3);
+    }
 
     // Administration
-    updateResolverSubItemVisibility(ActionProcess.RESOLVER, administrationActions);
-    updateResolverSubItemVisibility(InternalProcess.RESOLVER, administrationInternalActions);
-    updateResolverSubItemVisibility(MemberManagement.RESOLVER, administrationUser);
-    updateResolverSubItemVisibility(UserLog.RESOLVER, administrationLog);
-    updateResolverSubItemVisibility(NotificationRegister.RESOLVER, administrationNotifications);
-    updateResolverSubItemVisibility(Statistics.RESOLVER, administrationStatistics);
-    MenuItem adminItem = new MenuItem(messages.title("administration"), administrationMenu);
-    adminItem.addStyleName("administration_menu_item");
-    updateResolverTopItemVisibility(Management.RESOLVER, adminItem, 4);
+    if (!ConfigurationManager.getBoolean(false, RodaConstants.UI_MAINMENU_HIDE_ADMINISTRATION)) {
+      updateResolverSubItemVisibility(ActionProcess.RESOLVER, administrationActions);
+      updateResolverSubItemVisibility(InternalProcess.RESOLVER, administrationInternalActions);
+      updateResolverSubItemVisibility(MemberManagement.RESOLVER, administrationUser);
+      updateResolverSubItemVisibility(UserLog.RESOLVER, administrationLog);
+      updateResolverSubItemVisibility(NotificationRegister.RESOLVER, administrationNotifications);
+      updateResolverSubItemVisibility(Statistics.RESOLVER, administrationStatistics);
+      MenuItem adminItem = new MenuItem(messages.title("administration"), administrationMenu);
+      adminItem.addStyleName("administration_menu_item");
+      updateResolverTopItemVisibility(Management.RESOLVER, adminItem, 4);
+    }
 
     // Disposal
-    updateResolverSubItemVisibility(DisposalPolicy.RESOLVER, disposalPolicy);
-    updateResolverSubItemVisibility(DisposalConfirmations.RESOLVER, disposalConfirmation);
-    updateResolverSubItemVisibility(DisposalDestroyedRecords.RESOLVER, disposalDestroyedRecords);
-    updateResolverSubItemVisibility(DisposalConfirmations.RESOLVER, overdueActions);
-    MenuItem disposalItem = new MenuItem(messages.title("disposal"), disposalMenu);
-    disposalItem.addStyleName("disposal_menu_item");
-    updateResolverTopItemVisibility(Disposal.RESOLVER, disposalItem, 5);
+    if (!ConfigurationManager.getBoolean(false, RodaConstants.UI_MAINMENU_HIDE_DISPOSAL)) {
+      updateResolverSubItemVisibility(DisposalPolicy.RESOLVER, disposalPolicy);
+      updateResolverSubItemVisibility(DisposalConfirmations.RESOLVER, disposalConfirmation);
+      updateResolverSubItemVisibility(DisposalDestroyedRecords.RESOLVER, disposalDestroyedRecords);
+      updateResolverSubItemVisibility(DisposalConfirmations.RESOLVER, overdueActions);
+      MenuItem disposalItem = new MenuItem(messages.title("disposal"), disposalMenu);
+      disposalItem.addStyleName("disposal_menu_item");
+      updateResolverTopItemVisibility(Disposal.RESOLVER, disposalItem, 5);
+    }
 
     // Planning
-    updateResolverSubItemVisibility(RiskRegister.RESOLVER, planningRisk);
-    updateResolverSubItemVisibility(RepresentationInformationNetwork.RESOLVER, planningRepresentationInformation);
-    updateResolverSubItemVisibility(PreservationEvents.PLANNING_RESOLVER, planningEvent);
-    updateResolverSubItemVisibility(PreservationAgents.RESOLVER, planningAgent);
-    MenuItem planningItem = new MenuItem(messages.title("planning"), planningMenu);
-    planningItem.addStyleName("planning_menu_item");
-    updateResolverTopItemVisibility(Planning.RESOLVER, planningItem, 6);
+    if (!ConfigurationManager.getBoolean(false, RodaConstants.UI_MAINMENU_HIDE_PLANNING)) {
+      updateResolverSubItemVisibility(RiskRegister.RESOLVER, planningRisk);
+      updateResolverSubItemVisibility(RepresentationInformationNetwork.RESOLVER, planningRepresentationInformation);
+      updateResolverSubItemVisibility(PreservationEvents.PLANNING_RESOLVER, planningEvent);
+      updateResolverSubItemVisibility(PreservationAgents.RESOLVER, planningAgent);
+      MenuItem planningItem = new MenuItem(messages.title("planning"), planningMenu);
+      planningItem.addStyleName("planning_menu_item");
+      updateResolverTopItemVisibility(Planning.RESOLVER, planningItem, 6);
+    }
 
     // Help
-    updateResolverTopItemVisibility(Help.RESOLVER, help, 7);
+    if (!ConfigurationManager.getBoolean(false, RodaConstants.UI_MAINMENU_HIDE_HELP)) {
+      updateResolverTopItemVisibility(Help.RESOLVER, help, 7);
+    }
   }
 
   private MenuItem customMenuItem(String icon, String label, String styleNames, MenuBar subMenu,

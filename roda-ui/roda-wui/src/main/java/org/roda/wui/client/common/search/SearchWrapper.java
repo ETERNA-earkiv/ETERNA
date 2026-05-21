@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.search;
 
@@ -159,6 +159,18 @@ public class SearchWrapper extends Composite {
 
   public boolean changeDropdownSelectedValue(String objectClassSimpleName) {
     return searchPanelSelectionDropdown.setSelectedValue(objectClassSimpleName, true);
+  }
+
+  public void setQuery(String query) {
+    String currentClass = searchPanelSelectionDropdown != null
+      ? searchPanelSelectionDropdown.getSelectedValue()
+      : listClassForSingleSearchPanel;
+    if (currentClass != null) {
+      SearchPanel<?> searchPanel = components.getSearchPanel(currentClass);
+      if (searchPanel != null) {
+        searchPanel.setQuery(query);
+      }
+    }
   }
 
   public void refreshAllLists() {

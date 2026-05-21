@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.plugins.base.maintenance.reindex;
 
@@ -54,15 +54,13 @@ public class ReindexTransferredResourcePlugin extends AbstractPlugin<Void> {
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Clear indexes", PluginParameterType.BOOLEAN)
-        .withDefaultValue("false").isMandatory(false).withDescription("Clear all indexes before reindexing them.")
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Rensa index", PluginParameterType.BOOLEAN)
+        .withDefaultValue("false").isMandatory(false).withDescription("Rensar alla index innan återindexering.")
         .build());
 
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES,
-      PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES, "Optimize indexes", PluginParameterType.BOOLEAN)
-        .withDefaultValue("true").isMandatory(false).withDescription("Optimize indexes after reindexing them.")
-        .build());
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES, PluginParameter
+      .getBuilder(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES, "Optimera index", PluginParameterType.BOOLEAN)
+      .withDefaultValue("true").isMandatory(false).withDescription("Optimerar index efter återindexering.").build());
   }
 
   @Override
@@ -77,14 +75,14 @@ public class ReindexTransferredResourcePlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getName() {
-    return "Rebuild transferred resource index";
+    return "Återindexera index för överfört material";
   }
 
   @Override
   public String getDescription() {
-    return "Clears the index and recreates it from actual physical data that exists on the storage. This task aims to fix inconsistencies between what is "
-      + "shown in the graphical user interface of the repository and what is actually kept at the storage layer. Such inconsistencies may occur for "
-      + "various reasons, e.g. index corruption, ungraceful shutdown of the repository, etc.";
+    return "Återskapar indexet från faktisk fysisk data som finns i lagringen. Indexet kan rensas innan återindexeringen startar om alternativet 'Rensa index' är aktiverat. "
+      + "Denna uppgift syftar till att åtgärda inkonsekvenser mellan vad som visas i arkivets grafiska gränssnitt och vad som faktiskt finns i lagringsskiktet. "
+      + "Sådana inkonsekvenser kan uppstå av olika anledningar, t.ex. indexkorruption, ovarsam avstängning av arkivet, etc.";
   }
 
   @Override
@@ -114,8 +112,8 @@ public class ReindexTransferredResourcePlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model,
-    List<LiteOptionalWithCause> list) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> list)
+    throws PluginException {
     return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
       @Override
       public void process(IndexService index, ModelService model, Report report, Job cachedJob,
@@ -143,8 +141,7 @@ public class ReindexTransferredResourcePlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
 
     try {
       resourceCounter = index.count(TransferredResource.class, Filter.ALL).intValue();

@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 /**
  *
@@ -54,6 +54,8 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
+import org.roda.wui.client.common.TitlePanel;
+import com.google.gwt.user.client.ui.Anchor;
 
 /**
  * @author Luis Faria
@@ -122,6 +124,8 @@ public class PreservationEvents extends Composite {
   @UiField
   FlowPanel pageDescription;
   @UiField
+  TitlePanel title;
+  @UiField
   NavigationToolbarLegacy navigationToolbar;
   private String aipId;
   private String representationUUID;
@@ -161,6 +165,13 @@ public class PreservationEvents extends Composite {
     }
 
     pageDescription.add(new HTMLWidgetWrapper("PreservationEventsDescription.html"));
+    pageDescription.setVisible(false);
+    Anchor infoIconTitle = new Anchor();
+    infoIconTitle.getElement().setInnerHTML("<i class=\"fa fa-info-circle\"></i>");
+    infoIconTitle.addStyleName("description-toggle-icon");
+    infoIconTitle.setTitle("Klicka för att fälla ut hjälpen");
+    infoIconTitle.addClickHandler(event -> pageDescription.setVisible(!pageDescription.isVisible()));
+    title.add(infoIconTitle);
   }
 
   /**

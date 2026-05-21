@@ -8,7 +8,7 @@
 	<g:FlowPanel styleName="wui-job-list" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_12 content" ui:field="contentFlowPanel">
-				<common:TitlePanel text="{messages.preservationActionsTitle}" iconClass="Job" />
+				<common:TitlePanel text="{messages.preservationActionsTitle}" iconClass="Job" ui:field="title" />
 				<g:FlowPanel addStyleNames="page-description" ui:field="preservationProcessDescription" />
 				<search:JobSearch ui:field="jobSearch" />
 			</g:FlowPanel>

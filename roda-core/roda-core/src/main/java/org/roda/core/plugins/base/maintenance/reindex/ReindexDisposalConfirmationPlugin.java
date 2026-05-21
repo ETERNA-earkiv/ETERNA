@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.plugins.base.maintenance.reindex;
 
@@ -20,7 +20,7 @@ public class ReindexDisposalConfirmationPlugin extends ReindexRodaEntityPlugin<D
 
   @Override
   public String getName() {
-    return "Rebuild disposal confirmation index";
+    return "Återindexera gallringsbekräftelseindex";
   }
 
   @Override

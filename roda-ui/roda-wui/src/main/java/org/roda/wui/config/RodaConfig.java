@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.config;
 
@@ -12,6 +12,7 @@ import jakarta.servlet.ServletException;
 import org.apereo.cas.client.session.SingleSignOutHttpSessionListener;
 import org.roda.wui.filter.OnOffFilter;
 import org.roda.wui.filter.SecurityHeadersFilter;
+import org.roda.wui.filter.StaticCacheFilter;
 import org.roda.wui.servlets.ContextListener;
 import org.roda.wui.servlets.RodaWuiServlet;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -177,6 +178,15 @@ public class RodaConfig {
 
     registrationBean.addUrlPatterns("/login", "/logout");
 
+    return registrationBean;
+  }
+
+  @Bean
+  public FilterRegistrationBean<StaticCacheFilter> staticCacheFilter() {
+    FilterRegistrationBean<StaticCacheFilter> registrationBean = new FilterRegistrationBean<>();
+    registrationBean.setFilter(new StaticCacheFilter());
+    registrationBean.addUrlPatterns("/*");
+    registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
     return registrationBean;
   }
 

@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.index;
 
@@ -134,6 +134,14 @@ public class IndexModelObserver implements ModelObserver {
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error getting ancestors when creating AIP", e);
       ret.add(e);
+    }
+    if (ret.isEmpty()) {
+      try {
+        SolrUtils.commit(index, IndexedAIP.class);
+      } catch (GenericException e) {
+        LOGGER.error("Error committing Solr after AIP creation", e);
+        ret.add(e);
+      }
     }
 
     return ret;
@@ -781,6 +789,15 @@ public class IndexModelObserver implements ModelObserver {
       ret.add(e);
     }
 
+    if (ret.isEmpty()) {
+      try {
+        SolrUtils.commit(index, IndexedAIP.class);
+      } catch (GenericException e) {
+        LOGGER.error("Error committing Solr after AIP move", e);
+        ret.add(e);
+      }
+    }
+
     return ret;
   }
 
@@ -830,13 +847,22 @@ public class IndexModelObserver implements ModelObserver {
     	String parentAipId = model.retrieveAIP(aipId).getParentId();
         if (ret.getExceptions().isEmpty() && parentAipId != null) {
         	UpdateOriginalMETS.handleParentWhenRemovedAIP(model, aipId, parentAipId);
-        }  	
+        }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException | IOException | IPException | JAXBException | SAXException e) {
         LOGGER.error("Failed to updating parentAIP when removing AIP", e);
-        
-        ret.add(e);	
+
+        ret.add(e);
     }
-    
+
+    if (ret.isEmpty()) {
+      try {
+        SolrUtils.commit(index, IndexedAIP.class);
+      } catch (GenericException e) {
+        LOGGER.error("Error committing Solr after AIP deletion", e);
+        ret.add(e);
+      }
+    }
+
     return ret;
   }
 
@@ -859,6 +885,9 @@ public class IndexModelObserver implements ModelObserver {
         Representation representation = model.retrieveRepresentation(descriptiveMetadata.getAipId(),
           descriptiveMetadata.getRepresentationId());
         indexRepresentation(aip, representation, ancestors).addTo(ret);
+      }
+      if (ret.isEmpty()) {
+        SolrUtils.commit(index, descriptiveMetadata.isFromAIP() ? IndexedAIP.class : IndexedRepresentation.class);
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Failed to index AIP or representation when creating descriptive metadata", e);
@@ -887,6 +916,9 @@ public class IndexModelObserver implements ModelObserver {
         Representation representation = model.retrieveRepresentation(descriptiveMetadata.getAipId(),
           descriptiveMetadata.getRepresentationId());
         indexRepresentation(aip, representation, ancestors).addTo(ret);
+      }
+      if (ret.isEmpty()) {
+        SolrUtils.commit(index, descriptiveMetadata.isFromAIP() ? IndexedAIP.class : IndexedRepresentation.class);
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Failed to index AIP or representation when updating descriptive metadata", e);
@@ -998,7 +1030,21 @@ public class IndexModelObserver implements ModelObserver {
     try {
       AIP aip = model.retrieveAIP(file.getAipId());
       List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
-      indexFile(aip, file, ancestors, true).addTo(ret);
+      Long size = indexFile(aip, file, ancestors, true).addTo(ret).getReturnedObject();
+
+      // ret.isEmpty() = no exceptions from indexFile; do not update stats on partial failure
+      if (ret.isEmpty() && size != null) {
+        String repUUID = IdUtils.getRepresentationId(file.getAipId(), file.getRepresentationId());
+        Map<String, Long> increments = new HashMap<>();
+        if (file.isDirectory()) {
+          increments.put(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FOLDERS, 1L);
+        } else {
+          increments.put(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES, 1L);
+        }
+        increments.put(RodaConstants.REPRESENTATION_SIZE_IN_BYTES, size);
+        SolrUtils.atomicIncrement(index, IndexedRepresentation.class, repUUID, increments, (ModelObserver) this)
+          .addTo(ret);
+      }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error indexing file: {}", file, e);
       ret.add(e);
@@ -1021,7 +1067,34 @@ public class IndexModelObserver implements ModelObserver {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
     String uuid = IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId);
+
+    // Read file metadata before deletion to update representation counters
+    IndexedFile indexedFile = null;
+    try {
+      List<String> fields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.FILE_SIZE,
+        RodaConstants.FILE_ISDIRECTORY);
+      indexedFile = SolrUtils.retrieve(index, IndexedFile.class, uuid, fields);
+    } catch (NotFoundException e) {
+      LOGGER.warn("File not found in index before deletion, representation stats will not be updated: {}", uuid);
+    } catch (GenericException e) {
+      LOGGER.error("Error retrieving file from index before deletion: {}", uuid, e);
+      ret.add(e);
+    }
+
     deleteDocumentFromIndex(IndexedFile.class, uuid).addTo(ret);
+
+    if (indexedFile != null) {
+      String repUUID = IdUtils.getRepresentationId(aipId, representationId);
+      Map<String, Long> decrements = new HashMap<>();
+      if (indexedFile.isDirectory()) {
+        decrements.put(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FOLDERS, -1L);
+      } else {
+        decrements.put(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES, -1L);
+      }
+      decrements.put(RodaConstants.REPRESENTATION_SIZE_IN_BYTES, -indexedFile.getSize());
+      SolrUtils.atomicIncrement(index, IndexedRepresentation.class, repUUID, decrements, (ModelObserver) this)
+        .addTo(ret);
+    }
 
     if (deleteIncidences) {
       deleteDocumentsFromIndex(RiskIncidence.class, RodaConstants.RISK_INCIDENCE_FILE_ID, fileId).addTo(ret);

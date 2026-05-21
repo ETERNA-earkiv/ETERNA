@@ -1,9 +1,18 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/ETERNA-earkiv/ETERNA
+ */
 package org.roda.wui.client.redact;
 
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -12,7 +21,10 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import config.i18n.client.ClientMessages;
 import org.roda.core.data.v2.index.IndexedRepresentationRequest;
+import org.roda.core.data.v2.ip.redaction.SaveRedactionRequest;
 import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.widgets.Toast;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 import elemental2.dom.AbortSignal;
@@ -47,6 +59,7 @@ import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -97,6 +110,21 @@ public class PDFRedactor extends Composite {
   }
 
   private static final Sorter findRedactedRepresentationSorter = new Sorter(new SortParameter(RodaConstants.REPRESENTATION_ID, false));
+
+  private static String generateTimestamp() {
+    DateTimeFormat fmt = DateTimeFormat.getFormat("yyyy-MM-dd'T'HH-mm");
+    return fmt.format(new Date());
+  }
+
+  private static String buildFilename(String originalId, String suffix) {
+    String effectiveSuffix = (suffix == null || suffix.isEmpty())
+        ? generateTimestamp()
+        : suffix;
+    int lastDot = originalId.lastIndexOf('.');
+    String base = (lastDot >= 0) ? originalId.substring(0, lastDot) : originalId;
+    String ext  = (lastDot >= 0) ? originalId.substring(lastDot)    : "";
+    return base + "_" + effectiveSuffix + ext;
+  }
 
   private boolean initialized;
 
@@ -175,35 +203,68 @@ public class PDFRedactor extends Composite {
   private void initPdfRedactorPanel(final String aipId, final IndexedFile file, final String downloadUrl) {
     pdfRedactorPanel.setUrl(downloadUrl);
     pdfRedactorPanel.mount();
-    pdfRedactorPanel.setSaveCallback((Blob pdfData, AbortSignal signal) ->
+
+    pdfRedactorPanel.setPreSaveCallback(() -> {
+      PromiseWrapper<Void> preSavePromise = new PromiseWrapper<>();
+      boolean mandatory = ConfigurationManager.getBoolean(true, RodaConstants.UI_REDACTION_REASON_MANDATORY);
+
+      Dialogs.showPromptDialog(messages.redactPdfReasonTitle(), null, null,
+        messages.redactPdfReasonPlaceholder(), RegExp.compile(".*"),
+        messages.cancelButton(), messages.confirmButton(), mandatory, true,
+        new AsyncCallback<String>() {
+          @Override
+          public void onFailure(Throwable caught) {
+            preSavePromise.reject(caught);
+          }
+
+          @Override
+          public void onSuccess(String details) {
+            SaveRedactionRequest request = new SaveRedactionRequest(
+              aipId, file.getRepresentationId(), file.getId(), details);
+            Services services = new Services("Log redaction save", "post");
+            services.redactionResource(s -> s.logRedactionSave(request))
+              .whenComplete((result, throwable) -> {
+                if (throwable != null) {
+                  preSavePromise.reject(throwable);
+                } else {
+                  preSavePromise.resolve(null);
+                }
+              });
+          }
+        });
+      return preSavePromise.getPromise();
+    });
+
+    pdfRedactorPanel.setSaveCallback((Blob pdfData, AbortSignal signal, String suffix) ->
       getOrCreateRedactedRepresentation(aipId).then((representation) -> {
         List<String> path = new ArrayList<>(file.getPath());
 
-        String uploadUrl = RestUtils.createFileUploadUri(aipId, representation.getId(), path, "Saved redacted version");
+        String uploadUrl = RestUtils.createFileUploadUri(aipId, representation.getId(), path, "Maskerad PDF sparad");
 
-        FormData formData = new FormData();
-        formData.append("resource", pdfData, file.getId());
+          String newFilename = buildFilename(file.getId(), suffix);
 
-        RequestInit requestInit = RequestInit.create();
-        requestInit.setMethod("POST");
-        requestInit.setBody(formData);
-        requestInit.setSignal(signal);
+          FormData formData = new FormData();
+          formData.append("resource", pdfData, newFilename);
 
-        return fetch(uploadUrl, requestInit).then(response -> {
-          if (response.ok) {
-            Toast.showInfo(messages.redactPdfToastTitle(), messages.redactPdfSaveSuccessDescription());
-            return Promise.resolve(response);
-          } else if (response.status == RodaConstants.HTTP_RESPONSE_CODE_REQUEST_CONFLICT) {
-            Toast.showError(messages.redactPdfToastTitle(), messages.fileAlreadyExists());
-            return Promise.reject(response);
-          } else {
+          RequestInit requestInit = RequestInit.create();
+          requestInit.setMethod("POST");
+          requestInit.setBody(formData);
+          requestInit.setSignal(signal);
+
+          return fetch(uploadUrl, requestInit).then(response -> {
+            if (response.ok) {
+              Toast.showInfo(messages.redactPdfToastTitle(), messages.redactPdfSaveSuccessDescription());
+              return Promise.resolve(response);
+            } else if (response.status == RodaConstants.HTTP_RESPONSE_CODE_REQUEST_CONFLICT) {
+              // Resolve (inte reject) — React visar inline-feltext vid 409, ingen Toast
+              return Promise.resolve(response);
+            } else {
+              return Promise.reject(response);
+            }
+          }).catch_(error -> {
             Toast.showError(messages.redactPdfToastTitle(), messages.redactPdfSaveErrorDescription());
-            return Promise.reject(response);
-          }
-        });
-        }).catch_(error -> {
-          Toast.showError(messages.redactPdfToastTitle(), messages.redactPdfSaveErrorDescription());
-          return Promise.reject(error);
+            return Promise.reject(error);
+          });
         })
     );
   }

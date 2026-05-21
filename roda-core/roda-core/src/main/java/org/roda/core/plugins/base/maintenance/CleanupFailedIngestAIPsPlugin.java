@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.plugins.base.maintenance;
 
@@ -59,14 +59,14 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getName() {
-    return "Remove AIP(s) whose ingest failed";
+    return "Ta bort AIP(er) vars ingest misslyckades";
   }
 
   @Override
   public String getDescription() {
-    return "Permanently removes AIP(s) from the repository whose ingest failed (state="
+    return "Tar permanent bort AIP(er) från arkivet vars ingest misslyckades (status="
       + AIPState.INGEST_PROCESSING.toString()
-      + "). Data, metadata and event history will be deleted permanently. WARNING: This operation cannot be undone. Use with extreme caution.";
+      + "). Data, metadata och händelsehistorik raderas permanent. VARNING: Denna åtgärd kan inte ångras. Använd med yttersta försiktighet.";
   }
 
   @Override

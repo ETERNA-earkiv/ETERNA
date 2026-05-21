@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.plugins;
 
@@ -1269,14 +1269,22 @@ public final class PluginHelper {
         throw new RequestNotValidException(
           "Could not get LITE for agent with ID: " + linkingIdentifierAgent.getValue());
       }
-      if (!model.existsInStorage(agentLite.get())) {
-        PreservationMetadata pm = PremisV3Utils.createOrUpdatePremisUserAgentBinary(agentName, model, index, true,
-          jobUserDetails);
-        if (pm != null) {
-          agentIds.add(linkingIdentifierAgent);
-        }
-      } else {
+      PreservationMetadata pm = PremisV3Utils.createOrUpdatePremisUserAgentBinary(agentName, model, index, true,
+        jobUserDetails);
+      if (pm != null) {
         agentIds.add(linkingIdentifierAgent);
+      } else {
+        try {
+          index.retrieve(IndexedPreservationAgent.class, linkingIdentifierAgent.getValue(), Collections.emptyList());
+          LOGGER.warn("PREMIS agent binary could not be created/updated (blank agent name?) but exists in index: {}",
+            linkingIdentifierAgent.getValue());
+          agentIds.add(linkingIdentifierAgent);
+        } catch (NotFoundException e) {
+          LOGGER.warn("PREMIS agent binary could not be created and does not exist in index: {}",
+            linkingIdentifierAgent.getValue());
+        } catch (GenericException e) {
+          LOGGER.warn("Could not check Solr index for PREMIS agent: {}", linkingIdentifierAgent.getValue(), e);
+        }
       }
     } catch (AlreadyExistsException e) {
       agentIds.add(linkingIdentifierAgent);

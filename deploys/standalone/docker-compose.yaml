@@ -73,16 +73,32 @@ services:
     volumes:
       - ./ldap/ldif/pbkdf2.ldif:/opt/bitnami/openldap/etc/schema/pbkdf2.ldif
 
+  unoserver:
+    image: ghcr.io/eterna-earkiv/eterna-unoserver:latest
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 2003 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
   eterna:
     image: ghcr.io/eterna-earkiv/eterna:test-eterna-v1-alpha-latest
     restart: unless-stopped
     ports:
       - "8080:8080"
     depends_on:
-      - solr
-      - clamd
-      - siegfried
-      - postgres
+      solr:
+        condition: service_started
+      clamd:
+        condition: service_started
+      siegfried:
+        condition: service_started
+      postgres:
+        condition: service_started
+      unoserver:
+        condition: service_healthy
     volumes:
       - roda_data:/roda/data/
       - ./roda/config/roda-core.properties:/roda/config/roda-core.properties:ro
@@ -102,6 +118,8 @@ services:
       # SMTP configuration
       - SMTP_HOST=mailpit
       - SMTP_PORT=1025
+      - UNOSERVER_HOST=unoserver
+      - UNOSERVER_PORT=2003
 
   postgres:
     image: docker.io/postgres:17

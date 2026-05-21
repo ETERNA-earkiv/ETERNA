@@ -1,48 +1,45 @@
-#  Leveransförberedelse
+# Inleverans till ETERNA
 
-Processen för leveransförberedelse åskådliggör möjligheten att skapa Submission Information Packages (SIP) som innehåller data och metadata (i en tydligt definierad struktur) för att kunna överlämna dem till systemet för inleverans. SIP:arna som skapas förväntas följa policys som är fastställda av eller överenskomna med systemet. 
+Vid inleverans till ETERNA rekommenderas att leveransprocessen utgår från WhiteReds tolkning av PAIMAS, en internationell metodstandard som beskriver samarbetet mellan arkivbildare och arkiv inför en digital leverans. Processen används för att stegvis identifiera, specificera, paketera, överföra och kontrollera information som ska bevaras.
 
-Leveransförberedelserna omfattar vanligtvis följande aktiviteter:
+I ETERNA sker inleveransen genom att information och metadata paketeras i ett eller flera Submission Information Packages (SIP). SIP:arna ska följa de krav som tas fram under leveransprocessens första faser och paketeras enligt E-ARK CSIP. Efter överföring tas materialet emot, kontrolleras och omvandlas till Archival Information Packages (AIP) för långsiktigt bevarande.
 
-## Leveransöverenskommelse
+## Leveransprocessens faser
 
-Denna aktivitet består av att definiera villkoren, förutsättningar och krav för innehållet och för åtföljande information (t.ex. metadata, dokument, kontrakt etc.), som kommer att levereras till systemet av arkivbildaren. Det skapas en skriftlig överenskommelse mellan arkivbildare och systemet som specificerar typ av innehåll och juridiska- samt tekniska krav som båda parter förväntas följa.
+### Fas 0: Förbereda
 
-## Submission Information Packages (SIP)
+Klargör ansvar, roller, resurser, kostnader och förutsättningar. Ta fram underlag som dokumenthanteringsplan, gallringsbeslut, arkivstruktur, informationsvärdering och exempelexport.
 
-Denna aktivitet består av att förbereda ett eller flera Submission Information Package (SIP) enligt de tekniska och icke-tekniska krav som definierats i inlämningskontraktet. För att underlätta skapandet av SIP:ar kan verktyget RODA-in användas. 
+### Fas 1: Inventera
 
-Verktyget och dokumentation är tillgänglig på [https://rodain.roda-community.org](https://rodain.roda-community.org).
+Identifiera information, volymer, filformat, metadata, exportmöjligheter och behov av sökning samt åtkomst i ETERNA. Klargör vad som ska bevaras, gallras eller skyddas.
 
+### Fas 2: Specificera
 
-## Inleverans av material
+Bestäm vad som ska levereras och hur informationen ska struktureras i ETERNA. Definiera arkivobjekt, metadata, sökvärden, filformat, eventuell konvertering och koppling till arkivstrukturen.
 
-Aktiviteten består av överföring av Submission Information Package (SIP) från arkivbildare till systemet. SIP:arna lagras tillfälligt i karantän i väntan på att bli hanterade av systemet.
+### Fas 3: Utveckla
 
-Det finns flera sätt att överföra SIP:ar till systemet. Dessa inkluderar men är inte begränsade till följande alternativ:
+Förbered ETERNA för mottagning. Sätt upp leveranskanaler, arkivstruktur och transformering. Skapa och testa SIP-paket med exempelexport.
 
-### HTTP överföring
+#### Paketering
 
-1. Anslut till systemets webbsida och logga in med användarnamn och lösenord. 
-2. Gå till menyn Inleverans/Överföring och gå till mappen med ditt användarnamn (eller skapa en sådan mapp om den saknas)
-3. Ladda upp dina SIP:s i den nya mappen.
-4. Informera systemet om att det nu finns material som är redo att läsas in.
+Informationen paketeras till E-ARK CSIP utifrån information som framkommit under fas 2: Specificera. Verktyget Commons-ip kan användas: https://github.com/ETERNA-earkiv/commons-ip.
 
-### Överföring via FTP
+#### Överföring av SIP:ar
 
-1. Anslut till [ftp://address] och logga in med användarnamn och lösenord.
-2. Skapa en mapp för SIP:ar som ska läsas in (frivilligt)
-3. Kopiera de skapade SIP:arna till den nya mappen.
-4. Informera systemet om att det nu finns material som är redo att läsas in.
+SIP:ar kan överföras till ETERNA på flera sätt. Val av metod ska vara överenskommen i förväg. Överföring kan göras via webbgränssnitt, via SFTP eller via API:er.
 
-### Överföring från extern media
+När SIP:arna har överförts väljer arkivarien, eller ansvarig funktion, vilka paket som ska levereras in. ETERNA kontrollerar SIP:arna, kvalitetssäkrar innehållet, skapar AIP:ar och uppdaterar katalog, lagring och datahantering.
 
-1. Spara SIP:arna på externt lagringsmedia (t.ex CD, USB, etc.)
-2. Leverera till följande adress: [Repository address]
+### Fas 4: Arkivera
 
-## Inleveransprocess
+Genomför leveransen till ETERNA. SIP:arna överförs enligt överenskommen metod. Efter inläsning skapas kvittenser och rapporter.
 
-Efter överföringen kommer arkivarien att välja ut SIP:ar för inleverans. Inleveransprocessen innehåller tjänster och funktioner för att acceptera SIP:ar från producenter och förbereda innehållet för lagring.
+### Fas 5: Kontrollera
 
-Inleveransfunktioner inkluderar att ta emot SIP:ar, utföra kvalitetssäkring av SIP:ar, generera ett Archival Information Package (AIP) som överensstämmer med arkivets dataformaterings- och dokumentationsstandarder, extrahera beskrivande information från AIP:erna i arkivets katalog och koordinera uppdateringar av lagring och datahantering.
+Kontrollera kvittenser och gör vid behov stickprov i ETERNA. Säkerställ att informationen är komplett, korrekt presenterad, sökbar och följer specifikationen. Fel rapporteras och åtgärdas.
 
+Gallra därefter informationen i källsystemet.
+
+Vid engångsarkivering genomförs processen steg för steg en gång. Vid kontinuerlig arkivering upprepas faserna "Arkivera" och "Kontrollera" flera gånger (givet att ingen förändring sker av leveransspecifikationen).

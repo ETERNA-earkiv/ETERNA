@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.wui.client.common.lists.utils;
 
@@ -36,6 +36,7 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
@@ -44,6 +45,7 @@ import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
+import org.roda.wui.client.common.dialogs.ExportSearchDialog;
 import org.roda.wui.client.common.lists.pagination.ListSelectionState;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.popup.CalloutPopup;
@@ -393,18 +395,41 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     toggleFacetsPanel(createAndBindFacets(facetsPanel));
 
     csvDownloadButton.addClickHandler(event -> {
-      Services services = new Services("Retrieve export limit", "get");
-      services.configurationsResource(ConfigurationRestService::retrieveExportLimit)
-        .whenComplete((limit, throwable) -> {
-          if (throwable != null) {
-            AsyncCallbackUtils.defaultFailureTreatment(throwable);
-          } else {
-            Toast.showInfo(messages.exportListTitle(), messages.exportListMessage(limit.getResult().intValue()));
-            RestUtils.requestCSVExport(getClassToReturn(), getFilter(), dataProvider.getSorter(),
-              new Sublist(0, limit.getResult().intValue()), getFacets(), getJustActive(), false,
-              notNullSummary + ".csv");
-          }
-        });
+      Class<?> clazz = getClassToReturn();
+      String configKeyPrefix = null;
+      String exportClass = null;
+      if (IndexedAIP.class.equals(clazz)) {
+        configKeyPrefix = "ui.export.aip";
+        exportClass = "org.roda.core.data.v2.ip.IndexedAIP";
+      } else if (IndexedJob.class.equals(clazz)) {
+        configKeyPrefix = "ui.export.job";
+        exportClass = "org.roda.core.data.v2.jobs.IndexedJob";
+      } else if (IndexedReport.class.equals(clazz)) {
+        configKeyPrefix = "ui.export.report";
+        exportClass = "org.roda.core.data.v2.jobs.IndexedReport";
+      } else if (LogEntry.class.equals(clazz)) {
+        configKeyPrefix = "ui.export.logentry";
+        exportClass = "org.roda.core.data.v2.log.LogEntry";
+      }
+      if (configKeyPrefix != null) {
+        long total = (getResult() != null && getResult().getTotalCount() > 0) ? getResult().getTotalCount() : 0;
+        ExportSearchDialog dialog = new ExportSearchDialog(getFilter(), total, notNullSummary, configKeyPrefix,
+          exportClass);
+        dialog.show();
+      } else {
+        Services services = new Services("Retrieve export limit", "get");
+        services.configurationsResource(ConfigurationRestService::retrieveExportLimit)
+          .whenComplete((limit, throwable) -> {
+            if (throwable != null) {
+              AsyncCallbackUtils.defaultFailureTreatment(throwable);
+            } else {
+              Toast.showInfo(messages.exportListTitle(), messages.exportListMessage(limit.getResult().intValue()));
+              RestUtils.requestCSVExport(getClassToReturn(), getFilter(), dataProvider.getSorter(),
+                new Sublist(0, limit.getResult().intValue()), getFacets(), getJustActive(), false,
+                notNullSummary + ".csv");
+            }
+          });
+      }
     });
 
     selectionModel = new SingleSelectionModel<>(getKeyProvider());

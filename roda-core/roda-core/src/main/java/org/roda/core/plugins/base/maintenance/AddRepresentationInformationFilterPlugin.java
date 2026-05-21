@@ -3,7 +3,7 @@
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
  *
- * https://github.com/keeps/roda
+ * https://github.com/ETERNA-earkiv/ETERNA
  */
 package org.roda.core.plugins.base.maintenance;
 
@@ -44,8 +44,8 @@ public class AddRepresentationInformationFilterPlugin extends AbstractPlugin<Rep
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_INFORMATION_FILTER,
-      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_INFORMATION_FILTER, "New filter",
-        PluginParameterType.STRING).withDescription("Representation information new filter").build());
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_INFORMATION_FILTER, "Nytt filter",
+        PluginParameterType.STRING).withDescription("Nytt filter för representationsinformation").build());
   }
 
   @Override
@@ -60,12 +60,12 @@ public class AddRepresentationInformationFilterPlugin extends AbstractPlugin<Rep
 
   @Override
   public String getName() {
-    return "Add representation information filter";
+    return "Lägg till filter för representationsinformation";
   }
 
   @Override
   public String getDescription() {
-    return "Add filter to a representation information list";
+    return "Lägger till ett filter i en representationsinformationslista";
   }
 
   @Override
@@ -160,17 +160,17 @@ public class AddRepresentationInformationFilterPlugin extends AbstractPlugin<Rep
 
   @Override
   public String getPreservationEventDescription() {
-    return "Add representation information filter";
+    return "Lade till filter för representationsinformation";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Representation information filter was added successfully";
+    return "Filtret för representationsinformation lades till";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Representation information filter failed to add";
+    return "Det gick inte att lägga till filtret för representationsinformation";
   }
 
   @Override
