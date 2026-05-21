@@ -81,6 +81,9 @@ public class ScheduleJobDialog extends DialogBox {
 
     FlowPanel root = new FlowPanel();
     root.addStyleName("wui-dialog-layout");
+    // Fixed width keeps the dialog from shifting when month/day labels change length.
+    root.getElement().getStyle().setWidth(360, Style.Unit.PX);
+    root.getElement().getStyle().setPadding(8, Style.Unit.PX);
 
     // --- Frequency row ---
     FlowPanel freqRow = new FlowPanel();
