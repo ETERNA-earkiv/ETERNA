@@ -153,6 +153,7 @@ public class JobSchedulerTask {
         template.setState(Job.JOB_STATE.STOPPED);
         template.setScheduleExpression(null);
         template.setNextScheduledRun(null);
+        template.setEndDate(new Date());
       } else {
         try {
           CronExpression cron = CronExpression.parse(cronExpression);
@@ -163,6 +164,7 @@ public class JobSchedulerTask {
           template.setState(Job.JOB_STATE.STOPPED);
           template.setScheduleExpression(null);
           template.setNextScheduledRun(null);
+          template.setEndDate(new Date());
           RodaCoreFactory.getModelService().createOrUpdateJob(template);
           return;
         }
