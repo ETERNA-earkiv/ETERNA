@@ -30,6 +30,7 @@ import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
+import org.roda.wui.client.process.ActionProcess;
 import org.roda.wui.client.process.CreateDefaultJob;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.client.services.Services;
@@ -344,6 +345,7 @@ public class JobActions extends AbstractActionable<IndexedJob> {
             services.jobsResource(s -> s.unscheduleJob(object.getId())).whenComplete((value, error) -> {
               if (error == null) {
                 doActionCallbackUpdated();
+                HistoryUtils.newHistory(ActionProcess.RESOLVER);
               } else {
                 callback.onFailure(error);
                 doActionCallbackNone();
