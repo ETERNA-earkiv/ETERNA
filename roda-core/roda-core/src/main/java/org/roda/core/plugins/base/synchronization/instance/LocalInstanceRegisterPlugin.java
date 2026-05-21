@@ -166,7 +166,7 @@ public class LocalInstanceRegisterPlugin extends NoObjectsMultipleStepPlugin {
 
   @Override
   public String getName() {
-    return "RODA-objektets instansidentifierare";
+    return "ETERNA-objektets instansidentifierare";
   }
 
   @Override

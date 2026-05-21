@@ -175,12 +175,12 @@ public class ChangeRodaMemberStatusPlugin<T extends RODAMember> extends Abstract
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "The RODA user status were successfully updated";
+    return "The ETERNA user status were successfully updated";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "The RODA user status were not successfully updated";
+    return "The ETERNA user status were not successfully updated";
   }
 
   @Override

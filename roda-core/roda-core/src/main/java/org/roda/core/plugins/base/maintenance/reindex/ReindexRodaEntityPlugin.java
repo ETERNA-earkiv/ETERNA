@@ -237,7 +237,7 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
 
   @Override
   public String getPreservationEventDescription() {
-    return "Reindex Roda entity";
+    return "Reindex ETERNA entity";
   }
 
   @Override
