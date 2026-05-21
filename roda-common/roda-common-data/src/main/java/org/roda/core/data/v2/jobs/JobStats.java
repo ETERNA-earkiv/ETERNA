@@ -99,12 +99,19 @@ public class JobStats implements Serializable {
     return this;
   }
 
+  /**
+   * @return the total number of source objects processed, summing success, partial success,
+   *         skipped and failure counters.
+   */
   @JsonIgnore
   public int getSourceObjectsProcessed() {
     return sourceObjectsProcessedWithSuccess + sourceObjectsProcessedWithPartialSuccess
       + sourceObjectsProcessedWithSkipped + sourceObjectsProcessedWithFailure;
   }
 
+  /**
+   * @return the number of source objects processed with failure.
+   */
   @JsonIgnore
   public int getSourceObjectsWithErrors() {
     return sourceObjectsProcessedWithFailure;

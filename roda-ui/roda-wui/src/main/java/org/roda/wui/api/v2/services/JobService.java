@@ -230,6 +230,9 @@ public class JobService {
   }
 
   public Date computeNextRun(String cronExpression) throws RequestNotValidException {
+    if (cronExpression == null) {
+      return null;
+    }
     if (cronExpression.startsWith("@once:")) {
       try {
         long millis = Long.parseLong(cronExpression.substring(6));

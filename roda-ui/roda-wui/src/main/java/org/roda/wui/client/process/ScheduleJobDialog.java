@@ -36,7 +36,7 @@ public class ScheduleJobDialog extends DialogBox {
     void onSchedule(String scheduleExpression);
   }
 
-  /** Prefix for one-shot schedule expressions: {@code @once:YYYY-MM-DDTHH:MM} */
+  /** Prefix for one-shot schedule expressions: {@code @once:<epoch-millis>}. */
   public static final String ONCE_PREFIX = "@once:";
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
