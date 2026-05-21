@@ -183,9 +183,11 @@ public class JobService {
     return job;
   }
 
-  // Active/transitional states; setting SCHEDULED on these would bypass the orchestrator.
-  private static final Set<Job.JOB_STATE> NON_SCHEDULABLE_STATES = EnumSet.of(Job.JOB_STATE.STARTED,
-    Job.JOB_STATE.STOPPING, Job.JOB_STATE.TO_BE_CLEANED, Job.JOB_STATE.PENDING_APPROVAL);
+  // Allowlist to avoid rewriting history of finished/rejected runs (COMPLETED,
+  // FAILED_*, REJECTED) into SCHEDULED. SCHEDULED is allowed to support
+  // reschedule (changing the cron on a pending template).
+  private static final Set<Job.JOB_STATE> SCHEDULABLE_STATES = EnumSet.of(Job.JOB_STATE.CREATED,
+    Job.JOB_STATE.STOPPED, Job.JOB_STATE.SCHEDULED);
 
   public Job scheduleJob(String jobId, String cronExpression)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
@@ -194,7 +196,7 @@ public class JobService {
       throw new RequestNotValidException("Schedule expression is invalid or resolves to a past date: " + cronExpression);
     }
     Job job = RodaCoreFactory.getModelService().retrieveJob(jobId);
-    if (NON_SCHEDULABLE_STATES.contains(job.getState())) {
+    if (!SCHEDULABLE_STATES.contains(job.getState())) {
       throw new RequestNotValidException("Cannot schedule job in state: " + job.getState());
     }
     job.setScheduleExpression(cronExpression);

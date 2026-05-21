@@ -12,8 +12,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.config.ConfigurationManager;
@@ -59,9 +57,16 @@ public class JobSchedulerTask {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerTask.class);
 
-  // Per-template-id lock to serialize fireScheduledJob within this JVM.
-  // Clustered deployments require a distributed claim (see issue tracker).
-  private static final ConcurrentMap<String, Object> FIRING_LOCKS = new ConcurrentHashMap<>();
+  // Striped locks to serialize fireScheduledJob per template-id within this JVM
+  // without unbounded growth. Different ids may share a stripe (acceptable
+  // under low contention). Clustered deployments require a distributed claim.
+  private static final int FIRING_STRIPE_COUNT = 64;
+  private static final Object[] FIRING_STRIPES = new Object[FIRING_STRIPE_COUNT];
+  static {
+    for (int i = 0; i < FIRING_STRIPE_COUNT; i++) {
+      FIRING_STRIPES[i] = new Object();
+    }
+  }
 
   /**
    * Runs every minute (configurable via {@code jobs.scheduler.interval.millis}).
@@ -106,7 +111,7 @@ public class JobSchedulerTask {
   }
 
   private void fireScheduledJob(String templateJobId) {
-    Object lock = FIRING_LOCKS.computeIfAbsent(templateJobId, k -> new Object());
+    Object lock = FIRING_STRIPES[Math.floorMod(templateJobId.hashCode(), FIRING_STRIPE_COUNT)];
     synchronized (lock) {
       fireScheduledJobLocked(templateJobId);
     }
