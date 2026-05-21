@@ -39,6 +39,11 @@ public class RequestControllerAssistant extends ControllerAssistant {
   // controller's current relatedAipId/parameters — no need to log here too.
 
   @Override
+  public void checkGroup(User user, String group) throws AuthorizationDeniedException {
+    UserUtility.checkGroup(user, group);
+  }
+
+  @Override
   public void checkRoles(User user) throws AuthorizationDeniedException {
     UserUtility.checkRoles(user, requester.getClass());
   }

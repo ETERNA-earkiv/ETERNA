@@ -147,7 +147,24 @@ public class RodaUtils {
   }
 
   /**
-   * Executes an XSLT transformation with a timeout to prevent infinite loops.
+   * Best-effort timeout for XSLT transformations.
+   * <p>
+   * Saxon-HE does not poll the thread interrupt flag during transformation, so
+   * {@code future.cancel(true)} on a runaway transform may not abort the worker
+   * immediately — the request returns a timeout error but the worker can keep
+   * running until it finishes on its own. To prevent that from saturating the
+   * pool we use:
+   * <ul>
+   *   <li>a bounded fixed-size daemon pool (scales with CPU cores; daemon
+   *       threads die with the JVM)</li>
+   *   <li>{@link LimitedCharArrayWriter} with {@link #MAX_OUTPUT_SIZE} as an
+   *       upper bound on work — a transform that exceeds it throws and the
+   *       worker exits</li>
+   *   <li>uploaded XSLTs capped at 1&nbsp;MB by the controller</li>
+   * </ul>
+   * True in-process termination would require a Saxon cooperative-abort hook
+   * (e.g. throwing {@code XmlProcessingAbort} from a checkpoint) which is out
+   * of scope here.
    */
   private static final ExecutorService XSLT_EXECUTOR = Executors.newFixedThreadPool(
     Math.max(2, Runtime.getRuntime().availableProcessors()),
@@ -164,6 +181,8 @@ public class RodaUtils {
     try {
       future.get(XSLT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     } catch (TimeoutException e) {
+      // Best-effort cancel — see XSLT_EXECUTOR docs. The request fails fast even
+      // if the worker keeps churning until MAX_OUTPUT_SIZE or natural completion.
       future.cancel(true);
       throw new GenericException("XSLT transformation timed out after " + XSLT_TIMEOUT_SECONDS + " seconds");
     } catch (java.util.concurrent.ExecutionException e) {
@@ -326,6 +345,24 @@ public class RodaUtils {
     }
   }
 
+  /**
+   * Applies a user-supplied XSLT stylesheet to the given XML binary.
+   * <p>
+   * The transformation runs through the shared, secured {@code PROCESSOR} with
+   * external functions disabled and an output-size cap; execution is wrapped in
+   * a timeout (see {@link #transformWithTimeout(XsltTransformer)}).
+   *
+   * @param binary
+   *          the source XML binary to transform.
+   * @param xsltInputStream
+   *          the XSLT stylesheet to apply. Consumed and closed by this method.
+   * @param parameters
+   *          stylesheet parameters; also exposed as an {@code i18n} XdmMap.
+   * @return a {@link Reader} over the transformation output.
+   * @throws GenericException
+   *           if reading the source, compiling the stylesheet, or running the
+   *           transformation fails or exceeds the configured limits.
+   */
   public static Reader applyCustomStylesheet(Binary binary, InputStream xsltInputStream,
     Map<String, String> parameters) throws GenericException {
     try (

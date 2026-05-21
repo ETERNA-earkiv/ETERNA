@@ -77,7 +77,6 @@ import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import javax.xml.stream.XMLInputFactory;
@@ -776,14 +775,10 @@ public class FilesService {
 
   private String detectXmlNamespace(Binary binary) {
     try (InputStream is = binary.getContent().createInputStream()) {
-      byte[] header = new byte[4096];
-      int read = is.read(header);
-      if (read <= 0) return null;
-
       XMLInputFactory factory = XMLInputFactory.newInstance();
       factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
       factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
-      XMLStreamReader reader = factory.createXMLStreamReader(new ByteArrayInputStream(header, 0, read));
+      XMLStreamReader reader = factory.createXMLStreamReader(is);
       while (reader.hasNext()) {
         int event = reader.next();
         if (event == XMLStreamReader.START_ELEMENT) {

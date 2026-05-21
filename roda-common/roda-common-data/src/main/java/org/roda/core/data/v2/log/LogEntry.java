@@ -355,10 +355,24 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId, SetsUUID {
     this.relatedObjectID = relatedObjectID;
   }
 
+  /**
+   * Returns the ID of the AIP that this log entry is associated with, if any.
+   * Distinct from {@link #getRelatedObjectID()} which may point to a file,
+   * representation or other sub-object; {@code relatedAipId} always resolves
+   * to the owning AIP and lets audit views filter on it.
+   *
+   * @return the AIP ID this entry relates to, or {@code null} if not applicable.
+   */
   public String getRelatedAipId() {
     return relatedAipId;
   }
 
+  /**
+   * Sets the ID of the AIP that this log entry is associated with.
+   *
+   * @param relatedAipId
+   *          the AIP ID, or {@code null} if this entry has no AIP context.
+   */
   public void setRelatedAipId(String relatedAipId) {
     this.relatedAipId = relatedAipId;
   }

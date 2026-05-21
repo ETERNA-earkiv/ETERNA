@@ -526,9 +526,13 @@ public class FilesController implements FileRestService, Exportable {
       public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
         controllerAssistant.setRelatedObjectId(fileUUID);
+        // When the caller does not pin a specific XSLT, FilesService resolves one
+        // (filename match, namespace rule, or representation-default). The audit
+        // entry records "auto-detect" to make that ambiguity explicit instead of
+        // claiming a "default" stylesheet that may not be what was rendered.
         controllerAssistant.setParameters(
           RodaConstants.CONTROLLER_FILE_UUID_PARAM, fileUUID,
-          RodaConstants.CONTROLLER_XSLT_ID_PARAM, selectedXsltId != null ? selectedXsltId : "default",
+          RodaConstants.CONTROLLER_XSLT_ID_PARAM, selectedXsltId != null ? selectedXsltId : "auto-detect",
           RodaConstants.CONTROLLER_LANG_PARAM, localeString);
         List<String> fileFields = new ArrayList<>(RodaConstants.FILE_FIELDS_TO_RETURN);
         fileFields.add(RodaConstants.FILE_ISDIRECTORY);
@@ -574,16 +578,29 @@ public class FilesController implements FileRestService, Exportable {
           throw new RequestNotValidException("XSLT file exceeds maximum size of 1 MB");
         }
 
-        // Validate XSLT is well-formed XML
+        // Validate that the uploaded file is an XSLT stylesheet (not just any XML).
         try (InputStream validationStream = xsltFile.getInputStream()) {
           XMLInputFactory xmlFactory = XMLInputFactory.newInstance();
           xmlFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
           xmlFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
           XMLStreamReader xmlReader = xmlFactory.createXMLStreamReader(validationStream);
-          while (xmlReader.hasNext()) { xmlReader.next(); }
+          boolean xsltRootFound = false;
+          while (xmlReader.hasNext()) {
+            if (xmlReader.next() == XMLStreamReader.START_ELEMENT) {
+              xsltRootFound = "http://www.w3.org/1999/XSL/Transform".equals(xmlReader.getNamespaceURI())
+                && ("stylesheet".equals(xmlReader.getLocalName())
+                  || "transform".equals(xmlReader.getLocalName()));
+              break;
+            }
+          }
           xmlReader.close();
+          if (!xsltRootFound) {
+            throw new RequestNotValidException("Uploaded file must be an XSLT stylesheet");
+          }
+        } catch (RequestNotValidException e) {
+          throw e;
         } catch (Exception e) {
-          throw new RequestNotValidException("Uploaded file is not valid XML: " + e.getMessage());
+          throw new RequestNotValidException("Uploaded file must be valid XML");
         }
 
         try {
