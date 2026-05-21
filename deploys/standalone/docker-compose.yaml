@@ -50,7 +50,7 @@ services:
       - VALIDATOR_URL=none
 
   mailpit:
-    image: axllent/mailpit:v1.29.2
+    image: axllent/mailpit:v1.24
     restart: unless-stopped
     ports:
       - "1025:1025" # smtp server

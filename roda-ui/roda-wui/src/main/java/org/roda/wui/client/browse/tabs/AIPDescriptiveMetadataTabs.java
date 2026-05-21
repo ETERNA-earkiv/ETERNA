@@ -127,7 +127,6 @@ public class AIPDescriptiveMetadataTabs extends Tabs {
                     .assign(RestUtils.createDescriptiveMetadataDownloadUri(aip.getId(), metadataID).asString());
                 }
               }, messages.downloadButton(), "btn-download");
-
               // HTML
               String html = response.getText();
               SafeHtmlBuilder b = new SafeHtmlBuilder();
@@ -180,5 +179,4 @@ public class AIPDescriptiveMetadataTabs extends Tabs {
       });
     }
   }
-
 }

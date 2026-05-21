@@ -68,30 +68,28 @@ services:
       - VALIDATOR_URL=none
 
   mailpit:
-    image: axllent/mailpit:v1.29.2
-    container_name: mailpit
+    image: axllent/mailpit:v1.24
     restart: unless-stopped
     ports:
       - "1025:1025" # smtp server
       - "8025:8025" # web ui
 
   openldap:
-    image: vegardit/openldap:latest
-    container_name: openldap
+    image: docker.io/bitnamilegacy/openldap:2.6
     restart: unless-stopped
+    user: 1001:root
     ports:
-      - "1389:389"
-      - "1636:636"
+      - "1389:1389"
+      - "1636:1636"
     environment:
-      - LDAP_INIT_ORG_DN=DC=roda,DC=org
-      - LDAP_INIT_ORG_NAME=RODA
-      - LDAP_INIT_ROOT_USER_DN=cn=admin,dc=roda,dc=org
-      - LDAP_INIT_ROOT_USER_PW=eterna
-      - LDAP_TLS_ENABLED=false
+      - BITNAMI_DEBUG=true
+      - LDAP_ROOT=dc=roda,dc=org
+      - LDAP_SKIP_DEFAULT_TREE=yes
+      - LDAP_ADMIN_USERNAME=admin
+      - LDAP_ADMIN_PASSWORD=eterna
+      - LDAP_EXTRA_SCHEMAS=cosine,inetorgperson,nis,pbkdf2
     volumes:
-      - ./ldap/ldifs/init_org_tree.ldif:/opt/ldifs/init_org_tree.ldif:ro
-      - ./ldap/ldifs/init_org_entries.ldif:/opt/ldifs/init_org_entries.ldif:ro
-      - ./ldap/ldifs/init_org_ppolicy.ldif:/opt/ldifs/init_org_ppolicy.ldif:ro
+      - ./ldap/ldif/pbkdf2.ldif:/opt/bitnami/openldap/etc/schema/pbkdf2.ldif
 
   postgres:
     image: postgres:17

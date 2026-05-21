@@ -2759,4 +2759,12 @@ public interface ClientMessages extends Messages {
   String catalogTreeCollapse();
 
   String catalogTreeExpand();
+
+  String catalogTreeReasonListChildren();
+
+  String catalogTreeReasonListRoots();
+
+  String catalogTreeReasonGetAncestors();
+
+  String catalogTreeReasonRetrieveAIP();
 }

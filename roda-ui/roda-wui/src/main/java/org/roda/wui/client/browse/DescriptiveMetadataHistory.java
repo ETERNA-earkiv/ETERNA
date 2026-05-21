@@ -213,6 +213,7 @@ public class DescriptiveMetadataHistory extends Composite {
       RodaConstants.PERMISSION_METHOD_REVERT_DESCRIPTIVE_METADATA_VERSION);
     PermissionClientUtils.bindPermission(buttonRemove, descriptiveMetadataVersions.getPermissions(),
       RodaConstants.PERMISSION_METHOD_DELETE_DESCRIPTIVE_METADATA_VERSION);
+
     Element firstElement = showXml.getElement().getFirstChildElement();
     if ("input".equalsIgnoreCase(firstElement.getTagName())) {
       firstElement.setAttribute("title", "browse input");
