@@ -9,6 +9,8 @@ package org.roda.core.data.v2.jobs;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class JobStats implements Serializable {
   private static final long serialVersionUID = 2048747729436732179L;
 
@@ -97,11 +99,13 @@ public class JobStats implements Serializable {
     return this;
   }
 
+  @JsonIgnore
   public int getSourceObjectsProcessed() {
     return sourceObjectsProcessedWithSuccess + sourceObjectsProcessedWithPartialSuccess
       + sourceObjectsProcessedWithSkipped + sourceObjectsProcessedWithFailure;
   }
 
+  @JsonIgnore
   public int getSourceObjectsWithErrors() {
     return sourceObjectsProcessedWithFailure;
   }

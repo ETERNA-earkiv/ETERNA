@@ -208,11 +208,12 @@ public class ScheduleJobDialog extends DialogBox {
 
     // --- Footer ---
     FlowPanel footer = new FlowPanel();
-    footer.addStyleName("wui-dialog-footer");
+    footer.addStyleName("wui-dialog-layout-footer");
     Button cancelButton = new Button(messages.cancelButton());
     cancelButton.addStyleName("btn btn-default btn-times-circle");
     Button confirmButton = new Button(messages.scheduleDialogConfirmButton());
     confirmButton.addStyleName("btn btn-play");
+    confirmButton.getElement().getStyle().setMarginLeft(8, Style.Unit.PX);
     footer.add(cancelButton);
     footer.add(confirmButton);
     root.add(footer);
