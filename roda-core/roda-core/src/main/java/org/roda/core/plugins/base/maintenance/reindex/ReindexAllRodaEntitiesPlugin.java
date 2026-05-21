@@ -185,7 +185,7 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Reindex Roda entity";
+    return "Reindex ETERNA entity";
   }
 
   @Override

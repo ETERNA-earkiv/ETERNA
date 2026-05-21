@@ -163,17 +163,17 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
 
   @Override
   public String getPreservationEventDescription() {
-    return "Deletes RODA entities";
+    return "Deletes ETERNA entities";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "RODA entities were successfully removed";
+    return "ETERNA entities were successfully removed";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "RODA entities were not successfully removed";
+    return "ETERNA entities were not successfully removed";
   }
 
   @Override

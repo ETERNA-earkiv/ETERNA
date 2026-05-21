@@ -190,10 +190,11 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    String description = "Användarbehörigheter har kontrollerats för att säkerställa att användaren har tillräcklig behörighet att lagra AIP:et under den önskade noden i klassificeringssystemet.";
+    String description = "User permissions have been checked to ensure that he has sufficient authorization to store the AIP under the desired "
+      + "node of the classification scheme.";
 
     if (hasFreeAccess) {
-      description += " Läsbehörighet gavs till användargruppen enligt beskrivande metadata.";
+      description += " It was given READ permission to the users group as indicated on the descriptive metadata";
     }
 
     return description;
@@ -201,12 +202,12 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Användaren har tillräckliga behörigheter för att deponera AIP:et under den angivna noden i klassificeringssystemet.";
+    return "The user has enough permissions to deposit the AIP under the designated node of the classification scheme";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Användaren har inte tillräckliga behörigheter för att deponera AIP:et under den angivna noden i klassificeringssystemet.";
+    return "The user does not have enough permissions to deposit the AIP under the designated node of the classification scheme";
   }
 
   @Override

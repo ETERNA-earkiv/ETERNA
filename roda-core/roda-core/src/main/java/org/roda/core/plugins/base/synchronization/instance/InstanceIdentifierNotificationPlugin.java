@@ -112,17 +112,17 @@ public class InstanceIdentifierNotificationPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Uppdaterade instansidentifieraren";
+    return "Updated the instance identifier";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Instansidentifieraren uppdaterades.";
+    return "The instance identifier was updated successfully";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Kunde inte uppdatera instansidentifieraren.";
+    return "Could not update the instance identifier";
   }
 
   @Override
