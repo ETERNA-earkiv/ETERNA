@@ -101,6 +101,20 @@ public class JobSchedulerTask {
     try {
       Job template = RodaCoreFactory.getModelService().retrieveJob(templateJobId);
 
+      // Non-atomic guard against double-firing when pollers race or the
+      // template was rescheduled/unscheduled between query and retrieve.
+      if (template.getState() != Job.JOB_STATE.SCHEDULED) {
+        LOGGER.info("Scheduled job {} no longer in SCHEDULED state ({}); skipping",
+          templateJobId, template.getState());
+        return;
+      }
+      Date currentNextRun = template.getNextScheduledRun();
+      if (currentNextRun == null || currentNextRun.after(new Date())) {
+        LOGGER.info("Scheduled job {} nextScheduledRun already advanced; another poller likely claimed it",
+          templateJobId);
+        return;
+      }
+
       String cronExpression = template.getScheduleExpression();
       if (cronExpression == null) {
         LOGGER.warn("Scheduled job {} has no cron expression; skipping", templateJobId);

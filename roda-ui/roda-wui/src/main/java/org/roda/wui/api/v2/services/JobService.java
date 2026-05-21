@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -182,6 +183,10 @@ public class JobService {
     return job;
   }
 
+  // Active/transitional states; setting SCHEDULED on these would bypass the orchestrator.
+  private static final Set<Job.JOB_STATE> NON_SCHEDULABLE_STATES = EnumSet.of(Job.JOB_STATE.STARTED,
+    Job.JOB_STATE.STOPPING, Job.JOB_STATE.TO_BE_CLEANED, Job.JOB_STATE.PENDING_APPROVAL);
+
   public Job scheduleJob(String jobId, String cronExpression)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     Date nextRun = computeNextRun(cronExpression);
@@ -189,6 +194,9 @@ public class JobService {
       throw new RequestNotValidException("Schedule expression is invalid or resolves to a past date: " + cronExpression);
     }
     Job job = RodaCoreFactory.getModelService().retrieveJob(jobId);
+    if (NON_SCHEDULABLE_STATES.contains(job.getState())) {
+      throw new RequestNotValidException("Cannot schedule job in state: " + job.getState());
+    }
     job.setScheduleExpression(cronExpression);
     job.setState(Job.JOB_STATE.SCHEDULED);
     job.setEndDate(null);
@@ -201,6 +209,9 @@ public class JobService {
   public Job unscheduleJob(String jobId)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     Job job = RodaCoreFactory.getModelService().retrieveJob(jobId);
+    if (job.getState() != Job.JOB_STATE.SCHEDULED) {
+      throw new RequestNotValidException("Job is not scheduled (state: " + job.getState() + ")");
+    }
     job.setScheduleExpression(null);
     job.setNextScheduledRun(null);
     job.setState(Job.JOB_STATE.STOPPED);

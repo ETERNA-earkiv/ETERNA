@@ -657,6 +657,7 @@ public class CreateDefaultJob extends Composite {
   @UiHandler("buttonCreate")
   public void buttonCreateHandler(ClickEvent e) {
     buttonCreate.setEnabled(false);
+    buttonSchedule.setEnabled(false);
     String jobName = getName().getText();
     SelectedItems<? extends IsIndexed> selected = search.getSelectedItemsInCurrentList();
     if (org.roda.core.data.v2.Void.class.getName().equals(targetList.getSelectedValue())) {
@@ -680,6 +681,7 @@ public class CreateDefaultJob extends Composite {
       if (throwable != null) {
         // Toast.showError(messages.dialogFailure(), caught.getMessage());
         buttonCreate.setEnabled(true);
+        buttonSchedule.setEnabled(true);
       } else {
         Toast.showInfo(messages.dialogDone(), messages.processCreated());
         HistoryUtils.newHistory(ActionProcess.RESOLVER);
