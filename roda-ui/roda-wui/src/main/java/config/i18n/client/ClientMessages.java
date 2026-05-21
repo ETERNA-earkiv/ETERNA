@@ -2237,6 +2237,10 @@ public interface ClientMessages extends Messages {
 
   String disposalRetentionDueDateLabel();
 
+  String retentionPeriodStartDateMissing();
+
+  String retentionPeriodStartDateInvalidType();
+
   String disposalRetentionPeriodLabel();
 
   String disposalActionLabel();

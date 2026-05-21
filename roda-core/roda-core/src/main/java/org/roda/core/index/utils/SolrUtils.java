@@ -1969,7 +1969,7 @@ public class SolrUtils {
     Object o = retrieve.getFields().get(disposalSchedule.getRetentionTriggerElementId());
 
     if (o == null) {
-      values.put(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_DETAILS, "Retention period start date is missing");
+      values.put(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_DETAILS, RodaConstants.DISPOSAL_RETENTION_PERIOD_ERROR_MISSING_START_DATE);
       values.put(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_CALCULATION, RetentionPeriodCalculation.ERROR.name());
       return values;
     }
@@ -1977,7 +1977,7 @@ public class SolrUtils {
     if (o instanceof Date retentionPeriodStartDate) {
       cal.setTime(retentionPeriodStartDate);
     } else {
-      values.put(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_DETAILS, "Retention period start must be of date type");
+      values.put(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_DETAILS, RodaConstants.DISPOSAL_RETENTION_PERIOD_ERROR_INVALID_START_DATE_TYPE);
       values.put(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_CALCULATION, RetentionPeriodCalculation.ERROR.name());
       return values;
     }

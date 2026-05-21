@@ -1120,6 +1120,8 @@ public final class RodaConstants {
   public static final String AIP_DISPOSAL_RETENTION_PERIOD_INTERVAL = "retentionPeriodInterval";
   public static final String AIP_DISPOSAL_RETENTION_PERIOD_DETAILS = "retentionPeriodDetails";
   public static final String AIP_DISPOSAL_RETENTION_PERIOD_CALCULATION = "retentionPeriodCalculation";
+  public static final String DISPOSAL_RETENTION_PERIOD_ERROR_MISSING_START_DATE = "MISSING_START_DATE";
+  public static final String DISPOSAL_RETENTION_PERIOD_ERROR_INVALID_START_DATE_TYPE = "INVALID_START_DATE_TYPE";
 
   // AIP types
   public static final String AIP_TYPE_MIXED = "MIXED";
