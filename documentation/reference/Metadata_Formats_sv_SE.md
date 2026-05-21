@@ -304,7 +304,7 @@ Utdatan som produceras av denna visningsmall är ett [Solr dokument](https://wik
 
 ### Visualisering
 
-Aktiviteten _visualisering_ stöds av en [XSLT (eXtensible Stylesheet Language Transformations)](http://www.w3.org/standards/xml/transformation.html) som omvandlar den XML-baserade metadatafilen till HTML för presentationsändamål. Denna åtgärd ger en HTML-fil som kommer att visas för användaren när ett befintlig AIP i arkivbeståndet visas.
+Aktiviteten _visualisering_ stöds av en [XSLT (eXtensible Stylesheet Language Transformations)](http://www.w3.org/standards/xml/transformation.html) som omvandlar den XML-baserade metadatafilen till HTML för presentationsändamål. Denna åtgärd ger en HTML-fil som kommer att visas för användaren när en befintlig AIP i arkivbeståndet visas.
 
 Visualiseringsmappningsfilen bör läggas till i konfigurationsmappen under `[RODA_HOME]/config/crosswalks/dissemination/html/`.
 

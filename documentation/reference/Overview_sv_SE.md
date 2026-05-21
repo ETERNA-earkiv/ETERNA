@@ -37,7 +37,7 @@ Arkivbeståndet är en inventering av alla handlingar och information i arkivet.
 
 ### Sök & Avancerad sökning
 
-På söksidan kan du söka efter förvaringsenheter, representationer eller filer (använd nedåtpilen för att välja sökdomän). För var och en av dessa domäner kan du söka i alla dess egenskaper eller i specifika egenskaper (använd nedåtpilen för att utöka den avancerade sökningen). Om du till exempel väljer förvaringsenheter kan du söka i ett specifikt fält av beskrivande metadata, eller hitta filer av ett visst format om filer avancerad sökning är vald.
+På söksidan kan du söka efter förvaringsenheter, representationer eller filer (använd nedåtpilen för att välja sökdomän). För var och en av dessa domäner kan du söka i alla dess egenskaper eller i specifika egenskaper (använd nedåtpilen för att utöka den avancerade sökningen). Om du till exempel väljer förvaringsenheter kan du söka i ett specifikt fält av beskrivande metadata, eller hitta filer av ett visst format om avancerad sökning för filer är vald.
 
 Sökmotorn hittar endast hela ord. Om du vill söka efter delar av ord så använd '*'-tecken. För mer information om sökverktyg, se nästa sektion.
 
