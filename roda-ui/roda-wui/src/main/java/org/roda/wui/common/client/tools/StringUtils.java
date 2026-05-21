@@ -24,21 +24,26 @@ public class StringUtils {
     return !isNotBlank(s);
   }
 
-  // method to prettify method names
+  // Acronyms that the prettifier should glue back together after camelCase
+  // splitting. Order longest-first so "XSLT" is reconnected before "XSL" would
+  // ever match. GWT client code → no regex compilation cache, but the cost is
+  // negligible at audit-list render rate.
+  private static final String[] ACTION_METHOD_ACRONYMS = {
+    "XSLT", "HTML", "JSON", "UUID",
+    "AIP", "XML", "PDF", "URL", "CSV", "DIP", "SIP"
+  };
+
   public static String getPrettifiedActionMethod(String actionMethod) {
     String method = actionMethod.substring(0, 1).toUpperCase() + actionMethod.substring(1);
     method = method.replaceAll("([A-Z])", " $1").trim();
-    method = method.replaceAll("A I P", "AIP");
-    method = method.replaceAll("H T M L", "HTML");
-    method = method.replaceAll("X S L T", "XSLT");
-    method = method.replaceAll("X M L", "XML");
-    method = method.replaceAll("U U I D", "UUID");
-    method = method.replaceAll("J S O N", "JSON");
-    method = method.replaceAll("P D F", "PDF");
-    method = method.replaceAll("U R L", "URL");
-    method = method.replaceAll("C S V", "CSV");
-    method = method.replaceAll("D I P", "DIP");
-    method = method.replaceAll("S I P", "SIP");
+    for (String acronym : ACTION_METHOD_ACRONYMS) {
+      StringBuilder spaced = new StringBuilder(acronym.length() * 2);
+      for (int i = 0; i < acronym.length(); i++) {
+        if (i > 0) spaced.append(' ');
+        spaced.append(acronym.charAt(i));
+      }
+      method = method.replace(spaced.toString(), acronym);
+    }
     return method;
   }
 

@@ -198,22 +198,17 @@ För att stilmallarna ska upptäckas vid inmatning måste representations-METS (
 
 ### Bygga SIP-paket
 
-Skriptet `build_sip.py` (finns i `C:\claude\utb\`) automatiserar skapandet av SIP-paket med XSLT-stilmallar:
+För att paketera XSLT-stilmallar tillsammans med XML-filer i ett E-ARK SIP-paket
+behöver två steg utföras: generera stilmallar och paketera dem. Vilka verktyg
+som används är upp till respektive uppsättning — det här avsnittet beskriver
+vad paketeringen ska åstadkomma.
 
-```bash
-# Generera XSLT-stilmallar (en per XML-fil)
-python3 generate_xslt.py
-
-# Bygg SIP-paketet
-python3 build_sip.py
-```
-
-Skriptet:
-1. Samlar alla `.xslt`-filer från `/tmp/eterna-xslt/`
-2. Kopierar representationsfiler från ett befintligt SIP
-3. Injicerar dokumentationsreferenser i representations-METS
-4. Placerar stilmallarna i `representations/rep1/documentation/`
-5. Skapar ett komplett E-ARK SIP som ZIP-fil
+Stegen:
+1. Samla alla `.xslt`-filer för respektive XML-namespace.
+2. Kopiera representationsfiler från ett befintligt SIP eller skapa nya.
+3. Injicera dokumentationsreferenser i representations-METS (se `<mets:fptr>`-avsnittet ovan).
+4. Placera stilmallarna i `representations/rep1/documentation/`.
+5. Paketera till ett E-ARK SIP som ZIP-fil.
 
 ---
 

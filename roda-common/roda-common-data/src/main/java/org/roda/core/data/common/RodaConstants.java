@@ -378,8 +378,13 @@ public final class RodaConstants {
   // common
   public static final String API_REST_V2_DOWNLOAD_HANDLER = "/download";
   public static final String API_REST_V2_PREVIEW_HANDLER = "/preview";
+  public static final String API_REST_V2_PREVIEW_HTML_HANDLER = "/preview/html";
+  public static final String API_REST_V2_PREVIEW_HTML_XSLTS_HANDLER = "/preview/html/xslts";
+  public static final String API_REST_V2_PREVIEW_HTML_TRANSFORM_HANDLER = "/preview/html/transform";
   public static final String API_REST_V2_REPRESENTATION_OTHER_METADATA = "/other-metadata";
   public static final String API_REST_V2_REPRESENTATION_BINARY = "/binary";
+
+  public static final String API_QUERY_KEY_XSLT = "xslt";
 
   // aips
   public static final String API_REST_V2_AIPS = "api/v2/aips/";
