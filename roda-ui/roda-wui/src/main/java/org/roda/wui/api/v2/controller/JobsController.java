@@ -137,6 +137,7 @@ public class JobsController implements JobsRestService, Exportable {
       Job job = JobUtils.createJob(jobRequest.getName(), JobPriority.valueOf(jobRequest.getPriority()),
         JobParallelism.valueOf(jobRequest.getParallelism()), sourceObjects, jobRequest.getPlugin(),
         jobRequest.getPluginParameters());
+      job.setScheduleExpression(jobRequest.getScheduleExpression());
       // validate input and set missing information when possible
       jobService.validateAndSetJobInformation(requestContext.getUser(), job);
       // check user permissions
@@ -344,6 +345,53 @@ public class JobsController implements JobsRestService, Exportable {
       // register action
       controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_JOB_ID_PARAM, id,
         RodaConstants.CONTROLLER_JOB_ATTACHMENT_ID_PARAM, attachmentId);
+    }
+  }
+
+  @Override
+  public Job scheduleJob(String jobId, String cronExpression) {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+      // delegate
+      return jobService.scheduleJob(jobId, cronExpression);
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | NotFoundException | RequestNotValidException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId,
+        RodaConstants.API_QUERY_PARAM_SCHEDULE_EXPRESSION, cronExpression);
+    }
+  }
+
+  @Override
+  public Job unscheduleJob(String jobId) {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+      // delegate
+      return jobService.unscheduleJob(jobId);
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | NotFoundException | RequestNotValidException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId);
     }
   }
 

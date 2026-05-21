@@ -94,6 +94,8 @@ public class JobCollection extends AbstractSolrCollection<IndexedJob, Job> {
     fields.add(new Field(RodaConstants.JOB_HAS_PARTIAL_SUCCESS, Field.TYPE_BOOLEAN).setStored(false));
     fields.add(new Field(RodaConstants.JOB_HAS_SKIPPED, Field.TYPE_BOOLEAN).setStored(false));
     fields.add(new Field(RodaConstants.JOB_ATTACHMENTS, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
+    fields.add(new Field(RodaConstants.JOB_NEXT_SCHEDULED_RUN, Field.TYPE_DATE));
+    fields.add(new Field(RodaConstants.JOB_SCHEDULE_INFO, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
 
     return fields;
   }
@@ -146,6 +148,8 @@ public class JobCollection extends AbstractSolrCollection<IndexedJob, Job> {
     doc.addField(RodaConstants.JOB_HAS_PARTIAL_SUCCESS, jobStats.getSourceObjectsProcessedWithPartialSuccess() > 0);
     doc.addField(RodaConstants.JOB_HAS_SKIPPED, jobStats.getSourceObjectsProcessedWithSkipped() > 0);
     doc.addField(RodaConstants.JOB_ATTACHMENTS, JsonUtils.getJsonFromObject(job.getAttachmentsList()));
+    doc.addField(RodaConstants.JOB_NEXT_SCHEDULED_RUN, SolrUtils.formatDateWithMillis(job.getNextScheduledRun()));
+    doc.addField(RodaConstants.JOB_SCHEDULE_INFO, job.getScheduleExpression());
 
     return doc;
   }
@@ -194,6 +198,13 @@ public class JobCollection extends AbstractSolrCollection<IndexedJob, Job> {
     }
 
     job.setOutcomeObjectsClass(SolrUtils.objectToString(doc.get(RodaConstants.JOB_OUTCOME_OBJECTS_CLASS), null));
+    job.setNextScheduledRun(SolrUtils.objectToDateWithMillis(doc.get(RodaConstants.JOB_NEXT_SCHEDULED_RUN)));
+    String scheduleExpression = SolrUtils.objectToString(doc.get(RodaConstants.JOB_SCHEDULE_INFO), null);
+    if (scheduleExpression != null) {
+      java.util.Map<String, Object> fields = new java.util.HashMap<>();
+      fields.put(RodaConstants.JOB_SCHEDULE_INFO, scheduleExpression);
+      job.setFields(fields);
+    }
 
     try {
       if (fieldsToReturn.isEmpty() || fieldsToReturn.contains(RodaConstants.JOB_ATTACHMENTS)) {

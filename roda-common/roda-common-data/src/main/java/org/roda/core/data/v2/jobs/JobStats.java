@@ -9,6 +9,8 @@ package org.roda.core.data.v2.jobs;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class JobStats implements Serializable {
   private static final long serialVersionUID = 2048747729436732179L;
 
@@ -95,6 +97,24 @@ public class JobStats implements Serializable {
   public JobStats setSourceObjectsProcessedWithFailure(int sourceObjectsProcessedWithFailure) {
     this.sourceObjectsProcessedWithFailure = sourceObjectsProcessedWithFailure;
     return this;
+  }
+
+  /**
+   * @return the total number of source objects processed, summing success, partial success,
+   *         skipped and failure counters.
+   */
+  @JsonIgnore
+  public int getSourceObjectsProcessed() {
+    return sourceObjectsProcessedWithSuccess + sourceObjectsProcessedWithPartialSuccess
+      + sourceObjectsProcessedWithSkipped + sourceObjectsProcessedWithFailure;
+  }
+
+  /**
+   * @return the number of source objects processed with failure.
+   */
+  @JsonIgnore
+  public int getSourceObjectsWithErrors() {
+    return sourceObjectsProcessedWithFailure;
   }
 
   public int getOutcomeObjectsWithManualIntervention() {

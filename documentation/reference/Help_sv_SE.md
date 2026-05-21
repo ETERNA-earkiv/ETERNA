@@ -20,6 +20,7 @@ Tekniska referenser och detaljerad information om systemet.
 
 Steg-för-steg guider för att använda ETERNA effektivt.
 
+- **[Vanliga begrepp](usage/Vanliga_Begrepp_sv_SE.md)** - Förklaringar till vanliga begrepp inom e-arkivering och ETERNA
 - **[Redigera Beskrivande Metadata](usage/EditDescriptiveMetadata_sv_SE.md)** - Hur man redigerar metadata
 - **[Avancerad Sökning](usage/Advanced_Search_sv_SE.md)** - Avancerade sökfunktioner
 - **[Inleverans](usage/Pre_Ingest_sv_SE.md)** - Förbereda data för arkivering

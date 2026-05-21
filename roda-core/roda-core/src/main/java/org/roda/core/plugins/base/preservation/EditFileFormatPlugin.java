@@ -267,17 +267,17 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Ändrade filernas formatmetadata";
+    return "Changed files' format metadata";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Filformat uppdaterades och registrerades i PREMIS-objekt.";
+    return "File formats were updated and recorded in PREMIS objects.";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Det gick inte att uppdatera filformaten i paketet.";
+    return "Failed to update file formats in the package.";
   }
 
   @Override

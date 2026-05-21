@@ -118,17 +118,17 @@ public class InstanceIdentifierRepositoryEventPlugin extends AbstractPlugin<Void
 
   @Override
   public String getPreservationEventDescription() {
-    return "Uppdaterade instansidentifieraren för arkivets bevarandehändelser";
+    return "Updated the repository preservation events instance identifier";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Instansidentifieraren för arkivets bevarandehändelse uppdaterades.";
+    return "The repository preservation event instance identifier was updated successfully";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Kunde inte uppdatera instansidentifieraren för arkivets bevarandehändelse.";
+    return "Could not update the repository preservation event instance identifier";
   }
 
   @Override

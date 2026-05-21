@@ -343,7 +343,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
 
   @Override
   public String getPreservationEventDescription() {
-    return getDescription();
+    return "Associated selected objects with risks in the risk registry";
   }
 
   @Override

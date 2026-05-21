@@ -191,6 +191,8 @@ public class ShowJob extends Composite {
   @UiField
   Label duration;
   @UiField
+  FlowPanel durationPanel;
+  @UiField
   HTML progress;
   @UiField
   HTML status;
@@ -198,6 +200,10 @@ public class ShowJob extends Composite {
   Label scheduleInfoLabel;
   @UiField
   Label scheduleInfo;
+  @UiField
+  FlowPanel nextRunPanel;
+  @UiField
+  Label nextRunLabel, nextRun;
   @UiField
   Label stateDetailsLabel, stateDetailsValue;
   @UiField
@@ -526,7 +532,7 @@ public class ShowJob extends Composite {
         Label objectLabel = new Label();
         objectLabel.addStyleName("value");
 
-        if (!StringUtils.isBlank(selected.getSelectedClass())) {
+        if (StringUtils.isBlank(selected.getSelectedClass())) {
           objectLabel.setText(messages.noItemsToDisplay(messages.someOfAObject(selected.getSelectedClass())));
         } else if (AIP.class.getName().equals(selected.getSelectedClass())
           || IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
@@ -579,41 +585,65 @@ public class ShowJob extends Composite {
   }
 
   private void update() {
-    // set end date
-    dateEndedLabel.setVisible(job.getEndDate() != null);
-    dateEnded.setVisible(job.getEndDate() != null);
-    if (job.getEndDate() != null) {
+    boolean isScheduled = Job.JOB_STATE.SCHEDULED.equals(job.getState());
+    // A template job that was never executed: STOPPED with no objects touched at all.
+    // Using multiple counters avoids false positives for jobs stopped early after
+    // actually starting (which may also have completionPercentage == 0).
+    boolean isEmptyStopped = Job.JOB_STATE.STOPPED.equals(job.getState())
+      && job.getJobStats().getCompletionPercentage() == 0
+      && job.getJobStats().getSourceObjectsBeingProcessed() == 0
+      && job.getJobStats().getSourceObjectsProcessed() == 0
+      && job.getJobStats().getSourceObjectsWithErrors() == 0;
+
+    // set end date (hidden for scheduled/empty-stopped jobs)
+    boolean showEndDate = !isScheduled && !isEmptyStopped && job.getEndDate() != null;
+    dateEndedLabel.setVisible(showEndDate);
+    dateEnded.setVisible(showEndDate);
+    if (showEndDate) {
       dateEnded.setText(Humanize.formatDateTime(job.getEndDate()));
     }
 
-    // set duration
-    duration.setText(Humanize.durationInDHMS(job.getStartDate(), job.getEndDate(), DHMSFormat.LONG));
+    // duration panel hidden for scheduled jobs and empty-stopped jobs (never ran)
+    boolean showDuration = !isScheduled && !isEmptyStopped;
+    durationPanel.setVisible(showDuration);
+    if (showDuration) {
+      duration.setText(Humanize.durationInDHMS(job.getStartDate(), job.getEndDate(), DHMSFormat.LONG));
+    }
 
     // set state
     status.setHTML(HtmlSnippetUtils.getJobStateHtml(job.getState(), job.getJobStats()));
 
     scheduleInfoLabel.setVisible(false);
     scheduleInfo.setVisible(false);
+    nextRunPanel.setVisible(false);
 
-    String distributedMode = ConfigurationManager.getStringWithDefault(
-      RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
-
-    if (distributedMode.equals(RodaConstants.DistributedModeType.LOCAL.name())
-      && Job.JOB_STATE.SCHEDULED.equals(job.getState())) {
-      Services services = new Services("Retrieve job schedule info", "retrieve");
-      services.configurationsResource(s -> s.retrieveCronValue(LocaleInfo.getCurrentLocale().getLocaleName()))
-        .whenComplete((stringResponse, throwable) -> {
-          if (throwable != null) {
-            AsyncCallbackUtils.defaultFailureTreatment(throwable);
-          } else {
-            String description = stringResponse.getValue();
-            if (StringUtils.isNotBlank(description)) {
+    if (isScheduled) {
+      String cronExpression = job.getFields() != null
+        ? (String) job.getFields().get(RodaConstants.JOB_SCHEDULE_INFO)
+        : null;
+      if (StringUtils.isNotBlank(cronExpression)) {
+        Services services = new Services("Retrieve job schedule description", "retrieve");
+        services
+          .configurationsResource(
+            s -> s.describeCronExpression(cronExpression, LocaleInfo.getCurrentLocale().getLocaleName()))
+          .whenComplete((stringResponse, throwable) -> {
+            if (throwable != null) {
               scheduleInfoLabel.setVisible(true);
               scheduleInfo.setVisible(true);
-              scheduleInfo.setText(description);
+              scheduleInfo.setText(cronExpression);
+            } else {
+              String description = stringResponse.getValue();
+              scheduleInfoLabel.setVisible(true);
+              scheduleInfo.setVisible(true);
+              scheduleInfo.setText(StringUtils.isNotBlank(description) ? description : cronExpression);
             }
-          }
-        });
+          });
+      }
+      // show next scheduled run time
+      if (job.getNextScheduledRun() != null) {
+        nextRunPanel.setVisible(true);
+        nextRun.setText(Humanize.formatDateTime(job.getNextScheduledRun()));
+      }
     }
 
     // set state details

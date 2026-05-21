@@ -139,6 +139,8 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
   @UiField
   Button buttonCreate;
   @UiField
+  Button buttonSchedule;
+  @UiField
   Button buttonObtainCommand;
   @UiField
   Button buttonCancel;
@@ -395,6 +397,7 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
       workflowOptions.setPluginInfo(null);
     } else {
       buttonCreate.setEnabled(shouldEnableCreateButton());
+      buttonSchedule.setEnabled(shouldEnableCreateButton());
       buildPluginHeader();
       buildPluginStatusPanel();
 
@@ -593,6 +596,9 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
   @UiHandler("buttonCreate")
   public abstract void buttonCreateHandler(ClickEvent e);
 
+  @UiHandler("buttonSchedule")
+  public abstract void buttonScheduleHandler(ClickEvent e);
+
   @UiHandler("buttonObtainCommand")
   public abstract void buttonObtainCommandHandler(ClickEvent e);
 
@@ -625,6 +631,10 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
 
   public Button getButtonCreate() {
     return this.buttonCreate;
+  }
+
+  public Button getButtonSchedule() {
+    return this.buttonSchedule;
   }
 
   public TextBox getName() {

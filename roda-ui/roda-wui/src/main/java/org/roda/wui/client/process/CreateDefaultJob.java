@@ -161,6 +161,8 @@ public class CreateDefaultJob extends Composite {
   @UiField
   Button buttonCreate;
   @UiField
+  Button buttonSchedule;
+  @UiField
   Button buttonObtainCommand;
   @UiField
   Button buttonCancel;
@@ -655,6 +657,7 @@ public class CreateDefaultJob extends Composite {
   @UiHandler("buttonCreate")
   public void buttonCreateHandler(ClickEvent e) {
     buttonCreate.setEnabled(false);
+    buttonSchedule.setEnabled(false);
     String jobName = getName().getText();
     SelectedItems<? extends IsIndexed> selected = search.getSelectedItemsInCurrentList();
     if (org.roda.core.data.v2.Void.class.getName().equals(targetList.getSelectedValue())) {
@@ -678,11 +681,61 @@ public class CreateDefaultJob extends Composite {
       if (throwable != null) {
         // Toast.showError(messages.dialogFailure(), caught.getMessage());
         buttonCreate.setEnabled(true);
+        buttonSchedule.setEnabled(true);
       } else {
         Toast.showInfo(messages.dialogDone(), messages.processCreated());
         HistoryUtils.newHistory(ActionProcess.RESOLVER);
       }
     });
+  }
+
+  @SuppressWarnings("rawtypes")
+  @UiHandler("buttonSchedule")
+  public void buttonScheduleHandler(ClickEvent e) {
+    if (!shouldEnableCreateButton()) {
+      return;
+    }
+    String jobName = getName().getText();
+    SelectedItems<? extends IsIndexed> selected = search.getSelectedItemsInCurrentList();
+    if (org.roda.core.data.v2.Void.class.getName().equals(targetList.getSelectedValue())) {
+      selected = new SelectedItemsNone<>();
+    } else if (isListEmpty) {
+      selected = SelectedItemsAll.create(targetList.getSelectedValue());
+    }
+
+    final SelectedItems<? extends IsIndexed> finalSelected = selected;
+    ScheduleJobDialog dialog = new ScheduleJobDialog(cronExpression -> {
+      if (cronExpression == null) {
+        return;
+      }
+      buttonCreate.setEnabled(false);
+      buttonSchedule.setEnabled(false);
+
+      CreateJobRequest jobRequest = new CreateJobRequest();
+      jobRequest.setName(jobName);
+      jobRequest.setPlugin(getSelectedPlugin().getId());
+      jobRequest.setPluginParameters(getWorkflowOptions().getValue());
+      SelectedItemsRequest selectedItemsRequest = SelectedItemsUtils.convertToRESTRequest(finalSelected);
+      jobRequest.setSourceObjects(selectedItemsRequest);
+      jobRequest.setPriority(priority.name());
+      jobRequest.setParallelism(parallelism.name());
+      jobRequest.setSourceObjectsClass(finalSelected.getSelectedClass());
+      jobRequest.setScheduleExpression(cronExpression);
+
+      Services services = new Services("Schedule job", "create");
+      services.jobsResource(s -> s.createJob(jobRequest)).whenComplete((job1, throwable) -> {
+        buttonCreate.setEnabled(true);
+        buttonSchedule.setEnabled(true);
+        if (throwable != null) {
+          Toast.showError(messages.dialogFailure(), throwable.getMessage());
+        } else {
+          Toast.showInfo(messages.dialogDone(), messages.processCreated());
+          HistoryUtils.newHistory(ActionProcess.RESOLVER);
+        }
+      });
+    });
+    dialog.center();
+    dialog.show();
   }
 
   @SuppressWarnings("rawtypes")

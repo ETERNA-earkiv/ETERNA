@@ -160,17 +160,17 @@ public class AddRepresentationInformationFilterPlugin extends AbstractPlugin<Rep
 
   @Override
   public String getPreservationEventDescription() {
-    return "Lade till filter för representationsinformation";
+    return "Add representation information filter";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Filtret för representationsinformation lades till";
+    return "Representation information filter was added successfully";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Det gick inte att lägga till filtret för representationsinformation";
+    return "Representation information filter failed to add";
   }
 
   @Override

@@ -181,7 +181,7 @@ public class ReindexPreservationAIPEventPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Reindex Roda entity";
+    return "Reindex ETERNA entity";
   }
 
   @Override

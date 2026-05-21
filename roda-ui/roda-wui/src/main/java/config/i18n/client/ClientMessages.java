@@ -341,6 +341,38 @@ public interface ClientMessages extends Messages {
 
   String createJobCancelTitle();
 
+  String createJobScheduleTitle();
+
+  String scheduleDialogFrequencyLabel();
+
+  String scheduleDialogFrequencyOnce();
+
+  String scheduleDialogFrequencyHourly();
+
+  String scheduleDialogFrequencyDaily();
+
+  String scheduleDialogFrequencyWeekly();
+
+  String scheduleDialogFrequencyMonthly();
+
+  String scheduleDialogDateLabel();
+
+  String scheduleDialogTimeLabel();
+
+  String scheduleDialogDayOfWeekLabel();
+
+  String scheduleDialogDayOfMonthLabel();
+
+  String scheduleDialogPreviewLabel();
+
+  String scheduleDialogConfirmButton();
+
+  String scheduleDialogPastTimeError();
+
+  String scheduleDialogInvalidDateError();
+
+  String scheduleDialogOnceSummary(String date, String time);
+
   String createJobWorkflow();
 
   String createJobCategorySelect();
@@ -450,6 +482,8 @@ public interface ClientMessages extends Messages {
   String approveButton();
 
   String rejectButton();
+
+  String unscheduleButton();
 
   String listButton();
 
@@ -645,6 +679,10 @@ public interface ClientMessages extends Messages {
   String jobRejectConfirmDialogTitle();
 
   String jobRejectConfirmDialogMessage();
+
+  String jobUnscheduleConfirmDialogTitle();
+
+  String jobUnscheduleConfirmDialogMessage();
 
   String jobSelectedApproveConfirmDialogMessage(Long size);
 
@@ -1158,6 +1196,8 @@ public interface ClientMessages extends Messages {
   String jobEndDate();
 
   String jobDuration();
+
+  String jobNextScheduledRun();
 
   String jobStatus();
 
@@ -2241,6 +2281,10 @@ public interface ClientMessages extends Messages {
 
   String disposalRetentionDueDateLabel();
 
+  String retentionPeriodStartDateMissing();
+
+  String retentionPeriodStartDateInvalidType();
+
   String disposalRetentionPeriodLabel();
 
   String disposalActionLabel();
@@ -2692,6 +2736,8 @@ public interface ClientMessages extends Messages {
   String reasonJobIsFinishedOrStopping();
 
   String reasonJobNotPendingApproval();
+
+  String reasonJobNotScheduled();
 
   String reasonJobDoesNotNeedAppraisal();
 
