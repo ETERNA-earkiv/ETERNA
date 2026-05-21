@@ -83,7 +83,10 @@ public class ScheduleJobDialog extends DialogBox {
     root.addStyleName("wui-dialog-layout");
     // Fixed width keeps the dialog from shifting when month/day labels change length.
     root.getElement().getStyle().setWidth(360, Style.Unit.PX);
-    root.getElement().getStyle().setPadding(8, Style.Unit.PX);
+    root.getElement().getStyle().setPaddingTop(12, Style.Unit.PX);
+    root.getElement().getStyle().setPaddingBottom(16, Style.Unit.PX);
+    root.getElement().getStyle().setPaddingLeft(20, Style.Unit.PX);
+    root.getElement().getStyle().setPaddingRight(20, Style.Unit.PX);
 
     // --- Frequency row ---
     FlowPanel freqRow = new FlowPanel();
@@ -201,6 +204,7 @@ public class ScheduleJobDialog extends DialogBox {
     // --- Preview row ---
     FlowPanel previewRow = new FlowPanel();
     previewRow.addStyleName("form-row schedule-preview-row");
+    previewRow.getElement().getStyle().setMarginTop(16, Style.Unit.PX);
     Label previewTitleLabel = new Label(messages.scheduleDialogPreviewLabel() + ":");
     previewTitleLabel.addStyleName("form-label");
     previewLabel.addStyleName("value schedule-preview-text");
@@ -211,6 +215,7 @@ public class ScheduleJobDialog extends DialogBox {
     // --- Footer ---
     FlowPanel footer = new FlowPanel();
     footer.addStyleName("wui-dialog-layout-footer");
+    footer.getElement().getStyle().setMarginTop(16, Style.Unit.PX);
     Button cancelButton = new Button(messages.cancelButton());
     cancelButton.addStyleName("btn btn-default btn-times-circle");
     Button confirmButton = new Button(messages.scheduleDialogConfirmButton());
