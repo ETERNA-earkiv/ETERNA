@@ -2736,7 +2736,16 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .wui-home {
-    color: #58595b;
+    color: #222222;
+}
+
+.wui-home p {
+    font-size: 14px;
+}
+
+.wui-home li {
+    font-size: 14px;
+    line-height: 1.6;
 }
 
 .content > .gwt-HTML > h1 {
