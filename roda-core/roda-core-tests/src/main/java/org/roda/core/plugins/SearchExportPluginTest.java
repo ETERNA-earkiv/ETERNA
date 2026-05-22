@@ -82,9 +82,9 @@ public class SearchExportPluginTest {
     assertEquals("job-456", row.get(0));
     assertEquals("Ingest job", row.get(1));
     assertEquals("admin", row.get(2));
-    assertEquals("COMPLETED", row.get(3));
-    assertEquals("INGEST", row.get(4));
-    assertEquals("", row.get(5)); // unknown field → empty
+    assertEquals("Klar", row.get(3));       // COMPLETED → Klar
+    assertEquals("Inleverans", row.get(4)); // INGEST → Inleverans
+    assertEquals("", row.get(5));           // okänt fält → tomt
   }
 
   @Test
@@ -103,8 +103,8 @@ public class SearchExportPluginTest {
     assertEquals("job-456", row.get(1));
     assertEquals("Ingest job", row.get(2));
     assertEquals("sip-001", row.get(3));
-    assertEquals("SUCCESS", row.get(4));
-    assertEquals("", row.get(5)); // unknown field → empty
+    assertEquals("Framgång", row.get(4)); // SUCCESS → Framgång
+    assertEquals("", row.get(5));         // okänt fält → tomt
   }
 
   @Test
@@ -130,8 +130,8 @@ public class SearchExportPluginTest {
     assertEquals("127.0.0.1", row.get(4));
     assertEquals("aip-123", row.get(5));
     assertEquals("42", row.get(6));
-    assertEquals("SUCCESS", row.get(7));
-    assertEquals("", row.get(8)); // unknown field → empty
+    assertEquals("Framgång", row.get(7)); // SUCCESS → Framgång
+    assertEquals("", row.get(8));         // okänt fält → tomt
   }
 
   @Test

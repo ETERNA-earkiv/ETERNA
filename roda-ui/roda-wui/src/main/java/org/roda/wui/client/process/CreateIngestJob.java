@@ -54,11 +54,17 @@ public class CreateIngestJob extends CreateSelectedJob<TransferredResource> {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static PluginType[] pluginTypes = {PluginType.INGEST};
+  private static final String PREFERRED_INGEST_PLUGIN_ID = "org.roda.core.plugins.base.ingest.v2.ConfigurableIngestPlugin";
 
   public CreateIngestJob() {
     super(Arrays.asList(pluginTypes));
     super.setCategoryListBoxVisible(false);
     super.getButtonSchedule().setVisible(false);
+  }
+
+  @Override
+  protected String getPreferredPluginId() {
+    return PREFERRED_INGEST_PLUGIN_ID;
   }
 
   @Override

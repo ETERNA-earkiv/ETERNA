@@ -3,14 +3,18 @@
 # run extension scripts
 DIR=/docker-entrypoint.d
 
-if [[ -d "$DIR" ]]
-then
-  /bin/run-parts --regex '^.*$' --verbose "$DIR"
+if [[ -d "$DIR" ]]; then
+  for script in "$DIR"/*; do
+    if [[ -f "$script" && -x "$script" ]]; then
+      echo "Running $script"
+      "$script" || exit $?
+    fi
+  done
 fi
 
 if [[ $# -eq 0 ]] ; then
-    echo "Starting RODA (user: $(whoami))"
-    exec java -jar /KEEPS/bin/roda-wui-*.jar
+    echo "Starting ETERNA (user: $(whoami))"
+    exec java -jar /WhiteRed/bin/roda-wui-*.jar
 fi
 
 exec "$@"

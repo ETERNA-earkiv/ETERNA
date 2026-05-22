@@ -321,7 +321,30 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
         }
       }
 
+      String preferredPluginId = getPreferredPluginId();
+      if (preferredPluginId != null) {
+        selectPreferredPluginInWorkflowList(preferredPluginId);
+      }
+
       updateWorkflowOptions();
+    }
+  }
+
+  protected String getPreferredPluginId() {
+    return null;
+  }
+
+  private void selectPreferredPluginInWorkflowList(String preferredPluginId) {
+    for (int i = 0; i < workflowList.getWidgetCount(); i++) {
+      Widget panelWidget = workflowList.getWidget(i);
+      if (preferredPluginId.equals(panelWidget.getElement().getAttribute("data-id"))) {
+        for (int j = 0; j < workflowList.getWidgetCount(); j++) {
+          workflowList.getWidget(j).removeStyleName("plugin-list-item-selected");
+        }
+        panelWidget.addStyleName("plugin-list-item-selected");
+        this.selectedPlugin = lookupPlugin(preferredPluginId);
+        return;
+      }
     }
   }
 
