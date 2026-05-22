@@ -2749,10 +2749,11 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .wui-home h3 {
-    font-size: 16px;
-    font-weight: 600;
-    margin-top: 28px;
-    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    font-style: normal;
+    margin-top: 20px;
+    margin-bottom: 4px;
 }
 
 .content > .gwt-HTML > h1 {
