@@ -12,8 +12,6 @@ package org.roda.wui.client.management;
 
 import java.util.List;
 
-import org.roda.core.data.exceptions.EmailAlreadyExistsException;
-import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.user.requests.CreateUserRequest;
 import org.roda.wui.client.common.UserLogin;
@@ -126,13 +124,20 @@ public class CreateUser extends Composite {
   }
 
   private void errorMessage(Throwable caught) {
-    if (caught instanceof EmailAlreadyExistsException) {
-      Toast.showError(messages.createUserEmailAlreadyExists(user.getEmail()));
-    } else if (caught instanceof UserAlreadyExistsException) {
-      Toast.showError(messages.createUserAlreadyExists(user.getId()));
-    } else {
-      Toast.showError(messages.createUserFailure(caught.getMessage()));
+    Throwable cause = caught;
+    while (cause != null) {
+      String name = cause.getClass().getName();
+      if (name.contains("EmailAlreadyExists")) {
+        Toast.showError(messages.createUserEmailAlreadyExists(user.getEmail()));
+        return;
+      }
+      if (name.contains("AlreadyExists")) {
+        Toast.showError(messages.createUserAlreadyExists(user.getId()));
+        return;
+      }
+      cause = cause.getCause();
     }
+    Toast.showError(messages.createUserFailure(caught.getMessage()));
   }
 
 }
