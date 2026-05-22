@@ -18,9 +18,9 @@ If a stylesheet is available in the archive package, the rendered HTML view load
 
 The buttons above the preview pane are:
 
-### Toggle: rendered ↔ raw XML
+### Toggle: View rendered view ↔ View original XML
 
-The first button toggles between the **rendered HTML view** and the **raw XML view**. The label shows what the next click will do (*View original XML* / *View rendered view*). Use this when you need to verify the underlying XML or compare it with the rendered output.
+The first button toggles between the XML and the stylesheet view. The label shows what the next click will do, **View rendered view** and **View original XML**. Use this button when you need to verify the underlying XML or compare it with the rendered output.
 
 ### Print
 

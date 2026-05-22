@@ -18,9 +18,9 @@ Finns det en stilmall i arkivpaketet så laddas den renderade HTML-vyn direkt. A
 
 Knapparna ovanför förhandsvisningen är:
 
-### Växla: renderad ↔ rå XML
+### Växla: Visa renderad vy ↔ Visa original-XML
 
-Första knappen växlar mellan **renderad HTML-vy** och **rå XML-vy**. Etiketten visar vad nästa klick gör (*Visa original-XML* / *Visa renderad vy*). Använd den när du behöver verifiera den underliggande XML:en eller jämföra med den renderade utdatan.
+Först knappen går att växla mellan XML och stilmallsvy. Etiketten visar vad nästa klick gör, **Visa renderad vy** och **Visa original-XML**.  Använd denna knappen när du behöver verifiera den underliggande XML:en eller jämföra med den renderade utdatan.
 
 ### Skriv ut
 
