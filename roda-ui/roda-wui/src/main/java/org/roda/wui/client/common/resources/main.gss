@@ -2749,9 +2749,11 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .wui-home h3 {
-    font-size: 14px;
+    font-family: FONT_PRIMARY;
+    font-size: 14px !important;
     font-weight: 700;
     font-style: normal;
+    letter-spacing: normal;
     margin-top: 20px;
     margin-bottom: 4px;
 }
