@@ -3569,6 +3569,20 @@ body.catalogTreeResizing * {
     align-items: center;
 }
 
+.catalogTreeNode.ghost {
+    cursor: default;
+    color: COLOR_GREY_DARK;
+    font-style: italic;
+}
+
+.catalogTreeNode.ghost:hover {
+    background: transparent;
+}
+
+.catalogTreeNode.ghost .catalogTreeIcon {
+    color: COLOR_GREY_MEDIUM;
+}
+
 .browseSidePanel .actionable-menu {
     display: flex;
     flex-direction: column;

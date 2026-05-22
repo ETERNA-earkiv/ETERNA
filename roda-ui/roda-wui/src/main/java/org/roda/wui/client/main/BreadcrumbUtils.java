@@ -129,7 +129,7 @@ public class BreadcrumbUtils {
               Toast.showError(messages.unknownAncestorError());
             }
           });
-          breadcrumb.add(unknownAncestorBreadcrumb);
+          breadcrumb.add(1, unknownAncestorBreadcrumb);
         }
       }
     }
@@ -183,7 +183,7 @@ public class BreadcrumbUtils {
               Toast.showError(messages.unknownAncestorError());
             }
           });
-          breadcrumb.add(unknownAncestorBreadcrumb);
+          breadcrumb.add(1, unknownAncestorBreadcrumb);
         }
       }
     }
