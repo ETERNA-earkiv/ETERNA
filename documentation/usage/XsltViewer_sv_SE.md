@@ -1,10 +1,10 @@
 # XML-visning med XSLT-stilmallar
 
-ETERNA kan rendera XML-filer som en formaterad HTML-sida via stilmallar, direkt i gränssnittet. Verktygsraden låter dig växla tillbaka till rå XML, rendera vy med hjälp av XSLT-filer i paketet, eller, om du har behörigheten *Applicera egen XSLT-stilmall*, tillfälligt använda en stilmall från din lokala dator utan att arkivpaketet ändras.
+ETERNA kan rendera XML-filer som en formaterad HTML-sida via stilmallar, direkt i gränssnittet. Verktygsraden låter dig växla mellan XML, rendera vy med hjälp av XSLT-filer i paketet eller om du har behörigheten *Applicera egen XSLT-stilmall*, tillfälligt använda en stilmall från din lokala dator utan att arkivpaketet ändras.
 
 ## Vad är en stilmall?
 
-En **stilmall** (XSLT — *eXtensible Stylesheet Language Transformations*) är en fil som omvandlar en XML-fil till ett annat format, vanligen HTML. ETERNA använder XSLT för att göra strukturerad arkivmetadata (METS, EAD, samt andra standarder) läsbara för människor.
+En **stilmall** (XSLT — *eXtensible Stylesheet Language Transformations*) är en fil som omvandlar en XML-fil till ett annat format, vanligen HTML. ETERNA använder bland annat XSLT för att göra strukturerad arkivmetadata (METS, EAD, samt andra standarder) läsbara för människor.
 
 ## Öppna en XML-fil
 
@@ -12,7 +12,7 @@ En **stilmall** (XSLT — *eXtensible Stylesheet Language Transformations*) är 
 2. Öppna fillistan och hitta filen. ETERNA känner igen XML via MIME-typ (`text/xml`, `application/xml`, `*+xml`) eller filändelse (`.xml`).
 3. Klicka på filen. Visaren öppnas i samma område som övriga förhandsvisningar.
 
-Finns en matchande stilmall i arkivpaketet så laddas den renderade HTML-vyn direkt. Annars visas rå XML — du kan fortfarande granska, skriva ut filen, eller ladda upp en lokal stilmall (om du har behörighet).
+Finns det en stilmall i arkivpaketet så laddas den renderade HTML-vyn direkt. Annars visas rå XML — du kan fortfarande granska, skriva ut filen, eller ladda upp en lokal stilmall (om du har behörighet).
 
 ## Använd verktygsraden
 
@@ -26,7 +26,7 @@ Första knappen växlar mellan **renderad HTML-vy** och **rå XML-vy**. Etikette
 
 Skriv ut-knappen öppnar den aktuella renderade HTML:en i ett nytt webbläsarfönster och triggar utskriftsdialogen. Utskriften använder snålare marginaler och döljer webbläsarens default-sidhuvuden/sidfötter där webbläsaren tillåter det.
 
-> **Notera:** Utskrift är endast tillgängligt i den renderade vyn. Att skriva ut den råa XML-vyn stöds inte — använd webbläsarens egen utskriftsfunktion om det behövs.
+> **Notera:** Utskrift är endast tillgängligt i den renderade vyn. Att skriva ut den råa XML-vyn stöds inte, använd webbläsarens egen utskriftsfunktion om det behövs (`Ctrl + P`).
 
 **Tips för renare utskrifter** (Chrome / Edge): expandera *Fler inställningar* i utskriftsdialogen och stäng av **Sidhuvuden och sidfötter** för att ta bort sidans URL och sidnummer. Justera marginalerna från samma panel vid behov.
 
@@ -36,8 +36,10 @@ Rullisten visar alla stilmallar som gäller för aktuell XML-fil. Källorna slå
 
 | Prefix | Källa | Beskrivning |
 |--------|-------|-------------|
-| (inget prefix) | **Lokal** | En `.xsl` / `.xslt`-fil som ligger bredvid XML:en i samma representation. ETERNA prioriterar stilmallar med samma basnamn (`Foo.xml` → `Foo.xslt`). |
-| (inget prefix) | **AIP-dokumentation** | En stilmall som levererats i AIP:ns `documentation`-mapp. |
+| (inget prefix) | **AIP-representation data-mapp** | En `.xsl` / `.xslt`-fil som ligger bredvid XML:en i samma representation. ETERNA prioriterar stilmallar med samma basnamn (`Foo.xml` → `Foo.xslt`). |
+| (inget prefix) | **AIP-documentation (representations-nivå)** | En stilmall som levererats i en documentation-mapp på AIP:ns representations-nivå. |
+| (inget prefix) | **AIP-documentation (rot-nivå)** | En stilmall som levererats i AIP:ns `documentation`-mapp. |
+| **Lokal:** | **Lokal** | En stilmall som laddats upp från lokal dator för engångs-rendering. Sparas ej i ETERNA eller AIP. |
 | **Global:** | **Global** | En stilmall som administratören installerat och kopplat till XML:ens namespace. |
 
 Saknas matchande stilmall visar rullisten *(Ingen)* och rå XML förvalt.
@@ -78,11 +80,11 @@ Ingen matchande stilmall hittades för denna XML-fil, så det finns inget att re
 
 ### Varför försvinner min uppladdade stilmall när jag öppnar filen senare?
 
-Lokala stilmallsuppladdningar är medvetet sessionsbundna — de finns för att inspektera ad hoc utan att ändra arkivet. För att göra en stilmall permanent: placera den bredvid XML:en i representationen, i AIP:ns documentation-mapp, eller låt administratören installera den som global stilmall.
+Lokala stilmallsuppladdningar är medvetet sessionsbundna. De finns för att inspektera ad hoc utan att ändra arkivet. För att göra en stilmall permanent: placera den bredvid XML:en i representationen, i AIP:ns documentation-mapp, eller låt administratören installera den som global stilmall.
 
-### Jag får *XSLT-filen är för stor* — vad är gränsen?
+### Jag får *XSLT-filen är för stor*, vad är gränsen?
 
-1 MB. Större stilmallar avvisas vid uppladdning. De flesta renderings-stilmallar är långt mindre än så; om du slår i taket beror det oftast på inlagt statiskt innehåll som istället borde refereras.
+1 MB. Större stilmallar avvisas vid uppladdning. De flesta renderings-stilmallar är långt mindre än så om du slår i taket beror det oftast på inlagt statiskt innehåll som istället borde refereras.
 
 ### Min XSLT fungerar i en desktopverktyg men inte i ETERNA — varför?
 
@@ -94,6 +96,6 @@ Skriv ut-knappen är bara aktiv i den renderade vyn. För att skriva ut rå XML,
 
 ## Tekniska begränsningar
 
-- Visaren renderar XML server-side; mycket stora XML-filer kan ta tid eller tajma ut efter 30 sekunder vid lokal uppladdning.
+- Visaren renderar XML server-side så mycket stora XML-filer kan ta tid eller tajma ut efter 30 sekunder vid lokal uppladdning.
 - Den renderade HTML:en körs i en sandlådad iframe utan JavaScript-exekvering, formulär-submit eller toppnivå-navigation. Interaktiva element i stilmallens utdata är medvetet inerta.
-- Utskriftsresultatet beror på webbläsarens utskriftsmotor och stilmallens CSS — komplexa layouter kan behöva en utskriftsspecifik stilmall för bästa resultat.
+- Utskriftsresultatet beror på webbläsarens utskriftsmotor och stilmallens CSS, komplexa layouter kan behöva en utskriftsspecifik stilmall för bästa resultat.
