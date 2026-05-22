@@ -11,7 +11,6 @@ if [[ -d "$DIR" ]]; then
     fi
   done
 fi
-fi
 
 if [[ $# -eq 0 ]] ; then
     echo "Starting ETERNA (user: $(whoami))"
