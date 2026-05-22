@@ -17,15 +17,22 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.common.utils.IndexedDIPUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.tools.ConfigurationManager;
+import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.StringUtils;
+
+import java.util.Arrays;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.event.logical.shared.AttachEvent.Handler;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -40,12 +47,21 @@ import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.safehtml.shared.UriUtils;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Command;
+import org.roda.wui.common.client.widgets.Toast;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.ComplexPanel;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -59,8 +75,10 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   private static final String VIEWER_TYPE_HTML = "html";
   private static final String VIEWER_TYPE_PDF = "pdf";
   private static final String VIEWER_TYPE_IMAGE = "image";
+  private static final String VIEWER_TYPE_XML = "xml";
   private static final String VIEWER_TYPE_TIFF = "tiff";
   private static final String VIEWER_TYPE_WEBARCHIVE = "webarchive";
+  private static final String LOCAL_VALUE_PREFIX = "__local__:";
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -178,6 +196,11 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   }
 
   private void preview() {
+    // XSL/XSLT files: show raw XML, never apply a stylesheet
+    if (isXsltOrXslFile()) {
+      textPreview();
+      return;
+    }
     String type = viewerType();
     if (type != null) {
       if (type.equals(VIEWER_TYPE_IMAGE)) {
@@ -189,7 +212,11 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
       } else if (type.equals(VIEWER_TYPE_WEBARCHIVE)) {
         webarchivePreview();
       } else if (type.equals(VIEWER_TYPE_TEXT)) {
-        textPreview();
+        if (isXmlFile()) {
+          xmlHtmlPreview();
+        } else {
+          textPreview();
+        }
       } else if (type.equals(VIEWER_TYPE_HTML)) {
         htmlPreview();
       } else if (type.equals(VIEWER_TYPE_AUDIO)) {
@@ -199,6 +226,8 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
       } else {
         notSupportedPreview();
       }
+    } else if (isXmlFile()) {
+      xmlHtmlPreview();
     } else if (object instanceof IndexedDIP) {
       IndexedDIP dip = (IndexedDIP) object;
       dipUrlPreview(dip);
@@ -300,6 +329,10 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   }
 
   private void textPreview() {
+    textPreview(panel);
+  }
+
+  private void textPreview(ComplexPanel target) {
     if (StringUtils.isBlank(viewers.getTextLimit()) || size <= Long.parseLong(viewers.getTextLimit())) {
       RequestBuilder request = new RequestBuilder(RequestBuilder.GET, bitstreamDownloadUri.asString());
       try {
@@ -312,24 +345,24 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
               FlowPanel frame = new FlowPanel();
               frame.add(html);
 
-              panel.add(frame);
+              target.add(frame);
               frame.setStyleName("viewRepresentationTextFilePreview");
               JavascriptUtils.runHighlighter(html.getElement());
             } else {
-              errorPreview();
+              errorPreview(target);
             }
           }
 
           @Override
           public void onError(Request request, Throwable exception) {
-            errorPreview();
+            errorPreview(target);
           }
         });
       } catch (RequestException e) {
-        errorPreview();
+        errorPreview(target);
       }
     } else {
-      errorPreview(messages.viewRepresentationTooLargeErrorPreview());
+      errorPreview(messages.viewRepresentationTooLargeErrorPreview(), target);
     }
   }
 
@@ -433,10 +466,18 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   }
 
   private void errorPreview() {
-    errorPreview(messages.viewRepresentationErrorPreview());
+    errorPreview(messages.viewRepresentationErrorPreview(), panel);
   }
 
   private void errorPreview(String errorPreview) {
+    errorPreview(errorPreview, panel);
+  }
+
+  private void errorPreview(ComplexPanel target) {
+    errorPreview(messages.viewRepresentationErrorPreview(), target);
+  }
+
+  private void errorPreview(String errorPreview, ComplexPanel target) {
     HTML html = new HTML();
     SafeHtmlBuilder b = new SafeHtmlBuilder();
 
@@ -455,8 +496,8 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     });
 
     html.setHTML(b.toSafeHtml());
-    panel.add(html);
-    panel.add(downloadButton);
+    target.add(html);
+    target.add(downloadButton);
     html.setStyleName("viewRepresentationErrorPreview");
     downloadButton.setStyleName("btn btn-donwload viewRepresentationNotSupportedDownloadButton");
 
@@ -536,6 +577,371 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     html.setStyleName("viewRepresentationEmptyPreview");
     return html;
   }
+
+
+  private boolean isXsltOrXslFile() {
+    if (filename != null) {
+      String lower = filename.toLowerCase();
+      if (lower.endsWith(".xsl") || lower.endsWith(".xslt")) {
+        return true;
+      }
+    }
+    if (format != null && format.getMimeType() != null) {
+      String mime = format.getMimeType().toLowerCase();
+      if (mime.equals("application/xslt+xml") || mime.equals("text/xsl") || mime.equals("application/xsl+xml")) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean isXmlFile() {
+    if (format != null && format.getMimeType() != null) {
+      String mime = format.getMimeType().toLowerCase();
+      if (mime.equals("text/xml") || mime.equals("application/xml") || mime.endsWith("+xml")) {
+        return true;
+      }
+    }
+    if (filename != null) {
+      String lower = filename.toLowerCase();
+      if (lower.endsWith(".xml") || lower.endsWith(".xsl") || lower.endsWith(".xslt")) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private void xmlHtmlPreview() {
+    if (!(object instanceof IndexedFile)) {
+      textPreview();
+      return;
+    }
+
+    if (isXsltOrXslFile()) {
+      textPreview();
+      return;
+    }
+
+    final IndexedFile indexedFile = (IndexedFile) object;
+    final String fileUuid = indexedFile.getUUID();
+    final String locale = LocaleInfo.getCurrentLocale().getLocaleName();
+    String xsltsUrl = RestUtils.createRepresentationFileXsltsUri(fileUuid).asString();
+
+    // Fetch the available-XSLT list FIRST, then build the unified viewer regardless
+    // of whether anything was found. The toolbar always shows the same controls; an
+    // empty list just means the stylesheet dropdown shows "(None)" until a user
+    // with the apply_xslt role uploads a local one.
+    RequestBuilder xsltsRequest = new RequestBuilder(RequestBuilder.GET, xsltsUrl);
+    try {
+      xsltsRequest.sendRequest(null, new RequestCallback() {
+        @Override
+        public void onResponseReceived(Request req, Response response) {
+          JSONArray xslts = parseXsltArray(response);
+          buildXsltViewer(indexedFile, fileUuid, locale, xslts != null ? xslts : new JSONArray());
+        }
+
+        @Override
+        public void onError(Request req, Throwable exception) {
+          buildXsltViewer(indexedFile, fileUuid, locale, new JSONArray());
+        }
+      });
+    } catch (RequestException e) {
+      buildXsltViewer(indexedFile, fileUuid, locale, new JSONArray());
+    }
+  }
+
+  private static JSONArray parseXsltArray(Response response) {
+    if (response.getStatusCode() != HttpStatus.SC_OK) {
+      return null;
+    }
+    try {
+      JSONValue parsed = JSONParser.parseStrict(response.getText());
+      return parsed.isArray();
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  private void buildXsltViewer(IndexedFile indexedFile, String fileUuid, String locale, JSONArray xslts) {
+    String transformUrl = RestUtils.createRepresentationFileTransformUri(fileUuid, locale).asString();
+
+    final FlowPanel toolbar = new FlowPanel();
+    toolbar.setStyleName("xmlPreviewToolbar");
+
+    final Button toggleXmlButton = new Button(messages.xsltViewOriginalButton());
+    toggleXmlButton.setStyleName("btn btn-play xmlPreviewToggleButton");
+    toolbar.add(toggleXmlButton);
+
+    final Button printButton = new Button(messages.xsltPrintButton());
+    printButton.setStyleName("btn btn-play xmlPreviewPrintButton");
+    toolbar.add(printButton);
+
+    Label dropdownLabel = new Label(messages.xsltSelectLabel());
+    dropdownLabel.setStyleName("xmlPreviewSelectLabel");
+    final ListBox xsltDropdown = new ListBox();
+    xsltDropdown.setStyleName("xmlPreviewSelectDropdown");
+    for (int i = 0; i < xslts.size(); i++) {
+      JSONObject obj = xslts.get(i).isObject();
+      if (obj != null) {
+        String id = obj.get("id").isString().stringValue();
+        String label = obj.get("label").isString().stringValue();
+        if (id.startsWith("global:")) {
+          label = messages.xsltGlobalPrefix() + " " + label;
+        }
+        xsltDropdown.addItem(label, id);
+      }
+    }
+    if (xsltDropdown.getItemCount() == 0) {
+      xsltDropdown.addItem(messages.xsltDropdownEmpty(), "");
+    }
+    toolbar.add(dropdownLabel);
+    toolbar.add(xsltDropdown);
+
+    Label localLabel = new Label(messages.xsltUseLocalLabel());
+    localLabel.setStyleName("xmlPreviewLocalLabel");
+    localLabel.setVisible(false);
+    final FileUpload xsltUpload = new FileUpload();
+    xsltUpload.setName("xslt");
+    xsltUpload.getElement().setAttribute("accept", ".xslt,.xsl");
+    xsltUpload.setStyleName("xmlPreviewFileInput");
+    Button selectFileButton = new Button(messages.xsltSelectFileButton());
+    selectFileButton.setStyleName("btn-eterna-secondary xmlPreviewSelectFileButton");
+    selectFileButton.addClickHandler(event -> triggerClick(xsltUpload.getElement()));
+    selectFileButton.setVisible(false);
+    toolbar.add(localLabel);
+    toolbar.add(selectFileButton);
+    toolbar.add(xsltUpload);
+
+    Label flagLabel = new Label(messages.xsltLocalNotSaved());
+    flagLabel.setStyleName("xmlPreviewFlag");
+    flagLabel.setVisible(false);
+    toolbar.add(flagLabel);
+
+    panel.add(toolbar);
+
+    UserLogin.getInstance().checkRole(Arrays.asList("representation.apply_xslt"), new AsyncCallback<Boolean>() {
+      @Override
+      public void onSuccess(Boolean hasRole) {
+        boolean show = Boolean.TRUE.equals(hasRole);
+        localLabel.setVisible(show);
+        selectFileButton.setVisible(show);
+      }
+
+      @Override
+      public void onFailure(Throwable caught) {
+        localLabel.setVisible(false);
+        selectFileButton.setVisible(false);
+      }
+    });
+
+    final Frame xsltFrame = new Frame();
+    xsltFrame.setStyleName("viewRepresentationHtmlFilePreview");
+    xsltFrame.getElement().setAttribute("sandbox", "allow-same-origin");
+    panel.add(xsltFrame);
+
+    final FlowPanel rawXmlContainer = new FlowPanel();
+    rawXmlContainer.setVisible(false);
+    panel.add(rawXmlContainer);
+
+    final boolean[] rawXmlLoaded = {false};
+    final boolean noServerXslts = xslts.size() == 0;
+    // Always start in raw-XML / disabled mode. enterRenderedView is the only
+    // path that flips to the rendered view, and it is invoked exclusively from
+    // an HTTP 200 callback — so a failed initial preview leaves the user with
+    // raw XML rather than an empty iframe with active render/print controls.
+    final boolean[] showingRawXml = {true};
+    final boolean[] iframeHasContent = {false};
+    xsltFrame.setVisible(false);
+    rawXmlContainer.setVisible(true);
+    rawXmlLoaded[0] = true;
+    textPreview(rawXmlContainer);
+    toggleXmlButton.setText(messages.xsltViewRenderedButton());
+    toggleXmlButton.setEnabled(false);
+    printButton.setEnabled(false);
+
+    // Invoked from sync paths (cache hit / loadXsltPreview) and from applyCustomXslt's HTTP 200 callback
+    final com.google.gwt.user.client.Command enterRenderedView = () -> {
+      iframeHasContent[0] = true;
+      toggleXmlButton.setEnabled(true);
+      if (showingRawXml[0]) {
+        showingRawXml[0] = false;
+        toggleXmlButton.setText(messages.xsltViewOriginalButton());
+        rawXmlContainer.setVisible(false);
+        xsltFrame.setVisible(true);
+        printButton.setEnabled(true);
+      }
+    };
+
+    Runnable applyCurrentSelection = () -> {
+      int idx = xsltDropdown.getSelectedIndex();
+      if (idx < 0) return;
+      String selectedId = xsltDropdown.getValue(idx);
+      if (selectedId == null || selectedId.isEmpty()) {
+        flagLabel.setVisible(false);
+        return;
+      }
+      boolean isLocal = selectedId.startsWith(LOCAL_VALUE_PREFIX);
+      flagLabel.setVisible(isLocal);
+      if (isLocal) {
+        String fn = selectedId.substring(LOCAL_VALUE_PREFIX.length());
+        String cached = getCachedXslt(fn);
+        if (cached != null) {
+          applyCachedXslt(xsltFrame.getElement(), cached);
+          enterRenderedView.execute();
+        }
+      } else {
+        XsltPreviewService.loadPreview(
+          XsltPreviewService.buildPreviewUrl(fileUuid, locale, selectedId), xsltFrame, enterRenderedView);
+      }
+    };
+
+    xsltDropdown.addChangeHandler(event -> applyCurrentSelection.run());
+
+    xsltUpload.addChangeHandler(event -> {
+      String filename = xsltUpload.getFilename();
+      if (filename == null || filename.isEmpty()) {
+        return;
+      }
+      int slash = Math.max(filename.lastIndexOf('/'), filename.lastIndexOf('\\'));
+      String shortName = slash >= 0 ? filename.substring(slash + 1) : filename;
+      String localValue = LOCAL_VALUE_PREFIX + shortName;
+
+      // Always POST — even if filename matches an existing entry, the user may have
+      // picked a different file with the same name. The success callback either
+      // re-selects the existing entry (cache is overwritten in the JSNI on HTTP 200)
+      // or appends a new one. Failed POSTs leave the UI untouched.
+      final String localShortName = shortName;
+      final String localId = localValue;
+      com.google.gwt.user.client.Command onUploadSuccess = () -> {
+        int existingIdx = -1;
+        for (int i = 0; i < xsltDropdown.getItemCount(); i++) {
+          if (localId.equals(xsltDropdown.getValue(i))) {
+            existingIdx = i;
+            break;
+          }
+        }
+        if (existingIdx < 0) {
+          if (xsltDropdown.getItemCount() == 1 && "".equals(xsltDropdown.getValue(0))) {
+            xsltDropdown.removeItem(0);
+          }
+          xsltDropdown.addItem(messages.xsltLocalPrefix() + " " + localShortName, localId);
+          existingIdx = xsltDropdown.getItemCount() - 1;
+        }
+        xsltDropdown.setSelectedIndex(existingIdx);
+        flagLabel.setVisible(true);
+        enterRenderedView.execute();
+      };
+      applyCustomXslt(xsltUpload.getElement(), transformUrl, xsltFrame.getElement(),
+        onUploadSuccess,
+        messages.xsltFileTooLarge(), messages.xsltTransformFailed(),
+        messages.xsltUploadError(), messages.xsltTransformTimeout());
+    });
+
+    printButton.addClickHandler(event -> printIframeContent(xsltFrame.getElement(), messages.xsltPrintError()));
+
+    toggleXmlButton.addClickHandler(event -> {
+      if (!showingRawXml[0]) {
+        showingRawXml[0] = true;
+        toggleXmlButton.setText(messages.xsltViewRenderedButton());
+        printButton.setEnabled(false);
+        xsltFrame.setVisible(false);
+        rawXmlContainer.setVisible(true);
+        if (!rawXmlLoaded[0]) {
+          rawXmlLoaded[0] = true;
+          textPreview(rawXmlContainer);
+        }
+      } else {
+        showingRawXml[0] = false;
+        toggleXmlButton.setText(messages.xsltViewOriginalButton());
+        rawXmlContainer.setVisible(false);
+        xsltFrame.setVisible(true);
+        printButton.setEnabled(true);
+      }
+    });
+
+    // Initial render: if any server-side XSLT exists, load the first one and
+    // only switch the UI to rendered mode on HTTP 200 (via enterRenderedView).
+    if (!noServerXslts) {
+      XsltPreviewService.loadPreview(
+        XsltPreviewService.buildPreviewUrl(fileUuid, locale, xsltDropdown.getValue(0)),
+        xsltFrame, enterRenderedView);
+    }
+  }
+
+  private static native void triggerClick(com.google.gwt.dom.client.Element element) /*-{
+    element.click();
+  }-*/;
+
+  private native void printIframeContent(com.google.gwt.dom.client.Element iframe, String errorMsg) /*-{
+    try {
+      var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+      var html = iframeDoc.documentElement.outerHTML;
+      var printWin = $wnd.open('', '_blank');
+      printWin.document.write(html);
+      // Inject print styles to suppress headers/footers
+      var style = printWin.document.createElement('style');
+      style.textContent = '@page { margin: 15mm; size: auto; } @media print { body { margin: 0; } }';
+      printWin.document.head.appendChild(style);
+      printWin.document.close();
+      printWin.focus();
+      // Delay to let content render before printing
+      setTimeout(function() {
+        printWin.print();
+        printWin.close();
+      }, 500);
+    } catch (e) {
+      $wnd.alert(errorMsg + e.message);
+    }
+  }-*/;
+
+  private native void applyCustomXslt(
+    com.google.gwt.dom.client.Element fileInput, String url, com.google.gwt.dom.client.Element iframe,
+    com.google.gwt.user.client.Command onSuccess,
+    String fileTooLargeMsg, String transformFailedMsg, String uploadErrorMsg, String timeoutMsg) /*-{
+    var files = fileInput.files;
+    if (!files || files.length === 0) {
+      return;
+    }
+    var file = files[0];
+    var maxSize = 1024 * 1024;
+    if (file.size > maxSize) {
+      $wnd.alert(fileTooLargeMsg);
+      return;
+    }
+    var self = this;
+    var formData = new FormData();
+    formData.append("xslt", file);
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", url, true);
+    xhr.timeout = 30000;
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        iframe.setAttribute("srcdoc", xhr.responseText);
+        self.__xsltCache = self.__xsltCache || {};
+        self.__xsltCache[file.name] = xhr.responseText;
+        if (onSuccess) {
+          onSuccess.@com.google.gwt.user.client.Command::execute()();
+        }
+      } else {
+        $wnd.alert(transformFailedMsg + xhr.statusText);
+      }
+    };
+    xhr.onerror = function() {
+      $wnd.alert(uploadErrorMsg);
+    };
+    xhr.ontimeout = function() {
+      $wnd.alert(timeoutMsg);
+    };
+    xhr.send(formData);
+  }-*/;
+
+  private native String getCachedXslt(String filename) /*-{
+    return (this.__xsltCache && this.__xsltCache[filename]) || null;
+  }-*/;
+
+  private native void applyCachedXslt(com.google.gwt.dom.client.Element iframe, String html) /*-{
+    iframe.setAttribute("srcdoc", html);
+  }-*/;
 
   private void downloadFile() {
     if (bitstreamDownloadUri != null) {

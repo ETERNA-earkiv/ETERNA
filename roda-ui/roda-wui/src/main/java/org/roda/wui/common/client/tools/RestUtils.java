@@ -96,6 +96,38 @@ public class RestUtils {
     return UriUtils.fromSafeConstant(b);
   }
 
+  public static SafeUri createRepresentationFileHtmlPreviewUri(String fileUuid, String locale, String xsltId) {
+    // api/v2/files/{file_uuid}/preview/html?lang={locale}&xslt={xsltId}
+    StringBuilder b = new StringBuilder();
+    b.append(RodaConstants.API_REST_V2_FILES).append(URL.encodeQueryString(fileUuid))
+      .append(RodaConstants.API_REST_V2_PREVIEW_HTML_HANDLER)
+      .append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_LANG)
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(URL.encodeQueryString(locale));
+    if (xsltId != null && !xsltId.isEmpty()) {
+      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_KEY_XSLT)
+        .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(URL.encodeQueryString(xsltId));
+    }
+    return UriUtils.fromSafeConstant(b.toString());
+  }
+
+  public static SafeUri createRepresentationFileXsltsUri(String fileUuid) {
+    // api/v2/files/{file_uuid}/preview/html/xslts
+    String b = RodaConstants.API_REST_V2_FILES + URL.encodeQueryString(fileUuid)
+      + RodaConstants.API_REST_V2_PREVIEW_HTML_XSLTS_HANDLER;
+
+    return UriUtils.fromSafeConstant(b);
+  }
+
+  public static SafeUri createRepresentationFileTransformUri(String fileUuid, String locale) {
+    // api/v2/files/{file_uuid}/preview/html/transform?lang={locale}
+    StringBuilder b = new StringBuilder();
+    b.append(RodaConstants.API_REST_V2_FILES).append(URL.encodeQueryString(fileUuid))
+      .append(RodaConstants.API_REST_V2_PREVIEW_HTML_TRANSFORM_HANDLER)
+      .append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_LANG)
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(URL.encodeQueryString(locale));
+    return UriUtils.fromSafeConstant(b.toString());
+  }
+
   public static SafeUri createDipDownloadUri(String dipUUID) {
     // api/v2/dips/{uuid}/download
     StringBuilder b = new StringBuilder();

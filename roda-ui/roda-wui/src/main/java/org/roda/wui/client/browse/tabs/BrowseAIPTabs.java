@@ -12,6 +12,8 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.FilterParameter;
+import org.roda.core.data.v2.index.filter.OrFiltersParameters;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -81,9 +83,12 @@ public class BrowseAIPTabs extends Tabs {
         @Override
         public Widget buildTabWidget() {
           SearchWrapper auditLogs = new SearchWrapper(false);
+          List<FilterParameter> auditLogOrs = new ArrayList<>();
+          auditLogOrs.add(new SimpleFilterParameter(RodaConstants.LOG_RELATED_OBJECT_ID, aip.getId()));
+          auditLogOrs.add(new SimpleFilterParameter(RodaConstants.LOG_RELATED_AIP_ID, aip.getId()));
           auditLogs.createListAndSearchPanel(new ListBuilder<>(() -> new LogEntryList(),
             new AsyncTableCellOptions<>(LogEntry.class, "BrowseAIP_auditLogs")
-              .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.LOG_RELATED_OBJECT_ID, aip.getId())))
+              .withFilter(new Filter(new OrFiltersParameters(auditLogOrs)))
               .withJustActive(justActive).bindOpener()));
           return auditLogs;
         }

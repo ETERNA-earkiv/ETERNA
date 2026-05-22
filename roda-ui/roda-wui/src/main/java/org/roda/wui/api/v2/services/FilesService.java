@@ -13,10 +13,12 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
@@ -75,6 +77,11 @@ import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
+import org.roda.core.common.XsltDiscoveryHelper;
 
 @Service
 public class FilesService {
@@ -439,6 +446,253 @@ public class FilesService {
     ret = new StreamResponse(stream);
 
     return ret;
+  }
+
+  public StreamResponse retrieveFileContentHTML(RequestContext requestContext, IndexedFile indexedFile,
+    String localeString) throws GenericException, RequestNotValidException, NotFoundException,
+    AuthorizationDeniedException {
+    return retrieveFileContentHTML(requestContext, indexedFile, localeString, null);
+  }
+
+  public StreamResponse retrieveFileContentHTML(RequestContext requestContext, IndexedFile indexedFile,
+    String localeString, String selectedXsltId) throws GenericException, RequestNotValidException, NotFoundException,
+    AuthorizationDeniedException {
+
+    ModelService model = requestContext.getModelService();
+    Optional<LiteRODAObject> liteFile = LiteRODAObjectFactory.get(indexedFile);
+    if (liteFile.isEmpty()) {
+      throw new RequestNotValidException("Couldn't retrieve file with id: " + indexedFile.getId());
+    }
+
+    Binary binary = model.getBinary(liteFile.get());
+
+    // namespace may be null (XML without xmlns or unusual prolog); resolveXsltSources
+    // simply skips the global-mapping layer in that case — bundled XSLTs still work.
+    String namespace = detectXmlNamespace(binary);
+
+    Locale locale = ServerTools.parseLocale(localeString);
+
+    List<XsltSource> sources = resolveXsltSources(model, indexedFile, binary, namespace);
+    if (sources.isEmpty()) {
+      throw new NotFoundException("No XSLT stylesheet available for file: " + indexedFile.getId()
+        + " (namespace: " + namespace + ")");
+    }
+
+    XsltSource chosen = chooseXsltSource(sources, selectedXsltId);
+    if (chosen == null) {
+      throw new NotFoundException("Requested XSLT '" + selectedXsltId
+        + "' is not available for file: " + indexedFile.getId());
+    }
+    LOGGER.info("Rendering file {} with XSLT '{}'", indexedFile.getId(), chosen.id);
+    String html = chosen.render(binary, locale);
+
+    String filename = indexedFile.getId() + HTML_EXT;
+    final String finalHtml = html;
+    ConsumesOutputStream stream = new DefaultConsumesOutputStream(filename, RodaConstants.MEDIA_TYPE_TEXT_HTML,
+      out -> {
+        PrintStream printStream = new PrintStream(out);
+        printStream.print(finalHtml);
+        printStream.close();
+      });
+
+    return new StreamResponse(stream);
+  }
+
+  public List<Map<String, String>> listAvailableXslts(RequestContext requestContext, IndexedFile indexedFile)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+
+    ModelService model = requestContext.getModelService();
+    Optional<LiteRODAObject> liteFile = LiteRODAObjectFactory.get(indexedFile);
+    if (liteFile.isEmpty()) {
+      throw new RequestNotValidException("Couldn't retrieve file with id: " + indexedFile.getId());
+    }
+
+    Binary binary = model.getBinary(liteFile.get());
+    String namespace = detectXmlNamespace(binary);
+
+    List<XsltSource> sources = resolveXsltSources(model, indexedFile, binary, namespace);
+
+    List<Map<String, String>> result = new ArrayList<>(sources.size());
+    for (XsltSource source : sources) {
+      Map<String, String> entry = new HashMap<>();
+      entry.put("id", source.id);
+      entry.put("label", source.label);
+      result.add(entry);
+    }
+    return result;
+  }
+
+
+  public StreamResponse retrieveFileContentHTMLWithCustomXslt(RequestContext requestContext,
+    IndexedFile indexedFile, InputStream xsltInputStream, String localeString)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+
+    ModelService model = requestContext.getModelService();
+    Optional<LiteRODAObject> liteFile = LiteRODAObjectFactory.get(indexedFile);
+    if (liteFile.isEmpty()) {
+      throw new RequestNotValidException("Couldn't retrieve file with id: " + indexedFile.getId());
+    }
+
+    Binary binary = model.getBinary(liteFile.get());
+    Locale locale = ServerTools.parseLocale(localeString);
+    String html = HTMLUtils.representationFileToHtmlWithCustomXslt(binary, xsltInputStream, locale);
+
+    String filename = indexedFile.getId() + HTML_EXT;
+    ConsumesOutputStream stream = new DefaultConsumesOutputStream(filename, RodaConstants.MEDIA_TYPE_TEXT_HTML,
+      out -> {
+        PrintStream printStream = new PrintStream(out);
+        printStream.print(html);
+        printStream.close();
+      });
+
+    return new StreamResponse(stream);
+  }
+
+
+
+  // Discovery order (per-SIP, dedup on base filename — first wins):
+  //   1. .xsl/.xslt beside the XML file
+  //   2. representation-level documentation/
+  //   3. AIP-root documentation/
+  //   4. global namespace mapping (only if no filename-matched stylesheet in 1-3)
+  private List<XsltSource> resolveXsltSources(ModelService model, IndexedFile indexedFile, Binary binary,
+    String namespace) {
+    List<XsltSource> raw = new ArrayList<>();
+
+    if (indexedFile.getRepresentationId() != null) {
+      raw.addAll(toXsltSources(XsltDiscoveryHelper.searchXsltsBesideXmlFile(model, indexedFile)));
+      raw.addAll(toXsltSources(XsltDiscoveryHelper.searchAllXsltsInDocumentation(model, indexedFile.getAipId(),
+        indexedFile.getRepresentationId(), indexedFile.getId())));
+    }
+    raw.addAll(toXsltSources(XsltDiscoveryHelper.searchAllXsltsInDocumentation(model, indexedFile.getAipId(),
+      null, indexedFile.getId())));
+
+    List<XsltSource> result = new ArrayList<>(raw.size());
+    Set<String> seen = new HashSet<>();
+    boolean filenameMatchedPresent = false;
+    String xmlBase = XsltDiscoveryHelper.xmlBaseName(indexedFile.getId());
+    for (XsltSource s : raw) {
+      String key = dedupKey(s);
+      if (seen.add(key)) {
+        result.add(s);
+        if (!filenameMatchedPresent && xmlBase != null && XsltDiscoveryHelper.isXsltMatchForXml(s.id, xmlBase)) {
+          filenameMatchedPresent = true;
+        }
+      }
+    }
+
+    if (!filenameMatchedPresent && namespace != null) {
+      String xsltName = resolveXsltForNamespace(namespace);
+      if (xsltName != null) {
+        XsltSource globalSource = XsltSource.global(xsltName);
+        if (seen.add(dedupKey(globalSource))) {
+          result.add(globalSource);
+        }
+      }
+    }
+    return result;
+  }
+
+  // Base filename without extension, "global:" prefix stripped, lowercased.
+  private static String dedupKey(XsltSource s) {
+    if (s == null || s.id == null) {
+      return "";
+    }
+    if (s.id.startsWith("global:")) {
+      return s.id.substring("global:".length()).toLowerCase(Locale.ROOT);
+    }
+    String stripped = XsltDiscoveryHelper.stripXsltExtension(s.id);
+    return stripped == null ? "" : stripped.toLowerCase(Locale.ROOT);
+  }
+
+  private static List<XsltSource> toXsltSources(List<Binary> binaries) {
+    List<XsltSource> out = new ArrayList<>(binaries.size());
+    for (Binary b : binaries) {
+      String name = b.getStoragePath().getName();
+      out.add(XsltSource.bundled(name, b));
+    }
+    return out;
+  }
+
+  private static XsltSource chooseXsltSource(List<XsltSource> sources, String requestedId) {
+    if (requestedId == null || requestedId.isEmpty()) {
+      return sources.isEmpty() ? null : sources.get(0);
+    }
+    for (XsltSource s : sources) {
+      if (requestedId.equals(s.id)) {
+        return s;
+      }
+    }
+    return null;
+  }
+
+  // Bundled = Binary from AIP storage. Global = XSLT name from roda-wui.properties (id is "global:<name>").
+  private static final class XsltSource {
+    final String id;
+    final String label;
+    private final Binary bundledBinary;
+    private final String globalXsltName;
+
+    private XsltSource(String id, String label, Binary bundledBinary, String globalXsltName) {
+      this.id = id;
+      this.label = label;
+      this.bundledBinary = bundledBinary;
+      this.globalXsltName = globalXsltName;
+    }
+
+    static XsltSource bundled(String filename, Binary binary) {
+      return new XsltSource(filename, XsltDiscoveryHelper.stripXsltExtension(filename), binary, null);
+    }
+
+    static XsltSource global(String xsltName) {
+      return new XsltSource("global:" + xsltName, xsltName, null, xsltName);
+    }
+
+    String render(Binary inputBinary, Locale locale) throws GenericException {
+      if (globalXsltName != null) {
+        return HTMLUtils.representationFileToHtml(inputBinary, globalXsltName, locale);
+      }
+      try (InputStream xsltStream = bundledBinary.getContent().createInputStream()) {
+        return HTMLUtils.representationFileToHtmlWithCustomXslt(inputBinary, xsltStream, locale);
+      } catch (java.io.IOException e) {
+        throw new GenericException("Failed to read bundled XSLT '" + id + "'", e);
+      }
+    }
+  }
+
+  private String resolveXsltForNamespace(String namespace) {
+    List<String> rules = RodaCoreFactory.getRodaConfigurationAsList("ui", "viewer", "xslt", "representation",
+      "rules");
+    for (String rule : rules) {
+      String ruleNamespace = RodaCoreFactory.getRodaConfigurationAsString("ui", "viewer", "xslt", "representation",
+        "rule", rule, "namespace");
+      if (ruleNamespace != null && namespace.equals(ruleNamespace)) {
+        return RodaCoreFactory.getRodaConfigurationAsString("ui", "viewer", "xslt", "representation", "rule", rule,
+          "xslt");
+      }
+    }
+    return null;
+  }
+
+  private String detectXmlNamespace(Binary binary) {
+    try (InputStream is = binary.getContent().createInputStream()) {
+      XMLInputFactory factory = XMLInputFactory.newInstance();
+      factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+      factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+      XMLStreamReader reader = factory.createXMLStreamReader(is);
+      while (reader.hasNext()) {
+        int event = reader.next();
+        if (event == XMLStreamReader.START_ELEMENT) {
+          String ns = reader.getNamespaceURI();
+          reader.close();
+          return ns;
+        }
+      }
+      reader.close();
+    } catch (Exception e) {
+      LOGGER.debug("Could not detect XML namespace", e);
+    }
+    return null;
   }
 
 }

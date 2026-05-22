@@ -95,15 +95,19 @@ button.btn-primary:hover,
   background: var(--eterna-red-deep);
 }
 .btn-eterna-secondary {
-  background: transparent;
+  background: var(--eterna-surface);
   color: var(--eterna-ink);
-  border: 1px solid var(--eterna-border);
-  padding: 11px 19px;
+  border: 1px solid var(--eterna-slate);
+  padding: 6px 14px;
   border-radius: var(--eterna-radius-md);
   font-family: var(--eterna-font-body);
   font-weight: 500;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
+  transition: background 120ms ease;
+}
+.btn-eterna-secondary:hover {
+  background: var(--eterna-border);
 }
 
 /* === ETERNA inputs === */
@@ -1571,6 +1575,34 @@ a.btn-hero:visited, a.btn-welcome:visited {
 .learn-more,
 .enterprise-editions {
   color: white;
+}
+
+/* XML XSLT Preview Toolbar */
+.xmlPreviewToolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.xmlPreviewFileInput {
+  display: none;
+}
+
+.xmlPreviewFlag {
+  margin-left: auto;
+  color: var(--eterna-red);
+  font-style: italic;
+}
+
+.viewRepresentationHtmlFilePreview {
+  width: 100%;
+  min-height: 600px;
+  border: 1px solid #ddd;
 }
 
 .tutorial-roda-community,

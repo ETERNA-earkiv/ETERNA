@@ -11,11 +11,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Map;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
 import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.file.CreateFolderRequest;
@@ -483,4 +488,130 @@ public class FilesController implements FileRestService, Exportable {
       }
     });
   }
+  @GetMapping(path = "/{uuid}/preview/html/xslts", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Lists available XSLT stylesheets for a file", description = "Returns all XSLT stylesheets available for the given XML file, from AIP documentation and global config.", responses = {
+    @ApiResponse(responseCode = "200", description = "Returns list of available XSLTs"),
+    @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  ResponseEntity<List<Map<String, String>>> listAvailableXslts(
+    @Parameter(description = "The file UUID", required = true) @PathVariable(name = "uuid") String fileUUID) {
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<ResponseEntity<List<Map<String, String>>>>() {
+      @Override
+      public ResponseEntity<List<Map<String, String>>> process(RequestContext requestContext,
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        controllerAssistant.setRelatedObjectId(fileUUID);
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_FILE_UUID_PARAM, fileUUID);
+        List<String> fileFields = new ArrayList<>(RodaConstants.FILE_FIELDS_TO_RETURN);
+        fileFields.add(RodaConstants.FILE_ISDIRECTORY);
+        IndexedFile file = indexService.retrieve(IndexedFile.class, fileUUID, fileFields);
+        controllerAssistant.setRelatedAipId(file.getAipId());
+        controllerAssistant.addParameters(RodaConstants.CONTROLLER_AIP_ID_PARAM, file.getAipId());
+        controllerAssistant.checkObjectPermissions(requestContext.getUser(), file);
+        List<Map<String, String>> xslts = filesService.listAvailableXslts(requestContext, file);
+        return ResponseEntity.ok(xslts);
+      }
+    });
+  }
+
+  @GetMapping(path = "/{uuid}/preview/html", produces = MediaType.TEXT_HTML_VALUE)
+  @Operation(summary = "Renders file content as HTML", description = "Applies XSLT stylesheet to XML file content and returns rendered HTML. Returns 404 if no matching stylesheet is configured for the XML namespace.", responses = {
+    @ApiResponse(responseCode = "200", description = "Returns rendered HTML", content = @Content(schema = @Schema(implementation = ResponseEntity.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "404", description = "No stylesheet found for this file type", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  ResponseEntity<StreamingResponseBody> renderXmlWithXslt(
+    @Parameter(description = "The file UUID", required = true) @PathVariable(name = "uuid") String fileUUID,
+    @Parameter(description = "The language for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString,
+    @Parameter(description = "ID of a specific XSLT to apply") @RequestParam(name = "xslt", required = false) String selectedXsltId) {
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<ResponseEntity<StreamingResponseBody>>() {
+      @Override
+      public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        controllerAssistant.setRelatedObjectId(fileUUID);
+        // When the caller does not pin a specific XSLT, FilesService resolves one
+        // (filename match, namespace rule, or representation-default). The audit
+        // entry records "auto-detect" to make that ambiguity explicit instead of
+        // claiming a "default" stylesheet that may not be what was rendered.
+        controllerAssistant.setParameters(
+          RodaConstants.CONTROLLER_FILE_UUID_PARAM, fileUUID,
+          RodaConstants.CONTROLLER_XSLT_ID_PARAM, selectedXsltId != null ? selectedXsltId : "auto-detect",
+          RodaConstants.CONTROLLER_LANG_PARAM, localeString);
+        List<String> fileFields = new ArrayList<>(RodaConstants.FILE_FIELDS_TO_RETURN);
+        fileFields.add(RodaConstants.FILE_ISDIRECTORY);
+        IndexedFile file = indexService.retrieve(IndexedFile.class, fileUUID, fileFields);
+        controllerAssistant.setRelatedAipId(file.getAipId());
+        controllerAssistant.addParameters(RodaConstants.CONTROLLER_AIP_ID_PARAM, file.getAipId());
+        controllerAssistant.checkObjectPermissions(requestContext.getUser(), file);
+        StreamResponse streamResponse = filesService.retrieveFileContentHTML(requestContext, file, localeString, selectedXsltId);
+        return ApiUtils.okResponse(streamResponse);
+      }
+    });
+  }
+
+  @PostMapping(path = "/{uuid}/preview/html/transform", produces = MediaType.TEXT_HTML_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @Operation(summary = "Renders file with custom XSLT", description = "Applies a user-provided XSLT stylesheet to the file content and returns rendered HTML.", responses = {
+    @ApiResponse(responseCode = "200", description = "Returns rendered HTML", content = @Content(schema = @Schema(implementation = ResponseEntity.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "404", description = "File not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  ResponseEntity<StreamingResponseBody> renderXmlWithLocalXslt(
+    @Parameter(description = "The file UUID", required = true) @PathVariable(name = "uuid") String fileUUID,
+    @Parameter(description = "The language for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString,
+    @Parameter(content = @Content(mediaType = "multipart/form-data", schema = @Schema(implementation = MultipartFile.class)), description = "XSLT stylesheet file") @RequestPart(value = "xslt") MultipartFile xsltFile) {
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<ResponseEntity<StreamingResponseBody>>() {
+      @Override
+      public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        controllerAssistant.setRelatedObjectId(fileUUID);
+        controllerAssistant.setParameters(
+          RodaConstants.CONTROLLER_FILE_UUID_PARAM, fileUUID,
+          RodaConstants.CONTROLLER_XSLT_FILENAME_PARAM, xsltFile.getOriginalFilename(),
+          RodaConstants.CONTROLLER_XSLT_SIZE_PARAM, xsltFile.getSize(),
+          RodaConstants.CONTROLLER_LANG_PARAM, localeString);
+        List<String> fileFields = new ArrayList<>(RodaConstants.FILE_FIELDS_TO_RETURN);
+        fileFields.add(RodaConstants.FILE_ISDIRECTORY);
+        IndexedFile file = indexService.retrieve(IndexedFile.class, fileUUID, fileFields);
+        controllerAssistant.setRelatedAipId(file.getAipId());
+        controllerAssistant.addParameters(RodaConstants.CONTROLLER_AIP_ID_PARAM, file.getAipId());
+        controllerAssistant.checkObjectPermissions(requestContext.getUser(), file);
+
+        // Validate XSLT file size (max 1 MB)
+        long maxXsltSize = 1024 * 1024;
+        if (xsltFile.getSize() > maxXsltSize) {
+          throw new RequestNotValidException("XSLT file exceeds maximum size of 1 MB");
+        }
+
+        // Validate that the uploaded file is an XSLT stylesheet (not just any XML).
+        try (InputStream validationStream = xsltFile.getInputStream()) {
+          XMLInputFactory xmlFactory = XMLInputFactory.newInstance();
+          xmlFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+          xmlFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+          XMLStreamReader xmlReader = xmlFactory.createXMLStreamReader(validationStream);
+          boolean xsltRootFound = false;
+          while (xmlReader.hasNext()) {
+            if (xmlReader.next() == XMLStreamReader.START_ELEMENT) {
+              xsltRootFound = "http://www.w3.org/1999/XSL/Transform".equals(xmlReader.getNamespaceURI())
+                && ("stylesheet".equals(xmlReader.getLocalName())
+                  || "transform".equals(xmlReader.getLocalName()));
+              break;
+            }
+          }
+          xmlReader.close();
+          if (!xsltRootFound) {
+            throw new RequestNotValidException("Uploaded file must be an XSLT stylesheet");
+          }
+        } catch (RequestNotValidException e) {
+          throw e;
+        } catch (Exception e) {
+          throw new RequestNotValidException("Uploaded file must be valid XML");
+        }
+
+        try {
+          StreamResponse streamResponse = filesService.retrieveFileContentHTMLWithCustomXslt(
+            requestContext, file, xsltFile.getInputStream(), localeString);
+          return ApiUtils.okResponse(streamResponse);
+        } catch (java.io.IOException e) {
+          throw new RESTException(e);
+        }
+      }
+    });
+  }
+
 }

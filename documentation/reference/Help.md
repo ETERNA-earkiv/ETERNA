@@ -26,6 +26,7 @@ Step-by-step guides for using ETERNA effectively.
 - **[Pre-Ingest](usage/Pre_Ingest.md)** - Preparing data for archiving
 - **[PDF Redaction](usage/PdfRedaction.md)** - How to redact sensitive content in PDF files
 - **[Web Archive Viewer](usage/WebArchiveViewer.md)** - Play back archived web pages (WARC and WACZ)
+- **[XML Viewer with XSLT Stylesheets](usage/XsltViewer.md)** - Render XML files with XSLT and apply custom stylesheets
 - **[Troubleshooting](usage/Troubleshooting.md)** - Solutions to common problems
 - **[FAQ](usage/FAQ.md)** - Answers to frequently asked questions
 - **[README](usage/README.md)** - General information about ETERNA

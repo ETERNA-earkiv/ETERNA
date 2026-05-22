@@ -1129,6 +1129,10 @@ public interface ClientMessages extends Messages {
 
   String logParameter(String name, String value);
 
+  String logParameterName(@Select String name);
+
+  String logActionMethod(@Select String method);
+
   String windowTitle(String history);
 
   /************* User management Messages ****************/
@@ -2744,6 +2748,43 @@ public interface ClientMessages extends Messages {
   String reasonCantActOnUser();
 
   String reasonCantActOnGroup();
+
+  /*** XSLT Transform ***/
+  String applyXsltButton();
+
+  String xsltLoading();
+
+  String xsltPrintButton();
+
+  String xsltFileTooLarge();
+
+  String xsltTransformFailed();
+
+  String xsltUploadError();
+
+  String xsltTransformTimeout();
+
+  String xsltPrintError();
+
+  String xsltSelectLabel();
+
+  String xsltViewOriginalButton();
+
+  String xsltViewRenderedButton();
+
+  String xsltSelectFileButton();
+
+  String xsltNoFileSelected();
+
+  String xsltUseLocalLabel();
+
+  String xsltLocalNotSaved();
+
+  String xsltDropdownEmpty();
+
+  String xsltLocalPrefix();
+
+  String xsltGlobalPrefix();
 
   String redactPdfInvalidFormatMessage();
 

@@ -105,8 +105,8 @@ public class RequestHandler {
       throw new RESTException(e);
     } finally {
       if (logAction) {
-        controllerAssistant.registerAction(requestContext, controllerAssistant.getRelatedObjectId(), state,
-          controllerAssistant.getParameters());
+        controllerAssistant.registerAction(requestContext, controllerAssistant.getRelatedObjectId(),
+          controllerAssistant.getRelatedAipId(), state, controllerAssistant.getParameters());
       }
       try {
         if (isAValidTransactionalContext(isTransactional) && transactionalContext != null

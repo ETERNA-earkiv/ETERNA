@@ -39,8 +39,14 @@ public final class ControllerAssistantUtils {
 
   public static void registerAction(RequestContext requestContext, String actionComponent, String actionMethod,
     String relatedObjectId, long duration, LogEntryState state, Object... parameters) {
+    registerAction(requestContext, actionComponent, actionMethod, relatedObjectId, null, duration, state, parameters);
+  }
+
+  public static void registerAction(RequestContext requestContext, String actionComponent, String actionMethod,
+    String relatedObjectId, String relatedAipId, long duration, LogEntryState state, Object... parameters) {
     LogEntry logEntry = createLogEntry(requestContext, actionComponent, actionMethod, relatedObjectId, duration, state,
       parameters);
+    logEntry.setRelatedAipId(relatedAipId);
     registerAction(logEntry);
   }
 

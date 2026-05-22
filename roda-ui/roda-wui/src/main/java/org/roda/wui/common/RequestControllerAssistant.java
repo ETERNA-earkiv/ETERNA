@@ -26,6 +26,7 @@ import org.roda.core.model.utils.UserUtility;
 public class RequestControllerAssistant extends ControllerAssistant {
   private final Object requester;
   private String relatedObjectId;
+  private String relatedAipId;
   private Object[] parameters;
 
   public RequestControllerAssistant(Object requester) {
@@ -34,24 +35,22 @@ public class RequestControllerAssistant extends ControllerAssistant {
     this.requester = requester;
   }
 
+  // UNAUTHORIZED is logged once per request by RequestHandler.finally with the
+  // controller's current relatedAipId/parameters — no need to log here too.
+
+  @Override
+  public void checkGroup(User user, String group) throws AuthorizationDeniedException {
+    UserUtility.checkGroup(user, group);
+  }
+
   @Override
   public void checkRoles(User user) throws AuthorizationDeniedException {
-    try {
-      UserUtility.checkRoles(user, requester.getClass());
-    } catch (final AuthorizationDeniedException e) {
-      registerAction(user, LogEntryState.UNAUTHORIZED);
-      throw e;
-    }
+    UserUtility.checkRoles(user, requester.getClass());
   }
 
   @Override
   public void checkRoles(User user, Class<?> classToReturn) throws AuthorizationDeniedException {
-    try {
-      UserUtility.checkRoles(user, requester.getClass(), classToReturn);
-    } catch (final AuthorizationDeniedException e) {
-      registerAction(user, LogEntryState.UNAUTHORIZED);
-      throw e;
-    }
+    UserUtility.checkRoles(user, requester.getClass(), classToReturn);
   }
 
   @Override
@@ -62,12 +61,7 @@ public class RequestControllerAssistant extends ControllerAssistant {
   @Override
   public <T extends IsIndexed> void checkObjectPermissions(User user, T obj, Class<?> classToReturn)
     throws AuthorizationDeniedException {
-    try {
-      UserUtility.checkObjectPermissions(user, obj, requester.getClass(), classToReturn);
-    } catch (final AuthorizationDeniedException e) {
-      registerAction(user, LogEntryState.UNAUTHORIZED);
-      throw e;
-    }
+    UserUtility.checkObjectPermissions(user, obj, requester.getClass(), classToReturn);
   }
 
   @Override
@@ -79,12 +73,7 @@ public class RequestControllerAssistant extends ControllerAssistant {
   @Override
   public <T extends IsIndexed> void checkObjectPermissions(User user, SelectedItems<T> objs, Class<T> classToReturn)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    try {
-      UserUtility.checkObjectPermissions(user, objs, requester.getClass(), classToReturn);
-    } catch (final AuthorizationDeniedException e) {
-      registerAction(user, LogEntryState.UNAUTHORIZED);
-      throw e;
-    }
+    UserUtility.checkObjectPermissions(user, objs, requester.getClass(), classToReturn);
   }
 
   public void setRelatedObjectId(String relatedObjectId) {
@@ -93,6 +82,14 @@ public class RequestControllerAssistant extends ControllerAssistant {
 
   public String getRelatedObjectId() {
     return relatedObjectId;
+  }
+
+  public void setRelatedAipId(String relatedAipId) {
+    this.relatedAipId = relatedAipId;
+  }
+
+  public String getRelatedAipId() {
+    return relatedAipId;
   }
 
   public void setParameters(Object... parameters) {

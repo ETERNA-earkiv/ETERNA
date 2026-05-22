@@ -112,6 +112,7 @@ public final class RodaConstants {
   public static final String CROSSWALKS_DISSEMINATION_HTML_PATH = "crosswalks/dissemination/html/";
   public static final String CROSSWALKS_DISSEMINATION_HTML_EVENT_PATH = "crosswalks/dissemination/html/event.xslt";
   public static final String CROSSWALKS_DISSEMINATION_OTHER_PATH = "crosswalks/other/";
+  public static final String CROSSWALKS_DISSEMINATION_HTML_REPRESENTATION_PATH = "crosswalks/dissemination/html/representation/";
   public static final String UI_BROWSER_METADATA_DESCRIPTIVE_TYPES = "ui.browser.metadata.descriptive.types";
   public static final String I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX = "ui.browse.metadata.descriptive.type.";
   public static final String I18N_UI_BROWSE_METADATA_TECHNICAL_TYPE_PREFIX = "ui.browse.metadata.technical.type.";
@@ -377,8 +378,13 @@ public final class RodaConstants {
   // common
   public static final String API_REST_V2_DOWNLOAD_HANDLER = "/download";
   public static final String API_REST_V2_PREVIEW_HANDLER = "/preview";
+  public static final String API_REST_V2_PREVIEW_HTML_HANDLER = "/preview/html";
+  public static final String API_REST_V2_PREVIEW_HTML_XSLTS_HANDLER = "/preview/html/xslts";
+  public static final String API_REST_V2_PREVIEW_HTML_TRANSFORM_HANDLER = "/preview/html/transform";
   public static final String API_REST_V2_REPRESENTATION_OTHER_METADATA = "/other-metadata";
   public static final String API_REST_V2_REPRESENTATION_BINARY = "/binary";
+
+  public static final String API_QUERY_KEY_XSLT = "xslt";
 
   // aips
   public static final String API_REST_V2_AIPS = "api/v2/aips/";
@@ -712,6 +718,10 @@ public final class RodaConstants {
   public static final String CONTROLLER_FILE_PARAM = RODA_OBJECT_FILE;
   public static final String CONTROLLER_FILE_ID_PARAM = "fileId";
   public static final String CONTROLLER_FILE_UUID_PARAM = "fileUUID";
+  public static final String CONTROLLER_XSLT_ID_PARAM = "xsltId";
+  public static final String CONTROLLER_XSLT_FILENAME_PARAM = "xsltFilename";
+  public static final String CONTROLLER_XSLT_SIZE_PARAM = "xsltSize";
+  public static final String CONTROLLER_LANG_PARAM = "lang";
   public static final String CONTROLLER_METADATA_ID_PARAM = "metadataId";
   public static final String CONTROLLER_INDEX_PRESERVATION_EVENT_ID_PARAM = "indexedPreservationEventId";
   public static final String CONTROLLER_VERSION_ID_PARAM = "versionId";
@@ -1230,6 +1240,7 @@ public final class RodaConstants {
   public static final String LOG_DURATION = "duration";
   public static final String LOG_ID = "id";
   public static final String LOG_RELATED_OBJECT_ID = "relatedObject";
+  public static final String LOG_RELATED_AIP_ID = "relatedAipId";
   public static final String LOG_USERNAME = "username";
   public static final String LOG_PARAMETERS = "parameters";
   public static final String LOG_STATE = "state";

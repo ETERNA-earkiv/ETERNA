@@ -25,8 +25,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -60,6 +65,8 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
+import net.sf.saxon.Configuration;
+import net.sf.saxon.lib.Feature;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
@@ -73,7 +80,16 @@ import net.sf.saxon.s9api.XsltTransformer;
 public class RodaUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(RodaUtils.class);
 
-  private static final Processor PROCESSOR = new Processor(false);
+  private static final long XSLT_TIMEOUT_SECONDS = 30;
+  private static final int MAX_OUTPUT_SIZE = 10 * 1024 * 1024; // 10 MB
+
+  private static final Processor PROCESSOR = createSecuredProcessor();
+
+  private static Processor createSecuredProcessor() {
+    Configuration config = new Configuration();
+    config.setBooleanProperty(Feature.ALLOW_EXTERNAL_FUNCTIONS, false);
+    return new Processor(config);
+  }
 
   private static final LoadingCache<Triple<String, String, String>, XsltExecutable> CACHE = CacheBuilder.newBuilder()
     .expireAfterWrite(1, TimeUnit.MINUTES).build(new CacheLoader<Triple<String, String, String>, XsltExecutable>() {
@@ -95,6 +111,100 @@ public class RodaUtils {
         return createEventTransformer(path);
       }
     });
+
+  /**
+   * CharArrayWriter with a size limit to prevent output-based resource exhaustion.
+   */
+  private static class LimitedCharArrayWriter extends CharArrayWriter {
+    private final int limit;
+
+    LimitedCharArrayWriter(int limit) {
+      this.limit = limit;
+    }
+
+    @Override
+    public void write(int c) {
+      checkLimit(1);
+      super.write(c);
+    }
+
+    @Override
+    public void write(char[] c, int off, int len) {
+      checkLimit(len);
+      super.write(c, off, len);
+    }
+
+    @Override
+    public void write(String str, int off, int len) {
+      checkLimit(len);
+      super.write(str, off, len);
+    }
+
+    private void checkLimit(int additional) {
+      if (size() + additional > limit) {
+        throw new RuntimeException("XSLT output exceeded maximum size of " + limit + " bytes");
+      }
+    }
+  }
+
+  /**
+   * Best-effort timeout for XSLT transformations.
+   * <p>
+   * Saxon-HE does not poll the thread interrupt flag during transformation, so
+   * {@code future.cancel(true)} on a runaway transform may not abort the worker
+   * immediately — the request returns a timeout error but the worker can keep
+   * running until it finishes on its own. To prevent that from saturating the
+   * pool we use:
+   * <ul>
+   *   <li>a bounded fixed-size daemon pool (scales with CPU cores; daemon
+   *       threads die with the JVM)</li>
+   *   <li>{@link LimitedCharArrayWriter} with {@link #MAX_OUTPUT_SIZE} as an
+   *       upper bound on work — a transform that exceeds it throws and the
+   *       worker exits</li>
+   *   <li>uploaded XSLTs capped at 1&nbsp;MB by the controller</li>
+   * </ul>
+   * True in-process termination would require a Saxon cooperative-abort hook
+   * (e.g. throwing {@code XmlProcessingAbort} from a checkpoint) which is out
+   * of scope here.
+   */
+  private static final int XSLT_POOL_SIZE = Math.max(2, Runtime.getRuntime().availableProcessors());
+  // Bounded queue + CallerRunsPolicy gives backpressure: when both workers and
+  // queue are saturated, the submitting HTTP thread runs the transform itself
+  // (still capped by XSLT_TIMEOUT_SECONDS and MAX_OUTPUT_SIZE), so callers
+  // experience natural slowdown instead of unbounded memory growth.
+  private static final int XSLT_QUEUE_CAPACITY = Math.max(8, XSLT_POOL_SIZE * 4);
+  private static final ExecutorService XSLT_EXECUTOR = new ThreadPoolExecutor(
+    XSLT_POOL_SIZE, XSLT_POOL_SIZE, 0L, TimeUnit.MILLISECONDS,
+    new ArrayBlockingQueue<>(XSLT_QUEUE_CAPACITY),
+    r -> { Thread t = new Thread(r, "xslt-transform"); t.setDaemon(true); return t; },
+    new ThreadPoolExecutor.CallerRunsPolicy());
+
+  private static void transformWithTimeout(XsltTransformer transformer) throws GenericException {
+    Future<?> future = XSLT_EXECUTOR.submit(() -> {
+      try {
+        transformer.transform();
+      } catch (SaxonApiException e) {
+        throw new RuntimeException(e);
+      }
+    });
+    try {
+      future.get(XSLT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+    } catch (TimeoutException e) {
+      // Best-effort cancel — see XSLT_EXECUTOR docs. The request fails fast even
+      // if the worker keeps churning until MAX_OUTPUT_SIZE or natural completion.
+      future.cancel(true);
+      throw new GenericException("XSLT transformation timed out after " + XSLT_TIMEOUT_SECONDS + " seconds");
+    } catch (java.util.concurrent.ExecutionException e) {
+      Throwable cause = e.getCause();
+      if (cause instanceof RuntimeException && cause.getCause() instanceof SaxonApiException) {
+        throw new GenericException("XSLT transformation failed", cause.getCause());
+      }
+      throw new GenericException("XSLT transformation failed", e);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new GenericException("XSLT transformation interrupted", e);
+    }
+  }
 
   /** Private empty constructor */
   private RodaUtils() {
@@ -219,7 +329,7 @@ public class RodaUtils {
       XsltExecutable xsltExecutable = CACHE.get(Triple.of(basePath, metadataType, metadataVersion));
 
       XsltTransformer transformer = xsltExecutable.load();
-      CharArrayWriter transformerResult = new CharArrayWriter();
+      LimitedCharArrayWriter transformerResult = new LimitedCharArrayWriter(MAX_OUTPUT_SIZE);
 
       transformer.setSource(text);
       transformer.setDestination(PROCESSOR.newSerializer(transformerResult));
@@ -234,15 +344,76 @@ public class RodaUtils {
       XdmMap xdmMap = XdmMap.makeMap(parameters);
       transformer.setParameter(qNameMap, xdmMap);
 
-      transformer.transform();
+      transformWithTimeout(transformer);
 
       return new CharArrayReader(transformerResult.toCharArray());
 
-    } catch (IOException | SAXException | ExecutionException | SaxonApiException e) {
+    } catch (IOException | SAXException | ExecutionException e) {
       throw new GenericException("Could not process descriptive metadata binary " + binary.getStoragePath()
         + " metadata type " + metadataType + " and version " + metadataVersion, e);
     }
   }
+
+  /**
+   * Applies a user-supplied XSLT stylesheet to the given XML binary.
+   * <p>
+   * The transformation runs through the shared, secured {@code PROCESSOR} with
+   * external functions disabled and an output-size cap; execution is wrapped in
+   * a timeout (see {@link #transformWithTimeout(XsltTransformer)}).
+   *
+   * @param binary
+   *          the source XML binary to transform.
+   * @param xsltInputStream
+   *          the XSLT stylesheet to apply. Consumed and closed by this method.
+   * @param parameters
+   *          stylesheet parameters; also exposed as an {@code i18n} XdmMap.
+   * @return a {@link Reader} over the transformation output.
+   * @throws GenericException
+   *           if reading the source, compiling the stylesheet, or running the
+   *           transformation fails or exceeds the configured limits.
+   */
+  public static Reader applyCustomStylesheet(Binary binary, InputStream xsltInputStream,
+    Map<String, String> parameters) throws GenericException {
+    try (
+      // Read as bytes so SAX honours the encoding declared in the XML prolog
+      // (a Reader would already have applied the JVM default charset).
+      InputStream xmlByteStream = new BOMInputStream(binary.getContent().createInputStream());
+      InputStream xsltStream = xsltInputStream) {
+
+      XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+      xmlReader.setEntityResolver(new RodaEntityResolver());
+      InputSource source = new InputSource(xmlByteStream);
+      Source text = new SAXSource(xmlReader, source);
+
+      XsltCompiler compiler = PROCESSOR.newXsltCompiler();
+      compiler.setURIResolver(new RodaURIFileResolver());
+      XsltExecutable xsltExecutable = compiler.compile(new StreamSource(xsltStream));
+
+      XsltTransformer transformer = xsltExecutable.load();
+      LimitedCharArrayWriter transformerResult = new LimitedCharArrayWriter(MAX_OUTPUT_SIZE);
+
+      transformer.setSource(text);
+      transformer.setDestination(PROCESSOR.newSerializer(transformerResult));
+
+      for (Entry<String, String> parameter : parameters.entrySet()) {
+        QName qName = new QName(parameter.getKey());
+        XdmValue xdmValue = new XdmAtomicValue(parameter.getValue());
+        transformer.setParameter(qName, xdmValue);
+      }
+
+      QName qNameMap = new QName("i18n");
+      XdmMap xdmMap = XdmMap.makeMap(parameters);
+      transformer.setParameter(qNameMap, xdmMap);
+
+      transformWithTimeout(transformer);
+
+      return new CharArrayReader(transformerResult.toCharArray());
+
+    } catch (IOException | SAXException | SaxonApiException e) {
+      throw new GenericException("Could not apply custom XSLT stylesheet to binary " + binary.getStoragePath(), e);
+    }
+  }
+
 
   public static Reader applyEventStylesheet(Binary binary, boolean onlyDetails, Map<String, String> translations,
     String path) throws GenericException {
@@ -257,7 +428,7 @@ public class RodaUtils {
       XsltExecutable xsltExecutable = EVENT_CACHE.get(path);
 
       XsltTransformer transformer = xsltExecutable.load();
-      CharArrayWriter transformerResult = new CharArrayWriter();
+      LimitedCharArrayWriter transformerResult = new LimitedCharArrayWriter(MAX_OUTPUT_SIZE);
 
       transformer.setSource(text);
       transformer.setDestination(PROCESSOR.newSerializer(transformerResult));
@@ -271,9 +442,9 @@ public class RodaUtils {
         transformer.setParameter(qName, xdmValue);
       }
 
-      transformer.transform();
+      transformWithTimeout(transformer);
       return new CharArrayReader(transformerResult.toCharArray());
-    } catch (IOException | SAXException | ExecutionException | SaxonApiException e) {
+    } catch (IOException | SAXException | ExecutionException e) {
       LOGGER.error(e.getMessage(), e);
       throw new GenericException("Could not process event binary " + binary.getStoragePath(), e);
     }

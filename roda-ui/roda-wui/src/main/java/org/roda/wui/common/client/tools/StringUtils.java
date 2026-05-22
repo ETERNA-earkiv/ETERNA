@@ -24,11 +24,27 @@ public class StringUtils {
     return !isNotBlank(s);
   }
 
-  // method to prettify method names
+  // Acronyms that the prettifier should glue back together after camelCase
+  // splitting. Order longest-first so "XSLT" is reconnected before "XSL" would
+  // ever match. GWT client code → no regex compilation cache, but the cost is
+  // negligible at audit-list render rate.
+  private static final String[] ACTION_METHOD_ACRONYMS = {
+    "XSLT", "HTML", "JSON", "UUID",
+    "AIP", "XML", "PDF", "URL", "CSV", "DIP", "SIP"
+  };
+
   public static String getPrettifiedActionMethod(String actionMethod) {
     String method = actionMethod.substring(0, 1).toUpperCase() + actionMethod.substring(1);
     method = method.replaceAll("([A-Z])", " $1").trim();
-    return method.replaceAll("A I P", "AIP");
+    for (String acronym : ACTION_METHOD_ACRONYMS) {
+      StringBuilder spaced = new StringBuilder(acronym.length() * 2);
+      for (int i = 0; i < acronym.length(); i++) {
+        if (i > 0) spaced.append(' ');
+        spaced.append(acronym.charAt(i));
+      }
+      method = method.replace(spaced.toString(), acronym);
+    }
+    return method;
   }
 
   /**

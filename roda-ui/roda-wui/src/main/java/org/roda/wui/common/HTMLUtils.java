@@ -8,11 +8,17 @@
 package org.roda.wui.common;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
+import org.owasp.html.HtmlPolicyBuilder;
+import org.owasp.html.PolicyFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
@@ -31,6 +37,65 @@ import com.google.common.io.CharStreams;
  */
 public final class HTMLUtils {
 
+  // Output of toHtml() methods reaches trusted HTML sinks (SafeHtmlUtils.fromTrustedString,
+  // iframe srcdoc). XSLT input is user-controllable (SIPs, custom uploads), so sanitize
+  // server-side. Extend the policy here if a crosswalk needs more — never bypass.
+  private static final PolicyFactory HTML_SANITIZER = new HtmlPolicyBuilder()
+    .allowCommonBlockElements()
+    .allowCommonInlineFormattingElements()
+    .allowElements("table", "thead", "tbody", "tfoot", "tr", "th", "td", "caption", "col", "colgroup")
+    .allowElements("dl", "dt", "dd", "pre", "code", "hr", "a", "img", "section", "header", "footer", "nav", "main")
+    .allowElements("blockquote", "small")
+    // <style> for XSL-authored CSS; sandbox=allow-same-origin on the iframe limits
+    // CSS attacks. allowTextIn is required — OWASP strips text inside <style> by default.
+    .allowElements("style")
+    .allowTextIn("style")
+    .allowAttributes("class", "id", "style", "title", "lang").globally()
+    .allowAttributes("href").onElements("a")
+    .allowAttributes("src", "alt", "width", "height").onElements("img")
+    .allowAttributes("colspan", "rowspan", "scope", "align", "valign").onElements("th", "td")
+    .allowUrlProtocols("http", "https", "data")
+    .allowStyling()
+    .toFactory();
+
+  private static String sanitizeHtml(String html) {
+    return HTML_SANITIZER.sanitize(html);
+  }
+
+  // Override at $RODA_HOME/config/theme/xslt-preview.css
+  private static final AtomicReference<String> CACHED_XSLT_PREVIEW_CSS = new AtomicReference<>();
+
+  private static String loadXsltPreviewCss() {
+    String cached = CACHED_XSLT_PREVIEW_CSS.get();
+    if (cached != null) {
+      return cached;
+    }
+    String content = "";
+    try (InputStream is = RodaCoreFactory.getConfigurationFileAsStream("theme/xslt-preview.css")) {
+      if (is != null) {
+        try (Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+          content = CharStreams.toString(reader);
+        }
+      }
+    } catch (IOException e) {
+      content = "";
+    }
+    CACHED_XSLT_PREVIEW_CSS.compareAndSet(null, content);
+    return content;
+  }
+
+  // Wraps a bare HTML fragment in a complete document so iframe srcdoc renders styled.
+  static String wrapXsltHtml(String renderedFragment) {
+    String css = loadXsltPreviewCss();
+    StringBuilder b = new StringBuilder(renderedFragment.length() + css.length() + 256);
+    b.append("<!DOCTYPE html><html><head><meta charset=\"UTF-8\">");
+    if (!css.isEmpty()) {
+      b.append("<style>").append(css).append("</style>");
+    }
+    b.append("</head><body>").append(renderedFragment).append("</body></html>");
+    return b.toString();
+  }
+
   /** Private empty constructor */
   private HTMLUtils() {
     // do nothing
@@ -42,7 +107,7 @@ public final class HTMLUtils {
     Reader reader = RodaUtils.applyMetadataStylesheet(binary, RodaConstants.CROSSWALKS_DISSEMINATION_HTML_PATH,
       metadataType, metadataVersion, translations);
     try {
-      return CharStreams.toString(reader);
+      return sanitizeHtml(CharStreams.toString(reader));
     } catch (IOException e) {
       throw new GenericException("Could not transform PREMIS to HTML", e);
     }
@@ -72,7 +137,7 @@ public final class HTMLUtils {
         metadataVersion, translations);
     }
     try {
-      return CharStreams.toString(reader);
+      return sanitizeHtml(CharStreams.toString(reader));
     } catch (IOException e) {
       throw new GenericException("Could not transform PREMIS to HTML", e);
     }
@@ -87,7 +152,7 @@ public final class HTMLUtils {
       RodaConstants.CROSSWALKS_DISSEMINATION_HTML_EVENT_PATH);
 
     try {
-      return CharStreams.toString(reader);
+      return sanitizeHtml(CharStreams.toString(reader));
     } catch (IOException e) {
       throw new GenericException("Could not transform PREMIS to HTML", e);
     }
@@ -123,6 +188,30 @@ public final class HTMLUtils {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     return messages.getTranslations(RodaConstants.I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX + "event", String.class,
       true);
+  }
+
+
+  public static String representationFileToHtml(Binary binary, String xsltName, final Locale locale)
+    throws GenericException {
+    Map<String, String> translations = getTranslations(xsltName, null, locale);
+    Reader reader = RodaUtils.applyMetadataStylesheet(binary,
+      RodaConstants.CROSSWALKS_DISSEMINATION_HTML_REPRESENTATION_PATH, xsltName, null, translations);
+    try {
+      return wrapXsltHtml(sanitizeHtml(CharStreams.toString(reader)));
+    } catch (IOException e) {
+      throw new GenericException("Could not transform representation file to HTML", e);
+    }
+  }
+
+  public static String representationFileToHtmlWithCustomXslt(Binary binary, InputStream xsltInputStream,
+    final Locale locale) throws GenericException {
+    Map<String, String> translations = new HashMap<>();
+    Reader reader = RodaUtils.applyCustomStylesheet(binary, xsltInputStream, translations);
+    try {
+      return wrapXsltHtml(sanitizeHtml(CharStreams.toString(reader)));
+    } catch (IOException e) {
+      throw new GenericException("Could not transform representation file with custom XSLT", e);
+    }
   }
 
 }
