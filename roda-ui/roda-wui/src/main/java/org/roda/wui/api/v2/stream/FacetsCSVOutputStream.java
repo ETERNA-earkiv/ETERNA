@@ -10,6 +10,7 @@ package org.roda.wui.api.v2.stream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 
@@ -45,7 +46,7 @@ public class FacetsCSVOutputStream extends CSVOutputStream {
 
   @Override
   public void consumeOutputStream(final OutputStream out) throws IOException {
-    final OutputStreamWriter writer = new OutputStreamWriter(out);
+    final OutputStreamWriter writer = new OutputStreamWriter(out, StandardCharsets.UTF_8);
     final CSVPrinter printer = getFormat().print(writer);
 
     for (FacetFieldResult facet : this.facets) {
