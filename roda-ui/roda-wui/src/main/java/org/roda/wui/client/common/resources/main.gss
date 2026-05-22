@@ -2748,6 +2748,11 @@ td.datePickerMonth, td.datePickerYear {
     line-height: 1.6;
 }
 
+.wui-home h3 {
+    margin-top: 28px;
+    margin-bottom: 8px;
+}
+
 .content > .gwt-HTML > h1 {
 	margin-top: 0;
 }
