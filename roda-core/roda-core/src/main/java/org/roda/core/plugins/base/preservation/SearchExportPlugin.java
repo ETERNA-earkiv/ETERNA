@@ -493,16 +493,17 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
   }
 
   private static String getFieldLabel(String configKeyPrefix, String field) {
+    String trimmed = field != null ? field.trim() : field;
     if (configKeyPrefix != null) {
       try {
         String label = RodaCoreFactory.getConfigurationManager()
-          .getConfigurationString(configKeyPrefix + ".fields." + field + ".label", null);
+          .getConfigurationString(configKeyPrefix + ".fields." + trimmed + ".label", null);
         if (label != null && !label.isEmpty()) return label;
       } catch (Exception e) {
         // fall through to field name
       }
     }
-    return field;
+    return trimmed;
   }
 
   @Override
