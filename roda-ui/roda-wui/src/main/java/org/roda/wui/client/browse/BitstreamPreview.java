@@ -745,17 +745,19 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
 
     final boolean[] rawXmlLoaded = {false};
     final boolean noServerXslts = xslts.size() == 0;
-    final boolean[] showingRawXml = {noServerXslts};
-    final boolean[] iframeHasContent = {!noServerXslts};
-    if (noServerXslts) {
-      xsltFrame.setVisible(false);
-      rawXmlContainer.setVisible(true);
-      rawXmlLoaded[0] = true;
-      textPreview(rawXmlContainer);
-      toggleXmlButton.setText(messages.xsltViewRenderedButton());
-      toggleXmlButton.setEnabled(false);
-      printButton.setEnabled(false);
-    }
+    // Always start in raw-XML / disabled mode. enterRenderedView is the only
+    // path that flips to the rendered view, and it is invoked exclusively from
+    // an HTTP 200 callback — so a failed initial preview leaves the user with
+    // raw XML rather than an empty iframe with active render/print controls.
+    final boolean[] showingRawXml = {true};
+    final boolean[] iframeHasContent = {false};
+    xsltFrame.setVisible(false);
+    rawXmlContainer.setVisible(true);
+    rawXmlLoaded[0] = true;
+    textPreview(rawXmlContainer);
+    toggleXmlButton.setText(messages.xsltViewRenderedButton());
+    toggleXmlButton.setEnabled(false);
+    printButton.setEnabled(false);
 
     // Invoked from sync paths (cache hit / loadXsltPreview) and from applyCustomXslt's HTTP 200 callback
     final com.google.gwt.user.client.Command enterRenderedView = () -> {
@@ -857,10 +859,12 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
       }
     });
 
-    // Initial render: if any server-side XSLT exists, load the first one
+    // Initial render: if any server-side XSLT exists, load the first one and
+    // only switch the UI to rendered mode on HTTP 200 (via enterRenderedView).
     if (!noServerXslts) {
       XsltPreviewService.loadPreview(
-        XsltPreviewService.buildPreviewUrl(fileUuid, locale, xsltDropdown.getValue(0)), xsltFrame, null);
+        XsltPreviewService.buildPreviewUrl(fileUuid, locale, xsltDropdown.getValue(0)),
+        xsltFrame, enterRenderedView);
     }
   }
 

@@ -25,10 +25,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
@@ -166,9 +167,17 @@ public class RodaUtils {
    * (e.g. throwing {@code XmlProcessingAbort} from a checkpoint) which is out
    * of scope here.
    */
-  private static final ExecutorService XSLT_EXECUTOR = Executors.newFixedThreadPool(
-    Math.max(2, Runtime.getRuntime().availableProcessors()),
-    r -> { Thread t = new Thread(r, "xslt-transform"); t.setDaemon(true); return t; });
+  private static final int XSLT_POOL_SIZE = Math.max(2, Runtime.getRuntime().availableProcessors());
+  // Bounded queue + CallerRunsPolicy gives backpressure: when both workers and
+  // queue are saturated, the submitting HTTP thread runs the transform itself
+  // (still capped by XSLT_TIMEOUT_SECONDS and MAX_OUTPUT_SIZE), so callers
+  // experience natural slowdown instead of unbounded memory growth.
+  private static final int XSLT_QUEUE_CAPACITY = Math.max(8, XSLT_POOL_SIZE * 4);
+  private static final ExecutorService XSLT_EXECUTOR = new ThreadPoolExecutor(
+    XSLT_POOL_SIZE, XSLT_POOL_SIZE, 0L, TimeUnit.MILLISECONDS,
+    new ArrayBlockingQueue<>(XSLT_QUEUE_CAPACITY),
+    r -> { Thread t = new Thread(r, "xslt-transform"); t.setDaemon(true); return t; },
+    new ThreadPoolExecutor.CallerRunsPolicy());
 
   private static void transformWithTimeout(XsltTransformer transformer) throws GenericException {
     Future<?> future = XSLT_EXECUTOR.submit(() -> {
@@ -366,12 +375,14 @@ public class RodaUtils {
   public static Reader applyCustomStylesheet(Binary binary, InputStream xsltInputStream,
     Map<String, String> parameters) throws GenericException {
     try (
-      Reader descMetadataReader = new InputStreamReader(new BOMInputStream(binary.getContent().createInputStream()));
+      // Read as bytes so SAX honours the encoding declared in the XML prolog
+      // (a Reader would already have applied the JVM default charset).
+      InputStream xmlByteStream = new BOMInputStream(binary.getContent().createInputStream());
       InputStream xsltStream = xsltInputStream) {
 
       XMLReader xmlReader = XMLReaderFactory.createXMLReader();
       xmlReader.setEntityResolver(new RodaEntityResolver());
-      InputSource source = new InputSource(descMetadataReader);
+      InputSource source = new InputSource(xmlByteStream);
       Source text = new SAXSource(xmlReader, source);
 
       XsltCompiler compiler = PROCESSOR.newXsltCompiler();

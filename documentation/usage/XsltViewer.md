@@ -50,7 +50,7 @@ Users with the **Apply custom XSLT** permission also see a *Select file* button 
 
 - The file is sent to the server, applied to the XML, and the result is displayed.
 - The uploaded stylesheet is **not** saved to the archive package — a note in the toolbar reminds you of this.
-- If you later select the same filename again, the previously rendered output is reused without re-uploading, as long as the viewer session is active.
+- If you upload another file with the same filename, the previous upload is replaced — the latest selection always wins, so name conflicts in ETERNA's local stylesheet cache are handled automatically.
 
 **Limits:**
 

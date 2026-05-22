@@ -50,7 +50,7 @@ Användare med behörigheten **Applicera egen XSLT-stilmall** ser även en *Väl
 
 - Filen skickas till servern, appliceras på XML:en och resultatet visas.
 - Den uppladdade stilmallen **sparas inte** i arkivpaketet, en notis i verktygsfältet påminner om detta.
-- Om du senare väljer samma filnamn igen återanvänds föregående renderade utdata utan ny uppladdning, så länge visarsessionen är aktiv.
+- Om du laddar upp en ny fil med samma filnamn ersätts den tidigare — senaste valet vinner alltid, så namnkonflikter i ETERNA:s lokala stilmallscache hanteras automatiskt.
 
 **Gränser:**
 
@@ -60,7 +60,7 @@ Användare med behörigheten **Applicera egen XSLT-stilmall** ser även en *Väl
 
 ## Revisionsspår
 
-Server-side rendering registreras i ETERNAs revisionslogg:
+Server-side rendering registreras i ETERNA:s revisionslogg:
 
 | Händelse | Loggade värden |
 |---|---|
@@ -70,7 +70,7 @@ Server-side rendering registreras i ETERNAs revisionslogg:
 
 **Innehållet** i en uppladdad stilmall loggas aldrig — endast filnamn och storlek.
 
-Rent klientsidiga händelser (växla renderad/rå, utskrift, om-val av cachad uppladdning) auditeras **inte** separat — i linje med ETERNAs serverbaserade auditmodell. Kontakta administratören om strängare revisionsspår krävs för dessa.
+Rent klientsidiga händelser (växla renderad/rå, utskrift, om-val av cachad uppladdning) auditeras **inte** separat — i linje med ETERNA:s serverbaserade auditmodell. Kontakta administratören om strängare revisionsspår krävs för dessa.
 
 ## Vanliga frågor
 
@@ -88,7 +88,7 @@ Lokala stilmallsuppladdningar är medvetet sessionsbundna. De finns för att ins
 
 ### Min XSLT fungerar i en desktopverktyg men inte i ETERNA — varför?
 
-ETERNAs transformer stänger av externa resurser (DTD, externa entiteter, `document()`-anrop ut ur paketet) av säkerhetsskäl. Stilmallar som hämtar externa filer vid transformeringen stöds inte. Lägg in det du behöver i stilmallen, eller använd en global stilmall som administratören placerar under ETERNAs konfiguration.
+ETERNA:s transformer stänger av externa resurser (DTD, externa entiteter, `document()`-anrop ut ur paketet) av säkerhetsskäl. Stilmallar som hämtar externa filer vid transformeringen stöds inte. Lägg in det du behöver i stilmallen, eller använd en global stilmall som administratören placerar under ETERNA:s konfiguration.
 
 ### Kan jag skriva ut rå XML?
 
