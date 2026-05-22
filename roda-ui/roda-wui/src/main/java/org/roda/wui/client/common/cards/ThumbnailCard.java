@@ -13,14 +13,15 @@ import java.util.Map;
 import org.roda.wui.client.common.labels.Tag;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -47,36 +48,53 @@ public class ThumbnailCard extends Composite {
 
   private boolean collapsed = true;
 
+  private ClickHandler thumbnailClickHandler;
+
   public ThumbnailCard(String title, Widget iconThumbnail, List<Tag> tags, Map<String, String> attributes,
     ClickHandler thumbnailClickHandler) {
-    // INIT
     initWidget(uiBinder.createAndBindUi(this));
+    this.thumbnailClickHandler = thumbnailClickHandler;
 
     collapse();
 
-    // Click handler
     this.clickable.addClickHandler(thumbnailClickHandler);
 
-    // Title
     this.title.setText(title);
     this.title.addClickHandler(event -> toggleCollapse());
 
-    // Thumbnail
     iconThumbnail.addStyleName("thumbnailCardIconThumbnail");
     this.thumbnail.add(iconThumbnail);
 
-    // Tags
     for (Tag tag : tags) {
       this.tags.add(tag);
     }
 
-    // Attributes
+    // Label auto-escapes HTML; safe for user-supplied metadata
     for (Map.Entry<String, String> attribute : attributes.entrySet()) {
       FlowPanel attributePanel = new FlowPanel();
-      attributePanel.add(new HTML(SafeHtmlUtils.fromSafeConstant(attribute.getKey())));
-      attributePanel.add(new HTML(SafeHtmlUtils.fromSafeConstant(attribute.getValue())));
+      attributePanel.add(new Label(attribute.getKey()));
+      attributePanel.add(new Label(attribute.getValue()));
       this.attributes.add(attributePanel);
     }
+  }
+
+  /** Make the whole card surface clickable and keyboard-activatable. */
+  public ThumbnailCard enableWholeCardClick() {
+    // Stop propagation so the root handler doesn't fire twice
+    this.clickable.addClickHandler(event -> event.stopPropagation());
+
+    addDomHandler(thumbnailClickHandler, ClickEvent.getType());
+
+    getElement().setTabIndex(0);
+    addDomHandler(event -> {
+      int keyCode = event.getNativeKeyCode();
+      if (keyCode == KeyCodes.KEY_ENTER || keyCode == KeyCodes.KEY_SPACE) {
+        event.preventDefault();
+        thumbnailClickHandler.onClick(null);
+      }
+    }, KeyDownEvent.getType());
+
+    return this;
   }
 
   public void toggleCollapse() {

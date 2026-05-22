@@ -8,7 +8,7 @@
 package org.roda.wui.client.common.cards;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,8 +50,8 @@ public class AIPDisseminationCardList extends ThumbnailCardList<IndexedDIP> {
           // Tags
           List<Tag> tags = new ArrayList<>();
 
-          // Attributes
-          Map<String, String> attributes = new HashMap<>();
+          // LinkedHashMap so CSS nth-child column order is stable across cards
+          Map<String, String> attributes = new LinkedHashMap<>();
           attributes.put(messages.disseminationFiles(), Long.toString(dip.getFileIds().size()));
           if (dip.getDateCreated() != null) {
             attributes.put(messages.objectCreatedDateShort(), Humanize.formatDate(dip.getDateCreated()));
@@ -64,7 +64,8 @@ public class AIPDisseminationCardList extends ThumbnailCardList<IndexedDIP> {
             HistoryUtils.newHistory(BrowseDIP.RESOLVER, dip.getId());
           };
 
-          return new ThumbnailCard(title, iconThumbnailHTML, tags, attributes, thumbnailClickHandler);
+          return new ThumbnailCard(title, iconThumbnailHTML, tags, attributes, thumbnailClickHandler)
+            .enableWholeCardClick();
         }
       });
   }
