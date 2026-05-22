@@ -2748,7 +2748,10 @@ td.datePickerMonth, td.datePickerYear {
     line-height: 1.6;
 }
 
-.wui-home h3 {
+.wui-home h3,
+.wui-home h4,
+.wui-home h5,
+.wui-home h6 {
     font-family: FONT_PRIMARY;
     font-size: 14px !important;
     font-weight: 700;
