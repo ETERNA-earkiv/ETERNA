@@ -188,16 +188,24 @@ public class ContentPanelPortal extends SimplePanel {
     if (!resolved) {
       String lastToken = historyTokens.get(historyTokens.size() - 1);
 
-      // TODO generalize suffix approach
+      // strip file extension and normalize title
       if (lastToken.endsWith(".html")) {
         lastToken = lastToken.substring(0, lastToken.length() - ".html".length());
+        // strip locale suffix (e.g. _sv_SE, _pt_BR) and underscores
+        lastToken = lastToken.replaceAll("_[a-z]{2,3}_[A-Z]{2}$", "");
+        lastToken = lastToken.replace("_", " ");
+        // transform camel case to spaces (html files may use camelCase naming)
+        lastToken = lastToken.replaceAll("([A-Z])", " $1");
+      } else if (lastToken.endsWith(".md")) {
+        lastToken = lastToken.substring(0, lastToken.length() - ".md".length());
+        // strip locale suffix (e.g. _sv_SE, _pt_BR)
+        lastToken = lastToken.replaceAll("_[a-z]{2,3}_[A-Z]{2}$", "");
+        // underscores → spaces; skip camelCase to avoid double spaces after underscore→space
+        lastToken = lastToken.replace("_", " ");
       }
 
-      // transform camel case to spaces
-      lastToken = lastToken.replaceAll("([A-Z])", " $1");
-
-      // upper-case
-      lastToken = lastToken.toUpperCase();
+      // upper-case and trim
+      lastToken = lastToken.toUpperCase().trim();
       tokenI18N = lastToken;
     }
 
