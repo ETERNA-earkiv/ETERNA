@@ -74,7 +74,8 @@ public class AIPRepresentationCardList extends ThumbnailCardList<IndexedRepresen
             HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representation.getId());
           };
 
-          return new ThumbnailCard(title, iconThumbnailHTML, tags, attributes, thumbnailClickHandler);
+          return new ThumbnailCard(title, iconThumbnailHTML, tags, attributes, thumbnailClickHandler)
+            .enableWholeCardClick();
         }
       });
   }
