@@ -486,13 +486,13 @@ public class AipSearchWrapperActions extends AbstractActionable<IndexedAIP> {
                         @Override
                         public void onFailure(Throwable caught) {
                           Toast.showInfo(messages.removingSuccessTitle(), messages.removingSuccessMessage(1L));
-                          CatalogTreePanel.getInstance().removeNode(aip.getId(), aip.getParentID());
+                          CatalogTreePanel.getInstance().removeNode(aip.getId(), parentAipId);
                           doActionCallbackDestroyed();
                         }
 
                         @Override
                         public void onSuccess(final Void nothing) {
-                          CatalogTreePanel.getInstance().removeNode(aip.getId(), aip.getParentID());
+                          CatalogTreePanel.getInstance().removeNode(aip.getId(), parentAipId);
                           doActionCallbackNone();
                           HistoryUtils.newHistory(ShowJob.RESOLVER, value.getId());
                         }
@@ -506,6 +506,18 @@ public class AipSearchWrapperActions extends AbstractActionable<IndexedAIP> {
           }
         }
       });
+  }
+
+  private void removeCatalogTreeNodes(SelectedItems<IndexedAIP> selected) {
+    if (selected instanceof SelectedItemsList) {
+      for (String id : ((SelectedItemsList<IndexedAIP>) selected).getIds()) {
+        CatalogTreePanel.getInstance().removeNode(id, parentAipId);
+      }
+    } else if (parentAipId == null) {
+      CatalogTreePanel.getInstance().reloadRootNodes();
+    } else {
+      CatalogTreePanel.getInstance().refreshSubtree(parentAipId);
+    }
   }
 
   private void remove(final SelectedItems<IndexedAIP> selected, final AsyncCallback<ActionImpact> callback) {
@@ -540,12 +552,13 @@ public class AipSearchWrapperActions extends AbstractActionable<IndexedAIP> {
 
                             @Override
                             public void onFailure(Throwable caught) {
-
+                              removeCatalogTreeNodes(selected);
                               doActionCallbackDestroyed();
                             }
 
                             @Override
                             public void onSuccess(final Void nothing) {
+                              removeCatalogTreeNodes(selected);
                               doActionCallbackNone();
                               HistoryUtils.newHistory(ShowJob.RESOLVER, value.getId());
                             }
