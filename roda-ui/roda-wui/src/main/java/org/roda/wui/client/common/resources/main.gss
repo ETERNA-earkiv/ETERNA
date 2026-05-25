@@ -1811,7 +1811,6 @@ button:after {
     background-color: white;
     min-width: 150px;
     cursor: pointer;
-    text-transform: capitalize;
 }
 
 .dropdown-disabled .dropdown-label,
@@ -2664,7 +2663,6 @@ td.datePickerMonth, td.datePickerYear {
     white-space: nowrap;
     margin-bottom: 5px;
     font-size: 1.2rem;
-    text-transform: capitalize;
 }
 
 .sidebar-facet-label label {
