@@ -124,17 +124,8 @@ jobs:
 
       - name: Copy JAR to Docker build context
         run: |
-          rm -rf docker/target
           mkdir -p docker/target
-          # Resolve exact runtime JAR by version, mirrors docker/build.sh
-          VERSION=$(mvn $MAVEN_CLI_OPTS -q -N help:evaluate -Dexpression=project.version -DforceStdout)
-          JAR="roda-ui/roda-wui/target/roda-wui-${VERSION}.jar"
-          if [ ! -f "$JAR" ]; then
-            echo "Runtime JAR not found: $JAR"
-            ls -la roda-ui/roda-wui/target/
-            exit 1
-          fi
-          cp "$JAR" docker/target/
+          cp roda-ui/roda-wui/target/roda-wui-*.jar docker/target/
 
       - name: Docker meta for test images
         id: meta
