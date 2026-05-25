@@ -1,6 +1,9 @@
 
 # **Original-METS**
 
+> **⚠️ Under utveckling**
+> Denna funktion är under aktiv utveckling och kan komma att förändras. Betrakta inte denna dokumentation som slutgiltig.
+
 ## **Funktionalitet**
 
   - När man skapar en logisk AIP kommer även en METS fil att skapas.

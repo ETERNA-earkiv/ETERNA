@@ -1,6 +1,9 @@
 
 # **Original-METS**
 
+> **⚠️ Work in progress**
+> This feature is currently under development and may change. Do not rely on this documentation as final.
+
 ## **Functionality**
 
   - When a logical AIP is created, a METS file will also be created.
