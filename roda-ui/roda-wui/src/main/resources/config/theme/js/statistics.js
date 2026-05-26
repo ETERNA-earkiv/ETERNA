@@ -795,8 +795,8 @@ function customDiskStats(element, callback) {
           {
             field: "Disk Usage",
             values: [
-              { label: "Used", count: stats.used },
-              { label: "Available", count: stats.available }
+              { label: "Använt", count: stats.used },
+              { label: "Tillgängligt", count: stats.available }
             ]
           }
         ],
