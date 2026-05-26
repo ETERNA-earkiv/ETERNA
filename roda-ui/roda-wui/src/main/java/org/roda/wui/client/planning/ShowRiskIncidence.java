@@ -26,11 +26,11 @@ import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -195,14 +195,12 @@ public class ShowRiskIncidence extends Composite {
 
     status.setText(messages.riskIncidenceStatusValue(incidence.getStatus()));
     severity.setHTML(HtmlSnippetUtils.getSeverityDefinition(incidence.getSeverity()));
-    detectedOn
-      .setText(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT).format(incidence.getDetectedOn()));
+    detectedOn.setText(Humanize.formatDateTime(incidence.getDetectedOn()));
     detectedBy.setText(incidence.getDetectedBy());
 
     if (incidence.getMitigatedOn() != null) {
       mitigatedOnKey.setVisible(true);
-      mitigatedOnValue
-        .setText(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT).format(incidence.getMitigatedOn()));
+      mitigatedOnValue.setText(Humanize.formatDateTime(incidence.getMitigatedOn()));
     } else {
       mitigatedOnKey.setVisible(false);
     }
