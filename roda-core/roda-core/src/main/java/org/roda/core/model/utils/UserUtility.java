@@ -257,10 +257,14 @@ public class UserUtility {
    */
   public static User getGuest(String ipAddress) {
     User guest = null;
-    try {
-      guest = ldapUtility.getUser("guest").setIpAddress(ipAddress);
-    } catch (GenericException e) {
-      LOGGER.warn("Could not get user 'guest' from ldap", e);
+    if (ldapUtility == null) {
+      LOGGER.warn("LdapUtility not yet initialized, returning fallback guest user");
+    } else {
+      try {
+        guest = ldapUtility.getUser("guest").setIpAddress(ipAddress);
+      } catch (GenericException e) {
+        LOGGER.warn("Could not get user 'guest' from ldap", e);
+      }
     }
 
     if (guest == null) {
