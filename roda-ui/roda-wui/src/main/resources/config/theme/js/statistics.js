@@ -859,9 +859,10 @@ function customAipStats(element, callback, options) {
     type: "RangeFacetParameter"
   };
 
+  var pathname = window.location.pathname;
   if (isExport) {
     $.ajax({
-      url: "/api/v2/aips/export/csv",
+      url: pathname + "api/v2/aips/export/csv",
       method: "POST",
       contentType: "application/x-www-form-urlencoded",
       data: "findRequest=" + encodeURIComponent(JSON.stringify(payload)),
@@ -877,7 +878,7 @@ function customAipStats(element, callback, options) {
     });
   } else {
     $.ajax({
-      url: "/api/v2/aips/find",
+      url: pathname + "api/v2/aips/find",
       method: "POST",
       contentType: "application/json",
       data: JSON.stringify(payload),
