@@ -851,7 +851,7 @@ public class IndexModelObserver implements ModelObserver {
     } catch (NotFoundException e) {
       LOGGER.debug("AIP {} already removed from storage, skipping parent METS update", aipId);
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | IOException | IPException | JAXBException | SAXException e) {
-      LOGGER.error("Failed to updating parentAIP when removing AIP", e);
+      LOGGER.error("Failed to update parentAIP when removing AIP", e);
       ret.add(e);
     }
 
