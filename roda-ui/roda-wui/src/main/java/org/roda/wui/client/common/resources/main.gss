@@ -2684,7 +2684,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .sidebar-facet-count {
     background-color: COLOR_BLUE_LIGHT;
-    color: COLOR_PRIMARY;
+    color: #000;
     font-size: 1.2rem;
     border-radius: 64px;
     min-width: 20px;
