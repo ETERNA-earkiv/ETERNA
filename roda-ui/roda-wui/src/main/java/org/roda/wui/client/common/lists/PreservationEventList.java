@@ -21,10 +21,10 @@ import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.common.client.tools.StringUtils;
 
-import com.google.gwt.cell.client.DateCell;
+import org.roda.wui.client.common.lists.utils.HumanizeDateCell;
+
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -64,7 +64,7 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
   protected void configureDisplay(CellTable<IndexedPreservationEvent> display) {
 
     eventDateTimeColumn = new Column<IndexedPreservationEvent, Date>(
-      new DateCell(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT))) {
+      new HumanizeDateCell()) {
       @Override
       public Date getValue(IndexedPreservationEvent event) {
         return event != null ? event.getEventDateTime() : null;

@@ -20,10 +20,10 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 
-import com.google.gwt.cell.client.DateCell;
+import org.roda.wui.client.common.lists.utils.HumanizeDateCell;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
@@ -55,7 +55,7 @@ public class DIPList extends AsyncTableCell<IndexedDIP> {
   protected void configureDisplay(CellTable<IndexedDIP> display) {
 
     dateCreated = new Column<IndexedDIP, Date>(
-      new DateCell(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT))) {
+      new HumanizeDateCell()) {
       @Override
       public Date getValue(IndexedDIP dip) {
         return dip != null ? dip.getDateCreated() : null;
@@ -63,7 +63,7 @@ public class DIPList extends AsyncTableCell<IndexedDIP> {
     };
 
     lastModified = new Column<IndexedDIP, Date>(
-      new DateCell(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT))) {
+      new HumanizeDateCell()) {
       @Override
       public Date getValue(IndexedDIP dip) {
         return dip != null ? dip.getLastModified() : null;

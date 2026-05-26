@@ -23,10 +23,10 @@ import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.StringUtils;
 
-import com.google.gwt.cell.client.DateCell;
+import org.roda.wui.client.common.lists.utils.HumanizeDateCell;
+
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -65,7 +65,7 @@ public class InternalLogEntryList extends AsyncTableCell<LogEntry> {
   @Override
   protected void configureDisplay(CellTable<LogEntry> display) {
     dateColumn = new Column<LogEntry, Date>(
-      new DateCell(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT))) {
+      new HumanizeDateCell()) {
       @Override
       public Date getValue(LogEntry logEntry) {
         return logEntry != null ? logEntry.getDatetime() : null;
