@@ -42,6 +42,7 @@ Guider för systemadministratörer och ansvariga för arkivet.
 - **[Gallring](administration/Disposal_sv_SE.md)** - Processer för datahantering
 - **[Behörigheter](administration/Permissions_sv_SE.md)** - Hantering av användarbehörigheter
 - **[Riskbedömning](administration/Risk_Assessment_sv_SE.md)** - Utvärdering av arkiveringsrisker
+- **[Loggning](administration/Logging_sv_SE.md)** - Loggtyper och lagring
 <!-- - **[Original-METS](administration/original-mets_sv_SE.md)** - Hanterar METS filer -->
 
 ### Utvecklarresurser
