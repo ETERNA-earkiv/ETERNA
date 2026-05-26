@@ -13,6 +13,7 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -196,7 +197,10 @@ public class DisposalConfirmationService {
 
     Handlebars handlebars = new Handlebars();
     handlebars.registerHelper(HBS_DATEFORMAT_HELPER_NAME, (Helper<Long>) (value, options) -> {
-      ZonedDateTime date = Instant.ofEpochMilli(value).atZone(ZoneOffset.UTC);
+      boolean useUtc = RodaCoreFactory.getRodaConfiguration()
+          .getBoolean(RodaConstants.UI_DATE_TIME_FORMAT_UTC, false);
+      ZoneId zone = useUtc ? ZoneOffset.UTC : ZoneId.systemDefault();
+      ZonedDateTime date = Instant.ofEpochMilli(value).atZone(zone);
       return DateTimeFormatter.ofPattern(DATETIME_FORMAT).format(date);
     });
     Template template = handlebars.compileInline(reportTemplate);
