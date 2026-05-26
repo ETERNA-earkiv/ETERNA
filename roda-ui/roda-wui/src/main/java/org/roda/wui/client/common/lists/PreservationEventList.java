@@ -19,9 +19,8 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
-import org.roda.wui.common.client.tools.StringUtils;
-
 import org.roda.wui.client.common.lists.utils.HumanizeDateCell;
+import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;

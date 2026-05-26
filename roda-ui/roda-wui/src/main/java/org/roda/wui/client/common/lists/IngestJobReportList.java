@@ -21,10 +21,9 @@ import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
+import org.roda.wui.client.common.lists.utils.HumanizeDateCell;
 import org.roda.wui.client.common.lists.utils.TooltipTextColumn;
 import org.roda.wui.common.client.tools.StringUtils;
-
-import org.roda.wui.client.common.lists.utils.HumanizeDateCell;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;

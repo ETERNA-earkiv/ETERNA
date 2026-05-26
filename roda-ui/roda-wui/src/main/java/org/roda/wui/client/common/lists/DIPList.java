@@ -19,7 +19,6 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
-
 import org.roda.wui.client.common.lists.utils.HumanizeDateCell;
 
 import com.google.gwt.core.client.GWT;
