@@ -197,7 +197,7 @@ public class PermissionUtils {
       finalPermissions.setUserPermissions(creatorUsername, mustHavePermissions);
     }
 
-    LOGGER.warn("Permissions have been set");
+    LOGGER.debug("Permissions have been set");
 
     return finalPermissions;
 
