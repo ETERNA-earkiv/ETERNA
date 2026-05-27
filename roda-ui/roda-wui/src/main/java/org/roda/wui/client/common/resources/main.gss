@@ -7596,6 +7596,9 @@ body.catalogTreeResizing * {
     padding: 0em 2em 1.5em 2em;
     position: relative;
 }
+.chart_col_card h4 {
+    padding-right: 2.5em;
+}
 .chart_col_card .toolbarLink {
 	position: absolute;
 	top: 0;
@@ -7603,20 +7606,15 @@ body.catalogTreeResizing * {
 }
 .stat_col_card {
 	background: #eee;
-	padding: 0 2em 1em 2em;   /* reduced bottom padding */
+	padding: 0 2em 1em 2em;
 	display: flex;
 	flex-direction: column;
-	justify-content: flex-start; 
-	position: relative;
 }
 
 .stat_col_card .description {
-	position: absolute;
-	bottom: 10px;             /* stick to bottom */
-	left: 2em;
-	right: 2em;
 	font-size: 13px;
 	color: #555;
+	margin-top: 0.5em;
 }
 
 .statistic {

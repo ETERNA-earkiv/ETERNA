@@ -76,55 +76,27 @@
       }
     }
 
-    function buildDataUrl(element) {
-    	buildDataUrl(element, false);
+    function buildEndpointUrl(element) {
+      var returnClass = $(element).data("source-class");
+      var resource = getRespectiveEndpoint(returnClass);
+      var lang = document.locale || "en";
+      var pathname = window.location.pathname;
+      return pathname + "api/v2/" + resource + "/find?lang=" + lang;
     }
 
-    function buildDataUrl(element, noLimits) {
-  var returnClass = $(element).data("source-class");
+    function buildExportUrl(element) {
+      var returnClass = $(element).data("source-class");
+      var resource = getRespectiveEndpoint(returnClass);
+      var pathname = window.location.pathname;
+      return pathname + "api/v2/" + resource + "/export/csv";
+    }
 
-      var filters = $(element).data("source-filters") ? $(element).data(
-        "source-filters").split(/\s*[ ,]\s*/) : [];
-  var filterParams = filters.map(function(filter) {
-        return "filter=" + filter
-  }).join("&");
-
-      var facets = $(element).data("source-facets") ? $(element).data(
-        "source-facets").split(/\s*[ ,]\s*/) : [];
-  var facetParams = facets.map(function(facet) {
-        return "facet=" + facet
-  }).join("&");
-
-
-  var onlyActive = $(element).data("source-only-active") || "false";
-  var lang = document.locale;
-
-  var pathname = window.location.pathname;
-  var url;
-      if(noLimits) {
-    url = pathname + "api/v1/index?returnClass=" +
-      returnClass + "&" +
-      filterParams + "&" +
-      facetParams +
-      "&lang=" + lang +
-      "&onlyActive=" + onlyActive;
-  } else {
-    var start = $(element).data("source-start") || 0;
-    var limit = $(element).data("source-limit") || 0;
-    var facetLimit = $(element).data("view-limit") || 100;
-
-    url = pathname + "api/v1/index?returnClass=" +
-      returnClass + "&" +
-      filterParams + "&" +
-      facetParams +
-      "&start=" + start +
-      "&limit=" + limit +
-      "&facetLimit=" + facetLimit +
-      "&lang=" + lang +
-      "&onlyActive=" + onlyActive;
-  }
-  return url;
-}
+    function buildBodyForExport(element, exportFacets) {
+      var body = JSON.parse(buildBody(element));
+      body.exportFacets = exportFacets || false;
+      body.sublist = { firstElementIndex: 0, maximumElementCount: 0 };
+      return JSON.stringify(body);
+    }
 
 
     function buildBody(element) {
@@ -209,7 +181,7 @@
 
     function fetchIndexData(element, viewCallback) {
       $.ajax({
-        url: buildDataUrl(element),
+        url: buildEndpointUrl(element),
         type: 'POST',
         contentType: 'application/json',
         data: buildBody(element)
@@ -266,32 +238,26 @@
       });
     });
   } else {
-    var noLimits = true;
-    var url = buildDataUrl(element, noLimits);
-    if (viewField == "facetResults") {
-      url = url + "&exportFacets=true";
-    }
-
     element.on("click.download", function(e) {
       e.preventDefault();
       e.stopImmediatePropagation();
 
       var type = "text/csv";
-         if (element.data("function") === "customAipStats") {
-            customAipStats(element, function(el, data) {
-                saveAs(new Blob([data], { type: type }), filename);
-            }, { isExport: true }); // <-- Passing export flag
-        }
-      else{
-        $.ajax({
-        accepts: { text: type },
-        url: url + "&acceptFormat=csv",
-        processData: false,
-        dataType: "text",
-        success: function(data) {
+      if (element.data("function") === "customAipStats") {
+        customAipStats(element, function(el, data) {
           saveAs(new Blob([data], { type: type }), filename);
-        }
-      });
+        }, { isExport: true });
+      } else {
+        $.ajax({
+          url: buildExportUrl(element),
+          method: "POST",
+          contentType: "application/x-www-form-urlencoded",
+          data: "findRequest=" + encodeURIComponent(buildBodyForExport(element, viewField === "facetResults")),
+          dataType: "text",
+          success: function(data) {
+            saveAs(new Blob([data], { type: type }), filename);
+          }
+        });
       }
     });
   }
@@ -829,8 +795,8 @@ function customDiskStats(element, callback) {
           {
             field: "Disk Usage",
             values: [
-              { label: "Used", count: stats.used },
-              { label: "Available", count: stats.available }
+              { label: "Använt", count: stats.used },
+              { label: "Tillgängligt", count: stats.available }
             ]
           }
         ],
@@ -865,11 +831,10 @@ function formatMonthLabel(isoDate) {
 }
  
 function customAipStats(element, callback, options) {
-  var type = options && options.isExport ? 'text/csv' : 'application/json';
+  var isExport = options && options.isExport;
   var facetField = $(element).data("source-facets");
- 
+
   var payload = {
-    classToReturn: "org.roda.core.data.v2.ip.IndexedAIP",
     filter: {
       parameters: [
         { type: "AllFilterParameter" }
@@ -883,9 +848,9 @@ function customAipStats(element, callback, options) {
     facets: {
       parameters: {}
     },
-   exportFacets: true
+    exportFacets: true
   };
- 
+
   payload.facets.parameters[facetField] = {
     name: facetField,
     start: "NOW/MONTH-11MONTH",
@@ -893,24 +858,40 @@ function customAipStats(element, callback, options) {
     gap: "+1MONTH",
     type: "RangeFacetParameter"
   };
- 
-  $.ajax({
-    headers: {
-      'Accept': type
-    },
-    url: "/api/v1/index/find",  
-    method: "POST",
-    contentType: "application/json",
-    data: JSON.stringify(payload),
-    success: function (data) {
-      if (typeof callback === "function") {
-        callback(element, data);
+
+  var pathname = window.location.pathname;
+  if (isExport) {
+    $.ajax({
+      url: pathname + "api/v2/aips/export/csv",
+      method: "POST",
+      contentType: "application/x-www-form-urlencoded",
+      data: "findRequest=" + encodeURIComponent(JSON.stringify(payload)),
+      dataType: "text",
+      success: function(data) {
+        if (typeof callback === "function") {
+          callback(element, data);
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error("Failed to export AIP stats:", error);
       }
-    },
-    error: function (xhr, status, error) {
-      console.error("Failed to fetch AIP stats:", error);
-    }
-  });
+    });
+  } else {
+    $.ajax({
+      url: pathname + "api/v2/aips/find",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify(payload),
+      success: function(data) {
+        if (typeof callback === "function") {
+          callback(element, data);
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error("Failed to fetch AIP stats:", error);
+      }
+    });
+  }
 }
 
 

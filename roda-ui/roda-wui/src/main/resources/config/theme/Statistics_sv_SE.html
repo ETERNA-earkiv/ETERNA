@@ -7,20 +7,6 @@
         frågor som rör metadata och data, statistik för inleverans och bevarandeprocesser,
         användare och autentisering, bevarandehändelser, riskhantering och aviseringar.</p>
 
-    <div class="collapsable-card-panel" id="panelStatistic">
-        <h5 class="collapsable-card-panel-title">Rapporteringstjänster</h5>
-        <button class="collapsable-card-panel-close" id="closeButton">
-            <i class="fas fa-times"></i>
-        </button>
-        <p class="collapsable-card-panel-body">
-            Anpassningsbara instrumentpaneler för organisationer för att stödja kvalificerat
-            beslutsfattande och strategisk planering. Denna funktion möjliggör spårning av nyckelprestandaindikatorer (KPI),
-            riskanalys och andra viktiga uppgifter för databedömning, och tillhandahåller ledningen
-            den information som behövs för att fatta välgrundade beslut och säkerställa framgång för bevarandeprocessen.
-        </p>
-        <button type="button" id="reporting-action-button" class="btn collapsable-card-panel-action">Läs mer</button>
-    </div>
-
     <h2>Data</h2>
 
     <div class="row full_width">
@@ -34,9 +20,9 @@
         </div>
 
         <div class="col_8 chart_col_card">
-            <h4>Fördelning av fil-PRONOM (topp 10)</h4>
+            <h4>Fördelning av filformat via PRONOM (topp 10)</h4>
             <canvas id="file-formats-pronom" class="statistic" data-source="index" data-source-filters="any"
-                    data-source-class="org.roda.core.data.v2.ip.IndexedFile" data-source-facets="formatPronom"
+                    data-source-class="org.roda.core.data.v2.ip.IndexedFile" data-source-facets="formatDesignation"
                     data-view="chart" data-view-field="facetResults" data-view-type="horizontalBar"
                     data-view-limit="10"></canvas>
             <span class="statistic toolbarLink" data-ref="file-formats-pronom" data-view="download"
