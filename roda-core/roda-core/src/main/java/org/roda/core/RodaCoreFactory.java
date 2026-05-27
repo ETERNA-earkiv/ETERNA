@@ -884,14 +884,17 @@ public class RodaCoreFactory {
     if (StringUtils.isNotBlank(newStorageService)) {
       try {
         Class<?> storageClass = Class.forName(newStorageService);
-        Constructor<?> constructor = storageClass.getConstructor(Path.class, String.class);
+        Constructor<?> constructor = storageClass.getConstructor(Path.class, boolean.class, boolean.class,
+          String.class, boolean.class);
 
         LOGGER.debug("Going to instantiate '{}' on '{}'", storageClass.getSimpleName(),
           configurationManager.getStoragePath());
         String trashDirName = getRodaConfiguration().getString("core.storage.filesystem.trash",
           RodaConstants.TRASH_CONTAINER);
+        boolean trashEnabled = getRodaConfiguration().getBoolean("core.storage.filesystem.trash.enabled", true);
 
-        return (StorageService) constructor.newInstance(configurationManager.getStoragePath(), trashDirName);
+        return (StorageService) constructor.newInstance(configurationManager.getStoragePath(), trashEnabled,
+          true, trashDirName, true);
       } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException
         | InvocationTargetException e) {
         LOGGER.warn("Error instantiating storage service defined on properties, falling back to a default service", e);
@@ -904,7 +907,9 @@ public class RodaCoreFactory {
       LOGGER.debug("Going to instantiate Filesystem on '{}'", configurationManager.getStoragePath());
       String trashDirName = getRodaConfiguration().getString("core.storage.filesystem.trash",
         RodaConstants.TRASH_CONTAINER);
-      StorageService fileStorageService = new FileStorageService(configurationManager.getStoragePath(), trashDirName);
+      boolean trashEnabled = getRodaConfiguration().getBoolean("core.storage.filesystem.trash.enabled", true);
+      StorageService fileStorageService = new FileStorageService(configurationManager.getStoragePath(), trashEnabled,
+        true, trashDirName, true);
       return fileStorageService;
     } else {
       LOGGER.error("Unknown storage service '{}'", storageType.name());
