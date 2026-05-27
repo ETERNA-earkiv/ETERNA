@@ -173,7 +173,7 @@ public class CatalogTreePanel extends Composite {
       new Filter(
         new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID),
         new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file")),
-      false)
+      true)
       .withSorter(new Sorter(new SortParameter(RodaConstants.AIP_TITLE_SORT, false)))
       .withSublist(new Sublist(0, TREE_MAX_CHILDREN))
       .build();
@@ -223,7 +223,7 @@ public class CatalogTreePanel extends Composite {
   private void loadSupplementaryGhostRoots(Set<String> accessibleRootIds, int myGeneration) {
     FindRequest findRequest = new FindRequest.FindRequestBuilder(
       new Filter(new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file")),
-      false)
+      true)
       .withSorter(new Sorter(new SortParameter(RodaConstants.AIP_TITLE_SORT, false)))
       .withSublist(new Sublist(0, TREE_MAX_CHILDREN))
       .build();
@@ -328,7 +328,7 @@ public class CatalogTreePanel extends Composite {
     rootsLoading = true;
     FindRequest findRequest = new FindRequest.FindRequestBuilder(
       new Filter(new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file")),
-      false)
+      true)
       .withSorter(new Sorter(new SortParameter(RodaConstants.AIP_TITLE_SORT, false)))
       .withSublist(new Sublist(0, TREE_MAX_CHILDREN))
       .build();
