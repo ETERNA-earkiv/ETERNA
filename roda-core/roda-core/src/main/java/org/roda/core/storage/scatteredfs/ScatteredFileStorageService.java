@@ -78,12 +78,14 @@ public class ScatteredFileStorageService extends FileStorageService  {
   private final Path historyDataPath;
   private final Path historyMetadataPath;
   private final Path trashPath;
+  private final boolean trashEnabled;
 
-  public ScatteredFileStorageService(Path basePath, boolean createTrash, String trashDirName, boolean createHistory)
-          throws GenericException {
-    super(basePath, createTrash, trashDirName, createHistory);
+  public ScatteredFileStorageService(Path basePath, boolean trashEnabled, boolean createTrash, String trashDirName,
+    boolean createHistory) throws GenericException {
+    super(basePath, trashEnabled, createTrash, trashDirName, createHistory);
 
     this.basePath = basePath;
+    this.trashEnabled = trashEnabled;
     rodaDataPath = this.basePath.getParent();
     Path historyPath = rodaDataPath.resolve(basePath.getFileName() + HISTORY_SUFFIX);
     historyDataPath = historyPath.resolve(HISTORY_DATA_FOLDER);
@@ -96,6 +98,11 @@ public class ScatteredFileStorageService extends FileStorageService  {
       LOGGER.error("Error! Could not initialize scattered fs.");
       throw exception;
     }
+  }
+
+  public ScatteredFileStorageService(Path basePath, boolean createTrash, String trashDirName, boolean createHistory)
+    throws GenericException {
+    this(basePath, true, createTrash, trashDirName, createHistory);
   }
 
   public ScatteredFileStorageService(Path basePath, String trashDirName) throws GenericException {
@@ -171,6 +178,11 @@ public class ScatteredFileStorageService extends FileStorageService  {
   }
 
   private void trash(Path fromPath) throws GenericException, NotFoundException {
+    if (!trashEnabled) {
+      LOGGER.debug("Trash disabled, permanently deleting '{}'", fromPath);
+      FSUtils.deletePath(fromPath);
+      return;
+    }
     if (trashPath == null) {
       LOGGER.warn("Skipping trash '{}' because no trash folder is defined!", fromPath);
       return;
