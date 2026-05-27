@@ -17,8 +17,12 @@ import java.nio.file.attribute.BasicFileAttributes;
 import org.roda.core.TestsHelper;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.storage.AbstractStorageServiceTest;
+import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.StringContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -143,5 +147,37 @@ public class FileStorageServiceTest extends AbstractStorageServiceTest<FileStora
   // TODO test get binary while IO Error occurs
   // TODO test create binary as reference while IO Error occurs
   // TODO test update binary while IO Error occurs
+
+  @Test
+  public void testDeleteResourcePermanentlyWhenTrashDisabled() throws RODAException, IOException {
+    Path basePath2 = TestsHelper.createBaseTempDir(FileStorageServiceTest.class, true);
+    try {
+      // Given: storage with trash disabled (trashEnabled=false, createTrash=false)
+      // createTrash=false prevents the trash directory from being created at init
+      FileStorageService storageNoTrash = new FileStorageService(basePath2, false, false, "trash", true);
+
+      StoragePath containerPath = DefaultStoragePath.parse("testContainer");
+      storageNoTrash.createContainer(containerPath);
+
+      StoragePath resourcePath = DefaultStoragePath.parse("testContainer", "testFile.txt");
+      ContentPayload payload = new StringContentPayload("test content");
+      storageNoTrash.createBinary(resourcePath, payload, false);
+      Assert.assertTrue(storageNoTrash.exists(resourcePath), "Resource should exist before deletion");
+
+      // When: delete the resource
+      storageNoTrash.deleteResource(resourcePath);
+
+      // Then: resource should be permanently deleted
+      Assert.assertFalse(storageNoTrash.exists(resourcePath), "Resource should be gone after deletion");
+
+      // And: trash directory should not have been created
+      Path trashDir = basePath2.getParent().resolve("trash");
+      Assert.assertFalse(Files.exists(trashDir),
+        "Trash directory should not exist when trash is disabled");
+    } finally {
+      FSUtils.deletePath(basePath2);
+      FSUtils.deletePathQuietly(basePath2.getParent().resolve("trash"));
+    }
+  }
 
 }

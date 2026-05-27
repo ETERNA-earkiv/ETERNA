@@ -91,10 +91,12 @@ public class FileStorageService implements StorageService {
   private final Path historyDataPath;
   private final Path historyMetadataPath;
   private final Path trashPath;
+  private final boolean trashEnabled;
 
-  public FileStorageService(Path basePath, boolean createTrash, String trashDirName, boolean createHistory)
-    throws GenericException {
+  public FileStorageService(Path basePath, boolean trashEnabled, boolean createTrash, String trashDirName,
+    boolean createHistory) throws GenericException {
     this.basePath = basePath;
+    this.trashEnabled = trashEnabled;
     rodaDataPath = this.basePath.getParent();
     historyPath = rodaDataPath.resolve(basePath.getFileName() + HISTORY_SUFFIX);
     historyDataPath = historyPath.resolve(HISTORY_DATA_FOLDER);
@@ -110,7 +112,11 @@ public class FileStorageService implements StorageService {
     if (createTrash) {
       initialize(trashPath);
     }
+  }
 
+  public FileStorageService(Path basePath, boolean createTrash, String trashDirName, boolean createHistory)
+    throws GenericException {
+    this(basePath, true, createTrash, trashDirName, createHistory);
   }
 
   public FileStorageService(Path basePath, String trashDirName) throws GenericException {
@@ -208,6 +214,11 @@ public class FileStorageService implements StorageService {
   }
 
   private void trash(Path fromPath) throws GenericException, NotFoundException {
+    if (!trashEnabled) {
+      LOGGER.debug("Trash disabled, permanently deleting '{}'", fromPath);
+      FSUtils.deletePath(fromPath);
+      return;
+    }
     if (trashPath == null) {
       LOGGER.warn("Skipping trash '{}' because no trash folder is defined!", fromPath);
       return;
