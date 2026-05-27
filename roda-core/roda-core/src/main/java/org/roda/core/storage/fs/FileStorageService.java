@@ -74,6 +74,13 @@ import org.slf4j.LoggerFactory;
  * them to a 'trash' folder with the same folder structure
  * </p>
  *
+ * <p>
+ * 20260527 WhiteRed: trash behaviour is configurable via
+ * {@code core.storage.filesystem.trash.enabled} in {@code roda-core.properties}.
+ * When set to {@code false}, delete operations permanently remove files instead
+ * of moving them to the trash folder.
+ * </p>
+ *
  * @author Luis Faria <lfaria@keep.pt>
  * @author Hélder Silva <hsilva@keep.pt>
  */
