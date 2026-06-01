@@ -133,7 +133,7 @@ public class TransferredResourcesScanner {
       index.create(TransferredResource.class, resource);
       return resource;
     } catch (FileAlreadyExistsException e) {
-      LOGGER.error("Cannot create file", e);
+      LOGGER.debug("File already exists: {}", file);
       throw new AlreadyExistsException(file.toString());
     } catch (IOException e) {
       LOGGER.error("Cannot create file", e);
