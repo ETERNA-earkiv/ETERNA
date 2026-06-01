@@ -80,8 +80,8 @@ public class InternalWebAuthFilter implements Filter {
       parameterMap);
 
     if (requestURI.endsWith("/login")) {
-      if (!hash.startsWith("login" + HistoryUtils.HISTORY_SEP)) {
-        uri.setFragment("login" + HistoryUtils.HISTORY_SEP + hash);
+      if (hash == null || !hash.startsWith("login" + HistoryUtils.HISTORY_SEP)) {
+        uri.setFragment("login" + HistoryUtils.HISTORY_SEP + (hash != null ? hash : ""));
       }
 
       redirect(httpResponse, uri);
