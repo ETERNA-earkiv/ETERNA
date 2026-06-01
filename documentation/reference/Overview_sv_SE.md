@@ -37,7 +37,7 @@ Arkivbeståndet är en inventering av alla handlingar och information i arkivet.
 
 ### Sök & Avancerad sökning
 
-På söksidan kan du söka efter förvaringsenheter, representationer eller filer (använd nedåtpilen för att välja sökdomän). För var och en av dessa domäner kan du söka i alla dess egenskaper eller i specifika egenskaper (använd nedåtpilen för att utöka den avancerade sökningen). Om du till exempel väljer förvaringsenheter kan du söka i ett specifikt fält av beskrivande metadata, eller hitta filer av ett visst format om avancerad sökning för filer är vald.
+På söksidan kan du söka efter strukturenheter, representationer eller filer (använd nedåtpilen för att välja sökdomän). För var och en av dessa domäner kan du söka i alla dess egenskaper eller i specifika egenskaper (använd nedåtpilen för att utöka den avancerade sökningen). Om du till exempel väljer strukturenheter kan du söka i ett specifikt fält av beskrivande metadata, eller hitta filer av ett visst format om avancerad sökning för filer är vald.
 
 Sökmotorn hittar endast hela ord. Om du vill söka efter delar av ord så använd '*'-tecken. För mer information om sökverktyg, se nästa sektion.
 
@@ -110,7 +110,7 @@ När en ny användare skapas skickar systemet normalt ett aktiveringsmail med en
 
 ### Gallring
 
-Gallring i ETERNA innebär att information tas bort enligt fastställda gallringsregler och gallringsscheman, till exempel när en lagringstid har löpt ut. Varje förvaringsenhet är kopplad till ett gallringsschema som styr hur länge den bevaras och när gallring får ske.
+Gallring i ETERNA innebär att information tas bort enligt fastställda gallringsregler och gallringsscheman, till exempel när en lagringstid har löpt ut. Varje strukturenhet är kopplad till ett gallringsschema som styr hur länge den bevaras och när gallring får ske.
 
 Gallringen genomförs via en kontrollerad process och kan tillfälligt stoppas genom ett gallringsstopp. Inför gallring skapas en gallringsbekräftelse som innehåller en rapport över berörda enheter. Gallringen måste startas explicit och kan efteråt antingen återställas eller genomföras permanent.
 
