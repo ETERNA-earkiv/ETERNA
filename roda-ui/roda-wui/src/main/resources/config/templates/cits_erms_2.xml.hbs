@@ -1,0 +1,215 @@
+{{! ===== DOKUMENTKONTROLL ===== }}
+{{~field name="controlSeparator"         order="5"    hidden="false"  type="separator"  labeli18n="crosswalks.dissemination.html.cits_erms_2.controlSection"              label='{"en": "Document control", "sv": "Dokumentkontroll"}'~}}
+{{~field name="identification"           order="8"    hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.identification"               label='{"en": "Identification", "sv": "Identifiering"}'           xpath="//*:control/*:identification[1]/string()"~}}
+{{~field name="identificationType"       order="9"    hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.identificationType"           label='{"en": "Identification type", "sv": "Identifieringstyp"}'  xpath="//*:control/*:identification[1]/@identificationType/string()"~}}
+{{~field name="agencyName"               order="10"   hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.agencyName"                   label='{"en": "Agency name", "sv": "Myndighetsnamn"}'             xpath="//*:control/*:maintenanceInformation/*:maintenanceAgency/*:agencyName[1]/string()"~}}
+
+{{! ===== IDENTIFIERING ===== }}
+{{~field name="identificationSection"    order="20"   hidden="false"  type="separator"  labeli18n="crosswalks.dissemination.html.cits_erms_2.identificationSection"        label='{"en": "Identification", "sv": "Identifiering"}'~}}
+{{~field name="objectId"                 order="25"   hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.objectId"                     label='{"en": "Object ID", "sv": "Objekt-ID"}'                    xpath="//*:aggregation[1]/*:objectId/string()"   auto-generate="id"~}}
+{{~field name="systemIdentifier"         order="30"   hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.systemIdentifier"             label='{"en": "System identifier", "sv": "System-ID"}'            xpath="//*:aggregation[1]/@systemIdentifier/string()"~}}
+{{~field name="extraId"                  order="35"   hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.extraId"                      label='{"en": "Extra ID", "sv": "Externt ID"}'                    xpath="//*:aggregation[1]/*:extraId[1]/string()"~}}
+{{~field name="extraIdType"              order="36"   hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.extraIdType"                  label='{"en": "Extra ID type", "sv": "Externt ID-typ"}'           xpath="//*:aggregation[1]/*:extraId[1]/@extraIdType/string()"~}}
+{{~field name="informationClass"         order="40"   hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.informationClass"             label='{"en": "Information class", "sv": "Informationsklass"}'    xpath="//*:aggregation[1]/*:informationClass/string()"~}}
+{{~field name="securityClass"            order="45"   hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.securityClass"                label='{"en": "Security class", "sv": "Säkerhetsklass"}'          xpath="//*:aggregation[1]/*:securityClass/string()"~}}
+{{~field name="classification"           order="50"   hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.classification"               label='{"en": "Classification", "sv": "Klassificering"}'          xpath="//*:aggregation[1]/*:classification[1]/string()"~}}
+{{~field name="classificationCode"       order="51"   hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.classificationCode"           label='{"en": "Classification code", "sv": "Klassificeringskod"}' xpath="//*:aggregation[1]/*:classification[1]/@classificationCode/string()"~}}
+{{~field name="parentAggregationId"      order="55"   hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.parentAggregationId"          label='{"en": "Parent aggregation ID", "sv": "Tillhör ärende (ID)"}' xpath="//*:aggregation[1]/*:parentAggregationId/string()"~}}
+{{~field name="hierarchicalParentClassId" order="56"  hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.hierarchicalParentClassId"    label='{"en": "Hierarchical parent class ID", "sv": "Hierarkisk förälderklass"}' xpath="//*:aggregation[1]/*:hierarchicalParentClassId/string()"~}}
+{{~field name="levelName"                order="60"   hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.levelName"                    label='{"en": "Level name", "sv": "Ärendenivå"}'                  xpath="//*:aggregation[1]/*:levelName/string()"~}}
+
+{{! ===== GRUNDUPPGIFTER ===== }}
+{{~field name="contentSection"           order="70"   hidden="false"  type="separator"  labeli18n="crosswalks.dissemination.html.cits_erms_2.contentSection"               label='{"en": "Content", "sv": "Grunduppgifter"}'~}}
+{{~field name="title"                    order="75"   hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.title"                        label='{"en": "Title", "sv": "Titel"}'                            xpath="//*:aggregation[1]/*:title/string()"        auto-generate="title"~}}
+{{~field name="otherTitle"               order="76"   hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.otherTitle"                   label='{"en": "Other title", "sv": "Annan titel"}'                xpath="//*:aggregation[1]/*:otherTitle[1]/string()"~}}
+{{~field name="otherTitleType"           order="77"   hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.otherTitleType"               label='{"en": "Other title type", "sv": "Typ av annan titel"}'    xpath="//*:aggregation[1]/*:otherTitle[1]/@titleType/string()"~}}
+{{~field name="description"              order="80"   hidden="false"  type="text-area"  labeli18n="crosswalks.dissemination.html.cits_erms_2.description"                  label='{"en": "Description", "sv": "Beskrivning"}'                xpath="//*:aggregation[1]/*:description/string()"~}}
+{{~field name="subject1"                 order="85"   hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.subject"                      label='{"en": "Subject", "sv": "Ämne"}'                           xpath="//*:aggregation[1]/*:subject[1]/string()"~}}
+{{~field name="subject2"                 order="86"   hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.subject"                      label='{"en": "Subject", "sv": "Ämne"}'                           xpath="//*:aggregation[1]/*:subject[2]/string()"~}}
+{{~field name="keyword1"                 order="90"   hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.keywords"                     label='{"en": "Keyword", "sv": "Nyckelord"}'                      xpath="//*:aggregation[1]/*:keywords/*:keyword[1]/string()"~}}
+{{~field name="keyword2"                 order="91"   hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.keywords"                     label='{"en": "Keyword", "sv": "Nyckelord"}'                      xpath="//*:aggregation[1]/*:keywords/*:keyword[2]/string()"~}}
+
+{{! ===== STATUS OCH DATUM ===== }}
+{{~field name="statusSection"            order="100"  hidden="false"  type="separator"  labeli18n="crosswalks.dissemination.html.cits_erms_2.statusSection"                label='{"en": "Status and dates", "sv": "Status och datum"}'~}}
+{{~field name="status"                   order="105"  hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.status"                       label='{"en": "Status", "sv": "Status"}'                          xpath="//*:aggregation[1]/*:status/@value/string()"~}}
+{{~field name="openDate"                 order="110"  hidden="false"  type="date"       labeli18n="crosswalks.dissemination.html.cits_erms_2.openDate"                     label='{"en": "Opening date", "sv": "Öppningsdatum"}'             xpath="//*:aggregation[1]/*:dates/*:date[@dateType='opening_date' or @dateType='opened'][1]/string()"~}}
+{{~field name="closeDate"                order="115"  hidden="false"  type="date"       labeli18n="crosswalks.dissemination.html.cits_erms_2.closeDate"                    label='{"en": "Closing date", "sv": "Stängningsdatum"}'           xpath="//*:aggregation[1]/*:dates/*:date[@dateType='closed'][1]/string()"~}}
+
+{{! ===== RELATIONER ===== }}
+{{~field name="relationsSection"         order="120"  hidden="false"  type="separator"  labeli18n="crosswalks.dissemination.html.cits_erms_2.relationsSection"             label='{"en": "Relations", "sv": "Relationer"}'~}}
+{{~field name="relation1"                order="125"  hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.relation"                     label='{"en": "Relation", "sv": "Relation"}'                      xpath="//*:aggregation[1]/*:relation[1]/string()"~}}
+{{~field name="relation1Type"            order="126"  hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.relationType"                 label='{"en": "Relation type", "sv": "Relationstyp"}'             xpath="//*:aggregation[1]/*:relation[1]/@relationType/string()"~}}
+{{~field name="relation2"                order="127"  hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.relation"                     label='{"en": "Relation", "sv": "Relation"}'                      xpath="//*:aggregation[1]/*:relation[2]/string()"~}}
+{{~field name="relation2Type"            order="128"  hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.relationType"                 label='{"en": "Relation type", "sv": "Relationstyp"}'             xpath="//*:aggregation[1]/*:relation[2]/@relationType/string()"~}}
+
+{{! ===== AGENTER ===== }}
+{{~field name="agentsSection"            order="130"  hidden="false"  type="separator"  labeli18n="crosswalks.dissemination.html.cits_erms_2.agentsSection"                label='{"en": "Agents", "sv": "Agenter"}'~}}
+{{~field name="agent1Name"               order="135"  hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.agentName"                    label='{"en": "Agent name", "sv": "Namn"}'                        xpath="//*:aggregation[1]/*:agents/*:agent[1]/*:name/string()"~}}
+{{~field name="agent1Organisation"       order="136"  hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.agentOrganisation"            label='{"en": "Organisation", "sv": "Organisation"}'              xpath="//*:aggregation[1]/*:agents/*:agent[1]/*:organisation/string()"~}}
+{{~field name="agent1Role"               order="137"  hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.agentRole"                    label='{"en": "Role", "sv": "Roll"}'                              xpath="//*:aggregation[1]/*:agents/*:agent[1]/*:role/string()"~}}
+{{~field name="agent2Name"               order="140"  hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.agentName"                    label='{"en": "Agent name", "sv": "Namn"}'                        xpath="//*:aggregation[1]/*:agents/*:agent[2]/*:name/string()"~}}
+{{~field name="agent2Organisation"       order="141"  hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.agentOrganisation"            label='{"en": "Organisation", "sv": "Organisation"}'              xpath="//*:aggregation[1]/*:agents/*:agent[2]/*:organisation/string()"~}}
+{{~field name="agent2Role"               order="142"  hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.agentRole"                    label='{"en": "Role", "sv": "Roll"}'                              xpath="//*:aggregation[1]/*:agents/*:agent[2]/*:role/string()"~}}
+
+{{! ===== ÅTKOMST OCH BEGRÄNSNINGAR ===== }}
+{{~field name="accessSection"            order="150"  hidden="false"  type="separator"  labeli18n="crosswalks.dissemination.html.cits_erms_2.accessSection"                label='{"en": "Access and restrictions", "sv": "Åtkomst och begränsningar"}'~}}
+{{~field name="access"                   order="155"  hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.access"                       label='{"en": "Access", "sv": "Åtkomst"}'                         xpath="//*:aggregation[1]/*:access/string()"~}}
+{{~field name="restrictionType"          order="160"  hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.restrictionType"              label='{"en": "Restriction type", "sv": "Begränsningstyp"}'       xpath="//*:aggregation[1]/*:restriction[1]/@restrictionType/string()"~}}
+{{~field name="restrictionExplanatoryText" order="161" hidden="false" type="text-area"  labeli18n="crosswalks.dissemination.html.cits_erms_2.restrictionExplanatoryText"   label='{"en": "Restriction explanation", "sv": "Förklaring av begränsning"}' xpath="//*:aggregation[1]/*:restriction[1]/*:explanatoryText/string()"~}}
+{{~field name="restrictionRegulation"    order="162"  hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.restrictionRegulation"        label='{"en": "Regulation (law and paragraph)", "sv": "Lagstöd (lag och paragraf)"}' xpath="//*:aggregation[1]/*:restriction[1]/*:regulation/string()"~}}
+
+{{! ===== GALLRING ===== }}
+{{~field name="disposalSection"          order="170"  hidden="false"  type="separator"  labeli18n="crosswalks.dissemination.html.cits_erms_2.disposalSection"              label='{"en": "Disposal", "sv": "Gallring"}'~}}
+{{~field name="disposalScheduleId"       order="175"  hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.disposalScheduleId"           label='{"en": "Disposal schedule ID", "sv": "Gallringsschema-ID"}' xpath="//*:aggregation[1]/*:disposal/*:disposalScheduleId/string()"~}}
+{{~field name="disposalAction"           order="176"  hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.disposalAction"               label='{"en": "Disposal action", "sv": "Gallringsåtgärd"}'        xpath="//*:aggregation[1]/*:disposal/*:disposalAction/string()"~}}
+{{~field name="disposalPeriod"           order="177"  hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.disposalPeriod"               label='{"en": "Disposal period", "sv": "Gallringsperiod"}'        xpath="//*:aggregation[1]/*:disposal/*:disposalPeriod/string()"~}}
+{{~field name="disposalMandate"          order="178"  hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.disposalMandate"              label='{"en": "Disposal mandate", "sv": "Gallringsmandat"}'       xpath="//*:aggregation[1]/*:disposal/*:disposalMandate/string()"~}}
+{{~field name="disposalDescription"      order="179"  hidden="false"  type="text-area"  labeli18n="crosswalks.dissemination.html.cits_erms_2.disposalDescription"          label='{"en": "Disposal description", "sv": "Gallringsbeskrivning"}' xpath="//*:aggregation[1]/*:disposal/*:disposalDescription/string()"~}}
+
+{{! ===== PLATSINFORMATION ===== }}
+{{~field name="physicalSection"          order="185"  hidden="false"  type="separator"  labeli18n="crosswalks.dissemination.html.cits_erms_2.physicalSection"              label='{"en": "Physical information", "sv": "Platsinformation"}'~}}
+{{~field name="dispatchMode"             order="187"  hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.dispatchMode"                 label='{"en": "Dispatch mode", "sv": "Leveransläge"}'             xpath="//*:aggregation[1]/*:dispatchMode/string()"~}}
+{{~field name="physicalLocation"         order="189"  hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.physicalLocation"             label='{"en": "Physical location", "sv": "Fysisk plats"}'         xpath="//*:aggregation[1]/*:physicalLocations/*:physicalLocation[1]/*:currentLocation/string()"~}}
+
+{{! ===== HISTORIK OCH ANTECKNINGAR ===== }}
+{{~field name="historySection"           order="190"  hidden="false"  type="separator"  labeli18n="crosswalks.dissemination.html.cits_erms_2.historySection"               label='{"en": "History and notes", "sv": "Historik och anteckningar"}'~}}
+{{~field name="archivalHistory"          order="195"  hidden="false"  type="text-area"  labeli18n="crosswalks.dissemination.html.cits_erms_2.archivalHistory"              label='{"en": "Archival history", "sv": "Arkivhistorik"}'         xpath="//*:aggregation[1]/*:archivalHistory/*:historyLine[1]/string()"~}}
+{{~field name="note"                     order="197"  hidden="false"  type="text-area"  labeli18n="crosswalks.dissemination.html.cits_erms_2.note"                         label='{"en": "Note", "sv": "Anteckning"}'                        xpath="//*:aggregation[1]/*:notes/*:note[1]/string()"~}}
+{{~field name="noteType"                 order="198"  hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_2.noteType"                     label='{"en": "Note type", "sv": "Anteckningstyp"}'               xpath="//*:aggregation[1]/*:notes/*:note[1]/@noteType/string()"~}}
+
+<?xml version="1.0" encoding="utf-8"?>
+<erms xmlns="https://DILCIS.eu/XML/ERMS"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="https://DILCIS.eu/XML/ERMS ../schemas/cits_erms_2.xsd">
+  <control>
+    <identification identificationType="{{#if identificationType}}{{identificationType}}{{else}}local{{/if}}">{{identification}}</identification>
+    <maintenanceInformation>
+      <maintenanceStatus value="created"/>
+      <maintenanceAgency>
+        <agencyName>{{agencyName}}</agencyName>
+      </maintenanceAgency>
+      <maintenanceHistory>
+        <maintenanceEvent>
+          <eventType value="created"/>
+          <eventDateTime>{{#if openDate}}{{openDate}}T00:00:00{{else}}2001-01-01T00:00:00{{/if}}</eventDateTime>
+          <agent><name>ETERNA</name></agent>
+        </maintenanceEvent>
+      </maintenanceHistory>
+    </maintenanceInformation>
+  </control>
+  <aggregations>
+    <aggregation systemIdentifier="{{systemIdentifier}}" aggregationType="caseFile">
+      <objectId>{{objectId}}</objectId>
+      {{~#if extraId~}}
+      <extraId extraIdType="{{#if extraIdType}}{{extraIdType}}{{else}}other{{/if}}">{{extraId}}</extraId>
+      {{~/if~}}
+      {{~#if informationClass~}}
+      <informationClass>{{informationClass}}</informationClass>
+      {{~/if~}}
+      {{~#if securityClass~}}
+      <securityClass>{{securityClass}}</securityClass>
+      {{~/if~}}
+      {{~#if classification~}}
+      <classification{{#if classificationCode}} classificationCode="{{classificationCode}}"{{/if}}>{{classification}}</classification>
+      {{~/if~}}
+      {{~#if parentAggregationId~}}
+      <parentAggregationId>{{parentAggregationId}}</parentAggregationId>
+      {{~/if~}}
+      {{~#if hierarchicalParentClassId~}}
+      <hierarchicalParentClassId>{{hierarchicalParentClassId}}</hierarchicalParentClassId>
+      {{~/if~}}
+      {{~#if levelName~}}
+      <levelName>{{levelName}}</levelName>
+      {{~/if~}}
+      {{~#ifCond "||" keyword1 keyword2~}}
+      <keywords>
+        {{~#if keyword1~}}<keyword>{{keyword1}}</keyword>{{~/if~}}
+        {{~#if keyword2~}}<keyword>{{keyword2}}</keyword>{{~/if~}}
+      </keywords>
+      {{~/ifCond~}}
+      {{~#if title~}}
+      <title>{{title}}</title>
+      {{~/if~}}
+      {{~#if otherTitle~}}
+      <otherTitle titleType="{{#if otherTitleType}}{{otherTitleType}}{{else}}other{{/if}}">{{otherTitle}}</otherTitle>
+      {{~/if~}}
+      {{~#if subject1~}}<subject>{{subject1}}</subject>{{~/if~}}
+      {{~#if subject2~}}<subject>{{subject2}}</subject>{{~/if~}}
+      {{~#if status~}}
+      <status value="{{status}}"/>
+      {{~/if~}}
+      {{~#if relation1~}}
+      <relation relationType="{{#if relation1Type}}{{relation1Type}}{{else}}reference{{/if}}">{{relation1}}</relation>
+      {{~/if~}}
+      {{~#if relation2~}}
+      <relation relationType="{{#if relation2Type}}{{relation2Type}}{{else}}reference{{/if}}">{{relation2}}</relation>
+      {{~/if~}}
+      {{~#if restrictionRegulation~}}
+      <restriction restrictionType="{{#if restrictionType}}{{restrictionType}}{{else}}confidential{{/if}}">
+        {{~#if restrictionExplanatoryText~}}<explanatoryText>{{restrictionExplanatoryText}}</explanatoryText>{{~/if~}}
+        <regulation>{{restrictionRegulation}}</regulation>
+      </restriction>
+      {{~/if~}}
+      {{~#ifCond "||" disposalScheduleId disposalAction disposalPeriod disposalMandate disposalDescription~}}
+      <disposal>
+        {{~#if disposalScheduleId~}}<disposalScheduleId>{{disposalScheduleId}}</disposalScheduleId>{{~/if~}}
+        {{~#if disposalAction~}}<disposalAction>{{disposalAction}}</disposalAction>{{~/if~}}
+        {{~#if disposalPeriod~}}<disposalPeriod>{{disposalPeriod}}</disposalPeriod>{{~/if~}}
+        {{~#if disposalMandate~}}<disposalMandate>{{disposalMandate}}</disposalMandate>{{~/if~}}
+        {{~#if disposalDescription~}}<disposalDescription>{{disposalDescription}}</disposalDescription>{{~/if~}}
+        <dates><date dateType="other">2001-01-01T00:00:00</date></dates>
+      </disposal>
+      {{~/ifCond~}}
+      {{~#ifCond "||" agent1Name agent2Name~}}
+      <agents>
+        {{~#if agent1Name~}}
+        <agent>
+          <name>{{agent1Name}}</name>
+          {{~#if agent1Organisation~}}<organisation>{{agent1Organisation}}</organisation>{{~/if~}}
+          {{~#if agent1Role~}}<role>{{agent1Role}}</role>{{~/if~}}
+        </agent>
+        {{~/if~}}
+        {{~#if agent2Name~}}
+        <agent>
+          <name>{{agent2Name}}</name>
+          {{~#if agent2Organisation~}}<organisation>{{agent2Organisation}}</organisation>{{~/if~}}
+          {{~#if agent2Role~}}<role>{{agent2Role}}</role>{{~/if~}}
+        </agent>
+        {{~/if~}}
+      </agents>
+      {{~/ifCond~}}
+      {{~#if description~}}
+      <description>{{description}}</description>
+      {{~/if~}}
+      {{~#ifCond "||" openDate closeDate~}}
+      <dates>
+        {{~#if openDate~}}<date dateType="opening_date">{{openDate}}T00:00:00</date>{{~/if~}}
+        {{~#if closeDate~}}<date dateType="closed">{{closeDate}}T00:00:00</date>{{~/if~}}
+      </dates>
+      {{~/ifCond~}}
+      {{~#if archivalHistory~}}
+      <archivalHistory>
+        <historyLine>{{archivalHistory}}</historyLine>
+      </archivalHistory>
+      {{~/if~}}
+      {{~#if dispatchMode~}}
+      <dispatchMode>{{dispatchMode}}</dispatchMode>
+      {{~/if~}}
+      {{~#if access~}}
+      <access>{{access}}</access>
+      {{~/if~}}
+      {{~#if physicalLocation~}}
+      <physicalLocations>
+        <physicalLocation>
+          <currentLocation>{{physicalLocation}}</currentLocation>
+        </physicalLocation>
+      </physicalLocations>
+      {{~/if~}}
+      {{~#if note~}}
+      <notes>
+        <note{{#if noteType}} noteType="{{noteType}}"{{/if}}>{{note}}</note>
+      </notes>
+      {{~/if~}}
+    </aggregation>
+  </aggregations>
+</erms>
