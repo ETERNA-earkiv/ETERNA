@@ -1,6 +1,6 @@
 # Avancerad sökning
 
-På söksidan kan du söka efter förvaringsenheter, representationer eller filer (använd nedåtpilen för att välja sökdomän). För var och en av dessa domäner kan du söka i alla dess egenskaper eller i specifika egenskaper (använd nedåtpilen för att utöka den avancerade sökningen). Om du till exempel väljer förvaringsenheter kan du söka i ett specifikt fält av beskrivande metadata, eller hitta filer av ett visst format om avancerad sökning för filer är vald.
+På söksidan kan du söka efter strukturenheter, representationer eller filer (använd nedåtpilen för att välja sökdomän). För var och en av dessa domäner kan du söka i alla dess egenskaper eller i specifika egenskaper (använd nedåtpilen för att utöka den avancerade sökningen). Om du till exempel väljer strukturenheter kan du söka i ett specifikt fält av beskrivande metadata, eller hitta filer av ett visst format om avancerad sökning för filer är vald.
 
 Sökmotorn hittar bara hela ord. Om du vill söka efter deltermer bör du använda asterisk '*'.
 
