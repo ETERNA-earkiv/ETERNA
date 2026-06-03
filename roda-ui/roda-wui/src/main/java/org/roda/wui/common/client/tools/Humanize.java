@@ -41,7 +41,7 @@ public class Humanize {
   public static final double[] BYTES_IN_UNITS = {1, BYTES_IN_KILOBYTES, BYTES_IN_MEGABYTES, BYTES_IN_GIGABYTES,
     BYTES_IN_TERABYTES, BYTES_IN_PETABYTES};
   public static final DateTimeFormat DATE_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd");
-  public static final DateTimeFormat DATE_TIME_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss z");
+  public static final DateTimeFormat DATE_TIME_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss");
   public static final DateTimeFormat DATE_TIME_FORMAT_JSON = DateTimeFormat.getFormat("yyyy-MM-ddTHH:mm:ss.SSSZZZ");
   public static final boolean FORMAT_UTC = false;
   protected static final NumberFormat SMALL_NUMBER_FORMAT = NumberFormat.getFormat("0.#");
