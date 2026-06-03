@@ -27,7 +27,6 @@ import org.roda.wui.common.client.tools.Humanize.DHMSFormat;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Style;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -221,7 +220,7 @@ public class JobList extends AsyncTableCell<IndexedJob> {
     objectsSkippedCountColumn.setSortable(true);
     progressColumn.setSortable(true);
 
-    addColumn(nameColumn, messages.jobName(), true, false, 100, Style.Unit.PCT);
+    addColumn(nameColumn, messages.jobName(), true, false);
     addColumn(usernameColumn, messages.jobCreator(), true, false, 6);
     addColumn(startDateColumn, messages.jobStartDate(), true, false, 11);
     addColumn(durationColumn, messages.jobDuration(), true, true, 6);

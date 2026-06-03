@@ -1456,7 +1456,7 @@ button:after {
 
 .my-asyncdatagrid-main-panel {
     vertical-align: top;
-    overflow: hidden;
+    overflow-x: auto;
 }
 
 .my-asyncdatagrid-main-panel-full {
@@ -1588,8 +1588,9 @@ button:after {
 }
 
 .my-asyncdatagrid-display {
-    width: 100%;
-    table-layout: fixed;
+    width: max-content;
+    min-width: 99%;
+    table-layout: auto;
     margin-top: 0.6rem;
     margin-bottom: 32px;
 }
@@ -4601,6 +4602,11 @@ body.catalogTreeResizing * {
 .searchWrapper {
     display: flex;
     align-items: start;
+}
+
+.searchWrapperMainPanel {
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 .searchWrapperSearchPanel {
