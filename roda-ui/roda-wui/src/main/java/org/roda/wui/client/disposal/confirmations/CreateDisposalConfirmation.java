@@ -31,11 +31,11 @@ import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.disposal.Disposal;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -53,13 +53,11 @@ import com.google.gwt.user.client.ui.Anchor;
  */
 public class CreateDisposalConfirmation extends Composite {
 
-  private static final DateTimeFormat formatter = DateTimeFormat.getFormat(RodaConstants.SIMPLE_DATE_FORMATTER);
-
   private static final Filter SHOW_RECORDS_TO_REVIEW = new Filter(
     new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_ACTION, DisposalActionCode.REVIEW.name()),
     new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name()),
     new DateIntervalFilterParameter(RodaConstants.AIP_OVERDUE_DATE, RodaConstants.AIP_OVERDUE_DATE, null,
-      formatter.parse(formatter.format(new Date()))),
+      Humanize.DATE_FORMAT.parse(Humanize.DATE_FORMAT.format(new Date()))),
     new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLD_STATUS, Boolean.FALSE.toString()),
     new EmptyKeyFilterParameter(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID));
 
@@ -67,7 +65,7 @@ public class CreateDisposalConfirmation extends Composite {
     new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_ACTION, DisposalActionCode.DESTROY.name()),
     new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name()),
     new DateIntervalFilterParameter(RodaConstants.AIP_OVERDUE_DATE, RodaConstants.AIP_OVERDUE_DATE, null,
-      formatter.parse(formatter.format(new Date()))),
+      Humanize.DATE_FORMAT.parse(Humanize.DATE_FORMAT.format(new Date()))),
     new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLD_STATUS, Boolean.FALSE.toString()),
     new EmptyKeyFilterParameter(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID));
 

@@ -18,13 +18,12 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
+import org.roda.wui.client.common.lists.utils.HumanizeDateCell;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Humanize;
 
-import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -128,7 +127,7 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
     };
 
     creationDateColumn = new Column<TransferredResource, Date>(
-      new DateCell(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT))) {
+      new HumanizeDateCell()) {
       @Override
       public Date getValue(TransferredResource r) {
         return r != null ? r.getCreationDate() : null;
