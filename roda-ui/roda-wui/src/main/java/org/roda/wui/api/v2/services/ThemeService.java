@@ -43,8 +43,7 @@ public class ThemeService {
     String resourceId;
 
     if (RodaConstants.ResourcesTypes.PLUGINS.toString().equals(type)) {
-      resourcePath = RodaCoreFactory.getConfigPath()
-        .resolve(RodaConstants.CORE_PLUGINS_FOLDER);
+      resourcePath = RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_PLUGINS_FOLDER);
       resourceId = RodaConstants.CORE_PLUGINS_FOLDER + "/" + normalizedID;
     } else {
       resourcePath = RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_THEME_FOLDER);
@@ -53,11 +52,19 @@ public class ThemeService {
 
     URL url = RodaCoreFactory.getConfigurationFile(resourceId);
     if (url != null) {
-      ret = Pair.of(id,
-        () -> RodaCoreFactory.getConfigurationFileAsStream(resourcePath, normalizedID));
+      ret = Pair.of(id, () -> RodaCoreFactory.getConfigurationFileAsStream(resourcePath, normalizedID));
     } else {
-      ret = Pair.of(normalizedFallBackResource,
-        () -> RodaCoreFactory.getConfigurationFileAsStream(resourcePath, normalizedFallBackResource));
+      // Fall back to eterna-theme/ (ETERNA product defaults; customer overrides go in
+      // theme/)
+      String eternaResourceId = "eterna-theme/" + normalizedID;
+      URL eternaUrl = RodaCoreFactory.getConfigurationFile(eternaResourceId);
+      if (eternaUrl != null) {
+        Path eternaThemePath = RodaCoreFactory.getConfigPath().resolve("eterna-theme");
+        ret = Pair.of(id, () -> RodaCoreFactory.getConfigurationFileAsStream(eternaThemePath, normalizedID));
+      } else {
+        ret = Pair.of(normalizedFallBackResource,
+          () -> RodaCoreFactory.getConfigurationFileAsStream(resourcePath, normalizedFallBackResource));
+      }
     }
 
     return ret;
@@ -111,8 +118,7 @@ public class ThemeService {
     Date modifiedDate;
     URL file;
     if (RodaConstants.ResourcesTypes.PLUGINS.toString().equals(type)) {
-      file = RodaCoreFactory
-        .getConfigurationFile(RodaConstants.CORE_PLUGINS_FOLDER + "/" + resourceId);
+      file = RodaCoreFactory.getConfigurationFile(RodaConstants.CORE_PLUGINS_FOLDER + "/" + resourceId);
     } else {
       file = RodaCoreFactory.getConfigurationFile(RodaConstants.CORE_THEME_FOLDER + "/" + resourceId);
     }
