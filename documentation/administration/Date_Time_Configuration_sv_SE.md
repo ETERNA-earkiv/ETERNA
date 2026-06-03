@@ -1,6 +1,6 @@
 # Konfiguration av datum- och tidvisning
 
-ETERNA lagrar alltid tidsstämplar i UTC internt, men kan visa dem för användaren antingen i UTC eller i serverns lokala tid. Inställningen styrs via `roda-wui.properties`.
+ETERNA lagrar alltid tidsstämplar i UTC internt, men kan visa dem för användaren antingen i UTC eller i lokal tid. Inställningen styrs via `roda-wui.properties`.
 
 ## Konfigurationsinställning
 
@@ -9,7 +9,7 @@ ETERNA lagrar alltid tidsstämplar i UTC internt, men kan visa dem för använda
 ui.dateTime.format.UTC=false
 ```
 
-Standardvärdet är `false` — datum och tider visas i serverns lokala tidszon. Sätt värdet till `true` för att alltid visa UTC.
+Standardvärdet är `false` — i klient-UI:t (via Humanize, körs i webbläsaren) visas datum/tider i användarens webbläsares lokala tidszon, medan servergenererade rapporter (t.ex. Disposal Confirmation) använder serverns lokala tid. Sätt värdet till `true` för att alltid visa UTC i båda fallen.
 
 Filen finns under `~/.roda/config/roda-wui.properties` på en körande instans, eller i `roda-ui/roda-wui/src/main/resources/config/roda-wui.properties` i källkoden.
 

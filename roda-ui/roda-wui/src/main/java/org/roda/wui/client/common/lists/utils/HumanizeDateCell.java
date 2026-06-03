@@ -9,10 +9,10 @@ package org.roda.wui.client.common.lists.utils;
 
 import java.util.Date;
 
+import org.roda.wui.common.client.tools.Humanize;
+
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-
-import org.roda.wui.common.client.tools.Humanize;
 
 /**
  * A GWT cell that renders a {@link Date} using {@link Humanize}, which

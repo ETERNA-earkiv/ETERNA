@@ -57,7 +57,7 @@ public class CreateDisposalConfirmation extends Composite {
     new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_ACTION, DisposalActionCode.REVIEW.name()),
     new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name()),
     new DateIntervalFilterParameter(RodaConstants.AIP_OVERDUE_DATE, RodaConstants.AIP_OVERDUE_DATE, null,
-      Humanize.DATE_FORMAT.parse(Humanize.formatDate(new Date()))),
+      Humanize.DATE_FORMAT.parse(Humanize.DATE_FORMAT.format(new Date()))),
     new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLD_STATUS, Boolean.FALSE.toString()),
     new EmptyKeyFilterParameter(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID));
 
@@ -65,7 +65,7 @@ public class CreateDisposalConfirmation extends Composite {
     new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_ACTION, DisposalActionCode.DESTROY.name()),
     new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name()),
     new DateIntervalFilterParameter(RodaConstants.AIP_OVERDUE_DATE, RodaConstants.AIP_OVERDUE_DATE, null,
-      Humanize.DATE_FORMAT.parse(Humanize.formatDate(new Date()))),
+      Humanize.DATE_FORMAT.parse(Humanize.DATE_FORMAT.format(new Date()))),
     new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLD_STATUS, Boolean.FALSE.toString()),
     new EmptyKeyFilterParameter(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID));
 
