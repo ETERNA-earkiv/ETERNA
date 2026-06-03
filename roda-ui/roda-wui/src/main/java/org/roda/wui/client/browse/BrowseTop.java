@@ -170,6 +170,7 @@ public class BrowseTop extends Composite {
     CatalogTreePanel treePanel = CatalogTreePanel.getInstance();
     catalogTreeContainer.add(treePanel);
     treePanel.clearSelection();
+    treePanel.reloadIfStale();
   }
 
   @Override

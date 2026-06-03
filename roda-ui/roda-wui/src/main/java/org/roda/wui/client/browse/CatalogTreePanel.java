@@ -619,6 +619,16 @@ public class CatalogTreePanel extends Composite {
     loadRootNodes();
   }
 
+  public void markStale() {
+    rootsLoaded = false;
+  }
+
+  public void reloadIfStale() {
+    if (!rootsLoaded && !rootsLoading) {
+      loadRootNodes();
+    }
+  }
+
   public void refreshAfterMove(String oldParentId, String newParentId) {
     boolean rootInvolved = (oldParentId == null || oldParentId.isEmpty())
       || (newParentId == null || newParentId.isEmpty());
