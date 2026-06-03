@@ -577,6 +577,13 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
     }
   }
 
+  /**
+   * Builds a CSV row for a {@link TransferredResource} using the specified fields.
+   *
+   * @param resource the transferred resource to export
+   * @param fields   ordered list of field names to include in the row
+   * @return ordered list of string values forming one CSV row
+   */
   public static List<String> buildCsvRowTransferredResource(TransferredResource resource, List<String> fields) {
     List<String> row = new ArrayList<>();
     for (String field : fields) {
@@ -599,6 +606,13 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
     }
   }
 
+  /**
+   * Builds a CSV row for a {@link RODAMember} (user or group) using the specified fields.
+   *
+   * @param member the RODA member to export
+   * @param fields ordered list of field names to include in the row
+   * @return ordered list of string values forming one CSV row
+   */
   public static List<String> buildCsvRowMember(RODAMember member, List<String> fields) {
     List<String> row = new ArrayList<>();
     for (String field : fields) {
@@ -620,6 +634,13 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
     }
   }
 
+  /**
+   * Builds a CSV row for an {@link IndexedDIP} using the specified fields.
+   *
+   * @param dip    the indexed DIP to export
+   * @param fields ordered list of field names to include in the row
+   * @return ordered list of string values forming one CSV row
+   */
   public static List<String> buildCsvRowDIP(IndexedDIP dip, List<String> fields) {
     List<String> row = new ArrayList<>();
     for (String field : fields) {
@@ -641,6 +662,13 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
     }
   }
 
+  /**
+   * Builds a CSV row for an {@link IndexedRisk} using the specified fields.
+   *
+   * @param risk   the indexed risk to export
+   * @param fields ordered list of field names to include in the row
+   * @return ordered list of string values forming one CSV row
+   */
   public static List<String> buildCsvRowRisk(IndexedRisk risk, List<String> fields) {
     List<String> row = new ArrayList<>();
     for (String field : fields) {
@@ -667,6 +695,13 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
     }
   }
 
+  /**
+   * Builds a CSV row for a {@link RiskIncidence} using the specified fields.
+   *
+   * @param incidence the risk incidence to export
+   * @param fields    ordered list of field names to include in the row
+   * @return ordered list of string values forming one CSV row
+   */
   public static List<String> buildCsvRowRiskIncidence(RiskIncidence incidence, List<String> fields) {
     List<String> row = new ArrayList<>();
     for (String field : fields) {
@@ -691,6 +726,13 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
     }
   }
 
+  /**
+   * Builds a CSV row for an {@link IndexedRepresentation} using the specified fields.
+   *
+   * @param rep    the indexed representation to export
+   * @param fields ordered list of field names to include in the row
+   * @return ordered list of string values forming one CSV row
+   */
   public static List<String> buildCsvRowRepresentation(IndexedRepresentation rep, List<String> fields) {
     List<String> row = new ArrayList<>();
     for (String field : fields) {
@@ -711,6 +753,13 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
     }
   }
 
+  /**
+   * Builds a CSV row for an {@link IndexedPreservationEvent} using the specified fields.
+   *
+   * @param event  the indexed preservation event to export
+   * @param fields ordered list of field names to include in the row
+   * @return ordered list of string values forming one CSV row
+   */
   public static List<String> buildCsvRowPreservationEvent(IndexedPreservationEvent event, List<String> fields) {
     List<String> row = new ArrayList<>();
     for (String field : fields) {
@@ -732,6 +781,13 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
     }
   }
 
+  /**
+   * Builds a CSV row for an {@link IndexedPreservationAgent} using the specified fields.
+   *
+   * @param agent  the indexed preservation agent to export
+   * @param fields ordered list of field names to include in the row
+   * @return ordered list of string values forming one CSV row
+   */
   public static List<String> buildCsvRowPreservationAgent(IndexedPreservationAgent agent, List<String> fields) {
     List<String> row = new ArrayList<>();
     for (String field : fields) {
@@ -752,6 +808,13 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
     }
   }
 
+  /**
+   * Builds a CSV row for a {@link Notification} using the specified fields.
+   *
+   * @param notification the notification to export
+   * @param fields       ordered list of field names to include in the row
+   * @return ordered list of string values forming one CSV row
+   */
   public static List<String> buildCsvRowNotification(Notification notification, List<String> fields) {
     List<String> row = new ArrayList<>();
     for (String field : fields) {
@@ -774,6 +837,13 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
     }
   }
 
+  /**
+   * Builds a CSV row for a {@link DisposalConfirmation} using the specified fields.
+   *
+   * @param confirmation the disposal confirmation to export
+   * @param fields       ordered list of field names to include in the row
+   * @return ordered list of string values forming one CSV row
+   */
   public static List<String> buildCsvRowDisposalConfirmation(DisposalConfirmation confirmation, List<String> fields) {
     List<String> row = new ArrayList<>();
     for (String field : fields) {
@@ -797,6 +867,13 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
     }
   }
 
+  /**
+   * Builds a CSV row for an {@link IndexedFile} using the specified fields.
+   *
+   * @param file   the indexed file to export
+   * @param fields ordered list of field names to include in the row
+   * @return ordered list of string values forming one CSV row
+   */
   public static List<String> buildCsvRowFile(IndexedFile file, List<String> fields) {
     List<String> row = new ArrayList<>();
     for (String field : fields) {
@@ -805,6 +882,13 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
     return row;
   }
 
+  /**
+   * Builds a CSV row for a {@link RepresentationInformation} using the specified fields.
+   *
+   * @param ri     the representation information entry to export
+   * @param fields ordered list of field names to include in the row
+   * @return ordered list of string values forming one CSV row
+   */
   public static List<String> buildCsvRowRepresentationInformation(RepresentationInformation ri, List<String> fields) {
     List<String> row = new ArrayList<>();
     for (String field : fields) {
