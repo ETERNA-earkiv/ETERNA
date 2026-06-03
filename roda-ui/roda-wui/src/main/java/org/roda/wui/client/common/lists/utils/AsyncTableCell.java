@@ -42,6 +42,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.jobs.IndexedJob;
@@ -452,6 +453,9 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
       } else if (IndexedFile.class.equals(clazz)) {
         configKeyPrefix = "ui.export.file";
         exportClass = "org.roda.core.data.v2.ip.IndexedFile";
+      } else if (RepresentationInformation.class.equals(clazz)) {
+        configKeyPrefix = "ui.export.representationinformation";
+        exportClass = "org.roda.core.data.v2.ri.RepresentationInformation";
       }
       if (configKeyPrefix != null) {
         long total = (getResult() != null && getResult().getTotalCount() > 0) ? getResult().getTotalCount() : 0;

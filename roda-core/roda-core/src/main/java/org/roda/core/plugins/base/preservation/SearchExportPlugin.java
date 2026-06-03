@@ -50,6 +50,7 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.jobs.IndexedJob;
@@ -386,6 +387,14 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
             exportFields)) {
             for (IndexedFile file : results) {
               printer.printRecord(buildCsvRowFile(file, exportFields));
+            }
+          }
+          break;
+        case "org.roda.core.data.v2.ri.RepresentationInformation":
+          try (IterableIndexResult<RepresentationInformation> results = index.findAll(RepresentationInformation.class,
+            filter, user, true, exportFields)) {
+            for (RepresentationInformation ri : results) {
+              printer.printRecord(buildCsvRowRepresentationInformation(ri, exportFields));
             }
           }
           break;
@@ -796,6 +805,29 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
     return row;
   }
 
+  public static List<String> buildCsvRowRepresentationInformation(RepresentationInformation ri, List<String> fields) {
+    List<String> row = new ArrayList<>();
+    for (String field : fields) {
+      row.add(getFieldValueRepresentationInformation(ri, field));
+    }
+    return row;
+  }
+
+  private static String getFieldValueRepresentationInformation(RepresentationInformation ri, String field) {
+    if (field == null) return "";
+    switch (field.trim()) {
+      case "id": return nullToEmpty(ri.getId());
+      case "name": return nullToEmpty(ri.getName());
+      case "description": return nullToEmpty(ri.getDescription());
+      case "family": return nullToEmpty(ri.getFamily());
+      case "tags": return ri.getTags() != null ? String.join("; ", ri.getTags()) : "";
+      case "support": return ri.getSupport() != null ? ri.getSupport().toString() : "";
+      case "createdOn": return formatDateTime(ri.getCreatedOn());
+      case "updatedOn": return formatDateTime(ri.getUpdatedOn());
+      default: return "";
+    }
+  }
+
   private static String getFieldValueFile(IndexedFile file, String field) {
     if (field == null) return "";
     switch (field.trim()) {
@@ -840,6 +872,7 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
       case "org.roda.core.data.v2.notifications.Notification": return "ui.export.notification";
       case "org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation": return "ui.export.disposalconfirmation";
       case "org.roda.core.data.v2.ip.IndexedFile": return "ui.export.file";
+      case "org.roda.core.data.v2.ri.RepresentationInformation": return "ui.export.representationinformation";
       default: return null;
     }
   }
