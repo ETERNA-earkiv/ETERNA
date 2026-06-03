@@ -1906,19 +1906,16 @@ a.btn-hero:visited, a.btn-welcome:visited {
     font-size: 1rem !important;
 }
 
-/* #379: Katalogvyn (catalogTreeLayout) har fast höjd + egna scroll-regioner.
-   Dölj body-scroll och footer precis som login-sidan gör, annars uppstår
-   en scrollbar med exakt footerns höjd. */
-body:has(.catalogTreeLayout) {
-  overflow: hidden;
-  padding-bottom: 0;
-}
+/* #379: Katalogvyn (catalogTreeLayout) har fast höjd = calc(100vh - 64px).
+   Footern under layouten skapade en body-scroll lika hög som footern.
+   Löses enbart genom att dölja footern — body är flex-column med
+   min-height:100vh, så utan footer = exakt 100vh = noll body-scroll.
+   OBS: overflow:hidden på body tar bort scroll även för inre containers. */
 .main:has(.catalogTreeLayout) ~ .eterna-footer {
   display: none;
 }
 /* Återställ vid smala viewports (≤900px) där trädet döljs och naturlig
    sidscroll gäller. */
 @media (max-width: 900px) {
-  body:has(.catalogTreeLayout) { overflow: auto; }
   .main:has(.catalogTreeLayout) ~ .eterna-footer { display: revert; }
 }
