@@ -1911,8 +1911,8 @@ a.btn-hero:visited, a.btn-welcome:visited {
    Löses enbart genom att dölja footern — body är flex-column med
    min-height:100vh, så utan footer = exakt 100vh = noll body-scroll.
    OBS: overflow:hidden på body tar bort scroll även för inre containers. */
-body:has(.catalogTreeLayout) {
-  padding-bottom: 0;
+html:has(.catalogTreeLayout) {
+  overflow: hidden;
 }
 .main:has(.catalogTreeLayout) ~ .eterna-footer {
   display: none;
@@ -1920,6 +1920,6 @@ body:has(.catalogTreeLayout) {
 /* Återställ vid smala viewports (≤900px) där trädet döljs och naturlig
    sidscroll gäller. */
 @media (max-width: 900px) {
-  body:has(.catalogTreeLayout) { padding-bottom: revert; }
+  html:has(.catalogTreeLayout) { overflow: auto; }
   .main:has(.catalogTreeLayout) ~ .eterna-footer { display: revert; }
 }
