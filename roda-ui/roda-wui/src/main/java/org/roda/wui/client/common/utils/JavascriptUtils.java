@@ -54,8 +54,8 @@ public class JavascriptUtils {
   }-*/;
 
   public static native void removeHighlighting(JavaScriptObject element) /*-{
-    $wnd.jQuery(element).removeClass("hljs").removeAttr("data-highlighted");
-    $wnd.jQuery(element).find(".hljs").removeClass("hljs").removeAttr("data-highlighted");
+    $wnd.jQuery(element).removeClass('hljs').removeAttr('data-highlighted');
+    $wnd.jQuery(element).find('.hljs').removeClass('hljs').removeAttr('data-highlighted');
   }-*/;
 
 
