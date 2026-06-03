@@ -34,8 +34,16 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.risks.IndexedRisk;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.log.LogEntry;
@@ -417,6 +425,33 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
       } else if (RODAMember.class.equals(clazz)) {
         configKeyPrefix = "ui.export.member";
         exportClass = "org.roda.core.data.v2.user.RODAMember";
+      } else if (IndexedDIP.class.equals(clazz)) {
+        configKeyPrefix = "ui.export.dip";
+        exportClass = "org.roda.core.data.v2.ip.IndexedDIP";
+      } else if (IndexedRisk.class.equals(clazz)) {
+        configKeyPrefix = "ui.export.risk";
+        exportClass = "org.roda.core.data.v2.risks.IndexedRisk";
+      } else if (RiskIncidence.class.equals(clazz)) {
+        configKeyPrefix = "ui.export.riskincidence";
+        exportClass = "org.roda.core.data.v2.risks.RiskIncidence";
+      } else if (IndexedRepresentation.class.equals(clazz)) {
+        configKeyPrefix = "ui.export.representation";
+        exportClass = "org.roda.core.data.v2.ip.IndexedRepresentation";
+      } else if (IndexedPreservationEvent.class.equals(clazz)) {
+        configKeyPrefix = "ui.export.preservationevent";
+        exportClass = "org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent";
+      } else if (IndexedPreservationAgent.class.equals(clazz)) {
+        configKeyPrefix = "ui.export.preservationagent";
+        exportClass = "org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent";
+      } else if (Notification.class.equals(clazz)) {
+        configKeyPrefix = "ui.export.notification";
+        exportClass = "org.roda.core.data.v2.notifications.Notification";
+      } else if (DisposalConfirmation.class.equals(clazz)) {
+        configKeyPrefix = "ui.export.disposalconfirmation";
+        exportClass = "org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation";
+      } else if (IndexedFile.class.equals(clazz)) {
+        configKeyPrefix = "ui.export.file";
+        exportClass = "org.roda.core.data.v2.ip.IndexedFile";
       }
       if (configKeyPrefix != null) {
         long total = (getResult() != null && getResult().getTotalCount() > 0) ? getResult().getTotalCount() : 0;

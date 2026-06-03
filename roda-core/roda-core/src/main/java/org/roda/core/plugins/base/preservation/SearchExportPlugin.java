@@ -41,8 +41,17 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.risks.IndexedRisk;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
@@ -308,6 +317,78 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
             }
           }
           break;
+        case "org.roda.core.data.v2.ip.IndexedDIP":
+          try (IterableIndexResult<IndexedDIP> results = index.findAll(IndexedDIP.class, filter, user, true,
+            exportFields)) {
+            for (IndexedDIP dip : results) {
+              printer.printRecord(buildCsvRowDIP(dip, exportFields));
+            }
+          }
+          break;
+        case "org.roda.core.data.v2.risks.IndexedRisk":
+          try (IterableIndexResult<IndexedRisk> results = index.findAll(IndexedRisk.class, filter, user, true,
+            exportFields)) {
+            for (IndexedRisk risk : results) {
+              printer.printRecord(buildCsvRowRisk(risk, exportFields));
+            }
+          }
+          break;
+        case "org.roda.core.data.v2.risks.RiskIncidence":
+          try (IterableIndexResult<RiskIncidence> results = index.findAll(RiskIncidence.class, filter, user, true,
+            exportFields)) {
+            for (RiskIncidence incidence : results) {
+              printer.printRecord(buildCsvRowRiskIncidence(incidence, exportFields));
+            }
+          }
+          break;
+        case "org.roda.core.data.v2.ip.IndexedRepresentation":
+          try (IterableIndexResult<IndexedRepresentation> results = index.findAll(IndexedRepresentation.class, filter,
+            user, true, exportFields)) {
+            for (IndexedRepresentation rep : results) {
+              printer.printRecord(buildCsvRowRepresentation(rep, exportFields));
+            }
+          }
+          break;
+        case "org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent":
+          try (IterableIndexResult<IndexedPreservationEvent> results = index.findAll(IndexedPreservationEvent.class,
+            filter, user, true, exportFields)) {
+            for (IndexedPreservationEvent event : results) {
+              printer.printRecord(buildCsvRowPreservationEvent(event, exportFields));
+            }
+          }
+          break;
+        case "org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent":
+          try (IterableIndexResult<IndexedPreservationAgent> results = index.findAll(IndexedPreservationAgent.class,
+            filter, user, true, exportFields)) {
+            for (IndexedPreservationAgent agent : results) {
+              printer.printRecord(buildCsvRowPreservationAgent(agent, exportFields));
+            }
+          }
+          break;
+        case "org.roda.core.data.v2.notifications.Notification":
+          try (IterableIndexResult<Notification> results = index.findAll(Notification.class, filter, user, true,
+            exportFields)) {
+            for (Notification notification : results) {
+              printer.printRecord(buildCsvRowNotification(notification, exportFields));
+            }
+          }
+          break;
+        case "org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation":
+          try (IterableIndexResult<DisposalConfirmation> results = index.findAll(DisposalConfirmation.class, filter,
+            user, true, exportFields)) {
+            for (DisposalConfirmation confirmation : results) {
+              printer.printRecord(buildCsvRowDisposalConfirmation(confirmation, exportFields));
+            }
+          }
+          break;
+        case "org.roda.core.data.v2.ip.IndexedFile":
+          try (IterableIndexResult<IndexedFile> results = index.findAll(IndexedFile.class, filter, user, true,
+            exportFields)) {
+            for (IndexedFile file : results) {
+              printer.printRecord(buildCsvRowFile(file, exportFields));
+            }
+          }
+          break;
         default:
           try (IterableIndexResult<IndexedAIP> results = index.findAll(IndexedAIP.class, filter, user, true,
             exportFields)) {
@@ -530,6 +611,205 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
     }
   }
 
+  public static List<String> buildCsvRowDIP(IndexedDIP dip, List<String> fields) {
+    List<String> row = new ArrayList<>();
+    for (String field : fields) {
+      row.add(getFieldValueDIP(dip, field));
+    }
+    return row;
+  }
+
+  private static String getFieldValueDIP(IndexedDIP dip, String field) {
+    if (field == null) return "";
+    switch (field.trim()) {
+      case "id": return nullToEmpty(dip.getId());
+      case "title": return nullToEmpty(dip.getTitle());
+      case "description": return nullToEmpty(dip.getDescription());
+      case "type": return nullToEmpty(dip.getType());
+      case "dateCreated": return formatDateTime(dip.getDateCreated());
+      case "lastModified": return formatDateTime(dip.getLastModified());
+      default: return "";
+    }
+  }
+
+  public static List<String> buildCsvRowRisk(IndexedRisk risk, List<String> fields) {
+    List<String> row = new ArrayList<>();
+    for (String field : fields) {
+      row.add(getFieldValueRisk(risk, field));
+    }
+    return row;
+  }
+
+  private static String getFieldValueRisk(IndexedRisk risk, String field) {
+    if (field == null) return "";
+    switch (field.trim()) {
+      case "id": return nullToEmpty(risk.getId());
+      case "name": return nullToEmpty(risk.getName());
+      case "description": return nullToEmpty(risk.getDescription());
+      case "identifiedOn": return formatDate(risk.getIdentifiedOn());
+      case "identifiedBy": return nullToEmpty(risk.getIdentifiedBy());
+      case "preMitigationSeverityLevel":
+        return risk.getPreMitigationSeverityLevel() != null ? risk.getPreMitigationSeverityLevel().toString() : "";
+      case "postMitigationSeverityLevel":
+        return risk.getPostMitigationSeverityLevel() != null ? risk.getPostMitigationSeverityLevel().toString() : "";
+      case "incidencesCount": return String.valueOf(risk.getIncidencesCount());
+      case "unmitigatedIncidencesCount": return String.valueOf(risk.getUnmitigatedIncidencesCount());
+      default: return "";
+    }
+  }
+
+  public static List<String> buildCsvRowRiskIncidence(RiskIncidence incidence, List<String> fields) {
+    List<String> row = new ArrayList<>();
+    for (String field : fields) {
+      row.add(getFieldValueRiskIncidence(incidence, field));
+    }
+    return row;
+  }
+
+  private static String getFieldValueRiskIncidence(RiskIncidence incidence, String field) {
+    if (field == null) return "";
+    switch (field.trim()) {
+      case "id": return nullToEmpty(incidence.getId());
+      case "riskId": return nullToEmpty(incidence.getRiskId());
+      case "aipId": return nullToEmpty(incidence.getAipId());
+      case "status": return incidence.getStatus() != null ? incidence.getStatus().toString() : "";
+      case "severity": return incidence.getSeverity() != null ? incidence.getSeverity().toString() : "";
+      case "detectedOn": return formatDateTime(incidence.getDetectedOn());
+      case "detectedBy": return nullToEmpty(incidence.getDetectedBy());
+      case "mitigatedOn": return formatDateTime(incidence.getMitigatedOn());
+      case "mitigatedBy": return nullToEmpty(incidence.getMitigatedBy());
+      default: return "";
+    }
+  }
+
+  public static List<String> buildCsvRowRepresentation(IndexedRepresentation rep, List<String> fields) {
+    List<String> row = new ArrayList<>();
+    for (String field : fields) {
+      row.add(getFieldValueRepresentation(rep, field));
+    }
+    return row;
+  }
+
+  private static String getFieldValueRepresentation(IndexedRepresentation rep, String field) {
+    if (field == null) return "";
+    switch (field.trim()) {
+      case "uuid": return nullToEmpty(rep.getUUID());
+      case "title": return nullToEmpty(rep.getTitle());
+      case "sizeInBytes": return String.valueOf(rep.getSizeInBytes());
+      case "numberOfDataFiles": return String.valueOf(rep.getNumberOfDataFiles());
+      case "numberOfDataFolders": return String.valueOf(rep.getNumberOfDataFolders());
+      default: return "";
+    }
+  }
+
+  public static List<String> buildCsvRowPreservationEvent(IndexedPreservationEvent event, List<String> fields) {
+    List<String> row = new ArrayList<>();
+    for (String field : fields) {
+      row.add(getFieldValuePreservationEvent(event, field));
+    }
+    return row;
+  }
+
+  private static String getFieldValuePreservationEvent(IndexedPreservationEvent event, String field) {
+    if (field == null) return "";
+    switch (field.trim()) {
+      case "id": return nullToEmpty(event.getId());
+      case "aipID": return nullToEmpty(event.getAipID());
+      case "eventDateTime": return formatDateTime(event.getEventDateTime());
+      case "eventType": return nullToEmpty(event.getEventType());
+      case "eventOutcome": return nullToEmpty(event.getEventOutcome());
+      case "eventDetail": return nullToEmpty(event.getEventDetail());
+      default: return "";
+    }
+  }
+
+  public static List<String> buildCsvRowPreservationAgent(IndexedPreservationAgent agent, List<String> fields) {
+    List<String> row = new ArrayList<>();
+    for (String field : fields) {
+      row.add(getFieldValuePreservationAgent(agent, field));
+    }
+    return row;
+  }
+
+  private static String getFieldValuePreservationAgent(IndexedPreservationAgent agent, String field) {
+    if (field == null) return "";
+    switch (field.trim()) {
+      case "id": return nullToEmpty(agent.getId());
+      case "name": return nullToEmpty(agent.getName());
+      case "type": return nullToEmpty(agent.getType());
+      case "version": return nullToEmpty(agent.getVersion());
+      case "createdOn": return formatDateTime(agent.getCreatedOn());
+      default: return "";
+    }
+  }
+
+  public static List<String> buildCsvRowNotification(Notification notification, List<String> fields) {
+    List<String> row = new ArrayList<>();
+    for (String field : fields) {
+      row.add(getFieldValueNotification(notification, field));
+    }
+    return row;
+  }
+
+  private static String getFieldValueNotification(Notification notification, String field) {
+    if (field == null) return "";
+    switch (field.trim()) {
+      case "id": return nullToEmpty(notification.getId());
+      case "subject": return nullToEmpty(notification.getSubject());
+      case "sentOn": return formatDateTime(notification.getSentOn());
+      case "fromUser": return nullToEmpty(notification.getFromUser());
+      case "recipientUsers":
+        return notification.getRecipientUsers() != null ? String.join("; ", notification.getRecipientUsers()) : "";
+      case "state": return notification.getState() != null ? notification.getState().toString() : "";
+      default: return "";
+    }
+  }
+
+  public static List<String> buildCsvRowDisposalConfirmation(DisposalConfirmation confirmation, List<String> fields) {
+    List<String> row = new ArrayList<>();
+    for (String field : fields) {
+      row.add(getFieldValueDisposalConfirmation(confirmation, field));
+    }
+    return row;
+  }
+
+  private static String getFieldValueDisposalConfirmation(DisposalConfirmation confirmation, String field) {
+    if (field == null) return "";
+    switch (field.trim()) {
+      case "id": return nullToEmpty(confirmation.getId());
+      case "title": return nullToEmpty(confirmation.getTitle());
+      case "state": return confirmation.getState() != null ? confirmation.getState().toString() : "";
+      case "createdOn": return formatDateTime(confirmation.getCreatedOn());
+      case "createdBy": return nullToEmpty(confirmation.getCreatedBy());
+      case "executedOn": return formatDateTime(confirmation.getExecutedOn());
+      case "size": return confirmation.getSize() != null ? String.valueOf(confirmation.getSize()) : "";
+      case "numberOfAIPs": return confirmation.getNumberOfAIPs() != null ? String.valueOf(confirmation.getNumberOfAIPs()) : "";
+      default: return "";
+    }
+  }
+
+  public static List<String> buildCsvRowFile(IndexedFile file, List<String> fields) {
+    List<String> row = new ArrayList<>();
+    for (String field : fields) {
+      row.add(getFieldValueFile(file, field));
+    }
+    return row;
+  }
+
+  private static String getFieldValueFile(IndexedFile file, String field) {
+    if (field == null) return "";
+    switch (field.trim()) {
+      case "uuid": return nullToEmpty(file.getUUID());
+      case "id": return nullToEmpty(file.getId());
+      case "aipId": return nullToEmpty(file.getAipId());
+      case "representationId": return nullToEmpty(file.getRepresentationId());
+      case "originalName": return nullToEmpty(file.getOriginalName());
+      case "size": return String.valueOf(file.getSize());
+      case "isDirectory": return file.isDirectory() ? "Ja" : "Nej";
+      default: return "";
+    }
+  }
+
   private static String nullToEmpty(String s) {
     return s != null ? s : "";
   }
@@ -551,6 +831,15 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
       case "org.roda.core.data.v2.log.LogEntry": return "ui.export.logentry";
       case "org.roda.core.data.v2.ip.TransferredResource": return "ui.export.transferredresource";
       case "org.roda.core.data.v2.user.RODAMember": return "ui.export.member";
+      case "org.roda.core.data.v2.ip.IndexedDIP": return "ui.export.dip";
+      case "org.roda.core.data.v2.risks.IndexedRisk": return "ui.export.risk";
+      case "org.roda.core.data.v2.risks.RiskIncidence": return "ui.export.riskincidence";
+      case "org.roda.core.data.v2.ip.IndexedRepresentation": return "ui.export.representation";
+      case "org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent": return "ui.export.preservationevent";
+      case "org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent": return "ui.export.preservationagent";
+      case "org.roda.core.data.v2.notifications.Notification": return "ui.export.notification";
+      case "org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation": return "ui.export.disposalconfirmation";
+      case "org.roda.core.data.v2.ip.IndexedFile": return "ui.export.file";
       default: return null;
     }
   }
