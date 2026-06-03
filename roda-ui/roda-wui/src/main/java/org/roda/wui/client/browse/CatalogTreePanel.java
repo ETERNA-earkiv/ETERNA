@@ -37,7 +37,10 @@ import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.event.logical.shared.ResizeEvent;
+import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -57,6 +60,9 @@ public class CatalogTreePanel extends Composite {
 
   private static final String ICON_COLLAPSE = "<i class='fas fa-angle-double-left'></i>";
   private static final String ICON_EXPAND = "<i class='fas fa-angle-double-right'></i>";
+  private static final int RESPONSIVE_COLLAPSE_WIDTH = 1100;
+
+  private boolean responsiveCollapsed = false;
 
   interface MyUiBinder extends UiBinder<Widget, CatalogTreePanel> {}
 
@@ -108,6 +114,7 @@ public class CatalogTreePanel extends Composite {
     collapseToggle.getElement().setAttribute("aria-expanded", "true");
     collapseToggle.addClickHandler(e -> {
       e.stopPropagation();
+      responsiveCollapsed = false;
       setCollapsed(true);
     });
 
@@ -115,10 +122,16 @@ public class CatalogTreePanel extends Composite {
     expandButton.setTitle(messages.catalogTreeExpand());
     expandButton.getElement().setAttribute("aria-label", messages.catalogTreeExpand());
     expandButton.getElement().setAttribute("aria-expanded", "false");
-    expandButton.addClickHandler(e -> setCollapsed(false));
+    expandButton.addClickHandler(e -> {
+      responsiveCollapsed = false;
+      setCollapsed(false);
+    });
 
     headerTitle.setTitle(messages.catalogTreeTitle());
     headerTitle.setHref(org.roda.wui.common.client.tools.HistoryUtils.createHistoryHashLink(BrowseTop.RESOLVER));
+
+    Window.addResizeHandler(event -> handleViewportResize(event.getWidth()));
+    handleViewportResize(Window.getClientWidth());
 
     loadRootNodes();
   }
@@ -139,6 +152,16 @@ public class CatalogTreePanel extends Composite {
         removeStyleName("animatingCollapse");
       }
     }.schedule(220);
+  }
+
+  private void handleViewportResize(int clientWidth) {
+    if (clientWidth < RESPONSIVE_COLLAPSE_WIDTH && !hasStyleName("collapsed")) {
+      responsiveCollapsed = true;
+      setCollapsed(true);
+    } else if (clientWidth >= RESPONSIVE_COLLAPSE_WIDTH && responsiveCollapsed) {
+      responsiveCollapsed = false;
+      setCollapsed(false);
+    }
   }
 
   private void onFilterChanged(KeyUpEvent event) {
