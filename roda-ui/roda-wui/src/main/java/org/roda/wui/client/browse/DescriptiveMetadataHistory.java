@@ -271,6 +271,7 @@ public class DescriptiveMetadataHistory extends Composite {
           preview.setHTML(html);
           if (inHTML) {
             preview.removeStyleName("code-pre");
+            JavascriptUtils.removeHighlighting(preview.getElement());
           } else {
             preview.addStyleName("code-pre");
             JavascriptUtils.runHighlighterOn(preview.getElement());
