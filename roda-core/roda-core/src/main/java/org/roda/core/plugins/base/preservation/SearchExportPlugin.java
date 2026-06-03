@@ -174,7 +174,7 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getDescription() {
-    return "Exports search results to a CSV file. Supports AIP, job, report, log entry, transferred resource, and member lists. The result is available as a job attachment in Internal Actions.";
+    return "Exports search results to a CSV file for all major entity types. The result is available as a job attachment in Internal Actions.";
   }
 
   @Override
@@ -745,10 +745,14 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
     if (field == null) return "";
     switch (field.trim()) {
       case "uuid": return nullToEmpty(rep.getUUID());
+      case "aipId": return nullToEmpty(rep.getAipId());
+      case "type": return nullToEmpty(rep.getType());
       case "title": return nullToEmpty(rep.getTitle());
       case "sizeInBytes": return String.valueOf(rep.getSizeInBytes());
       case "numberOfDataFiles": return String.valueOf(rep.getNumberOfDataFiles());
       case "numberOfDataFolders": return String.valueOf(rep.getNumberOfDataFolders());
+      case "createdOn": return rep.getCreatedOn() != null ? rep.getCreatedOn().toString() : "";
+      case "updatedOn": return rep.getUpdatedOn() != null ? rep.getUpdatedOn().toString() : "";
       default: return "";
     }
   }
