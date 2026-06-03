@@ -62,6 +62,7 @@ public class CatalogTreePanel extends Composite {
   private static final String ICON_EXPAND = "<i class='fas fa-angle-double-right'></i>";
   private static final int RESPONSIVE_COLLAPSE_WIDTH = 1100;
 
+  private boolean isCollapsed = false;
   private boolean responsiveCollapsed = false;
 
   interface MyUiBinder extends UiBinder<Widget, CatalogTreePanel> {}
@@ -137,6 +138,7 @@ public class CatalogTreePanel extends Composite {
   }
 
   private void setCollapsed(boolean collapse) {
+    isCollapsed = collapse;
     addStyleName("animatingCollapse");
     if (collapse) {
       addStyleName("collapsed");
@@ -155,7 +157,7 @@ public class CatalogTreePanel extends Composite {
   }
 
   private void handleViewportResize(int clientWidth) {
-    if (clientWidth < RESPONSIVE_COLLAPSE_WIDTH && !hasStyleName("collapsed")) {
+    if (clientWidth < RESPONSIVE_COLLAPSE_WIDTH && !isCollapsed) {
       responsiveCollapsed = true;
       setCollapsed(true);
     } else if (clientWidth >= RESPONSIVE_COLLAPSE_WIDTH && responsiveCollapsed) {
