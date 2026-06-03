@@ -12,7 +12,7 @@
         let lastBottom = 0;
         function measure() {
             void bannerHeader.offsetHeight;
-            const bhBottom = Math.round(bannerHeader.getBoundingClientRect().bottom);
+            const bhBottom = Math.round(bannerHeader.getBoundingClientRect().height);
             if (bhBottom <= 6 || bhBottom !== lastBottom) {
                 lastBottom = bhBottom;
                 setTimeout(measure, 50);

@@ -176,7 +176,14 @@ public class BrowseTop extends Composite {
   @Override
   protected void onLoad() {
     super.onLoad();
+    Document.get().getBody().addClassName("catalog-active");
     reattachTreePanel();
+  }
+
+  @Override
+  protected void onUnload() {
+    super.onUnload();
+    Document.get().getBody().removeClassName("catalog-active");
   }
 
   private void initTreeResize() {

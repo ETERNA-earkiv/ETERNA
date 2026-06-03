@@ -896,7 +896,7 @@ body:has(.eterna-login) {
 
 .main .contentPanel {
   padding-top: 96px;
-  min-height: 767px !important;
+  /*min-height: 767px !important;*/
 }
 
 .double-bounce1,
@@ -1904,4 +1904,15 @@ a.btn-hero:visited, a.btn-welcome:visited {
 
 .MuiDialog-root .MuiInputLabel-shrink {
     font-size: 1rem !important;
+}
+
+/* #379: catalog-active sätts på body av BrowseTop/BrowseAIP/BrowseRepresentation
+   via onLoad()/onUnload(). Säkrare än :has() som kan matcha fel vid GWT async. */
+body.catalog-active {
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  body.catalog-active { overflow: auto; }
+  body.catalog-active .eterna-footer { display: revert; }
 }

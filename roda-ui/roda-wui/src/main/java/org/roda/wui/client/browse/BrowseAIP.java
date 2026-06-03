@@ -58,6 +58,7 @@ import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -452,10 +453,17 @@ public class BrowseAIP extends Composite {
   @Override
   protected void onLoad() {
     super.onLoad();
+    Document.get().getBody().addClassName("catalog-active");
     catalogTreeContainer.clear();
     CatalogTreePanel treePanel = CatalogTreePanel.getInstance();
     catalogTreeContainer.add(treePanel);
     treePanel.revealAip(aipId);
+  }
+
+  @Override
+  protected void onUnload() {
+    super.onUnload();
+    Document.get().getBody().removeClassName("catalog-active");
   }
 
   interface MyUiBinder extends UiBinder<Widget, BrowseAIP> {
