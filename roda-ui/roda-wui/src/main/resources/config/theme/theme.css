@@ -1914,12 +1914,14 @@ a.btn-hero:visited, a.btn-welcome:visited {
 html:has(.catalogTreeLayout) {
   overflow: hidden;
 }
-.main:has(.catalogTreeLayout) ~ .eterna-footer {
+/* Footer.java renderas via HTMLWidgetWrapper — .eterna-footer hamnar inuti
+   en GWT-wrapperdiv, inte som direkt sibling. Descendant-selektor krävs. */
+body:has(.catalogTreeLayout) .eterna-footer {
   display: none;
 }
 /* Återställ vid smala viewports (≤900px) där trädet döljs och naturlig
    sidscroll gäller. */
 @media (max-width: 900px) {
   html:has(.catalogTreeLayout) { overflow: auto; }
-  .main:has(.catalogTreeLayout) ~ .eterna-footer { display: revert; }
+  body:has(.catalogTreeLayout) .eterna-footer { display: revert; }
 }
