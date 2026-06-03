@@ -11,6 +11,7 @@ import java.util.Collections;
 
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.generics.select.SelectedItemsListRequest;
+import org.roda.wui.client.browse.CatalogTreePanel;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.disposal.DisposalConfirmations;
@@ -87,6 +88,7 @@ public class DisposalConfirmationActionsUtils {
                 if (throwable != null) {
                   callback.onFailure(throwable);
                 } else {
+                  CatalogTreePanel.getInstance().markStale();
                   Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
                     @Override
@@ -128,6 +130,7 @@ public class DisposalConfirmationActionsUtils {
                 if (throwable != null) {
                   callback.onFailure(throwable);
                 } else {
+                  CatalogTreePanel.getInstance().markStale();
                   Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
                     @Override
