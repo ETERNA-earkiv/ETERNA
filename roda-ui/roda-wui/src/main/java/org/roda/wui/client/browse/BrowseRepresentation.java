@@ -163,10 +163,17 @@ public class BrowseRepresentation extends Composite {
   @Override
   protected void onLoad() {
     super.onLoad();
+    Document.get().getBody().addClassName("catalog-active");
     catalogTreeContainer.clear();
     CatalogTreePanel treePanel = CatalogTreePanel.getInstance();
     catalogTreeContainer.add(treePanel);
     treePanel.revealAip(aipId);
+  }
+
+  @Override
+  protected void onUnload() {
+    super.onUnload();
+    Document.get().getBody().removeClassName("catalog-active");
   }
 
   private void initTreeResize() {

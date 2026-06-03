@@ -896,7 +896,7 @@ body:has(.eterna-login) {
 
 .main .contentPanel {
   padding-top: 96px;
-  min-height: 767px !important;
+  /*min-height: 767px !important;*/
 }
 
 .double-bounce1,
@@ -1906,22 +1906,13 @@ a.btn-hero:visited, a.btn-welcome:visited {
     font-size: 1rem !important;
 }
 
-/* #379: Katalogvyn (catalogTreeLayout) har fast höjd = calc(100vh - 64px).
-   Footern under layouten skapade en body-scroll lika hög som footern.
-   Löses enbart genom att dölja footern — body är flex-column med
-   min-height:100vh, så utan footer = exakt 100vh = noll body-scroll.
-   OBS: overflow:hidden på body tar bort scroll även för inre containers. */
-html:has(.catalogTreeLayout) {
+/* #379: catalog-active sätts på body av BrowseTop/BrowseAIP/BrowseRepresentation
+   via onLoad()/onUnload(). Säkrare än :has() som kan matcha fel vid GWT async. */
+html.catalog-active {
   overflow: hidden;
 }
-/* Footer.java renderas via HTMLWidgetWrapper — .eterna-footer hamnar inuti
-   en GWT-wrapperdiv, inte som direkt sibling. Descendant-selektor krävs. */
-body:has(.catalogTreeLayout) .eterna-footer {
-  display: none;
-}
-/* Återställ vid smala viewports (≤900px) där trädet döljs och naturlig
-   sidscroll gäller. */
+
 @media (max-width: 900px) {
-  html:has(.catalogTreeLayout) { overflow: auto; }
-  body:has(.catalogTreeLayout) .eterna-footer { display: revert; }
+  html.catalog-active { overflow: auto; }
+  body.catalog-active .eterna-footer { display: revert; }
 }

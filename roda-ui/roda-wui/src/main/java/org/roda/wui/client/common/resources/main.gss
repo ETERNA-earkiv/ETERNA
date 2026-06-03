@@ -3353,7 +3353,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .contentWithSidePanel {
     display: flex;
-    min-height: 767px !important;
+    /*min-height: 767px !important;*/
 }
 
 .browseSidePanel {
@@ -3562,7 +3562,7 @@ body.catalogTreeResizing * {
    så att .catalogTreePanel (intern scroll i .catalogTreeBodyScroll) håller
    sin position och .catalogTreeMainContent kan ha egen y-scroll. */
 .catalogTreeLayout {
-    height: calc(100vh - 64px);
+    height: calc(100vh - 126px);
     min-height: 0 !important;
     overflow: hidden;
 }
