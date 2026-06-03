@@ -3549,6 +3549,14 @@ body.catalogTreeResizing * {
     overflow: hidden;
 }
 
+/* #379: catalogTreeContainer är GWT-wrapperens div utan explicit höjd.
+   height:100% säkerställer att .catalogTreePanel kan ärva höjden korrekt,
+   vilket gör att .catalogTreeBodyScroll (flex:1, overflow-y:auto) blir
+   korrekt begränsad och visar sin scrollbar intill trädet. */
+.catalogTreeContainer {
+    height: 100%;
+}
+
 /* #337: Trädpanel ska stå still medan höger sida skrollar för sig.
    Begränsar layoutens höjd till viewport (minus sticky bannerHeader 64px),
    så att .catalogTreePanel (intern scroll i .catalogTreeBodyScroll) håller
@@ -3564,7 +3572,10 @@ body.catalogTreeResizing * {
     overflow-x: hidden;
 }
 
-@media (max-width: 900px) {
+/* #379: Under 1100px skapar trädet + innehåll två synliga scrollbars
+   (en vid trädpanelens kant, en längst till höger) vilket bryter WCAG.
+   Dölj trädet och återgå till naturlig sidscroll under detta tröskelvärde. */
+@media (max-width: 1100px) {
     .catalogTreePanel {
         display: none;
     }
