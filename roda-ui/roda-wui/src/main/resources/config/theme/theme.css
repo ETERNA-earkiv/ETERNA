@@ -1908,11 +1908,11 @@ a.btn-hero:visited, a.btn-welcome:visited {
 
 /* #379: catalog-active sätts på body av BrowseTop/BrowseAIP/BrowseRepresentation
    via onLoad()/onUnload(). Säkrare än :has() som kan matcha fel vid GWT async. */
-html.catalog-active {
+body.catalog-active {
   overflow: hidden;
 }
 
 @media (max-width: 900px) {
-  html.catalog-active { overflow: auto; }
+  body.catalog-active { overflow: auto; }
   body.catalog-active .eterna-footer { display: revert; }
 }
