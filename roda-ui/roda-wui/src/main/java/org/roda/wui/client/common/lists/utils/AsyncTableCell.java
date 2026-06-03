@@ -40,6 +40,7 @@ import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.ActionsToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.actions.Actionable;
@@ -410,6 +411,12 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
       } else if (LogEntry.class.equals(clazz)) {
         configKeyPrefix = "ui.export.logentry";
         exportClass = "org.roda.core.data.v2.log.LogEntry";
+      } else if (TransferredResource.class.equals(clazz)) {
+        configKeyPrefix = "ui.export.transferredresource";
+        exportClass = "org.roda.core.data.v2.ip.TransferredResource";
+      } else if (RODAMember.class.equals(clazz)) {
+        configKeyPrefix = "ui.export.member";
+        exportClass = "org.roda.core.data.v2.user.RODAMember";
       }
       if (configKeyPrefix != null) {
         long total = (getResult() != null && getResult().getTotalCount() > 0) ? getResult().getTotalCount() : 0;

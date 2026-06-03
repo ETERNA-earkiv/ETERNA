@@ -42,6 +42,7 @@ import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
@@ -50,6 +51,7 @@ import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
@@ -162,7 +164,7 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getDescription() {
-    return "Exports search results to a CSV file. Supports AIP, job, report, and log entry lists. The result is available as a job attachment in Internal Actions.";
+    return "Exports search results to a CSV file. Supports AIP, job, report, log entry, transferred resource, and member lists. The result is available as a job attachment in Internal Actions.";
   }
 
   @Override
@@ -287,6 +289,22 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
             exportFields)) {
             for (LogEntry entry : results) {
               printer.printRecord(buildCsvRowLogEntry(entry, exportFields));
+            }
+          }
+          break;
+        case "org.roda.core.data.v2.ip.TransferredResource":
+          try (IterableIndexResult<TransferredResource> results = index.findAll(TransferredResource.class, filter,
+            user, true, exportFields)) {
+            for (TransferredResource resource : results) {
+              printer.printRecord(buildCsvRowTransferredResource(resource, exportFields));
+            }
+          }
+          break;
+        case "org.roda.core.data.v2.user.RODAMember":
+          try (IterableIndexResult<RODAMember> results = index.findAll(RODAMember.class, filter, user, true,
+            exportFields)) {
+            for (RODAMember member : results) {
+              printer.printRecord(buildCsvRowMember(member, exportFields));
             }
           }
           break;
@@ -469,6 +487,49 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
     }
   }
 
+  public static List<String> buildCsvRowTransferredResource(TransferredResource resource, List<String> fields) {
+    List<String> row = new ArrayList<>();
+    for (String field : fields) {
+      row.add(getFieldValueTransferredResource(resource, field));
+    }
+    return row;
+  }
+
+  private static String getFieldValueTransferredResource(TransferredResource resource, String field) {
+    if (field == null) return "";
+    switch (field.trim()) {
+      case "uuid": return nullToEmpty(resource.getUUID());
+      case "name": return nullToEmpty(resource.getName());
+      case "fullPath": return nullToEmpty(resource.getFullPath());
+      case "relativePath": return nullToEmpty(resource.getRelativePath());
+      case "size": return String.valueOf(resource.getSize());
+      case "creationDate": return formatDateTime(resource.getCreationDate());
+      case "file": return resource.isFile() ? "Ja" : "Nej";
+      default: return "";
+    }
+  }
+
+  public static List<String> buildCsvRowMember(RODAMember member, List<String> fields) {
+    List<String> row = new ArrayList<>();
+    for (String field : fields) {
+      row.add(getFieldValueMember(member, field));
+    }
+    return row;
+  }
+
+  private static String getFieldValueMember(RODAMember member, String field) {
+    if (field == null) return "";
+    switch (field.trim()) {
+      case "id": return nullToEmpty(member.getId());
+      case "name": return nullToEmpty(member.getName());
+      case "fullName": return nullToEmpty(member.getFullName());
+      case "active": return member.isActive() ? "Ja" : "Nej";
+      case "directRoles":
+        return member.getDirectRoles() != null ? String.join("; ", member.getDirectRoles()) : "";
+      default: return "";
+    }
+  }
+
   private static String nullToEmpty(String s) {
     return s != null ? s : "";
   }
@@ -488,6 +549,8 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
       case "org.roda.core.data.v2.jobs.IndexedJob": return "ui.export.job";
       case "org.roda.core.data.v2.jobs.IndexedReport": return "ui.export.report";
       case "org.roda.core.data.v2.log.LogEntry": return "ui.export.logentry";
+      case "org.roda.core.data.v2.ip.TransferredResource": return "ui.export.transferredresource";
+      case "org.roda.core.data.v2.user.RODAMember": return "ui.export.member";
       default: return null;
     }
   }
