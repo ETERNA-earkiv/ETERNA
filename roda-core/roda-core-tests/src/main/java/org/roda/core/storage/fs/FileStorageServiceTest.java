@@ -151,10 +151,11 @@ public class FileStorageServiceTest extends AbstractStorageServiceTest<FileStora
   @Test
   public void testDeleteResourcePermanentlyWhenTrashDisabled() throws RODAException, IOException {
     Path basePath2 = TestsHelper.createBaseTempDir(FileStorageServiceTest.class, true);
+    String uniqueTrashName = "trash-" + basePath2.getFileName();
     try {
       // Given: storage with trash disabled (trashEnabled=false, createTrash=false)
       // createTrash=false prevents the trash directory from being created at init
-      FileStorageService storageNoTrash = new FileStorageService(basePath2, false, false, "trash", true);
+      FileStorageService storageNoTrash = new FileStorageService(basePath2, false, false, uniqueTrashName, true);
 
       StoragePath containerPath = DefaultStoragePath.parse("testContainer");
       storageNoTrash.createContainer(containerPath);
@@ -171,12 +172,12 @@ public class FileStorageServiceTest extends AbstractStorageServiceTest<FileStora
       Assert.assertFalse(storageNoTrash.exists(resourcePath), "Resource should be gone after deletion");
 
       // And: trash directory should not have been created
-      Path trashDir = basePath2.getParent().resolve("trash");
+      Path trashDir = basePath2.getParent().resolve(uniqueTrashName);
       Assert.assertFalse(Files.exists(trashDir),
         "Trash directory should not exist when trash is disabled");
     } finally {
       FSUtils.deletePath(basePath2);
-      FSUtils.deletePathQuietly(basePath2.getParent().resolve("trash"));
+      FSUtils.deletePathQuietly(basePath2.getParent().resolve(uniqueTrashName));
     }
   }
 

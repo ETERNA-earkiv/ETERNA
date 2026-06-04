@@ -80,6 +80,20 @@ public class ScatteredFileStorageService extends FileStorageService  {
   private final Path trashPath;
   private final boolean trashEnabled;
 
+  /**
+   * Creates a new ScatteredFileStorageService with full control over trash and history initialisation.
+   *
+   * <p>Delegates path setup to the parent {@link FileStorageService} constructor and then calls
+   * {@link ScatteredFSUtils#initialize()} to prepare the scattered-filesystem layer.
+   *
+   * @param basePath      root storage directory
+   * @param trashEnabled  when {@code false} deleted resources are permanently removed rather than moved to trash
+   * @param createTrash   whether to create the trash directory during construction
+   * @param trashDirName  name of the trash directory relative to {@code basePath}'s parent; falls back to
+   *                      {@link org.roda.core.data.common.RodaConstants#TRASH_CONTAINER} when {@code null}
+   * @param createHistory whether to create the AIP history directory tree during construction
+   * @throws GenericException if a required directory cannot be created or {@link ScatteredFSUtils#initialize()} fails
+   */
   public ScatteredFileStorageService(Path basePath, boolean trashEnabled, boolean createTrash, String trashDirName,
     boolean createHistory) throws GenericException {
     super(basePath, trashEnabled, createTrash, trashDirName, createHistory);
@@ -100,6 +114,17 @@ public class ScatteredFileStorageService extends FileStorageService  {
     }
   }
 
+  /**
+   * Convenience constructor that defaults {@code trashEnabled} to {@code true}.
+   *
+   * @param basePath      root storage directory
+   * @param createTrash   whether to create the trash directory during construction
+   * @param trashDirName  name of the trash directory; falls back to
+   *                      {@link org.roda.core.data.common.RodaConstants#TRASH_CONTAINER} when {@code null}
+   * @param createHistory whether to create the AIP history directory tree during construction
+   * @throws GenericException if a required directory cannot be created or {@link ScatteredFSUtils#initialize()} fails
+   * @see #ScatteredFileStorageService(Path, boolean, boolean, String, boolean)
+   */
   public ScatteredFileStorageService(Path basePath, boolean createTrash, String trashDirName, boolean createHistory)
     throws GenericException {
     this(basePath, true, createTrash, trashDirName, createHistory);

@@ -884,19 +884,39 @@ public class RodaCoreFactory {
     if (StringUtils.isNotBlank(newStorageService)) {
       try {
         Class<?> storageClass = Class.forName(newStorageService);
-        Constructor<?> constructor = storageClass.getConstructor(Path.class, boolean.class, boolean.class,
-          String.class, boolean.class);
-
-        LOGGER.debug("Going to instantiate '{}' on '{}'", storageClass.getSimpleName(),
-          configurationManager.getStoragePath());
         String trashDirName = getRodaConfiguration().getString("core.storage.filesystem.trash",
           RodaConstants.TRASH_CONTAINER);
         boolean trashEnabled = getRodaConfiguration().getBoolean("core.storage.filesystem.trash.enabled", true);
+        Path storagePath = configurationManager.getStoragePath();
+        LOGGER.debug("Going to instantiate '{}' on '{}'", storageClass.getSimpleName(), storagePath);
 
-        return (StorageService) constructor.newInstance(configurationManager.getStoragePath(), trashEnabled,
-          true, trashDirName, true);
-      } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException
-        | InvocationTargetException e) {
+        // Try 5-arg: (Path, boolean trashEnabled, boolean createTrash, String trashDirName, boolean createHistory)
+        try {
+          return (StorageService) storageClass
+            .getConstructor(Path.class, boolean.class, boolean.class, String.class, boolean.class)
+            .newInstance(storagePath, trashEnabled, true, trashDirName, true);
+        } catch (NoSuchMethodException ignored) {
+          // fall through to older signatures
+        }
+        // Try 4-arg: (Path, boolean createTrash, String trashDirName, boolean createHistory)
+        try {
+          return (StorageService) storageClass
+            .getConstructor(Path.class, boolean.class, String.class, boolean.class)
+            .newInstance(storagePath, true, trashDirName, true);
+        } catch (NoSuchMethodException ignored) {
+          // fall through to older signatures
+        }
+        // Try 2-arg: (Path, String trashDirName)
+        try {
+          return (StorageService) storageClass
+            .getConstructor(Path.class, String.class)
+            .newInstance(storagePath, trashDirName);
+        } catch (NoSuchMethodException ignored) {
+          // fall through
+        }
+        LOGGER.warn("No compatible constructor found for '{}', falling back to a default service",
+          storageClass.getSimpleName());
+      } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
         LOGGER.warn("Error instantiating storage service defined on properties, falling back to a default service", e);
       }
     }
