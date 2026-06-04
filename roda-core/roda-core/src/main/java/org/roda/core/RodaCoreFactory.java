@@ -900,9 +900,14 @@ public class RodaCoreFactory {
         }
         // Try 4-arg: (Path, boolean createTrash, String trashDirName, boolean createHistory)
         try {
+          if (!trashEnabled) {
+            LOGGER.warn(
+              "Custom storage '{}' has no trashEnabled constructor; configured trashEnabled=false will be ignored",
+              storageClass.getSimpleName());
+          }
           return (StorageService) storageClass
             .getConstructor(Path.class, boolean.class, String.class, boolean.class)
-            .newInstance(storagePath, trashEnabled, trashDirName, true);
+            .newInstance(storagePath, true, trashDirName, true);
         } catch (NoSuchMethodException ignored) {
           // fall through to older signatures
         }
