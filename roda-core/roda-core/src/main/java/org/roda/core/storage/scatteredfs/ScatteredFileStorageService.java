@@ -78,12 +78,28 @@ public class ScatteredFileStorageService extends FileStorageService  {
   private final Path historyDataPath;
   private final Path historyMetadataPath;
   private final Path trashPath;
+  private final boolean trashEnabled;
 
-  public ScatteredFileStorageService(Path basePath, boolean createTrash, String trashDirName, boolean createHistory)
-          throws GenericException {
-    super(basePath, createTrash, trashDirName, createHistory);
+  /**
+   * Creates a new ScatteredFileStorageService with full control over trash and history initialisation.
+   *
+   * <p>Delegates path setup to the parent {@link FileStorageService} constructor and then calls
+   * {@link ScatteredFSUtils#initialize()} to prepare the scattered-filesystem layer.
+   *
+   * @param basePath      root storage directory
+   * @param trashEnabled  when {@code false} deleted resources are permanently removed rather than moved to trash
+   * @param createTrash   whether to create the trash directory during construction
+   * @param trashDirName  name of the trash directory relative to {@code basePath}'s parent; falls back to
+   *                      {@link org.roda.core.data.common.RodaConstants#TRASH_CONTAINER} when {@code null}
+   * @param createHistory whether to create the AIP history directory tree during construction
+   * @throws GenericException if a required directory cannot be created or {@link ScatteredFSUtils#initialize()} fails
+   */
+  public ScatteredFileStorageService(Path basePath, boolean trashEnabled, boolean createTrash, String trashDirName,
+    boolean createHistory) throws GenericException {
+    super(basePath, trashEnabled, createTrash, trashDirName, createHistory);
 
     this.basePath = basePath;
+    this.trashEnabled = trashEnabled;
     rodaDataPath = this.basePath.getParent();
     Path historyPath = rodaDataPath.resolve(basePath.getFileName() + HISTORY_SUFFIX);
     historyDataPath = historyPath.resolve(HISTORY_DATA_FOLDER);
@@ -96,6 +112,22 @@ public class ScatteredFileStorageService extends FileStorageService  {
       LOGGER.error("Error! Could not initialize scattered fs.");
       throw exception;
     }
+  }
+
+  /**
+   * Convenience constructor that defaults {@code trashEnabled} to {@code true}.
+   *
+   * @param basePath      root storage directory
+   * @param createTrash   whether to create the trash directory during construction
+   * @param trashDirName  name of the trash directory; falls back to
+   *                      {@link org.roda.core.data.common.RodaConstants#TRASH_CONTAINER} when {@code null}
+   * @param createHistory whether to create the AIP history directory tree during construction
+   * @throws GenericException if a required directory cannot be created or {@link ScatteredFSUtils#initialize()} fails
+   * @see #ScatteredFileStorageService(Path, boolean, boolean, String, boolean)
+   */
+  public ScatteredFileStorageService(Path basePath, boolean createTrash, String trashDirName, boolean createHistory)
+    throws GenericException {
+    this(basePath, true, createTrash, trashDirName, createHistory);
   }
 
   public ScatteredFileStorageService(Path basePath, String trashDirName) throws GenericException {
@@ -171,6 +203,11 @@ public class ScatteredFileStorageService extends FileStorageService  {
   }
 
   private void trash(Path fromPath) throws GenericException, NotFoundException {
+    if (!trashEnabled) {
+      LOGGER.debug("Trash disabled, permanently deleting '{}'", fromPath);
+      FSUtils.deletePath(fromPath);
+      return;
+    }
     if (trashPath == null) {
       LOGGER.warn("Skipping trash '{}' because no trash folder is defined!", fromPath);
       return;

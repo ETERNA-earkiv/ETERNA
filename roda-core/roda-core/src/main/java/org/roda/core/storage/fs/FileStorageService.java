@@ -74,6 +74,13 @@ import org.slf4j.LoggerFactory;
  * them to a 'trash' folder with the same folder structure
  * </p>
  *
+ * <p>
+ * 20260527 WhiteRed: trash behaviour is configurable via
+ * {@code core.storage.filesystem.trash.enabled} in {@code roda-core.properties}.
+ * When set to {@code false}, delete operations permanently remove files instead
+ * of moving them to the trash folder.
+ * </p>
+ *
  * @author Luis Faria <lfaria@keep.pt>
  * @author Hélder Silva <hsilva@keep.pt>
  */
@@ -91,10 +98,26 @@ public class FileStorageService implements StorageService {
   private final Path historyDataPath;
   private final Path historyMetadataPath;
   private final Path trashPath;
+  private final boolean trashEnabled;
 
-  public FileStorageService(Path basePath, boolean createTrash, String trashDirName, boolean createHistory)
-    throws GenericException {
+  /**
+   * Creates a new FileStorageService with full control over trash and history initialisation.
+   *
+   * <p>Sets {@code rodaDataPath} to {@code basePath.getParent()}, resolves history paths under
+   * {@code <baseName>-history/} and the trash path as {@code rodaDataPath/<trashDirName>}.
+   *
+   * @param basePath      root storage directory; its parent must be writable when the directory does not yet exist
+   * @param trashEnabled  when {@code false} deleted resources are permanently removed rather than moved to trash
+   * @param createTrash   whether to create (and initialise) the trash directory during construction
+   * @param trashDirName  name of the trash directory relative to {@code basePath}'s parent; falls back to
+   *                      {@link org.roda.core.data.common.RodaConstants#TRASH_CONTAINER} when {@code null}
+   * @param createHistory whether to create the AIP history directory tree ({@code data/} and {@code metadata/}) during construction
+   * @throws GenericException if a required directory cannot be created
+   */
+  public FileStorageService(Path basePath, boolean trashEnabled, boolean createTrash, String trashDirName,
+    boolean createHistory) throws GenericException {
     this.basePath = basePath;
+    this.trashEnabled = trashEnabled;
     rodaDataPath = this.basePath.getParent();
     historyPath = rodaDataPath.resolve(basePath.getFileName() + HISTORY_SUFFIX);
     historyDataPath = historyPath.resolve(HISTORY_DATA_FOLDER);
@@ -110,7 +133,22 @@ public class FileStorageService implements StorageService {
     if (createTrash) {
       initialize(trashPath);
     }
+  }
 
+  /**
+   * Convenience constructor that defaults {@code trashEnabled} to {@code true}.
+   *
+   * @param basePath      root storage directory
+   * @param createTrash   whether to create the trash directory during construction
+   * @param trashDirName  name of the trash directory; falls back to
+   *                      {@link org.roda.core.data.common.RodaConstants#TRASH_CONTAINER} when {@code null}
+   * @param createHistory whether to create the AIP history directory tree during construction
+   * @throws GenericException if a required directory cannot be created
+   * @see #FileStorageService(Path, boolean, boolean, String, boolean)
+   */
+  public FileStorageService(Path basePath, boolean createTrash, String trashDirName, boolean createHistory)
+    throws GenericException {
+    this(basePath, true, createTrash, trashDirName, createHistory);
   }
 
   public FileStorageService(Path basePath, String trashDirName) throws GenericException {
@@ -208,6 +246,11 @@ public class FileStorageService implements StorageService {
   }
 
   private void trash(Path fromPath) throws GenericException, NotFoundException {
+    if (!trashEnabled) {
+      LOGGER.debug("Trash disabled, permanently deleting '{}'", fromPath);
+      FSUtils.deletePath(fromPath);
+      return;
+    }
     if (trashPath == null) {
       LOGGER.warn("Skipping trash '{}' because no trash folder is defined!", fromPath);
       return;

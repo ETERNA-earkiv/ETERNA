@@ -884,16 +884,46 @@ public class RodaCoreFactory {
     if (StringUtils.isNotBlank(newStorageService)) {
       try {
         Class<?> storageClass = Class.forName(newStorageService);
-        Constructor<?> constructor = storageClass.getConstructor(Path.class, String.class);
-
-        LOGGER.debug("Going to instantiate '{}' on '{}'", storageClass.getSimpleName(),
-          configurationManager.getStoragePath());
         String trashDirName = getRodaConfiguration().getString("core.storage.filesystem.trash",
           RodaConstants.TRASH_CONTAINER);
+        boolean trashEnabled = getRodaConfiguration().getBoolean("core.storage.filesystem.trash.enabled", true);
+        Path storagePath = configurationManager.getStoragePath();
+        LOGGER.debug("Going to instantiate '{}' on '{}'", storageClass.getSimpleName(), storagePath);
 
-        return (StorageService) constructor.newInstance(configurationManager.getStoragePath(), trashDirName);
-      } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException
-        | InvocationTargetException e) {
+        // Try 5-arg: (Path, boolean trashEnabled, boolean createTrash, String trashDirName, boolean createHistory)
+        try {
+          return (StorageService) storageClass
+            .getConstructor(Path.class, boolean.class, boolean.class, String.class, boolean.class)
+            .newInstance(storagePath, trashEnabled, true, trashDirName, true);
+        } catch (NoSuchMethodException ignored) {
+          // fall through to older signatures
+        }
+        // Try 4-arg: (Path, boolean createTrash, String trashDirName, boolean createHistory)
+        try {
+          if (!trashEnabled) {
+            LOGGER.warn(
+              "Custom storage '{}' has no trashEnabled constructor; configured trashEnabled=false will be ignored",
+              storageClass.getSimpleName());
+          }
+          return (StorageService) storageClass
+            .getConstructor(Path.class, boolean.class, String.class, boolean.class)
+            .newInstance(storagePath, true, trashDirName, true);
+        } catch (NoSuchMethodException ignored) {
+          // fall through to older signatures
+        }
+        // Try 2-arg: (Path, String trashDirName) — no trash flag; warn that trashEnabled is ignored
+        try {
+          LOGGER.warn("Custom storage '{}' has no trashEnabled constructor; configured trashEnabled={} will be ignored",
+            storageClass.getSimpleName(), trashEnabled);
+          return (StorageService) storageClass
+            .getConstructor(Path.class, String.class)
+            .newInstance(storagePath, trashDirName);
+        } catch (NoSuchMethodException ignored) {
+          // fall through
+        }
+        LOGGER.warn("No compatible constructor found for '{}', falling back to a default service",
+          storageClass.getSimpleName());
+      } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
         LOGGER.warn("Error instantiating storage service defined on properties, falling back to a default service", e);
       }
     }
@@ -904,7 +934,9 @@ public class RodaCoreFactory {
       LOGGER.debug("Going to instantiate Filesystem on '{}'", configurationManager.getStoragePath());
       String trashDirName = getRodaConfiguration().getString("core.storage.filesystem.trash",
         RodaConstants.TRASH_CONTAINER);
-      StorageService fileStorageService = new FileStorageService(configurationManager.getStoragePath(), trashDirName);
+      boolean trashEnabled = getRodaConfiguration().getBoolean("core.storage.filesystem.trash.enabled", true);
+      StorageService fileStorageService = new FileStorageService(configurationManager.getStoragePath(), trashEnabled,
+        true, trashDirName, true);
       return fileStorageService;
     } else {
       LOGGER.error("Unknown storage service '{}'", storageType.name());
