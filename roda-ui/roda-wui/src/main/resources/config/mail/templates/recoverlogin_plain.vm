@@ -1,14 +1,14 @@
-A login recovery associated to this e-mail was requested.
+En återställning av lösenord kopplad till denna e-postadress har begärts.
 
-To continue the recovery process, access the following address: $recoverLoginCompleteURL
-Alternatively, insert the necessary data in the following address: $recoverLoginURL
+För att fortsätta återställningsprocessen, besök följande adress: $recoverLoginCompleteURL
+Alternativt, ange nödvändiga uppgifter på följande adress: $recoverLoginURL
 
-Username: $username
-Password for verification: $token
+Användarnamn: $username
+Verifieringslösenord: $token
 
-And modify your password.
+Och ändra ditt lösenord.
 
-If you didn't ask the login recovery before mentioned, please ignore this e-mail.
+Om du inte begärt den lösenordsåterställning som nämns ovan, vänligen ignorera detta e-postmeddelande.
 
 =====================================================
-ETERNA - Repository of Authentic Digital Objects
+ETERNA

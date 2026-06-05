@@ -1,12 +1,12 @@
 <html>
 <body>
-<p>Dear Mr./Mrs. $producerFullName,</p>
-<p>The package with the name $sipOriginalFilename, on $sipDateTime, was rejected manually for the following reason:</p>
+<p>Hej $producerFullName,</p>
+<p>Paketet med namnet $sipOriginalFilename, inlämnat $sipDateTime, har manuellt avvisats av följande anledning:</p>
 <p style="margin-left: 5px; margin-right: 5px; font-style: italic">$message</p>
 
-<p>Please revise the errors mentioned and act accordingly.</p>
+<p>Vänligen åtgärda de nämnda felen och vidta lämpliga åtgärder.</p>
 
-<p>ETERNA - Repository of Authentic Digital Objects</p>
+<p>ETERNA</p>
 
 </body>
-<html>
+</html>

@@ -1,17 +1,17 @@
 <html>
 <body>
-<p>A login recovery associated to this e-mail was requested.</p>
+<p>En återställning av lösenord kopplad till denna e-postadress har begärts.</p>
 
-<p>To continue the recovery process, access the following address <a href="{{recoverLoginCompleteURL}}">{{recoverLoginCompleteURL}}</a>.</p>
-<p>Alternatively, insert the necessary data in the following address <a href="{{recoverLoginURL}}">{{recoverLoginURL}}</a>.</p>
+<p>För att fortsätta återställningsprocessen, besök följande adress <a href="{{recoverLoginCompleteURL}}">{{recoverLoginCompleteURL}}</a>.</p>
+<p>Alternativt, ange nödvändiga uppgifter på följande adress <a href="{{recoverLoginURL}}">{{recoverLoginURL}}</a>.</p>
 <ul>
-<li><strong>Username:</strong> {{username}}</li>
-<li><strong>Password for verification:</strong> {{token}}</li>
+<li><strong>Användarnamn:</strong> {{username}}</li>
+<li><strong>Verifieringslösenord:</strong> {{token}}</li>
 </ul>
-<p>And modify your password.</p>
-<p>If you didn't ask the login recovery before mentioned, please ignore this e-mail.</p>
+<p>Och ändra ditt lösenord.</p>
+<p>Om du inte begärt den lösenordsåterställning som nämns ovan, vänligen ignorera detta e-postmeddelande.</p>
 
-<p>ETERNA - Repository of Authentic Digital Objects</p>
+<p>ETERNA</p>
 
 </body>
-<html>
+</html>
