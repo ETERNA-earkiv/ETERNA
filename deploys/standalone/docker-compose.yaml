@@ -104,6 +104,7 @@ services:
       - ./roda/config/roda-core.properties:/roda/config/roda-core.properties:ro
     environment:
       # Spring configuration
+      # Uncomment when running with the postgres service enabled:
       # - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/roda_core_db
 
       # Solr Cloud configuration
