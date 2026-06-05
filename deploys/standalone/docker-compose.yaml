@@ -104,7 +104,7 @@ services:
       - ./roda/config/roda-core.properties:/roda/config/roda-core.properties:ro
     environment:
       # Spring configuration
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/roda_core_db
+      # - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/roda_core_db
 
       # Solr Cloud configuration
       - RODA_CORE_SOLR_TYPE=CLOUD
