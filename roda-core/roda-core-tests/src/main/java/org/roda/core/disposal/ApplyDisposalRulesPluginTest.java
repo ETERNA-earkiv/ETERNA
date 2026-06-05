@@ -22,6 +22,7 @@ import java.util.Set;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
+import org.roda.core.common.DisposalRuleConditionFields;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.disposal.rule.ConditionType;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
@@ -40,7 +41,6 @@ import org.roda.core.index.IndexServiceTest;
 import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.base.disposal.rules.ApplyDisposalRulesPlugin;
-import org.roda.core.plugins.base.disposal.rules.ApplyDisposalRulesPluginUtils;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -186,7 +186,7 @@ public class ApplyDisposalRulesPluginTest {
   /** The blacklist matches the config key (reference), not the resolved Solr field (unitId_txt), exactly as the UI. */
   @Test
   public void blacklistAppliesToConfigurationKeyNotSolrField() {
-    Set<String> allowed = ApplyDisposalRulesPluginUtils.allowedMetadataConditionFields();
+    Set<String> allowed = DisposalRuleConditionFields.allowedMetadataConditionFields();
     assertTrue("A regular text search field must be allowed", allowed.contains("title"));
     assertFalse("The Solr field of a blacklisted configuration key must be excluded", allowed.contains("unitId_txt"));
   }

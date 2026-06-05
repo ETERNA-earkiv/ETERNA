@@ -7,13 +7,10 @@
  */
 package org.roda.core.plugins.base.disposal.rules;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -38,6 +35,21 @@ public class ApplyDisposalRulesPluginUtils {
   private ApplyDisposalRulesPluginUtils() {
   }
 
+  /**
+   * Applies the first matching disposal rule to the given AIP, setting its disposal metadata in place.
+   *
+   * @param aip
+   *          the AIP to evaluate
+   * @param disposalRules
+   *          the ordered disposal rules to evaluate
+   * @param index
+   *          the index service used for metadata-field matching
+   * @param allowedConditionFields
+   *          the whitelist of allowed metadata condition fields (see {@link #allowedMetadataConditionFields()})
+   * @return the first matching rule, or {@link Optional#empty()} if none matched
+   * @throws GenericException
+   *           if rule evaluation against the index fails
+   */
   public static Optional<DisposalRule> applyRule(AIP aip, DisposalRules disposalRules, IndexService index,
     Set<String> allowedConditionFields) throws GenericException {
 
@@ -95,34 +107,6 @@ public class ApplyDisposalRulesPluginUtils {
     }
 
     return Optional.empty();
-  }
-
-  /**
-   * The set of Solr field names a {@link ConditionType#METADATA_FIELD} rule is allowed to target. Mirrors the fields
-   * the UI offers in MetadataFieldsPanel: text-typed IndexedAIP search fields whose configuration key is not in the
-   * disposal rule condition blacklist. Shared by the apply job and the API validation (DisposalRuleService) so both
-   * enforce the same whitelist.
-   *
-   * <p>
-   * Note: the blacklist is matched against the configuration key (e.g. {@code reference}), not the resolved Solr field
-   * (e.g. {@code unitId_txt}), exactly as the UI does.
-   */
-  public static Set<String> allowedMetadataConditionFields() {
-    List<String> blacklist = RodaCoreFactory.getRodaConfigurationAsList(RodaConstants.DISPOSAL_RULE_BLACKLIST_CONDITION);
-    String classSimpleName = IndexedAIP.class.getSimpleName();
-
-    Set<String> allowedFields = new HashSet<>();
-    for (String field : RodaCoreFactory.getRodaConfigurationAsList(RodaConstants.SEARCH_FIELD_PREFIX, classSimpleName)) {
-      String fieldPrefix = RodaConstants.SEARCH_FIELD_PREFIX + '.' + classSimpleName + '.' + field;
-      String fieldType = RodaCoreFactory.getRodaConfigurationAsString(fieldPrefix, RodaConstants.SEARCH_FIELD_TYPE);
-      String fieldName = RodaCoreFactory.getRodaConfigurationAsString(fieldPrefix, RodaConstants.SEARCH_FIELD_FIELDS);
-
-      if (RodaConstants.SEARCH_FIELD_TYPE_TEXT.equals(fieldType) && StringUtils.isNotBlank(fieldName)
-        && !blacklist.contains(field)) {
-        allowedFields.add(fieldName);
-      }
-    }
-    return allowedFields;
   }
 
   private static DisposalAIPMetadata getDisposalAipMetadata(AIP aip, DisposalRule rule) {

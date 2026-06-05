@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.roda.core.common.DisposalRuleConditionFields;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -33,7 +34,6 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.base.disposal.rules.ApplyDisposalRulesPlugin;
-import org.roda.core.plugins.base.disposal.rules.ApplyDisposalRulesPluginUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.model.RequestContext;
@@ -115,7 +115,7 @@ public class DisposalRuleService {
     if (StringUtils.isBlank(rule.getConditionKey()) || StringUtils.isBlank(rule.getConditionValue())) {
       return false;
     }
-    return ApplyDisposalRulesPluginUtils.allowedMetadataConditionFields().contains(rule.getConditionKey());
+    return DisposalRuleConditionFields.allowedMetadataConditionFields().contains(rule.getConditionKey());
   }
 
   private boolean isConditionTypeValid(ConditionType type) {

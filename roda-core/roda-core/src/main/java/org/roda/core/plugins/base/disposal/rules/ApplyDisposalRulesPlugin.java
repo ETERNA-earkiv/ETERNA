@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.roda.core.common.DisposalRuleConditionFields;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -195,7 +196,7 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
   private void processDisposalRules(List<AIP> aips, DisposalRules disposalRules, IndexService index, ModelService model,
     Report report, Job cachedJob, JobPluginInfo jobPluginInfo) {
     // Compute the metadata-field whitelist once per job run (not per AIP/rule) to avoid repeated config I/O.
-    Set<String> allowedConditionFields = ApplyDisposalRulesPluginUtils.allowedMetadataConditionFields();
+    Set<String> allowedConditionFields = DisposalRuleConditionFields.allowedMetadataConditionFields();
     boolean metadataRulesSkipped = allowedConditionFields.isEmpty() && hasMetadataFieldRule(disposalRules);
     if (metadataRulesSkipped) {
       LOGGER.warn("No allowed metadata condition fields are configured (ui.search.fields.IndexedAIP in "
