@@ -16,7 +16,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.disposal.metadata.DisposalAIPMetadata;
 import org.roda.core.data.v2.disposal.metadata.DisposalScheduleAIPMetadata;
@@ -39,15 +38,15 @@ public class ApplyDisposalRulesPluginUtils {
   private ApplyDisposalRulesPluginUtils() {
   }
 
-  public static Optional<DisposalRule> applyRule(AIP aip, DisposalRules disposalRules, IndexService index)
-    throws NotFoundException, GenericException {
+  public static Optional<DisposalRule> applyRule(AIP aip, DisposalRules disposalRules, IndexService index,
+    Set<String> allowedConditionFields) throws GenericException {
 
     for (DisposalRule rule : disposalRules.getObjects()) {
       Optional<DisposalRule> used = Optional.empty();
       if (ConditionType.IS_CHILD_OF.equals(rule.getType())) {
         used = conditionTypeChildOf(aip, rule);
       } else if (ConditionType.METADATA_FIELD.equals(rule.getType())) {
-        used = conditionTypeMetadataValue(aip, rule, index);
+        used = conditionTypeMetadataValue(aip, rule, index, allowedConditionFields);
       }
 
       if (used.isPresent()) {
@@ -68,24 +67,18 @@ public class ApplyDisposalRulesPluginUtils {
     return Optional.empty();
   }
 
-  private static Optional<DisposalRule> conditionTypeMetadataValue(AIP aip, DisposalRule rule, IndexService index)
-    throws NotFoundException, GenericException {
+  private static Optional<DisposalRule> conditionTypeMetadataValue(AIP aip, DisposalRule rule, IndexService index,
+    Set<String> allowedConditionFields) throws GenericException {
 
-    // Guard against incomplete or unsafe rules (e.g. created through the API or stored before validation was added):
-    // a blank condition key/value would reach SolrUtils and throw on a null value, and a non-whitelisted condition key
-    // is written raw into the Solr query (SolrUtils#appendExactMatch does not escape the field name). Skipping such a
-    // rule keeps the job from failing and closes a Solr-query-injection/DoS vector for rules that bypassed the API
-    // validation. The whitelist is shared with the API (DisposalRuleService) so both honour the same allowed fields.
+    // Skip incomplete/unsafe rules: a blank value would NPE in SolrUtils, and a non-whitelisted key is written raw
+    // into the Solr query (appendExactMatch does not escape the field name). The whitelist is shared with the API.
     if (StringUtils.isBlank(rule.getConditionKey()) || StringUtils.isBlank(rule.getConditionValue())
-      || !allowedMetadataConditionFields().contains(rule.getConditionKey())) {
+      || !allowedConditionFields.contains(rule.getConditionKey())) {
       return Optional.empty();
     }
 
-    // Evaluate the rule the same way the disposal rule preview does (DisposalRuleDataPanel#refreshPreviewAIPList):
-    // a Solr filter on the condition field plus AIP_STATE=ACTIVE, scoped to this single AIP. This guarantees that
-    // applying the rules associates exactly the AIPs shown in the preview — a previous implementation compared the
-    // indexed value with String.equals, which diverged from the preview for tokenized fields (e.g. dynamic _txt
-    // fields) and also threw ClassCastException on multi-valued fields.
+    // Match exactly like the preview (DisposalRuleDataPanel#refreshPreviewAIPList): a Solr filter on the condition
+    // field plus AIP_STATE=ACTIVE, scoped to this AIP — so apply associates the same AIPs the preview shows.
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, aip.getId()),
       new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name()),
       new SimpleFilterParameter(rule.getConditionKey(), rule.getConditionValue()));

@@ -119,10 +119,8 @@ public class DisposalRuleService {
   }
 
   private boolean isConditionTypeValid(ConditionType type) {
-    if (StringUtils.isNotBlank(type.toString())) {
-      return ConditionType.IS_CHILD_OF.equals(type) || ConditionType.METADATA_FIELD.equals(type);
-    }
-    return false;
+    // type may be null for an API request that omits it — must yield a validation error, not a NullPointerException.
+    return ConditionType.IS_CHILD_OF.equals(type) || ConditionType.METADATA_FIELD.equals(type);
   }
 
   private boolean isRuleScheduleValid(DisposalRule rule, DisposalSchedules disposalSchedules) {

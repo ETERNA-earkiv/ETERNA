@@ -109,11 +109,7 @@ public class ApplyDisposalRulesPluginTest {
     TestsHelper.releaseAllLocks();
   }
 
-  /**
-   * The rule condition value ("example") is only a token <em>inside</em> the AIP title ("My example"). It therefore
-   * matches via the tokenized Solr query the preview uses, but NOT via the exact {@code String.equals} the apply job
-   * used before the fix. With the fix, applying the rule must associate the schedule exactly as the preview promised.
-   */
+  /** "example" is only a token inside the title "My example": matches the preview's tokenized Solr query, not the old exact String.equals. */
   @Test
   public void applyRuleMatchesTokenizedMetadataFieldLikePreview() throws Exception {
     // AIP from corpora: EAD descriptive metadata with title "My example"
@@ -123,9 +119,7 @@ public class ApplyDisposalRulesPluginTest {
     final AIP aip = model.createAIP(aipId, corporaService, aipPath, RodaConstants.ADMIN);
     index.commitAIPs();
 
-    // Sanity check: the rule's condition matches this AIP via the same tokenized Solr query the preview uses
-    // ("example" is a token inside the indexed title "My example"). This localizes a failure to either matching
-    // (this assertion) or association (the assertions after the job).
+    // Precondition: the condition matches via tokenized search, localizing any failure to the association step.
     final Filter ruleFilter = new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, aipId),
       new SimpleFilterParameter(RodaConstants.AIP_TITLE, "example"));
     assertEquals("Precondition: rule condition must match the AIP via tokenized search", Long.valueOf(1L),
@@ -157,11 +151,7 @@ public class ApplyDisposalRulesPluginTest {
       updated.getDisposalScheduleAssociationType());
   }
 
-  /**
-   * A rule with a blank condition value (possible via the API or for legacy stored rules) must not crash the whole
-   * apply job: the AIP is simply skipped. Before the defensive guard, the blank value reached SolrUtils and threw on a
-   * null value.
-   */
+  /** A rule with a blank condition value must be skipped, not crash the job (previously NPE'd in SolrUtils). */
   @Test
   public void applyRuleWithBlankConditionDoesNotCrashJob() throws Exception {
     final String aipId = IdUtils.createUUID();
@@ -193,11 +183,7 @@ public class ApplyDisposalRulesPluginTest {
       updated.getDisposal() == null ? null : updated.getDisposal().getSchedule());
   }
 
-  /**
-   * The condition blacklist must be matched against the configuration key (e.g. {@code reference}), not the resolved
-   * Solr field (e.g. {@code unitId_txt}), exactly as the UI does. So a text field whose key is blacklisted must be
-   * excluded from the allowed set, while a regular text field stays allowed.
-   */
+  /** The blacklist matches the config key (reference), not the resolved Solr field (unitId_txt), exactly as the UI. */
   @Test
   public void blacklistAppliesToConfigurationKeyNotSolrField() {
     Set<String> allowed = ApplyDisposalRulesPluginUtils.allowedMetadataConditionFields();
