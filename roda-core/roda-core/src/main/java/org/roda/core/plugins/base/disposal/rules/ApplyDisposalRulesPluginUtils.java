@@ -7,17 +7,19 @@
  */
 package org.roda.core.plugins.base.disposal.rules;
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.Optional;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.disposal.metadata.DisposalAIPMetadata;
 import org.roda.core.data.v2.disposal.metadata.DisposalScheduleAIPMetadata;
 import org.roda.core.data.v2.disposal.rule.ConditionType;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.rule.DisposalRules;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPDisposalScheduleAssociationType;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -63,17 +65,23 @@ public class ApplyDisposalRulesPluginUtils {
   private static Optional<DisposalRule> conditionTypeMetadataValue(AIP aip, DisposalRule rule, IndexService index)
     throws NotFoundException, GenericException {
 
-    IndexedAIP indexedAIP = index.retrieve(IndexedAIP.class, aip.getId(),
-      Collections.singletonList(rule.getConditionKey()));
+    // Evaluate the rule the same way the disposal rule preview does (DisposalRuleDataPanel#refreshPreviewAIPList):
+    // a Solr filter on the condition field, scoped to this single AIP. This guarantees that applying the rules
+    // associates exactly the AIPs shown in the preview — a previous implementation compared the indexed value with
+    // String.equals, which diverged from the preview for tokenized fields (e.g. dynamic _txt fields) and also threw
+    // ClassCastException on multi-valued fields.
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, aip.getId()),
+      new SimpleFilterParameter(rule.getConditionKey(), rule.getConditionValue()));
 
-    Map<String, Object> fields = indexedAIP.getFields();
-    Object o = fields.get(rule.getConditionKey());
-    String metadataValue = (String) o;
-
-    if (metadataValue != null && metadataValue.equals(rule.getConditionValue())) {
-      DisposalAIPMetadata disposal = getDisposalAipMetadata(aip, rule);
-      aip.setDisposal(disposal);
-      return Optional.of(rule);
+    try {
+      if (index.count(IndexedAIP.class, filter) > 0) {
+        DisposalAIPMetadata disposal = getDisposalAipMetadata(aip, rule);
+        aip.setDisposal(disposal);
+        return Optional.of(rule);
+      }
+    } catch (RequestNotValidException e) {
+      throw new GenericException(
+        "Unable to evaluate disposal rule '" + rule.getId() + "' for AIP '" + aip.getId() + "'", e);
     }
 
     return Optional.empty();
