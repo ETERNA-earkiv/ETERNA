@@ -8,13 +8,16 @@
 package org.roda.core.disposal;
 
 import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertFalse;
 import static org.testng.AssertJUnit.assertNotNull;
 import static org.testng.AssertJUnit.assertNull;
+import static org.testng.AssertJUnit.assertTrue;
 
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.Set;
 
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
@@ -37,6 +40,7 @@ import org.roda.core.index.IndexServiceTest;
 import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.base.disposal.rules.ApplyDisposalRulesPlugin;
+import org.roda.core.plugins.base.disposal.rules.ApplyDisposalRulesPluginUtils;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -77,6 +81,9 @@ public class ApplyDisposalRulesPluginTest {
     boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
       deployPluginManager, deployDefaultResources, false);
+    // The disposal rule condition whitelist comes from roda-wui.properties (ui.search.fields.*), which the WUI
+    // registers at runtime (RodaWuiServlet) but the core test harness does not load by default.
+    RodaCoreFactory.addConfiguration("roda-wui.properties");
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
 
@@ -184,6 +191,18 @@ public class ApplyDisposalRulesPluginTest {
     final AIP updated = model.retrieveAIP(aip.getId());
     assertNull("No schedule should be associated for an incomplete rule",
       updated.getDisposal() == null ? null : updated.getDisposal().getSchedule());
+  }
+
+  /**
+   * The condition blacklist must be matched against the configuration key (e.g. {@code reference}), not the resolved
+   * Solr field (e.g. {@code unitId_txt}), exactly as the UI does. So a text field whose key is blacklisted must be
+   * excluded from the allowed set, while a regular text field stays allowed.
+   */
+  @Test
+  public void blacklistAppliesToConfigurationKeyNotSolrField() {
+    Set<String> allowed = ApplyDisposalRulesPluginUtils.allowedMetadataConditionFields();
+    assertTrue("A regular text search field must be allowed", allowed.contains("title"));
+    assertFalse("The Solr field of a blacklisted configuration key must be excluded", allowed.contains("unitId_txt"));
   }
 
   private DisposalSchedule createDestroySchedule() throws Exception {

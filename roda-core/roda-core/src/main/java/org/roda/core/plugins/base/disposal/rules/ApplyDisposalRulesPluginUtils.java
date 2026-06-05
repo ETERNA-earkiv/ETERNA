@@ -7,9 +7,13 @@
  */
 package org.roda.core.plugins.base.disposal.rules;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -67,9 +71,13 @@ public class ApplyDisposalRulesPluginUtils {
   private static Optional<DisposalRule> conditionTypeMetadataValue(AIP aip, DisposalRule rule, IndexService index)
     throws NotFoundException, GenericException {
 
-    // Guard against incomplete rules (e.g. created through the API or stored before validation was added): a blank
-    // condition key/value would otherwise reach SolrUtils and throw on a null value, failing the whole apply job.
-    if (StringUtils.isBlank(rule.getConditionKey()) || StringUtils.isBlank(rule.getConditionValue())) {
+    // Guard against incomplete or unsafe rules (e.g. created through the API or stored before validation was added):
+    // a blank condition key/value would reach SolrUtils and throw on a null value, and a non-whitelisted condition key
+    // is written raw into the Solr query (SolrUtils#appendExactMatch does not escape the field name). Skipping such a
+    // rule keeps the job from failing and closes a Solr-query-injection/DoS vector for rules that bypassed the API
+    // validation. The whitelist is shared with the API (DisposalRuleService) so both honour the same allowed fields.
+    if (StringUtils.isBlank(rule.getConditionKey()) || StringUtils.isBlank(rule.getConditionValue())
+      || !allowedMetadataConditionFields().contains(rule.getConditionKey())) {
       return Optional.empty();
     }
 
@@ -94,6 +102,34 @@ public class ApplyDisposalRulesPluginUtils {
     }
 
     return Optional.empty();
+  }
+
+  /**
+   * The set of Solr field names a {@link ConditionType#METADATA_FIELD} rule is allowed to target. Mirrors the fields
+   * the UI offers in MetadataFieldsPanel: text-typed IndexedAIP search fields whose configuration key is not in the
+   * disposal rule condition blacklist. Shared by the apply job and the API validation (DisposalRuleService) so both
+   * enforce the same whitelist.
+   *
+   * <p>
+   * Note: the blacklist is matched against the configuration key (e.g. {@code reference}), not the resolved Solr field
+   * (e.g. {@code unitId_txt}), exactly as the UI does.
+   */
+  public static Set<String> allowedMetadataConditionFields() {
+    List<String> blacklist = RodaCoreFactory.getRodaConfigurationAsList(RodaConstants.DISPOSAL_RULE_BLACKLIST_CONDITION);
+    String classSimpleName = IndexedAIP.class.getSimpleName();
+
+    Set<String> allowedFields = new HashSet<>();
+    for (String field : RodaCoreFactory.getRodaConfigurationAsList(RodaConstants.SEARCH_FIELD_PREFIX, classSimpleName)) {
+      String fieldPrefix = RodaConstants.SEARCH_FIELD_PREFIX + '.' + classSimpleName + '.' + field;
+      String fieldType = RodaCoreFactory.getRodaConfigurationAsString(fieldPrefix, RodaConstants.SEARCH_FIELD_TYPE);
+      String fieldName = RodaCoreFactory.getRodaConfigurationAsString(fieldPrefix, RodaConstants.SEARCH_FIELD_FIELDS);
+
+      if (RodaConstants.SEARCH_FIELD_TYPE_TEXT.equals(fieldType) && StringUtils.isNotBlank(fieldName)
+        && !blacklist.contains(field)) {
+        allowedFields.add(fieldName);
+      }
+    }
+    return allowedFields;
   }
 
   private static DisposalAIPMetadata getDisposalAipMetadata(AIP aip, DisposalRule rule) {

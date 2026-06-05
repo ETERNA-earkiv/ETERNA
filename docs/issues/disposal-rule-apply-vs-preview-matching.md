@@ -71,14 +71,21 @@ tillämpas* — och `ClassCastException` på flervärda fält försvinner.
 Eftersom apply-vägen nu bygger en Solr-fråga av `conditionKey`/`conditionValue` tillkom tre
 skydd:
 
+- **Delad whitelist** (`ApplyDisposalRulesPluginUtils.allowedMetadataConditionFields`): de
+  tillåtna villkorsfälten beräknas i core och återanvänds av **både** apply-jobbet och
+  API-valideringen, så de aldrig kan glida isär. Tillåtna fält = textsökfälten UI:t erbjuder
+  (`ui.search.fields.IndexedAIP.*` med typ `text`), minus
+  `ui.disposal.rule.blacklist.condition`. Blacklisten jämförs mot konfigurations*nyckeln*
+  (t.ex. `reference`), inte det upplösta Solr-fältet (`unitId_txt`) — exakt som UI:t.
+- **Apply-jobbet whitelistar nu också** (inte bara API:t): en regel vars `conditionKey` inte
+  är vitlistat hoppas över i stället för att skrivas rått in i Solr-queryn
+  (`SolrUtils#appendExactMatch` escapear inte fältnamnet). Det stänger query-injection/DoS-
+  vektorn även för äldre/manipulerade regler som skapats utanför API-valideringen.
 - **Server-validering** (`DisposalRuleService.validateDisposalRule`): för `METADATA_FIELD`
-  krävs nu icke-tomma `conditionKey`/`conditionValue`, och `conditionKey` måste vara ett av
-  de konfigurerade textsökfälten UI:t erbjuder (`ui.search.fields.IndexedAIP.*` med typ
-  `text`, minus `ui.disposal.rule.blacklist.condition`). Stoppar både ofullständiga regler
-  och godtyckliga/icke-vitlistade Solr-fältnamn (query-injection/DoS) via API:t.
-- **Defensiv skydd i apply-jobbet** (`ApplyDisposalRulesPluginUtils`): en regel med tomt
-  villkor hoppas över i stället för att krascha hela jobbet (tidigare `NullPointerException`
-  i `SolrUtils#appendExactMatch` på ett `null`-värde). Skyddar mot äldre lagrade regler.
+  krävs icke-tomma `conditionKey`/`conditionValue`, och `conditionKey` måste finnas i den
+  delade whitelisten.
+- **Defensivt skydd**: en regel med tomt villkor hoppas över i stället för att krascha hela
+  jobbet (tidigare `NullPointerException` i `SolrUtils#appendExactMatch` på ett `null`-värde).
 - **Preview-paritet**: filtret i apply-jobbet inkluderar nu även `AIP_STATE=ACTIVE`, precis
   som förhandsgranskningen.
 

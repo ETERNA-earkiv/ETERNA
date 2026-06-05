@@ -9,12 +9,8 @@ package org.roda.wui.api.v2.services;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -37,6 +33,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.base.disposal.rules.ApplyDisposalRulesPlugin;
+import org.roda.core.plugins.base.disposal.rules.ApplyDisposalRulesPluginUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.model.RequestContext;
@@ -109,34 +106,16 @@ public class DisposalRuleService {
 
   /**
    * Validates the condition of a {@link ConditionType#METADATA_FIELD} rule. Both key and value must be present, and the
-   * key must be one of the search fields the UI offers (see the client MetadataFieldsPanel) — i.e. a text-typed
-   * IndexedAIP search field that is not blacklisted. This prevents incomplete rules (which would fail the apply job
-   * with a null value) and stops arbitrary, non-whitelisted Solr field names from reaching the query the apply job
-   * builds.
+   * key must be one of the allowed condition fields. The whitelist lives in core
+   * ({@link ApplyDisposalRulesPluginUtils#allowedMetadataConditionFields()}) so the API and the apply job enforce
+   * exactly the same set of fields. This prevents incomplete rules (which would fail the apply job with a null value)
+   * and stops arbitrary, non-whitelisted Solr field names from reaching the query the apply job builds.
    */
   private boolean isMetadataConditionValid(DisposalRule rule) {
     if (StringUtils.isBlank(rule.getConditionKey()) || StringUtils.isBlank(rule.getConditionValue())) {
       return false;
     }
-    return allowedMetadataConditionFields().contains(rule.getConditionKey());
-  }
-
-  private Set<String> allowedMetadataConditionFields() {
-    List<String> blacklist = RodaCoreFactory.getRodaConfigurationAsList(RodaConstants.DISPOSAL_RULE_BLACKLIST_CONDITION);
-    String classSimpleName = IndexedAIP.class.getSimpleName();
-
-    Set<String> allowedFields = new HashSet<>();
-    for (String field : RodaCoreFactory.getRodaConfigurationAsList(RodaConstants.SEARCH_FIELD_PREFIX, classSimpleName)) {
-      String fieldPrefix = RodaConstants.SEARCH_FIELD_PREFIX + '.' + classSimpleName + '.' + field;
-      String fieldType = RodaCoreFactory.getRodaConfigurationAsString(fieldPrefix, RodaConstants.SEARCH_FIELD_TYPE);
-      String fieldName = RodaCoreFactory.getRodaConfigurationAsString(fieldPrefix, RodaConstants.SEARCH_FIELD_FIELDS);
-
-      if (RodaConstants.SEARCH_FIELD_TYPE_TEXT.equals(fieldType) && StringUtils.isNotBlank(fieldName)
-        && !blacklist.contains(fieldName)) {
-        allowedFields.add(fieldName);
-      }
-    }
-    return allowedFields;
+    return ApplyDisposalRulesPluginUtils.allowedMetadataConditionFields().contains(rule.getConditionKey());
   }
 
   private boolean isConditionTypeValid(ConditionType type) {
