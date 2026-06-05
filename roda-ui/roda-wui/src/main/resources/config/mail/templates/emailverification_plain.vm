@@ -1,12 +1,12 @@
-In the sequence of the registration process of the username $username, an e-mail address verification is needed.
+I samband med registrering för användarnamnet $username krävs verifiering av e-postadressen.
 
-To continue the verification process, access the following address: $verificationCompleteURL
-Alternatively, insert the password for verification in the following address: $verificationURL
+För att fortsätta verifieringsprocessen, besök följande adress: $verificationCompleteURL
+Alternativt, ange verifieringslösenordet på följande adress: $verificationURL
 
-Username: $username
-Password for verification: $token
+Användarnamn: $username
+Verifieringslösenord: $token
 
-If you didn't made the registration before mentioned, please ignore this e-mail.
+Om du inte gjort registreringen som nämns ovan, vänligen ignorera detta e-postmeddelande.
 
 =====================================================
-ETERNA - Repository of Authentic Digital Objects
+ETERNA

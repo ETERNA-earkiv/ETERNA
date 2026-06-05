@@ -1,15 +1,15 @@
 <html>
 <body>
-<p>In the sequence of the registration process of the username <em>{{username}}</em>, an e-mail address verification is needed.</p>
-<p>To continue the verification process, access the following address <a href="{{verificationCompleteURL}}">{{verificationCompleteURL}}</a>, or, alternatively, insert the password for verification in the following address <a href="{{verificationURL}}">{{verificationURL}}</a>:
+<p>I samband med registrering för användarnamnet <em>{{username}}</em> krävs verifiering av e-postadressen.</p>
+<p>För att fortsätta verifieringsprocessen, besök följande adress <a href="{{verificationCompleteURL}}">{{verificationCompleteURL}}</a>, eller, alternativt, ange verifieringslösenordet på följande adress <a href="{{verificationURL}}">{{verificationURL}}</a>:
 <ul>
-<li><strong>Username:</strong> {{username}}</li>
-<li><strong>Password for verification:</strong> {{token}}</li>
+<li><strong>Användarnamn:</strong> {{username}}</li>
+<li><strong>Verifieringslösenord:</strong> {{token}}</li>
 </ul>
 </p>
-<p>If you didn't made the registration before mentioned, please ignore this e-mail.</p>
+<p>Om du inte gjort registreringen som nämns ovan, vänligen ignorera detta e-postmeddelande.</p>
 
-<p>ETERNA - Repository of Authentic Digital Objects</p>
+<p>ETERNA</p>
 
 </body>
 <html>
