@@ -42,7 +42,6 @@ ENV LANG=en_US.UTF-8 \
     LDAP_SERVER_PORT=1389 \
     SIEGFRIED_MODE=server \
     SIEGFRIED_SERVER_URL=http://siegfried:5138 \
-    SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/roda_core_db \
     RODA_USER="roda" \
     RODA_UID="1000" \
     RODA_GROUP="roda" \

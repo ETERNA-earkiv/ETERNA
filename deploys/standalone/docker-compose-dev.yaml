@@ -91,17 +91,17 @@ services:
     volumes:
       - ./ldap/ldif/pbkdf2.ldif:/opt/bitnami/openldap/etc/schema/pbkdf2.ldif
 
-  postgres:
-    image: postgres:17
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: roda
-      POSTGRES_DB: roda_core_db
-    ports:
-      - "5432:5432"
-    volumes:
-      - pg_data:/var/lib/postgresql/data
+  # postgres:
+  #   image: postgres:17
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_USER: admin
+  #     POSTGRES_PASSWORD: roda
+  #     POSTGRES_DB: roda_core_db
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - pg_data:/var/lib/postgresql/data
 
 volumes:
   zookeeper_data:
@@ -109,4 +109,4 @@ volumes:
   solr_data:
   clam_data:
   siegfried_data:
-  pg_data:
+  #pg_data:
