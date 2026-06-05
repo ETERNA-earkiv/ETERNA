@@ -9,6 +9,7 @@ package org.roda.core.disposal;
 
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNotNull;
+import static org.testng.AssertJUnit.assertNull;
 
 import java.net.URL;
 import java.nio.file.Path;
@@ -94,6 +95,10 @@ public class ApplyDisposalRulesPluginTest {
 
   @AfterMethod
   public void cleanUp() throws Exception {
+    // Disposal rules are global; remove them between methods so each test is isolated.
+    for (DisposalRule rule : model.listDisposalRules().getObjects()) {
+      model.deleteDisposalRule(rule.getId(), RodaConstants.ADMIN);
+    }
     TestsHelper.releaseAllLocks();
   }
 
@@ -143,6 +148,42 @@ public class ApplyDisposalRulesPluginTest {
       updated.getDisposal().getSchedule().getId());
     assertEquals("Association must be flagged as coming from a rule", AIPDisposalScheduleAssociationType.RULES,
       updated.getDisposalScheduleAssociationType());
+  }
+
+  /**
+   * A rule with a blank condition value (possible via the API or for legacy stored rules) must not crash the whole
+   * apply job: the AIP is simply skipped. Before the defensive guard, the blank value reached SolrUtils and threw on a
+   * null value.
+   */
+  @Test
+  public void applyRuleWithBlankConditionDoesNotCrashJob() throws Exception {
+    final String aipId = IdUtils.createUUID();
+    final DefaultStoragePath aipPath = DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER,
+      CorporaConstants.SOURCE_AIP_ID);
+    final AIP aip = model.createAIP(aipId, corporaService, aipPath, RodaConstants.ADMIN);
+    index.commitAIPs();
+
+    final DisposalSchedule schedule = createDestroySchedule();
+
+    final DisposalRule rule = new DisposalRule();
+    rule.setTitle("Incomplete metadata rule");
+    rule.setType(ConditionType.METADATA_FIELD);
+    rule.setConditionKey(RodaConstants.AIP_TITLE);
+    rule.setConditionValue(null);
+    rule.setDisposalScheduleId(schedule.getId());
+    rule.setDisposalScheduleName(schedule.getTitle());
+    rule.setOrder(0);
+    model.createDisposalRule(rule, RodaConstants.ADMIN);
+
+    final SelectedItemsFilter<IndexedAIP> selectedItems = new SelectedItemsFilter<>(
+      new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, aipId)), IndexedAIP.class.getName(), false);
+    // executeJob asserts the job reaches state COMPLETED; with a blank condition that would previously fail.
+    TestsHelper.executeJob(ApplyDisposalRulesPlugin.class, Collections.<String, String> emptyMap(),
+      PluginType.AIP_TO_AIP, selectedItems);
+
+    final AIP updated = model.retrieveAIP(aip.getId());
+    assertNull("No schedule should be associated for an incomplete rule",
+      updated.getDisposal() == null ? null : updated.getDisposal().getSchedule());
   }
 
   private DisposalSchedule createDestroySchedule() throws Exception {

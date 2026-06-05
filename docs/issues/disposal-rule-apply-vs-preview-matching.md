@@ -66,6 +66,22 @@ tillämpas* — och `ClassCastException` på flervärda fält försvinner.
 Ändring: `roda-core/.../disposal/rules/ApplyDisposalRulesPluginUtils.java`
 (`conditionTypeMetadataValue`).
 
+## Härdning (från kodgranskning)
+
+Eftersom apply-vägen nu bygger en Solr-fråga av `conditionKey`/`conditionValue` tillkom tre
+skydd:
+
+- **Server-validering** (`DisposalRuleService.validateDisposalRule`): för `METADATA_FIELD`
+  krävs nu icke-tomma `conditionKey`/`conditionValue`, och `conditionKey` måste vara ett av
+  de konfigurerade textsökfälten UI:t erbjuder (`ui.search.fields.IndexedAIP.*` med typ
+  `text`, minus `ui.disposal.rule.blacklist.condition`). Stoppar både ofullständiga regler
+  och godtyckliga/icke-vitlistade Solr-fältnamn (query-injection/DoS) via API:t.
+- **Defensiv skydd i apply-jobbet** (`ApplyDisposalRulesPluginUtils`): en regel med tomt
+  villkor hoppas över i stället för att krascha hela jobbet (tidigare `NullPointerException`
+  i `SolrUtils#appendExactMatch` på ett `null`-värde). Skyddar mot äldre lagrade regler.
+- **Preview-paritet**: filtret i apply-jobbet inkluderar nu även `AIP_STATE=ACTIVE`, precis
+  som förhandsgranskningen.
+
 ## Test
 
 `ApplyDisposalRulesPluginTest#applyRuleMatchesTokenizedMetadataFieldLikePreview` reproducerar

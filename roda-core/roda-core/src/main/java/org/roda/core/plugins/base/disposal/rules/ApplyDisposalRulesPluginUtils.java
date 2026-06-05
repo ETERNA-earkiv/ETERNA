@@ -9,6 +9,7 @@ package org.roda.core.plugins.base.disposal.rules;
 
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -22,6 +23,7 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPDisposalScheduleAssociationType;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.index.IndexService;
 
@@ -65,12 +67,19 @@ public class ApplyDisposalRulesPluginUtils {
   private static Optional<DisposalRule> conditionTypeMetadataValue(AIP aip, DisposalRule rule, IndexService index)
     throws NotFoundException, GenericException {
 
+    // Guard against incomplete rules (e.g. created through the API or stored before validation was added): a blank
+    // condition key/value would otherwise reach SolrUtils and throw on a null value, failing the whole apply job.
+    if (StringUtils.isBlank(rule.getConditionKey()) || StringUtils.isBlank(rule.getConditionValue())) {
+      return Optional.empty();
+    }
+
     // Evaluate the rule the same way the disposal rule preview does (DisposalRuleDataPanel#refreshPreviewAIPList):
-    // a Solr filter on the condition field, scoped to this single AIP. This guarantees that applying the rules
-    // associates exactly the AIPs shown in the preview — a previous implementation compared the indexed value with
-    // String.equals, which diverged from the preview for tokenized fields (e.g. dynamic _txt fields) and also threw
-    // ClassCastException on multi-valued fields.
+    // a Solr filter on the condition field plus AIP_STATE=ACTIVE, scoped to this single AIP. This guarantees that
+    // applying the rules associates exactly the AIPs shown in the preview — a previous implementation compared the
+    // indexed value with String.equals, which diverged from the preview for tokenized fields (e.g. dynamic _txt
+    // fields) and also threw ClassCastException on multi-valued fields.
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, aip.getId()),
+      new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name()),
       new SimpleFilterParameter(rule.getConditionKey(), rule.getConditionValue()));
 
     try {

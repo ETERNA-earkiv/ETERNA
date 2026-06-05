@@ -9,8 +9,12 @@ package org.roda.wui.api.v2.services;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -96,6 +100,43 @@ public class DisposalRuleService {
     if (!isRuleScheduleValid(disposalRule, disposalSchedules)) {
       throw new DisposalRuleNotValidException("The disposal rule schedule is not valid");
     }
+
+    if (ConditionType.METADATA_FIELD.equals(disposalRule.getType()) && !isMetadataConditionValid(disposalRule)) {
+      throw new DisposalRuleNotValidException("The disposal rule condition is not valid: the condition key and value "
+        + "are mandatory and the condition key must be one of the configured text search fields");
+    }
+  }
+
+  /**
+   * Validates the condition of a {@link ConditionType#METADATA_FIELD} rule. Both key and value must be present, and the
+   * key must be one of the search fields the UI offers (see the client MetadataFieldsPanel) — i.e. a text-typed
+   * IndexedAIP search field that is not blacklisted. This prevents incomplete rules (which would fail the apply job
+   * with a null value) and stops arbitrary, non-whitelisted Solr field names from reaching the query the apply job
+   * builds.
+   */
+  private boolean isMetadataConditionValid(DisposalRule rule) {
+    if (StringUtils.isBlank(rule.getConditionKey()) || StringUtils.isBlank(rule.getConditionValue())) {
+      return false;
+    }
+    return allowedMetadataConditionFields().contains(rule.getConditionKey());
+  }
+
+  private Set<String> allowedMetadataConditionFields() {
+    List<String> blacklist = RodaCoreFactory.getRodaConfigurationAsList(RodaConstants.DISPOSAL_RULE_BLACKLIST_CONDITION);
+    String classSimpleName = IndexedAIP.class.getSimpleName();
+
+    Set<String> allowedFields = new HashSet<>();
+    for (String field : RodaCoreFactory.getRodaConfigurationAsList(RodaConstants.SEARCH_FIELD_PREFIX, classSimpleName)) {
+      String fieldPrefix = RodaConstants.SEARCH_FIELD_PREFIX + '.' + classSimpleName + '.' + field;
+      String fieldType = RodaCoreFactory.getRodaConfigurationAsString(fieldPrefix, RodaConstants.SEARCH_FIELD_TYPE);
+      String fieldName = RodaCoreFactory.getRodaConfigurationAsString(fieldPrefix, RodaConstants.SEARCH_FIELD_FIELDS);
+
+      if (RodaConstants.SEARCH_FIELD_TYPE_TEXT.equals(fieldType) && StringUtils.isNotBlank(fieldName)
+        && !blacklist.contains(fieldName)) {
+        allowedFields.add(fieldName);
+      }
+    }
+    return allowedFields;
   }
 
   private boolean isConditionTypeValid(ConditionType type) {
