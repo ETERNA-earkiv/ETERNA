@@ -243,8 +243,6 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
             }
           } else {
             state = PluginState.SKIPPED;
-            // When the allowlist is empty, METADATA_FIELD rules were never evaluated; say so explicitly (alongside the
-            // no-match outcome, which still holds for any IS_CHILD_OF rules) instead of the misleading generic message.
             outcomeDetailsText = metadataRulesSkipped
               ? "No disposal rule matched AIP '" + aip.getId() + "'; METADATA_FIELD rules were skipped because no "
                 + "allowed metadata condition fields are configured (ui.search.fields.IndexedAIP in roda-wui.properties)"
