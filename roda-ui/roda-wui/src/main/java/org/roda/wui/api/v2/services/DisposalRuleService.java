@@ -119,7 +119,6 @@ public class DisposalRuleService {
   }
 
   private boolean isConditionTypeValid(ConditionType type) {
-    // type may be null for an API request that omits it — must yield a validation error, not a NullPointerException.
     return ConditionType.IS_CHILD_OF.equals(type) || ConditionType.METADATA_FIELD.equals(type);
   }
 

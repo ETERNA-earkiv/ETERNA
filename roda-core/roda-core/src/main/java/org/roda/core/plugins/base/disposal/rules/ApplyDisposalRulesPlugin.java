@@ -196,7 +196,8 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
     Report report, Job cachedJob, JobPluginInfo jobPluginInfo) {
     // Compute the metadata-field whitelist once per job run (not per AIP/rule) to avoid repeated config I/O.
     Set<String> allowedConditionFields = ApplyDisposalRulesPluginUtils.allowedMetadataConditionFields();
-    if (allowedConditionFields.isEmpty() && hasMetadataFieldRule(disposalRules)) {
+    boolean metadataRulesSkipped = allowedConditionFields.isEmpty() && hasMetadataFieldRule(disposalRules);
+    if (metadataRulesSkipped) {
       LOGGER.warn("No allowed metadata condition fields are configured (ui.search.fields.IndexedAIP in "
         + "roda-wui.properties); METADATA_FIELD disposal rules will be skipped. If this job runs without the WUI "
         + "configuration loaded, the allowlist will be empty.");
@@ -242,8 +243,13 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
             }
           } else {
             state = PluginState.SKIPPED;
-            outcomeDetailsText = "The AIP '" + aip.getId()
-              + "' did not match any disposal rule therefore the disposal schedule association was skipped";
+            // When the allowlist is empty, METADATA_FIELD rules were never evaluated; make that explicit in the
+            // report instead of the misleading generic "did not match" message.
+            outcomeDetailsText = metadataRulesSkipped
+              ? "Metadata disposal rules were skipped for AIP '" + aip.getId() + "' because no allowed metadata "
+                + "condition fields are configured (ui.search.fields.IndexedAIP in roda-wui.properties)"
+              : "The AIP '" + aip.getId()
+                + "' did not match any disposal rule therefore the disposal schedule association was skipped";
             reportItem.setPluginState(state).setPluginDetails(outcomeDetailsText);
             jobPluginInfo.incrementObjectsProcessedWithSkipped();
           }
