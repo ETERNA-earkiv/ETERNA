@@ -39,23 +39,6 @@ services:
       - siegfried_data:/root/siegfried/
       - roda_data:/roda/data/
 
-  swagger:
-    image: docker.io/swaggerapi/swagger-ui:v5.13.0
-    restart: on-failure
-    ports:
-      - "8081:8080"
-    environment:
-      - URL=http://localhost:8080/api/openapi.json
-      - DOC_EXPANSION=none
-      - VALIDATOR_URL=none
-
-  mailpit:
-    image: axllent/mailpit:v1.24
-    restart: unless-stopped
-    ports:
-      - "1025:1025" # smtp server
-      - "8025:8025" # web ui
-
   openldap:
     image: docker.io/bitnamilegacy/openldap:2.6
     restart: unless-stopped
