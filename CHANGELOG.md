@@ -1,8 +1,125 @@
 # ETERNA Changelog
 
 ## v1.0.0-SNAPSHOT
-#### WIP
-- Restored PDF redactor compatibility by realigning the integration with [`eterna-pdf-redactor@v1.0.1`](https://github.com/ETERNA-earkiv/eterna-pdf-redactor). [#142](https://github.com/ETERNA-earkiv/ETERNA/issues/142)
+
+#### New features
+- Added XSLT viewer for XML files with auto-discovery of co-located stylesheets, multi-stylesheet dropdown, and toggle to view raw XML [#468](https://github.com/ETERNA-earkiv/ETERNA/pull/468)
+- Added web archive (WARC/WACZ) viewer using ReplayWeb.page v2.4.4 [#225](https://github.com/ETERNA-earkiv/ETERNA/pull/225)
+- Added TIFF file preview with canvas-based rendering and multi-page navigation [#312](https://github.com/ETERNA-earkiv/ETERNA/pull/312)
+- Added collapsible catalog tree drawer with level icons and clickable header [#306](https://github.com/ETERNA-earkiv/ETERNA/pull/306) [#430](https://github.com/ETERNA-earkiv/ETERNA/pull/430)
+- Added ghost-node fallback in catalog tree for users without root-level permissions [#516](https://github.com/ETERNA-earkiv/ETERNA/pull/516)
+- Added resizable columns to all GWT tables via drag handles [#266](https://github.com/ETERNA-earkiv/ETERNA/pull/266)
+- Added configurable main menu item visibility via `roda-wui.properties` [#356](https://github.com/ETERNA-earkiv/ETERNA/pull/356)
+- Added collapsible info-icon description panels on all main pages [#353](https://github.com/ETERNA-earkiv/ETERNA/pull/353)
+- Added full job scheduling system: recurring cron and one-shot archive maintenance jobs, `SCHEDULED` template jobs, `JobSchedulerTask` polling every 60 s, new REST endpoints `POST/DELETE /api/v2/jobs/{id}/schedule` [#257](https://github.com/ETERNA-earkiv/ETERNA/pull/257)
+- Added HumanizeDateCell respecting `ui.dateTime.format.UTC` configuration in all list views [#581](https://github.com/ETERNA-earkiv/ETERNA/pull/581)
+- Added configurable trash support (`core.storage.filesystem.trash.enabled`) in FileStorageService and ScatteredFileStorageService [#573](https://github.com/ETERNA-earkiv/ETERNA/pull/573)
+- Added COOP/COEP headers for cross-origin isolation [#539](https://github.com/ETERNA-earkiv/ETERNA/pull/539)
+- Added Swedish localization for cron-expression-descriptor [#574](https://github.com/ETERNA-earkiv/ETERNA/pull/574)
+- Added audit log entries on AIP view and XSLT request context in audit trail [#468](https://github.com/ETERNA-earkiv/ETERNA/pull/468)
+- Added query routing from welcome page search bar to catalogue [#351](https://github.com/ETERNA-earkiv/ETERNA/pull/351)
+- Added welcome page quick-actions configurable via `roda-wui.properties`, time-based greeting, and forum integration (Flarum API proxy showing latest threads) [#320](https://github.com/ETERNA-earkiv/ETERNA/pull/320)
+- Added configurable CSV export and expanded the export module to support all entity types: RepresentationInformation, User/Groups, Ingest, and remaining types [#315](https://github.com/ETERNA-earkiv/ETERNA/pull/315) [#575](https://github.com/ETERNA-earkiv/ETERNA/pull/575)
+- Added infrastructure support for office document conversion via unoserver (LibreOffice/unoconvert); includes dedicated `unoserver` Docker image and client installation in main image [#309](https://github.com/ETERNA-earkiv/ETERNA/pull/309)
+- Added Swedish translations for set password screen [#536](https://github.com/ETERNA-earkiv/ETERNA/pull/536) and email templates [#583](https://github.com/ETERNA-earkiv/ETERNA/pull/583)
+- Added plugin names, descriptions, and parameter labels translated to Swedish for all ingest, preservation, and support plugins [#311](https://github.com/ETERNA-earkiv/ETERNA/pull/311) [#314](https://github.com/ETERNA-earkiv/ETERNA/pull/314)
+- Updated PDF redactor integration to `se.whitered.eterna:pdf-redactor` 1.1.0 with async save callbacks, user-defined version suffix (empty → timestamp), and mandatory redaction reason at save time (configurable via `ui.redaction.reason.mandatory`) [#238](https://github.com/ETERNA-earkiv/ETERNA/pull/238) [#319](https://github.com/ETERNA-earkiv/ETERNA/pull/319) [#321](https://github.com/ETERNA-earkiv/ETERNA/pull/321)
+
+#### Improvements
+- Replaced embedded ApacheDS with external OpenLDAP server via Spring LDAP integration
+- Migrated all remaining GWT-RPC interface methods to REST API v2; removed GWT-RPC layer
+- Catalog tree now refreshes automatically after AIP create, delete, move, and metadata updates, including node title sync
+- Catalog tree auto-collapses at narrow viewports; fixed double scrollbars and separated tree/content scroll [#434](https://github.com/ETERNA-earkiv/ETERNA/pull/434) [#578](https://github.com/ETERNA-earkiv/ETERNA/pull/578)
+- Statistics page AJAX calls are now context-path aware; chart title and layout issues resolved; removed reporting services panel [#547](https://github.com/ETERNA-earkiv/ETERNA/pull/547)
+- Date/time formatting centralised through Humanize; disposal confirmation reports respect UTC configuration
+- CSV export now uses UTF-8 BOM for correct Excel rendering of Swedish characters, with Swedish column headers and date formatting
+- Scheduler hardened against race conditions; firing serialised per job ID; day-name expressions used for weekly schedules
+- PREMIS user agent always re-indexed in Solr on create/update and on CAS login [#422](https://github.com/ETERNA-earkiv/ETERNA/pull/422)
+- Representation file statistics updated atomically on file creation and deletion [#422](https://github.com/ETERNA-earkiv/ETERNA/pull/422)
+- Permissions UI improved with grouped permissions, reusable panel layout, and select-all support [#213](https://github.com/ETERNA-earkiv/ETERNA/pull/213)
+- Cache-Control headers added for static resources; StaticCacheFilter updated [#460](https://github.com/ETERNA-earkiv/ETERNA/pull/460)
+- Favicon updated to WhiteRed logo
+- Default ingest pipeline set as the pre-selected option on the ingest page
+- RODATransactionManager disabled for large-scale ingest jobs (legacy storage mode); individual AIP failures are handled at plugin/job level instead of rolling back the entire batch [#290](https://github.com/ETERNA-earkiv/ETERNA/pull/290)
+- External links in HTML widgets now open in a new tab with `rel="noopener noreferrer"` [#259](https://github.com/ETERNA-earkiv/ETERNA/pull/259)
+- Branding updated: user-visible RODA references replaced with ETERNA in English and Swedish i18n files (UI strings, email subjects, CAS/Drop Folder texts, log facets), OpenAPI config, and license headers [#297](https://github.com/ETERNA-earkiv/ETERNA/pull/297) [#341](https://github.com/ETERNA-earkiv/ETERNA/pull/341) [#342](https://github.com/ETERNA-earkiv/ETERNA/pull/342)
+
+#### Swedish terminology updates
+- "Katalog" → "Arkivbestånd" throughout UI, HTML templates, and documentation [#439](https://github.com/ETERNA-earkiv/ETERNA/issues/439)
+- "Logisk enhet" / "Förvaringsenhet" → "Strukturenhet" for intellectual entities/AIPs [#437](https://github.com/ETERNA-earkiv/ETERNA/issues/437) [#572](https://github.com/ETERNA-earkiv/ETERNA/pull/572)
+- "Undernivå" → "Strukturenhet" [#436](https://github.com/ETERNA-earkiv/ETERNA/issues/436)
+- "Ankomstkontroll" → "Leveranskontroll" [#443](https://github.com/ETERNA-earkiv/ETERNA/issues/443)
+- "Bevara permanent" → "Bevara" in disposal schedule [#406](https://github.com/ETERNA-earkiv/ETERNA/issues/406)
+
+#### Bug fixes
+- Fixed destroyed AIPs appearing in catalog tree [#560](https://github.com/ETERNA-earkiv/ETERNA/pull/560)
+- Fixed catalog tree not updating after AIP deletion [#470](https://github.com/ETERNA-earkiv/ETERNA/issues/470) [#530](https://github.com/ETERNA-earkiv/ETERNA/pull/530)
+- Fixed ghost nodes showing expand arrow incorrectly; tree state preserved across navigation
+- Fixed Solr commit not being guarded on success; commit errors now propagated correctly [#403](https://github.com/ETERNA-earkiv/ETERNA/issues/403) [#407](https://github.com/ETERNA-earkiv/ETERNA/issues/407)
+- Fixed `transfer.update` permission could not be saved; role was mapped to `transfer.read` in `roda-roles.properties` [#261](https://github.com/ETERNA-earkiv/ETERNA/pull/261)
+- Fixed navigation after removing a representation: user is now redirected to the parent AIP instead of staying on the deleted representation view [#421](https://github.com/ETERNA-earkiv/ETERNA/pull/421)
+- Fixed missing AMDSEC element in UpdateOriginalMETS; element is now added automatically when absent [#248](https://github.com/ETERNA-earkiv/ETERNA/pull/248)
+- Fixed file download endpoint UUID lookup by resolving file UUIDs to their full composite paths [#253](https://github.com/ETERNA-earkiv/ETERNA/pull/253)
+- Fixed retention-period end date handling when the disposal deadline was missing [#459](https://github.com/ETERNA-earkiv/ETERNA/pull/459)
+- Fixed NPE in InternalWebAuthFilter login redirect and various production log NPEs [#541](https://github.com/ETERNA-earkiv/ETERNA/pull/541) [#544](https://github.com/ETERNA-earkiv/ETERNA/pull/544)
+- Fixed Docker startup syntax error in `docker-entrypoint.sh` caused by duplicate `fi`
+- Fixed hardcoded `SPRING_DATASOURCE_URL` in Dockerfile ENV
+- Fixed duplicate user creation showing incorrect error message in Swedish [#387](https://github.com/ETERNA-earkiv/ETERNA/issues/387) [#520](https://github.com/ETERNA-earkiv/ETERNA/pull/520)
+- Fixed XSLT viewer rendering, caching, fallback to native text preview, and permission grants
+- Fixed CSV export field name trimming, section headers, and export dialog placement
+- Fixed Swedish i18n: date range search fields [#393](https://github.com/ETERNA-earkiv/ETERNA/issues/393), package label in ingest context [#442](https://github.com/ETERNA-earkiv/ETERNA/issues/442), sub-levels label [#435](https://github.com/ETERNA-earkiv/ETERNA/issues/435), catalog tree search field label [#398](https://github.com/ETERNA-earkiv/ETERNA/issues/398)
+- Fixed additional Swedish i18n labels for disposal classes, disposal confirmations/catalog tree, edit permissions, representation cards, and log reason/loading messages [#587](https://github.com/ETERNA-earkiv/ETERNA/pull/587) [#577](https://github.com/ETERNA-earkiv/ETERNA/pull/577) [#524](https://github.com/ETERNA-earkiv/ETERNA/pull/524) [#523](https://github.com/ETERNA-earkiv/ETERNA/pull/523) [#411](https://github.com/ETERNA-earkiv/ETERNA/issues/411) [#412](https://github.com/ETERNA-earkiv/ETERNA/issues/412)
+- Fixed ReplayWeb.page URL encoding, service worker scope, and iframe accessibility [#539](https://github.com/ETERNA-earkiv/ETERNA/pull/539)
+- Fixed representations card layout and full-area click handling [#531](https://github.com/ETERNA-earkiv/ETERNA/issues/531) [#532](https://github.com/ETERNA-earkiv/ETERNA/pull/532)
+- Fixed UI table overflow in job list and disposal confirmations layout [#582](https://github.com/ETERNA-earkiv/ETERNA/pull/582)
+- Fixed highlight.js dark theme applied incorrectly; switched to light (github) theme
+- Fixed statistics API calls migrated from v1 to v2 endpoints [#547](https://github.com/ETERNA-earkiv/ETERNA/pull/547)
+- Fixed WhiteRed support portal URL [#473](https://github.com/ETERNA-earkiv/ETERNA/pull/473)
+
+#### Configuration changes
+
+**`roda-core.properties`**
+- **LDAP** — removed ApacheDS-specific settings (`core.ldap.backend`, `core.ldap.cacheSize`, `core.ldap.startServer`, `core.ldap.passwordDigestAlgorithm`); connection now configured via `core.ldap.url` and `core.ldap.port` pointing to an external OpenLDAP server (environment variable substitution: `${env:LDAP_SERVER_URL}`, `${env:LDAP_SERVER_PORT}`)
+- **Orchestrator** — previously commented-out defaults are now active: `core.orchestrator.max_jobs_in_parallel=8`, `max_limited_jobs_in_parallel=2`, `nr_of_jobs_workers=8`, `nr_of_limited_jobs_workers=2`, `block_size=100`
+- **Storage** — added `core.storage.filesystem.trash.enabled` (commented out, default `true`) and inline documentation for ScatteredFileStorageService folder-scattering configuration
+- **Email** — `core.email.from`/`user` now uncommented; default protocol changed from `smtps` to `smtp`, default host/port changed to `127.0.0.1:1025` (Mailhog/dev); deploy config reads from `${env:SMTP_HOST}` / `${env:SMTP_PORT}`
+- **Storage legacy mode** — added `core.storage.legacy.implementation.enabled=true` to keep large ingest jobs outside `RODATransactionManager` rollback semantics
+- **External authentication/security** — added CAS plugin defaults, commented CAS group-mapping settings (`core.authorization.external.*`), and commented external security plugin examples (`core.plugins.external.security.*`) for CAS/Entra ID
+
+**`roda-wui.properties`**
+- Added `ui.sharedProperties.whitelist.configuration.prefix` entries for `ui.welcome`, `ui.mainmenu`, and `ui.export`
+- Added `ui.sharedProperties.whitelist.configuration.property = ui.redaction.reason.mandatory`
+- Added `ui.filter.security.csp.directives[] = worker-src 'self'` to global CSP
+- Added path-scoped CSP configuration for the ReplayWeb.page WARC/WACZ viewer (`ui.filter.security.csp.replay.*`)
+- Added new role `ui.role: representation.apply_xslt` for XSLT stylesheet application
+- **Renamed** `ui.search.fields.Job.*` → `ui.search.fields.IndexedJob.*` (custom configs referencing the old key must be updated)
+- Added `ui.icons.class.IndexedJob = fa fa-cog`
+- Added `ui.lists.AuditLogs_triggeredLogs.*` search configuration
+
+**`application.properties`** (Spring Boot)
+- Added `spring.servlet.multipart.max-file-size=-1` and `max-request-size=-1` (unlimited upload size)
+- Added `server.forward-headers-strategy=NATIVE` for reverse-proxy header forwarding
+- Added `server.servlet.session.cookie.secure=true` (session cookies require HTTPS by default)
+- Added OpenAPI/Swagger configuration (`springdoc.api-docs.path=/api/v2/openapi`, UI disabled by default)
+- Added PostgreSQL datasource configuration with lazy startup (`spring.datasource.hikari.initialization-fail-timeout=-1`); application starts without a database connection
+- Added `transactions.cleanup.interval.millis=3600000` and `jobs.scheduler.interval.millis=60000`
+- Added Micrometer metrics and Prometheus endpoint exposure (`management.endpoints.web.exposure.include=health,info,metrics,prometheus`)
+
+#### Infrastructure
+- Docker build context corrected from repo root to `docker/` directory
+- CI workflow updated for Docker image build, unoserver image build, and SNAPSHOT artifact publishing
+- Dependencies upgraded: Spring Boot 3.4.10, Spring Core 6.2.11, commons-ip2 2.11.2, ReplayWeb.page 2.4.4, Handlebars 4.4.0, and various security patches
+
+#### Documentation
+- Added admin guide for date/time timezone configuration
+- Added configurable export administration guide
+- Added IDP group authorization administration guide
+- Added PDF redaction user guide
+- Added WARC/WACZ web archive viewer user guide
+- Added XSLT viewer user guide
+- Added Swedish "Common Terms" (Vanliga begrepp) glossary page
+- Updated Swedish overview, FAQ, and pre-ingest documentation (PAIMAS-based delivery process)
+- Updated help index with links to new guides
 
 
 ## v0.5.0 (2025-12-16)
