@@ -132,8 +132,8 @@
         <cas.client.version>4.0.4</cas.client.version>
         <swagger.version>2.2.34</swagger.version>
         <jackson.version>2.19.1</jackson.version>
-        <spring.version>6.2.11</spring.version>
-        <solr.version>9.8.1</solr.version>
+        <spring.version>6.2.18</spring.version>
+        <solr.version>9.10.1</solr.version>
         <pekko.version>1.1.4</pekko.version>
         <httpcomponents.version>5.5</httpcomponents.version>
         <commons_ip2.version>2.10.0</commons_ip2.version>
@@ -142,7 +142,7 @@
         <testng.groups>all</testng.groups>
         <springboot.version>3.4.10</springboot.version>
         <scope.gwt-dev>provided</scope.gwt-dev>
-        <logback.version>1.5.18</logback.version>
+        <logback.version>1.5.25</logback.version>
     </properties>
     <profiles>
         <profile>
@@ -363,7 +363,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.22.2</version>
+                    <version>3.2.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -485,6 +485,18 @@
                 <artifactId>jetty-alpn-java-client</artifactId>
                 <version>10.0.19</version>
             </dependency>
+            <!-- Override commons-beanutils to fix GHSA-wxr5-93ph-8wr9 -->
+            <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>1.11.0</version>
+            </dependency>
+            <!-- Override protobuf-java to fix GHSA-wrvw-hg22-4m67, GHSA-h4h5-3hr4-j3g2, GHSA-735f-pc8j-v9w8 -->
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>3.25.5</version>
+            </dependency>
             <dependency>
                 <groupId>jakarta.xml.bind</groupId>
                 <artifactId>jakarta.xml.bind-api</artifactId>
@@ -494,6 +506,36 @@
                 <groupId>org.glassfish.jaxb</groupId>
                 <artifactId>jaxb-runtime</artifactId>
                 <version>4.0.5</version>
+            </dependency>
+            <!-- Override Spring Framework before Spring Boot BOM -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-framework-bom</artifactId>
+                <version>6.2.18</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- Override Tomcat before Spring Boot BOM (first-wins rule) -->
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-core</artifactId>
+                <version>10.1.55</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-el</artifactId>
+                <version>10.1.55</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-websocket</artifactId>
+                <version>10.1.55</version>
+            </dependency>
+            <!-- Override PostgreSQL before Spring Boot BOM -->
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>42.7.11</version>
             </dependency>
             <dependency>
                 <!-- Import dependency management from Spring Boot -->
@@ -608,7 +650,7 @@
             <dependency>
                 <groupId>org.eclipse.angus</groupId>
                 <artifactId>angus-mail</artifactId>
-                <version>2.0.3</version>
+                <version>2.0.4</version>
             </dependency>
             <dependency>
                 <groupId>javax.transaction</groupId>
@@ -960,7 +1002,12 @@
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk18on</artifactId>
-                <version>1.80</version>
+                <version>1.84</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk18on</artifactId>
+                <version>1.84</version>
             </dependency>
             <!-- mguimaraes: 2022-12-15 -->
             <!-- Forcing transitive dependencies upgrade due to vulnerabilities -->
@@ -989,6 +1036,72 @@
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
                 <version>2.11.0</version>
+            </dependency>
+            <!-- Security: fix xalan GHSA-9339-86wc-4qgf (High, RISK 8.2) -->
+            <dependency>
+                <groupId>xalan</groupId>
+                <artifactId>xalan</artifactId>
+                <version>2.7.3</version>
+            </dependency>
+            <!-- Security: fix commons-net GHSA-cgp8-4m63-fhh5 -->
+            <dependency>
+                <groupId>commons-net</groupId>
+                <artifactId>commons-net</artifactId>
+                <version>3.9.0</version>
+            </dependency>
+            <!-- Security: fix nimbus-jose-jwt GHSA-xwmg-2g98-w7v9 -->
+            <dependency>
+                <groupId>com.nimbusds</groupId>
+                <artifactId>nimbus-jose-jwt</artifactId>
+                <version>9.37.4</version>
+            </dependency>
+            <!-- Security: fix jetty 9.x CVEs (GHSA-qw69-rqj8-6qw8 RISK 18.9, GHSA-q4rv-gq96-w7c5, GHSA-3gh6-v5v9-6v9j, GHSA-j26w-f9rq-mr2q, GHSA-p26g-97m4-6q7c, GHSA-58qw-p7qm-5rvh) -->
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-server</artifactId>
+                <version>9.4.57.v20241219</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-servlets</artifactId>
+                <version>9.4.57.v20241219</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-xml</artifactId>
+                <version>9.4.57.v20241219</version>
+            </dependency>
+            <!-- Security: fix zookeeper CVEs GHSA-7xrh-hqfc-g7qr, GHSA-crhr-qqj8-rpxc (High) -->
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper</artifactId>
+                <version>3.9.5</version>
+            </dependency>
+            <!-- Security: fix netty-codec GHSA-mj4r-2hfc-f8p6 (High) -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-codec</artifactId>
+                <version>4.1.133.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-handler</artifactId>
+                <version>4.1.133.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-transport</artifactId>
+                <version>4.1.133.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-common</artifactId>
+                <version>4.1.133.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-buffer</artifactId>
+                <version>4.1.133.Final</version>
             </dependency>
             <dependency>
                 <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
