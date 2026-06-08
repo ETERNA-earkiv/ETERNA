@@ -14,6 +14,7 @@ import java.util.MissingResourceException;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.disposal.rule.DisposalRuleCondition;
+import org.roda.core.data.v2.disposal.rule.DisposalRuleConditionOperator;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.StringUtils;
@@ -119,20 +120,23 @@ public class MetadataFieldsPanel extends Composite implements HasValueChangeHand
     ConditionRow row = new ConditionRow(condition);
     rows.add(row);
     conditionsPanel.add(row.panel);
-    updateRemoveButtons();
+    updateRowChrome();
   }
 
   private void removeRow(ConditionRow row) {
     rows.remove(row);
     conditionsPanel.remove(row.panel);
-    updateRemoveButtons();
+    updateRowChrome();
     onChange();
   }
 
-  private void updateRemoveButtons() {
+  private void updateRowChrome() {
     boolean canRemove = rows.size() > 1;
-    for (ConditionRow row : rows) {
+    for (int i = 0; i < rows.size(); i++) {
+      ConditionRow row = rows.get(i);
       row.removeButton.setVisible(canRemove);
+      // The AND/OR connective joins a row to the previous one, so it only makes sense from the second row onwards.
+      row.connectiveWrapper.setVisible(i > 0);
     }
   }
 
@@ -179,8 +183,12 @@ public class MetadataFieldsPanel extends Composite implements HasValueChangeHand
 
   public List<DisposalRuleCondition> getValue() {
     List<DisposalRuleCondition> conditions = new ArrayList<>();
-    for (ConditionRow row : rows) {
-      conditions.add(new DisposalRuleCondition(row.fieldsList.getSelectedValue(), row.valueBox.getText()));
+    for (int i = 0; i < rows.size(); i++) {
+      ConditionRow row = rows.get(i);
+      // The first condition has no preceding operator; default it to AND.
+      DisposalRuleConditionOperator operator = i == 0 ? DisposalRuleConditionOperator.AND
+        : DisposalRuleConditionOperator.valueOf(row.connectiveList.getSelectedValue());
+      conditions.add(new DisposalRuleCondition(row.fieldsList.getSelectedValue(), row.valueBox.getText(), operator));
     }
     return conditions;
   }
@@ -193,6 +201,8 @@ public class MetadataFieldsPanel extends Composite implements HasValueChangeHand
    */
   private class ConditionRow {
     private final FlowPanel panel = new FlowPanel();
+    private final FlowPanel connectiveWrapper = new FlowPanel();
+    private final ListBox connectiveList = new ListBox();
     private final ListBox fieldsList = new ListBox();
     private final TextBox valueBox = new TextBox();
     private final Button removeButton = new Button();
@@ -200,6 +210,17 @@ public class MetadataFieldsPanel extends Composite implements HasValueChangeHand
     private ConditionRow(DisposalRuleCondition condition) {
       panel.getElement().getStyle().setProperty("display", "flex");
       panel.getElement().getStyle().setProperty("marginBottom", "4px");
+
+      // AND/OR connective to the previous row (only shown from the second row onwards; see updateRowChrome).
+      connectiveWrapper.addStyleName("col_1");
+      connectiveList.addStyleName("form-textbox");
+      connectiveList.addItem(messages.disposalRuleConditionAnd(), DisposalRuleConditionOperator.AND.name());
+      connectiveList.addItem(messages.disposalRuleConditionOr(), DisposalRuleConditionOperator.OR.name());
+      if (condition != null && DisposalRuleConditionOperator.OR.equals(condition.getOperator())) {
+        connectiveList.setSelectedIndex(1);
+      }
+      connectiveList.addChangeHandler(event -> onChange());
+      connectiveWrapper.add(connectiveList);
 
       FlowPanel fieldWrapper = new FlowPanel();
       fieldWrapper.addStyleName("col_2");
@@ -225,6 +246,7 @@ public class MetadataFieldsPanel extends Composite implements HasValueChangeHand
       removeButton.addClickHandler(event -> removeRow(this));
       removeWrapper.add(removeButton);
 
+      panel.add(connectiveWrapper);
       panel.add(fieldWrapper);
       panel.add(operatorWrapper);
       panel.add(valueWrapper);

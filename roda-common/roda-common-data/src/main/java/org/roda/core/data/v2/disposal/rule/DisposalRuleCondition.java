@@ -25,6 +25,9 @@ public class DisposalRuleCondition implements Serializable {
 
   private String key;
   private String value;
+  // The operator joining this condition to the previous one (ignored for the first condition). Defaults to AND so that
+  // rules stored before per-condition operators were introduced keep behaving as an all-conditions-must-match (AND).
+  private DisposalRuleConditionOperator operator = DisposalRuleConditionOperator.AND;
 
   public DisposalRuleCondition() {
     super();
@@ -33,6 +36,12 @@ public class DisposalRuleCondition implements Serializable {
   public DisposalRuleCondition(String key, String value) {
     this.key = key;
     this.value = value;
+  }
+
+  public DisposalRuleCondition(String key, String value, DisposalRuleConditionOperator operator) {
+    this.key = key;
+    this.value = value;
+    this.operator = operator;
   }
 
   public String getKey() {
@@ -51,6 +60,14 @@ public class DisposalRuleCondition implements Serializable {
     this.value = value;
   }
 
+  public DisposalRuleConditionOperator getOperator() {
+    return operator;
+  }
+
+  public void setOperator(DisposalRuleConditionOperator operator) {
+    this.operator = operator;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -60,16 +77,16 @@ public class DisposalRuleCondition implements Serializable {
       return false;
     }
     DisposalRuleCondition that = (DisposalRuleCondition) o;
-    return Objects.equals(key, that.key) && Objects.equals(value, that.value);
+    return Objects.equals(key, that.key) && Objects.equals(value, that.value) && operator == that.operator;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(key, value);
+    return Objects.hash(key, value, operator);
   }
 
   @Override
   public String toString() {
-    return "DisposalRuleCondition{key='" + key + '\'' + ", value='" + value + '\'' + '}';
+    return "DisposalRuleCondition{key='" + key + '\'' + ", value='" + value + '\'' + ", operator=" + operator + '}';
   }
 }

@@ -28,6 +28,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.disposal.rule.ConditionType;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.rule.DisposalRuleCondition;
+import org.roda.core.data.v2.disposal.rule.DisposalRuleConditionOperator;
 import org.roda.core.data.v2.disposal.schedule.DisposalActionCode;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.disposal.schedule.RetentionPeriodIntervalCode;
@@ -224,6 +225,29 @@ public class ApplyDisposalRulesPluginTest {
     AIP notMatched = model.retrieveAIP(partialAipId);
     assertNull("Second condition does not match, so no schedule should be associated",
       notMatched.getDisposal() == null ? null : notMatched.getDisposal().getSchedule());
+  }
+
+  /** OR-joined conditions: the schedule is associated when ANY condition matches. */
+  @Test
+  public void appliesOrConditionWhenAnyConditionMatches() throws Exception {
+    final DisposalSchedule schedule = createDestroySchedule();
+
+    // title does NOT match, but description does -> OR means the rule still matches AIP_1.
+    final DisposalRule rule = new DisposalRule();
+    rule.setTitle("title=missing OR description=nice");
+    rule.setType(ConditionType.METADATA_FIELD);
+    rule.setConditions(Arrays.asList(new DisposalRuleCondition(RodaConstants.AIP_TITLE, "thisdoesnotmatchanything"),
+      new DisposalRuleCondition(RodaConstants.AIP_DESCRIPTION, "nice", DisposalRuleConditionOperator.OR)));
+    rule.setDisposalScheduleId(schedule.getId());
+    rule.setDisposalScheduleName(schedule.getTitle());
+    rule.setOrder(0);
+    model.createDisposalRule(rule, RodaConstants.ADMIN);
+
+    final String aipId = createIndexedCorpusAIP();
+    runApplyRules(aipId);
+    AIP updated = model.retrieveAIP(aipId);
+    assertNotNull("OR rule must match because one condition matches", updated.getDisposal());
+    assertEquals(schedule.getId(), updated.getDisposal().getSchedule().getId());
   }
 
   /** The blacklist matches the config key (reference), not the resolved Solr field (unitId_txt), exactly as the UI. */

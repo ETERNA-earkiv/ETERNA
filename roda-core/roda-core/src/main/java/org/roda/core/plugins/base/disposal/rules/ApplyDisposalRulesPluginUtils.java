@@ -20,6 +20,7 @@ import org.roda.core.data.v2.disposal.metadata.DisposalScheduleAIPMetadata;
 import org.roda.core.data.v2.disposal.rule.ConditionType;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.rule.DisposalRuleCondition;
+import org.roda.core.data.v2.disposal.rule.DisposalRuleConditions;
 import org.roda.core.data.v2.disposal.rule.DisposalRules;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -89,20 +90,20 @@ public class ApplyDisposalRulesPluginUtils {
       return Optional.empty();
     }
 
-    // Match exactly like the preview (DisposalRuleDataPanel#refreshPreviewAIPList): a Solr filter scoped to this AIP
-    // (AIP_STATE=ACTIVE) plus one filter parameter per condition. Solr ANDs the parameters, so all conditions must
-    // hold — that is how "field A AND field B" rules are enforced.
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, aip.getId()),
-      new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name()));
+    // Skip incomplete/unsafe rules: a blank value would NPE in SolrUtils, and a non-whitelisted key is written raw
+    // into the Solr query (appendExactMatch does not escape the field name). The whitelist is shared with the API.
     for (DisposalRuleCondition condition : conditions) {
-      // Skip incomplete/unsafe rules: a blank value would NPE in SolrUtils, and a non-whitelisted key is written raw
-      // into the Solr query (appendExactMatch does not escape the field name). The whitelist is shared with the API.
       if (StringUtils.isBlank(condition.getKey()) || StringUtils.isBlank(condition.getValue())
         || !allowedConditionFields.contains(condition.getKey())) {
         return Optional.empty();
       }
-      filter.add(new SimpleFilterParameter(condition.getKey(), condition.getValue()));
     }
+
+    // Match exactly like the preview (DisposalRuleDataPanel#refreshPreviewAIPList): a Solr filter scoped to this AIP
+    // (AIP_STATE=ACTIVE) plus the conditions folded with their per-condition AND/OR operators (shared helper).
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, aip.getId()),
+      new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name()));
+    filter.add(DisposalRuleConditions.toFilterParameter(conditions));
 
     try {
       if (index.count(IndexedAIP.class, filter) > 0) {

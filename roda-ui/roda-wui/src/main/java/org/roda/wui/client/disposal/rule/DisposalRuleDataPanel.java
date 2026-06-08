@@ -16,6 +16,7 @@ import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.disposal.rule.ConditionType;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.rule.DisposalRuleCondition;
+import org.roda.core.data.v2.disposal.rule.DisposalRuleConditions;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.disposal.schedule.DisposalScheduleState;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
@@ -180,12 +181,10 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
   }
 
   private void refreshPreviewAIPList(final List<DisposalRuleCondition> conditions) {
-    // One filter parameter per condition; Solr ANDs them, so the preview shows exactly the AIPs that match all
-    // conditions — the same filter the apply job builds.
+    // Conditions folded with their per-condition AND/OR operators (shared helper) — the exact filter the apply job
+    // builds, so the preview shows precisely the AIPs that will be matched.
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name()));
-    for (DisposalRuleCondition condition : conditions) {
-      filter.add(new SimpleFilterParameter(condition.getKey(), condition.getValue()));
-    }
+    filter.add(DisposalRuleConditions.toFilterParameter(conditions));
     showPreview(filter);
   }
 

@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.rule.DisposalRuleCondition;
+import org.roda.core.data.v2.disposal.rule.DisposalRuleConditionOperator;
 
 import com.google.gwt.core.client.GWT;
 
@@ -31,10 +32,13 @@ public final class DisposalRuleConditionFormatter {
     StringBuilder builder = new StringBuilder();
     List<DisposalRuleCondition> conditions = rule.getMetadataConditions();
     for (int i = 0; i < conditions.size(); i++) {
-      if (i > 0) {
-        builder.append(' ').append(messages.disposalRuleConditionConjunction()).append(' ');
-      }
       DisposalRuleCondition condition = conditions.get(i);
+      if (i > 0) {
+        String connective = DisposalRuleConditionOperator.OR.equals(condition.getOperator())
+          ? messages.disposalRuleConditionOr()
+          : messages.disposalRuleConditionAnd();
+        builder.append(' ').append(connective).append(' ');
+      }
       builder.append(condition.getKey()).append(' ').append(messages.disposalRuleConditionOperator()).append(' ')
         .append(condition.getValue());
     }
