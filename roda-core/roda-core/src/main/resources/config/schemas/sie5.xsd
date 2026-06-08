@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:sie="http://www.sie.se/sie5"
+           targetNamespace="http://www.sie.se/sie5"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+
+  <xs:element name="SIE">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="FileInfo" type="sie:FileInfoType"/>
+        <xs:element name="Company" type="sie:CompanyType"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="FileInfoType">
+    <xs:sequence>
+      <xs:element name="SoftwareProduct" type="sie:SoftwareProductType"/>
+      <xs:element name="FileCreation" type="sie:FileCreationType"/>
+      <xs:element name="CompanyTypeInfo" type="sie:CompanyTypeInfoType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="SoftwareProductType">
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="version" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="FileCreationType">
+    <xs:attribute name="time" type="xs:string" use="required"/>
+    <xs:attribute name="by" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="CompanyTypeInfoType">
+    <xs:attribute name="type" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="CompanyType">
+    <xs:sequence>
+      <xs:element name="FiscalYears" type="sie:FiscalYearsType" minOccurs="0"/>
+      <xs:element name="AccountingPlan" type="sie:AccountingPlanType" minOccurs="0"/>
+      <xs:element name="GeneralSubdivisionAccountGroup" type="sie:GeneralSubdivisionAccountGroupType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="GeneralLedger" type="sie:GeneralLedgerType" minOccurs="0"/>
+      <xs:element name="ClosingBalances" type="sie:ClosingBalancesType" minOccurs="0"/>
+      <xs:element name="OpeningBalances" type="sie:OpeningBalancesType" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="clientId" type="xs:string"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="FiscalYearsType">
+    <xs:sequence>
+      <xs:element name="FiscalYear" type="sie:FiscalYearType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="FiscalYearType">
+    <xs:attribute name="id" type="xs:string" use="required"/>
+    <xs:attribute name="start" type="xs:string" use="required"/>
+    <xs:attribute name="end" type="xs:string" use="required"/>
+    <xs:attribute name="primaryYear" type="xs:boolean"/>
+  </xs:complexType>
+
+  <xs:complexType name="AccountingPlanType">
+    <xs:sequence>
+      <xs:element name="Account" type="sie:AccountType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="type" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="AccountType">
+    <xs:attribute name="id" type="xs:string" use="required"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="type" type="xs:string"/>
+    <xs:attribute name="unit" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="GeneralSubdivisionAccountGroupType">
+    <xs:sequence>
+      <xs:element name="AccountGroup" type="sie:AccountGroupType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="type" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="AccountGroupType">
+    <xs:attribute name="id" type="xs:string" use="required"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="GeneralLedgerType">
+    <xs:sequence>
+      <xs:element name="Journal" type="sie:JournalType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="JournalType">
+    <xs:sequence>
+      <xs:element name="JournalEntry" type="sie:JournalEntryType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required"/>
+    <xs:attribute name="name" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="JournalEntryType">
+    <xs:sequence>
+      <xs:element name="LedgerEntry" type="sie:LedgerEntryType" minOccurs="2" maxOccurs="unbounded"/>
+      <xs:element name="OriginalEntryInfo" type="sie:OriginalEntryInfoType" minOccurs="0"/>
+      <xs:element name="VoucherReference" type="sie:VoucherReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required"/>
+    <xs:attribute name="journalDate" type="xs:string" use="required"/>
+    <xs:attribute name="text" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="LedgerEntryType">
+    <xs:attribute name="accountId" type="xs:string" use="required"/>
+    <xs:attribute name="amount" type="xs:decimal" use="required"/>
+    <xs:attribute name="quantity" type="xs:decimal"/>
+    <xs:attribute name="baseQuantity" type="xs:decimal"/>
+  </xs:complexType>
+
+  <xs:complexType name="OriginalEntryInfoType">
+    <xs:attribute name="by" type="xs:string"/>
+    <xs:attribute name="date" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="VoucherReferenceType">
+    <xs:attribute name="type" type="xs:string"/>
+    <xs:attribute name="id" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="ClosingBalancesType">
+    <xs:sequence>
+      <xs:element name="ClosingBalance" type="sie:BalanceType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="OpeningBalancesType">
+    <xs:sequence>
+      <xs:element name="OpeningBalance" type="sie:BalanceType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="BalanceType">
+    <xs:attribute name="accountId" type="xs:string" use="required"/>
+    <xs:attribute name="month" type="xs:string"/>
+    <xs:attribute name="amount" type="xs:decimal" use="required"/>
+    <xs:attribute name="quantity" type="xs:decimal"/>
+  </xs:complexType>
+
+</xs:schema>
