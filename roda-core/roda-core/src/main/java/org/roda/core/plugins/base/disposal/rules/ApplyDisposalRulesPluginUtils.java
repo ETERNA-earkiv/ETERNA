@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.base.disposal.rules;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -18,6 +19,7 @@ import org.roda.core.data.v2.disposal.metadata.DisposalAIPMetadata;
 import org.roda.core.data.v2.disposal.metadata.DisposalScheduleAIPMetadata;
 import org.roda.core.data.v2.disposal.rule.ConditionType;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.rule.DisposalRuleCondition;
 import org.roda.core.data.v2.disposal.rule.DisposalRules;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -82,18 +84,25 @@ public class ApplyDisposalRulesPluginUtils {
   private static Optional<DisposalRule> conditionTypeMetadataValue(AIP aip, DisposalRule rule, IndexService index,
     Set<String> allowedConditionFields) throws GenericException {
 
-    // Skip incomplete/unsafe rules: a blank value would NPE in SolrUtils, and a non-whitelisted key is written raw
-    // into the Solr query (appendExactMatch does not escape the field name). The whitelist is shared with the API.
-    if (StringUtils.isBlank(rule.getConditionKey()) || StringUtils.isBlank(rule.getConditionValue())
-      || !allowedConditionFields.contains(rule.getConditionKey())) {
+    List<DisposalRuleCondition> conditions = rule.getMetadataConditions();
+    if (conditions.isEmpty()) {
       return Optional.empty();
     }
 
-    // Match exactly like the preview (DisposalRuleDataPanel#refreshPreviewAIPList): a Solr filter on the condition
-    // field plus AIP_STATE=ACTIVE, scoped to this AIP — so apply associates the same AIPs the preview shows.
+    // Match exactly like the preview (DisposalRuleDataPanel#refreshPreviewAIPList): a Solr filter scoped to this AIP
+    // (AIP_STATE=ACTIVE) plus one filter parameter per condition. Solr ANDs the parameters, so all conditions must
+    // hold — that is how "field A AND field B" rules are enforced.
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, aip.getId()),
-      new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name()),
-      new SimpleFilterParameter(rule.getConditionKey(), rule.getConditionValue()));
+      new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name()));
+    for (DisposalRuleCondition condition : conditions) {
+      // Skip incomplete/unsafe rules: a blank value would NPE in SolrUtils, and a non-whitelisted key is written raw
+      // into the Solr query (appendExactMatch does not escape the field name). The whitelist is shared with the API.
+      if (StringUtils.isBlank(condition.getKey()) || StringUtils.isBlank(condition.getValue())
+        || !allowedConditionFields.contains(condition.getKey())) {
+        return Optional.empty();
+      }
+      filter.add(new SimpleFilterParameter(condition.getKey(), condition.getValue()));
+    }
 
     try {
       if (index.count(IndexedAIP.class, filter) > 0) {

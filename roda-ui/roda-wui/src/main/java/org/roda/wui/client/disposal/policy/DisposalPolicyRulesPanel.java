@@ -16,6 +16,7 @@ import org.roda.core.data.v2.disposal.rule.DisposalRules;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
+import org.roda.wui.client.disposal.rule.DisposalRuleConditionFormatter;
 import org.roda.wui.client.disposal.rule.ShowDisposalRule;
 import org.roda.wui.client.services.DisposalRuleRestService;
 import org.roda.wui.client.services.Services;
@@ -145,14 +146,10 @@ public class DisposalPolicyRulesPanel extends Composite {
         new BasicTablePanel.ColumnInfo<>(messages.disposalRuleCondition(), 24, new TextColumn<DisposalRule>() {
           @Override
           public String getValue(DisposalRule rule) {
-            String condition = "";
             if (rule.getType().equals(ConditionType.METADATA_FIELD)) {
-              condition = rule.getConditionKey() + " " + messages.disposalRuleConditionOperator() + " "
-                + rule.getConditionValue();
-            } else {
-              condition = rule.getConditionValue();
+              return DisposalRuleConditionFormatter.describeMetadataConditions(rule);
             }
-            return messages.disposalRuleTypeValue(condition);
+            return messages.disposalRuleTypeValue(rule.getConditionValue());
           }
         }),
 

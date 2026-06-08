@@ -9,7 +9,9 @@ package org.roda.wui.api.v2.services;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.roda.core.common.DisposalRuleConditionFields;
 import org.roda.core.data.common.RodaConstants;
@@ -21,6 +23,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.disposal.rule.ConditionType;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.rule.DisposalRuleCondition;
 import org.roda.core.data.v2.disposal.rule.DisposalRules;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.disposal.schedule.DisposalScheduleState;
@@ -105,17 +108,26 @@ public class DisposalRuleService {
   }
 
   /**
-   * Validates the condition of a {@link ConditionType#METADATA_FIELD} rule. Both key and value must be present, and the
-   * key must be one of the allowed condition fields. The whitelist lives in core
-   * ({@link ApplyDisposalRulesPluginUtils#allowedMetadataConditionFields()}) so the API and the apply job enforce
-   * exactly the same set of fields. This prevents incomplete rules (which would fail the apply job with a null value)
-   * and stops arbitrary, non-whitelisted Solr field names from reaching the query the apply job builds.
+   * Validates the conditions of a {@link ConditionType#METADATA_FIELD} rule. The rule must carry at least one
+   * condition, and every condition's key and value must be present with the key being one of the allowed condition
+   * fields. The whitelist lives in core ({@link DisposalRuleConditionFields#allowedMetadataConditionFields()}) so the
+   * API and the apply job enforce exactly the same set of fields. This prevents incomplete rules (which would fail the
+   * apply job with a null value) and stops arbitrary, non-whitelisted Solr field names from reaching the query the
+   * apply job builds.
    */
   private boolean isMetadataConditionValid(DisposalRule rule) {
-    if (StringUtils.isBlank(rule.getConditionKey()) || StringUtils.isBlank(rule.getConditionValue())) {
+    List<DisposalRuleCondition> conditions = rule.getMetadataConditions();
+    if (conditions.isEmpty()) {
       return false;
     }
-    return DisposalRuleConditionFields.allowedMetadataConditionFields().contains(rule.getConditionKey());
+    Set<String> allowedFields = DisposalRuleConditionFields.allowedMetadataConditionFields();
+    for (DisposalRuleCondition condition : conditions) {
+      if (StringUtils.isBlank(condition.getKey()) || StringUtils.isBlank(condition.getValue())
+        || !allowedFields.contains(condition.getKey())) {
+        return false;
+      }
+    }
+    return true;
   }
 
   private boolean isConditionTypeValid(ConditionType type) {

@@ -16,6 +16,7 @@ import static org.testng.AssertJUnit.assertTrue;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 
@@ -26,6 +27,7 @@ import org.roda.core.common.DisposalRuleConditionFields;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.disposal.rule.ConditionType;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.rule.DisposalRuleCondition;
 import org.roda.core.data.v2.disposal.schedule.DisposalActionCode;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.disposal.schedule.RetentionPeriodIntervalCode;
@@ -183,12 +185,69 @@ public class ApplyDisposalRulesPluginTest {
       updated.getDisposal() == null ? null : updated.getDisposal().getSchedule());
   }
 
+  /** Multi-condition rule: the schedule is associated only when ALL conditions match (title AND description). */
+  @Test
+  public void appliesMultiConditionRuleOnlyWhenAllConditionsMatch() throws Exception {
+    final DisposalSchedule schedule = createDestroySchedule();
+
+    // Both conditions match AIP_1 (title "My example", description "This is a very nice example") -> associated.
+    final DisposalRule matching = new DisposalRule();
+    matching.setTitle("title=example AND description=nice");
+    matching.setType(ConditionType.METADATA_FIELD);
+    matching.setConditions(Arrays.asList(new DisposalRuleCondition(RodaConstants.AIP_TITLE, "example"),
+      new DisposalRuleCondition(RodaConstants.AIP_DESCRIPTION, "nice")));
+    matching.setDisposalScheduleId(schedule.getId());
+    matching.setDisposalScheduleName(schedule.getTitle());
+    matching.setOrder(0);
+    model.createDisposalRule(matching, RodaConstants.ADMIN);
+
+    final String matchingAipId = createIndexedCorpusAIP();
+    runApplyRules(matchingAipId);
+    AIP matched = model.retrieveAIP(matchingAipId);
+    assertNotNull("Both conditions match, so the schedule must be associated", matched.getDisposal());
+    assertEquals(schedule.getId(), matched.getDisposal().getSchedule().getId());
+
+    // Replace with a rule whose second condition does NOT match -> a fresh AIP must not be associated.
+    model.deleteDisposalRule(matching.getId(), RodaConstants.ADMIN);
+    final DisposalRule partial = new DisposalRule();
+    partial.setTitle("title=example AND description=missing");
+    partial.setType(ConditionType.METADATA_FIELD);
+    partial.setConditions(Arrays.asList(new DisposalRuleCondition(RodaConstants.AIP_TITLE, "example"),
+      new DisposalRuleCondition(RodaConstants.AIP_DESCRIPTION, "thisdoesnotmatchanything")));
+    partial.setDisposalScheduleId(schedule.getId());
+    partial.setDisposalScheduleName(schedule.getTitle());
+    partial.setOrder(0);
+    model.createDisposalRule(partial, RodaConstants.ADMIN);
+
+    final String partialAipId = createIndexedCorpusAIP();
+    runApplyRules(partialAipId);
+    AIP notMatched = model.retrieveAIP(partialAipId);
+    assertNull("Second condition does not match, so no schedule should be associated",
+      notMatched.getDisposal() == null ? null : notMatched.getDisposal().getSchedule());
+  }
+
   /** The blacklist matches the config key (reference), not the resolved Solr field (unitId_txt), exactly as the UI. */
   @Test
   public void blacklistAppliesToConfigurationKeyNotSolrField() {
     Set<String> allowed = DisposalRuleConditionFields.allowedMetadataConditionFields();
     assertTrue("A regular text search field must be allowed", allowed.contains("title"));
     assertFalse("The Solr field of a blacklisted configuration key must be excluded", allowed.contains("unitId_txt"));
+  }
+
+  private String createIndexedCorpusAIP() throws Exception {
+    String aipId = IdUtils.createUUID();
+    DefaultStoragePath aipPath = DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER,
+      CorporaConstants.SOURCE_AIP_ID);
+    model.createAIP(aipId, corporaService, aipPath, RodaConstants.ADMIN);
+    index.commitAIPs();
+    return aipId;
+  }
+
+  private void runApplyRules(String aipId) throws Exception {
+    SelectedItemsFilter<IndexedAIP> selectedItems = new SelectedItemsFilter<>(
+      new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, aipId)), IndexedAIP.class.getName(), false);
+    TestsHelper.executeJob(ApplyDisposalRulesPlugin.class, Collections.<String, String> emptyMap(),
+      PluginType.AIP_TO_AIP, selectedItems);
   }
 
   private DisposalSchedule createDestroySchedule() throws Exception {
