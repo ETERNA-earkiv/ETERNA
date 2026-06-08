@@ -11,7 +11,7 @@ The following versions are supported with security updates
 | ------- | ------------------ | ----------------------- | ----------- |
 | 1.0     | 2026-06            |                         |             |
 | 0.6     | 2026-03            | 2027-06                 | 2027-06     |
-| 0.X     | 2025-05            | 2027-06                 | 2027-03     |
+| 0.X     | 2025-05            | 2027-06                 | 2027-06     |
 
 
 Note: After *End of Standard Support* a release will only get security patches.
