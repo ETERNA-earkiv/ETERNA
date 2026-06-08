@@ -41,83 +41,11 @@
     </repositories>
     <developers>
         <developer>
-            <id>filiph-schaaf</id>
-            <name>Filiph Schaaf</name>
-            <email>filiph.schaaf@whitered.se</email>
+            <id>whitered</id>
+            <name>WhiteRed</name>
+            <email>info@whitered.se</email>
             <organization>White Red Consulting AB</organization>
             <organizationUrl>https://www.whitered.se/</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>lfaria</id>
-            <name>Luis Faria</name>
-            <email>lfaria@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>hsilva</id>
-            <name>Helder Silva</name>
-            <email>hsilva@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>mguimaraes</id>
-            <name>Miguel Guimarães</name>
-            <email>mguimaraes@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>gbarros</id>
-            <name>Gabriel Barros</name>
-            <email>gbarros@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>jgomes</id>
-            <name>João Gomes</name>
-            <email>jgomes@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>syusupov</id>
-            <name>Shahzod Yusupov</name>
-            <email>syusupov@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>alindo</id>
-            <name>António Lindo</name>
-            <email>alindo@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>cafonso</id>
-            <name>Carlos Afonso</name>
-            <email>cafonso@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>aflores</id>
-            <name>Alexandre Flores</name>
-            <email>aflores@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
             <timezone>0</timezone>
         </developer>
     </developers>
@@ -131,7 +59,7 @@
         <gwt.version>2.12.2</gwt.version>
         <cas.client.version>4.0.4</cas.client.version>
         <swagger.version>2.2.34</swagger.version>
-        <jackson.version>2.22.0</jackson.version>
+        <jackson.version>2.19.1</jackson.version>
         <spring.version>6.2.18</spring.version>
         <solr.version>9.10.1</solr.version>
         <pekko.version>1.1.4</pekko.version>
@@ -484,6 +412,12 @@
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-alpn-java-client</artifactId>
                 <version>10.0.19</version>
+            </dependency>
+            <!-- Security: fix commons-configuration2 GHSA-337m-mw94-2v6g -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-configuration2</artifactId>
+                <version>2.15.0</version>
             </dependency>
             <!-- Override commons-beanutils to fix GHSA-wxr5-93ph-8wr9 -->
             <dependency>
@@ -1100,7 +1034,7 @@
             <dependency>
                 <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
                 <artifactId>owasp-java-html-sanitizer</artifactId>
-                <version>20240325.1</version>
+                <version>20260101.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
