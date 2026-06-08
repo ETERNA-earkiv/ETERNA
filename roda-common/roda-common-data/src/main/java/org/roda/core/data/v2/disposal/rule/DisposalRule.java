@@ -27,7 +27,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRule> {
 
-  private static final int VERSION = 2;
+  // Stays at 1 on purpose: the new conditions list is an optional, additive field and old rules are read transparently
+  // via getMetadataConditions(), so no stored-data migration is required. Bumping this would trip RODA's model-version
+  // mismatch check (MigrationManager) and abort primary-node startup for an existing installation.
+  private static final int VERSION = 1;
   @Serial
   private static final long serialVersionUID = 6903251340335265336L;
 
@@ -41,8 +44,8 @@ public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRu
   // condition
   // For IS_CHILD_OF: conditionKey holds the parent AIP id (single condition).
   // For METADATA_FIELD: conditions holds one or more field/value pairs that are ANDed together. conditionKey/
-  // conditionValue are kept for backward compatibility with rules stored before multi-condition support (VERSION 1);
-  // getMetadataConditions() normalises both shapes.
+  // conditionValue are kept for backward compatibility with rules stored before multi-condition support;
+  // getMetadataConditions() normalises both shapes (so no model-version migration is required).
   private String conditionKey;
   private String conditionValue;
   private List<DisposalRuleCondition> conditions;
@@ -177,7 +180,7 @@ public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRu
 
   /**
    * Returns the metadata-field conditions normalised across storage formats. Rules saved with multi-condition support
-   * carry them in {@link #conditions}; rules saved before that (VERSION 1) carry a single condition in
+   * carry them in {@link #conditions}; rules saved before that carry a single condition in
    * {@link #conditionKey}/{@link #conditionValue}. All METADATA_FIELD evaluation and validation should go through this
    * method so both shapes behave identically.
    *
