@@ -1,5 +1,4 @@
 services:
-
   zoo:
     image: ghcr.io/eterna-earkiv/zookeeper:3.9.5
     restart: unless-stopped
@@ -100,7 +99,7 @@ services:
       - CLAMD_TCPADDR=clamd
       - CLAMD_TCPSOCKET=3310
       # SMTP configuration
-      - SMTP_HOST=mailpit
+      - SMTP_HOST=mailserver
       - SMTP_PORT=1025
       - UNOSERVER_HOST=unoserver
       - UNOSERVER_PORT=2003
