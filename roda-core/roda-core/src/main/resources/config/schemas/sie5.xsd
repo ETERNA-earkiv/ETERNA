@@ -42,11 +42,56 @@
       <xs:element name="AccountingPlan" type="sie:AccountingPlanType" minOccurs="0"/>
       <xs:element name="GeneralSubdivisionAccountGroup" type="sie:GeneralSubdivisionAccountGroupType" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="GeneralLedger" type="sie:GeneralLedgerType" minOccurs="0"/>
+      <xs:element name="Suppliers" type="sie:SuppliersType" minOccurs="0"/>
+      <xs:element name="SupplierInvoices" type="sie:SupplierInvoicesType" minOccurs="0"/>
       <xs:element name="ClosingBalances" type="sie:ClosingBalancesType" minOccurs="0"/>
       <xs:element name="OpeningBalances" type="sie:OpeningBalancesType" minOccurs="0"/>
     </xs:sequence>
     <xs:attribute name="clientId" type="xs:string"/>
     <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="SuppliersType">
+    <xs:sequence>
+      <xs:element name="Supplier" type="sie:SupplierType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="SupplierType">
+    <xs:attribute name="id" type="xs:string" use="required"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="organizationId" type="xs:string"/>
+    <xs:attribute name="bankGiro" type="xs:string"/>
+    <xs:attribute name="plusGiro" type="xs:string"/>
+    <xs:attribute name="country" type="xs:string"/>
+    <xs:attribute name="city" type="xs:string"/>
+    <xs:attribute name="currency" type="xs:string"/>
+    <xs:attribute name="paymentTerms" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="SupplierInvoicesType">
+    <xs:sequence>
+      <xs:element name="SupplierInvoice" type="sie:SupplierInvoiceType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="SupplierInvoiceType">
+    <xs:attribute name="id" type="xs:string" use="required"/>
+    <xs:attribute name="supplierRef" type="xs:string" use="required"/>
+    <xs:attribute name="supplierInvoiceId" type="xs:string"/>
+    <xs:attribute name="invoiceDate" type="xs:string" use="required"/>
+    <xs:attribute name="dueDate" type="xs:string"/>
+    <xs:attribute name="paymentDate" type="xs:string"/>
+    <xs:attribute name="currency" type="xs:string"/>
+    <xs:attribute name="grossAmount" type="xs:decimal"/>
+    <xs:attribute name="vatAmount" type="xs:decimal"/>
+    <xs:attribute name="netAmount" type="xs:decimal"/>
+    <xs:attribute name="paymentAmount" type="xs:decimal"/>
+    <xs:attribute name="status" type="xs:string"/>
+    <xs:attribute name="approvedBy" type="xs:string"/>
+    <xs:attribute name="approvedDate" type="xs:string"/>
+    <xs:attribute name="paymentTerms" type="xs:string"/>
+    <xs:attribute name="bankGiro" type="xs:string"/>
   </xs:complexType>
 
   <xs:complexType name="FiscalYearsType">
