@@ -392,27 +392,32 @@
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-client</artifactId>
-                <version>10.0.19</version>
+                <version>10.0.26</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-http</artifactId>
-                <version>10.0.19</version>
+                <version>10.0.26</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-util</artifactId>
-                <version>10.0.19</version>
+                <version>10.0.26</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-io</artifactId>
-                <version>10.0.19</version>
+                <version>10.0.26</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-alpn-java-client</artifactId>
-                <version>10.0.19</version>
+                <version>10.0.26</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-alpn-client</artifactId>
+                <version>10.0.26</version>
             </dependency>
             <!-- Security: fix commons-configuration2 GHSA-337m-mw94-2v6g -->
             <dependency>
@@ -984,7 +989,7 @@
                 <artifactId>nimbus-jose-jwt</artifactId>
                 <version>9.37.4</version>
             </dependency>
-            <!-- Security: fix jetty 9.x CVEs (GHSA-qw69-rqj8-6qw8 RISK 18.9, GHSA-q4rv-gq96-w7c5, GHSA-3gh6-v5v9-6v9j, GHSA-j26w-f9rq-mr2q, GHSA-p26g-97m4-6q7c, GHSA-58qw-p7qm-5rvh) -->
+            <!-- Security: fix jetty 9.x CVEs (GHSA-qw69-rqj8-6qw8, GHSA-q4rv-gq96-w7c5, GHSA-3gh6-v5v9-6v9j, GHSA-j26w-f9rq-mr2q, GHSA-p26g-97m4-6q7c, GHSA-58qw-p7qm-5rvh) -->
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-server</artifactId>
