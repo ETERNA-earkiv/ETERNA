@@ -7,11 +7,14 @@ title: Support Policy
 
 The following versions are supported with security updates
 
-| Version | Release date       | End of Standard Support | End of Life |
+| Version | Release date ¹     | End of Standard Support | End of Life |
 | ------- | ------------------ | ----------------------- | ----------- |
-| 1.0     | 2026-06            |                         |             |
+| 1.0     | 2026-06            | TBD                     | TBD         |
 | 0.6     | 2026-03            | 2027-06                 | 2027-06     |
-| 0.X     | 2025-05            | 2027-06                 | 2027-06     |
+| 0.X ²   | 2025-05            | 2027-06                 | 2027-06     |
+
+¹ Release date = date of first release in the series (not the latest patch).  
+² 0.X covers all 0.x releases prior to 0.6.
 
 
 Note: After *End of Standard Support* a release will only get security patches.
