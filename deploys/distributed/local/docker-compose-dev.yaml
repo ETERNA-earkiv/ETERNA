@@ -1,6 +1,6 @@
 services:
   zoo:
-    image: docker.io/zookeeper:3.9-jre-17
+    image: ghcr.io/eterna-earkiv/zookeeper:3.9.5
     restart: unless-stopped
     ports:
       - "2181:2181"
@@ -9,8 +9,9 @@ services:
     volumes:
       - zookeeper_data:/data
       - zookeeper_datalog:/datalog
+
   solr:
-    image: docker.io/solr:9.6.1
+    image: ghcr.io/eterna-earkiv/solr:9.10.1
     restart: unless-stopped
     ports:
       - "8983:8983"
@@ -24,16 +25,18 @@ services:
       - -c
     volumes:
       - solr_data:/var/solr
+      
   clamd:
-    image: docker.io/clamav/clamav:1.2.3
+    image: docker.io/clamav/clamav:stable
     restart: unless-stopped
     ports:
       - "3310:3310"
     volumes:
       - clam_data:/var/lib/clamav
       - $HOME/.roda_local/data/storage:$HOME/.roda_local/data/storage
+
   siegfried:
-    image: ghcr.io/keeps/siegfried:v1.11.0
+    image: ghcr.io/eterna-earkiv/siegfried:v1.11.4
     restart: unless-stopped
     ports:
       - "5138:5138"
@@ -43,8 +46,26 @@ services:
     volumes:
       - siegfried_data:/root/siegfried/
       - $HOME/.roda_local/data/storage:$HOME/.roda_local/data/storage
+  
+  swagger:
+    image: docker.io/swaggerapi/swagger-ui:latest
+    restart: on-failure
+    ports:
+      - "8081:8080"
+    environment:
+      - URL=http://localhost:8080/api/openapi.json
+      - DOC_EXPANSION=none
+      - VALIDATOR_URL=none
+
+  mailpit:
+    image: axllent/mailpit:v1.24
+    restart: unless-stopped
+    ports:
+      - "1025:1025" # smtp server
+      - "8025:8025" # web ui
+
   openldap:
-    image: docker.io/bitnami/openldap:2.6.8
+    image: docker.io/bitnamilegacy/openldap:2.6
     user: 1001:root
     ports:
       - "1389:1389"
@@ -58,6 +79,7 @@ services:
       - LDAP_EXTRA_SCHEMAS=cosine,inetorgperson,nis,pbkdf2
     volumes:
       - ldap_data:/opt/bitnami/openldap/etc/schema/pbkdf2.ldif
+
 volumes:
   zookeeper_data:
   zookeeper_datalog:

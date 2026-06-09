@@ -1,5 +1,4 @@
 services:
-
   zoo:
     image: ghcr.io/eterna-earkiv/zookeeper:3.9.5
     restart: unless-stopped
@@ -38,23 +37,6 @@ services:
     volumes:
       - siegfried_data:/root/siegfried/
       - roda_data:/roda/data/
-
-  swagger:
-    image: docker.io/swaggerapi/swagger-ui:v5.13.0
-    restart: on-failure
-    ports:
-      - "8081:8080"
-    environment:
-      - URL=http://localhost:8080/api/openapi.json
-      - DOC_EXPANSION=none
-      - VALIDATOR_URL=none
-
-  mailpit:
-    image: axllent/mailpit:v1.24
-    restart: unless-stopped
-    ports:
-      - "1025:1025" # smtp server
-      - "8025:8025" # web ui
 
   openldap:
     image: docker.io/bitnamilegacy/openldap:2.6
@@ -117,7 +99,7 @@ services:
       - CLAMD_TCPADDR=clamd
       - CLAMD_TCPSOCKET=3310
       # SMTP configuration
-      - SMTP_HOST=mailpit
+      - SMTP_HOST=mailserver
       - SMTP_PORT=1025
       - UNOSERVER_HOST=unoserver
       - UNOSERVER_PORT=2003
