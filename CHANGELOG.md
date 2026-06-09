@@ -108,7 +108,22 @@
 #### Infrastructure
 - Docker build context corrected from repo root to `docker/` directory
 - CI workflow updated for Docker image build, unoserver image build, and SNAPSHOT artifact publishing
-- Dependencies upgraded: Spring Boot 3.4.10, Spring Core 6.2.11, commons-ip2 2.11.2, ReplayWeb.page 2.4.4, Handlebars 4.4.0, and various security patches
+- Dependencies upgraded: Spring Boot 3.4.10, Spring Core 6.2.18, Solr 9.10.1, Logback 1.5.34, Tomcat 10.1.55, PostgreSQL driver 42.7.11, commons-ip2 2.11.2, ReplayWeb.page 2.4.4, Handlebars 4.4.0
+- Docker Compose: updated service images for ZooKeeper, Solr, ClamAV, and Siegfried; switched OpenLDAP image to `docker.io/bitnamilegacy/openldap:2.6` [#591](https://github.com/ETERNA-earkiv/ETERNA/pull/591)
+- Docker Compose: added unoserver service with restart policy and healthcheck; added Swagger UI and Mailpit to distributed dev environments (not standalone); removed Swagger UI and Mailpit from standalone configuration and changed SMTP host to `mailserver` [#591](https://github.com/ETERNA-earkiv/ETERNA/pull/591)
+
+#### Security updates
+- Fixed GHSA-wxr5-93ph-8wr9: upgraded `commons-beanutils` to 1.11.0
+- Fixed GHSA-wrvw-hg22-4m67, GHSA-h4h5-3hr4-j3g2, GHSA-735f-pc8j-v9w8: upgraded `protobuf-java` to 3.25.9
+- Fixed GHSA-mj4r-2hfc-f8p6: upgraded `netty` to 4.1.133.Final
+- Fixed GHSA-337m-mw94-2v6g: added `commons-configuration2` 2.15.0
+- Fixed GHSA-9339-86wc-4qgf: upgraded `xalan` to 2.7.3
+- Fixed GHSA-cgp8-4m63-fhh5: upgraded `commons-net` to 3.9.0
+- Fixed GHSA-xwmg-2g98-w7v9: upgraded `nimbus-jose-jwt` to 9.37.4
+- Fixed GHSA-qw69-rqj8-6qw8, GHSA-q4rv-gq96-w7c5, GHSA-3gh6-v5v9-6v9j, GHSA-j26w-f9rq-mr2q, GHSA-p26g-97m4-6q7c, GHSA-58qw-p7qm-5rvh: pinned Jetty 9.x transitive dependencies to 9.4.57.v20241219 [#590](https://github.com/ETERNA-earkiv/ETERNA/pull/590)
+- Fixed GHSA-7xrh-hqfc-g7qr, GHSA-crhr-qqj8-rpxc: upgraded ZooKeeper to 3.9.5
+- Migrated BouncyCastle from `bcpkix/bcprov-jdk15on` to `jdk18on` in `cas-client-core`; upgraded to 1.84
+- Upgraded `owasp-java-html-sanitizer` to 20260101.1
 
 #### Documentation
 - Added admin guide for date/time timezone configuration
