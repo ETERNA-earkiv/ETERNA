@@ -468,6 +468,26 @@
         <dependency>
             <groupId>org.apereo.cas.client</groupId>
             <artifactId>cas-client-core</artifactId>
+            <exclusions>
+                <!-- jdk15on topped out at 1.70; replaced by jdk18on:1.80 already in BOM -->
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcpkix-jdk15on</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcprov-jdk15on</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcutil-jdk15on</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- Explicit replacement for bcpkix/bcprov-jdk15on excluded above from cas-client-core -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk18on</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>

@@ -41,83 +41,11 @@
     </repositories>
     <developers>
         <developer>
-            <id>filiph-schaaf</id>
-            <name>Filiph Schaaf</name>
-            <email>filiph.schaaf@whitered.se</email>
+            <id>whitered</id>
+            <name>WhiteRed</name>
+            <email>info@whitered.se</email>
             <organization>White Red Consulting AB</organization>
             <organizationUrl>https://www.whitered.se/</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>lfaria</id>
-            <name>Luis Faria</name>
-            <email>lfaria@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>hsilva</id>
-            <name>Helder Silva</name>
-            <email>hsilva@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>mguimaraes</id>
-            <name>Miguel Guimarães</name>
-            <email>mguimaraes@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>gbarros</id>
-            <name>Gabriel Barros</name>
-            <email>gbarros@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>jgomes</id>
-            <name>João Gomes</name>
-            <email>jgomes@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>syusupov</id>
-            <name>Shahzod Yusupov</name>
-            <email>syusupov@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>alindo</id>
-            <name>António Lindo</name>
-            <email>alindo@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>cafonso</id>
-            <name>Carlos Afonso</name>
-            <email>cafonso@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>aflores</id>
-            <name>Alexandre Flores</name>
-            <email>aflores@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
             <timezone>0</timezone>
         </developer>
     </developers>
@@ -132,8 +60,8 @@
         <cas.client.version>4.0.4</cas.client.version>
         <swagger.version>2.2.34</swagger.version>
         <jackson.version>2.19.1</jackson.version>
-        <spring.version>6.2.11</spring.version>
-        <solr.version>9.8.1</solr.version>
+        <spring.version>6.2.18</spring.version>
+        <solr.version>9.10.1</solr.version>
         <pekko.version>1.1.4</pekko.version>
         <httpcomponents.version>5.5</httpcomponents.version>
         <commons_ip2.version>2.10.0</commons_ip2.version>
@@ -142,7 +70,7 @@
         <testng.groups>all</testng.groups>
         <springboot.version>3.4.10</springboot.version>
         <scope.gwt-dev>provided</scope.gwt-dev>
-        <logback.version>1.5.18</logback.version>
+        <logback.version>1.5.34</logback.version>
     </properties>
     <profiles>
         <profile>
@@ -249,12 +177,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.6.0</version>
+                <version>3.11.0</version>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.10</version>
+                <version>0.8.15</version>
                 <executions>
                     <execution>
                         <id>default-prepare-agent</id>
@@ -274,7 +202,7 @@
             <plugin>
                 <groupId>net.revelc.code.formatter</groupId>
                 <artifactId>formatter-maven-plugin</artifactId>
-                <version>2.20.0</version>
+                <version>2.29.0</version>
                 <configuration>
                     <configFile>${maven.multiModuleProjectDirectory}/code-style/eclipse_formatter.xml
                     </configFile>
@@ -329,7 +257,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.11.0</version>
+                    <version>3.15.0</version>
                     <configuration>
                         <release>21</release>
                         <encoding>UTF-8</encoding>
@@ -338,17 +266,17 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.3.1</version>
+                    <version>3.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -363,22 +291,22 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.22.2</version>
+                    <version>3.5.6</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>3.3.1</version>
+                    <version>3.5.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.6.0</version>
+                    <version>3.11.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.8.0</version>
                 </plugin>
                 <plugin>
                     <groupId>net.ltgt.gwt.maven</groupId>
@@ -388,7 +316,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.2.1</version>
+                    <version>3.4.0</version>
                     <configuration>
                         <excludeResources>true</excludeResources>
                     </configuration>
@@ -405,12 +333,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.2.4</version>
+                    <version>3.6.2</version>
                 </plugin>
                 <plugin>
                     <groupId>pl.project13.maven</groupId>
                     <artifactId>git-commit-id-plugin</artifactId>
-                    <version>4.0.0</version>
+                    <version>4.9.10</version>
                     <executions>
                         <execution>
                             <id>servlet-resource</id>
@@ -452,7 +380,8 @@
             <dependency>
                 <groupId>jakarta.servlet</groupId>
                 <artifactId>jakarta.servlet-api</artifactId>
-                <version>6.1.0</version>
+                <!-- Servlet 6.0 aligns with Tomcat 10.1.x (Servlet 6.1 requires Tomcat 11.x) -->
+                <version>6.0.0</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.persistence</groupId>
@@ -463,27 +392,50 @@
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-client</artifactId>
-                <version>10.0.19</version>
+                <version>10.0.26</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-http</artifactId>
-                <version>10.0.19</version>
+                <version>10.0.26</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-util</artifactId>
-                <version>10.0.19</version>
+                <version>10.0.26</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-io</artifactId>
-                <version>10.0.19</version>
+                <version>10.0.26</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-alpn-java-client</artifactId>
-                <version>10.0.19</version>
+                <version>10.0.26</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-alpn-client</artifactId>
+                <version>10.0.26</version>
+            </dependency>
+            <!-- Security: fix commons-configuration2 GHSA-337m-mw94-2v6g -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-configuration2</artifactId>
+                <version>2.15.0</version>
+            </dependency>
+            <!-- Override commons-beanutils to fix GHSA-wxr5-93ph-8wr9 -->
+            <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>1.11.0</version>
+            </dependency>
+            <!-- Override protobuf-java to fix GHSA-wrvw-hg22-4m67, GHSA-h4h5-3hr4-j3g2, GHSA-735f-pc8j-v9w8 -->
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>3.25.9</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.xml.bind</groupId>
@@ -494,6 +446,36 @@
                 <groupId>org.glassfish.jaxb</groupId>
                 <artifactId>jaxb-runtime</artifactId>
                 <version>4.0.5</version>
+            </dependency>
+            <!-- Override Spring Framework before Spring Boot BOM -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-framework-bom</artifactId>
+                <version>6.2.18</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- Override Tomcat before Spring Boot BOM (first-wins rule) -->
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-core</artifactId>
+                <version>10.1.55</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-el</artifactId>
+                <version>10.1.55</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-websocket</artifactId>
+                <version>10.1.55</version>
+            </dependency>
+            <!-- Override PostgreSQL before Spring Boot BOM -->
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>42.7.11</version>
             </dependency>
             <dependency>
                 <!-- Import dependency management from Spring Boot -->
@@ -608,7 +590,7 @@
             <dependency>
                 <groupId>org.eclipse.angus</groupId>
                 <artifactId>angus-mail</artifactId>
-                <version>2.0.3</version>
+                <version>2.0.4</version>
             </dependency>
             <dependency>
                 <groupId>javax.transaction</groupId>
@@ -629,7 +611,7 @@
             <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
-                <version>7.11.0</version>
+                <version>7.12.0</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -769,7 +751,7 @@
             <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
-                <version>2.11.0</version>
+                <version>2.14.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.solr</groupId>
@@ -960,7 +942,12 @@
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk18on</artifactId>
-                <version>1.80</version>
+                <version>1.84</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk18on</artifactId>
+                <version>1.84</version>
             </dependency>
             <!-- mguimaraes: 2022-12-15 -->
             <!-- Forcing transitive dependencies upgrade due to vulnerabilities -->
@@ -984,16 +971,76 @@
                 <scope>provided</scope>
             </dependency>
 
-            <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
+            <!-- Security: fix xalan GHSA-9339-86wc-4qgf (High, RISK 8.2) -->
             <dependency>
-                <groupId>com.google.code.gson</groupId>
-                <artifactId>gson</artifactId>
-                <version>2.11.0</version>
+                <groupId>xalan</groupId>
+                <artifactId>xalan</artifactId>
+                <version>2.7.3</version>
+            </dependency>
+            <!-- Security: fix commons-net GHSA-cgp8-4m63-fhh5 -->
+            <dependency>
+                <groupId>commons-net</groupId>
+                <artifactId>commons-net</artifactId>
+                <version>3.9.0</version>
+            </dependency>
+            <!-- Security: fix nimbus-jose-jwt GHSA-xwmg-2g98-w7v9 -->
+            <dependency>
+                <groupId>com.nimbusds</groupId>
+                <artifactId>nimbus-jose-jwt</artifactId>
+                <version>9.37.4</version>
+            </dependency>
+            <!-- Security: fix jetty 9.x CVEs (GHSA-qw69-rqj8-6qw8, GHSA-q4rv-gq96-w7c5, GHSA-3gh6-v5v9-6v9j, GHSA-j26w-f9rq-mr2q, GHSA-p26g-97m4-6q7c, GHSA-58qw-p7qm-5rvh) -->
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-server</artifactId>
+                <version>9.4.57.v20241219</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-servlets</artifactId>
+                <version>9.4.57.v20241219</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-xml</artifactId>
+                <version>9.4.57.v20241219</version>
+            </dependency>
+            <!-- Security: fix zookeeper CVEs GHSA-7xrh-hqfc-g7qr, GHSA-crhr-qqj8-rpxc (High) -->
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper</artifactId>
+                <version>3.9.5</version>
+            </dependency>
+            <!-- Security: fix netty-codec GHSA-mj4r-2hfc-f8p6 (High) -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-codec</artifactId>
+                <version>4.1.133.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-handler</artifactId>
+                <version>4.1.133.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-transport</artifactId>
+                <version>4.1.133.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-common</artifactId>
+                <version>4.1.133.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-buffer</artifactId>
+                <version>4.1.133.Final</version>
             </dependency>
             <dependency>
                 <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
                 <artifactId>owasp-java-html-sanitizer</artifactId>
-                <version>20240325.1</version>
+                <version>20260101.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
