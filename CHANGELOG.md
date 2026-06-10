@@ -1,6 +1,6 @@
 # ETERNA Changelog
 
-## v1.0.0-SNAPSHOT
+## v1.0.0
 
 #### New features
 - Added XSLT viewer for XML files with auto-discovery of co-located stylesheets, multi-stylesheet dropdown, and toggle to view raw XML [#468](https://github.com/ETERNA-earkiv/ETERNA/pull/468)
