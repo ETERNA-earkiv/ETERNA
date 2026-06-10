@@ -2,7 +2,7 @@
 
 ## Gallringsschema
 
-Gallringsscheman anger minimikraven för underhålls-, bevarande- eller gallringsåtgärder som ska vidtas på befintliga eller framtida logiska enheter i detta arkiv. En logisk enhet får endast gallras som en del av en gallringsprocess som styrs av det gallringsschema som tilldelats den enheten. Det är den logiska enhetens gallringsschema som bestämmer hur länge en post bevaras och hur den därefter gallras i slutet av dess bevarandeperiod.
+Gallringsscheman anger minimikraven för underhålls-, bevarande- eller gallringsåtgärder som ska vidtas på befintliga eller framtida strukturenheter i detta arkiv. En strukturenhet får endast gallras som en del av en gallringsprocess som styrs av det gallringsschema som tilldelats den enheten. Det är den strukturenhetens gallringsschema som bestämmer hur länge en post bevaras och hur den därefter gallras i slutet av dess bevarandeperiod.
 
 ### 1. Vad är ett gallringsschema?
 
@@ -60,7 +60,7 @@ Gallringen av bevarandeobjekt har vissa begränsningar. Hur objekten gallras ber
 
 ### 1. Vad är en gallringsregel
 
-Gallringsregler är ett antal regler och krav som sätter gallringsschema för varje logisk enhet i systemet. Gallringsreglerna kan sättas när som helst för att säkerställa upprätthållandet av systemet. Gallringsregler kan också sättas under inläsningsprocessen. Gallringsreglerna har egenskaper och regler som triggar om själva gallringen genomförs eller inte. Om ett arkivobjekt inte uppfyller någon av dessa regler, kommer den inte att följa gallringsregeln. 
+Gallringsregler är ett antal regler och krav som sätter gallringsschema för varje strukturenhet i systemet. Gallringsreglerna kan sättas när som helst för att säkerställa upprätthållandet av systemet. Gallringsregler kan också sättas under inläsningsprocessen. Gallringsreglerna har egenskaper och regler som triggar om själva gallringen genomförs eller inte. Om ett arkivobjekt inte uppfyller någon av dessa regler, kommer den inte att följa gallringsregeln. 
 
 ### 2. Vad är en gallringsregel?
 
@@ -91,7 +91,7 @@ Gallringsregler kan tillämpas vid inleveransprocessen via ett plugin, men kan o
 
 ### 1. Vad är gallringsstopp?
 
-Gallringsstopp är en order som stoppar den normala processen för gallring och som innebär att en logisk enhet inte kommer att gallras. När gallringsstoppet är associerat med en logisk enhet kommer gallring inte att ske så länge som gallringsstoppet är aktivt i systemet. När gallringsstoppet inaktiveras, kommer gallringsprocessen att fortsätta. 
+Gallringsstopp är en order som stoppar den normala processen för gallring och som innebär att en strukturenhet inte kommer att gallras. När gallringsstoppet är associerat med en strukturenhet kommer gallring inte att ske så länge som gallringsstoppet är aktivt i systemet. När gallringsstoppet inaktiveras, kommer gallringsprocessen att fortsätta. 
 
 ### 2. Vad kategoriserar ett gallringsstopp?
 
