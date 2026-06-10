@@ -143,7 +143,7 @@ jobs:
           images: |
             ghcr.io/eterna-earkiv/eterna
           tags: |
-            type=raw,value=test-${{ env.branch_name }}-${{ env.commit_sha }}
+            type=raw,value=test-${{ env.branch_name }}-{{date 'YYYYMMDD'}}-${{ env.commit_sha }}
             type=raw,value=test-${{ env.branch_name }}-latest
             type=raw,value=latest-test
 
@@ -173,6 +173,4 @@ jobs:
       - name: Test image availability
         run: |
           echo "Test image built and available at:"
-          echo "ghcr.io/eterna-earkiv/eterna:test-${{ env.branch_name }}-${{ env.commit_sha }}"
-          echo "ghcr.io/eterna-earkiv/eterna:test-${{ env.branch_name }}-latest"
-          echo "ghcr.io/eterna-earkiv/eterna:latest-test"
+          echo "${{ steps.meta.outputs.tags }}"
