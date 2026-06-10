@@ -32,43 +32,6 @@ jobs:
     env:
       MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
 
-    services:
-      zookeeper:
-        image: zookeeper:3.9.1-jre-17
-        ports:
-          - 2181:2181
-      solr:
-        image: solr:9
-        ports:
-          - 8983:8983
-        env:
-          ZK_HOST: zookeeper:2181
-        options: -e cloud
-      postgres:
-        image: postgres:17
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_USER: admin
-          POSTGRES_PASSWORD: roda
-          POSTGRES_DB: roda_core_db
-      mailhog:
-        image: mailhog/mailhog:v1.0.1
-        ports:
-          - 1025:1025
-      openldap:
-        image: docker.io/bitnamilegacy/openldap:2.6
-        ports:
-          - 1389:1389
-          - 1636:1636
-        env:
-          BITNAMI_DEBUG: true
-          LDAP_ROOT: dc=roda,dc=org
-          LDAP_SKIP_DEFAULT_TREE: yes
-          LDAP_ADMIN_USERNAME: admin
-          LDAP_ADMIN_PASSWORD: eterna
-          LDAP_EXTRA_SCHEMAS: cosine,inetorgperson,nis,pbkdf2
-
     steps:
       - uses: actions/checkout@v5
         with:
