@@ -6,8 +6,17 @@ on:
       - "main"
     paths-ignore:
       - "README.md"
-      - "docs/**"
+      - "README_sv_SE.md"
       - ".github/ISSUE_TEMPLATE/**"
+      - "CHANGELOG.md"
+      - "SECURITY.md"
+      - "CODE_OF_CONDUCT.md"
+      - "CONTRIBUTING.md"
+      - "DEV_NOTES.md"
+      - "LICENSE"
+      - "LICENSE_HEADER.txt"
+      - "openapi.json"
+      - "code-style/**"
 
 permissions:
   actions: write
