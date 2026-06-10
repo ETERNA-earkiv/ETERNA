@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - "main"
-      - "eterna-v1-alpha"
     paths:
       - "deploys/standalone/unoserver/Dockerfile"
   workflow_dispatch:
