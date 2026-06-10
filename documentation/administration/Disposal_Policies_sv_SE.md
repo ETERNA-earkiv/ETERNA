@@ -81,7 +81,7 @@ Urvalsmetod för den mekanism som matchar regler med arkivobjekten i systemet oc
 Det finns två typer av utvalsmetoder i ETERNA:
 
 * Child of (Barn): om arkivobjekt är underliggande till ett specifikt AIP.
-* Metadatafält: om arkivobjektet uppfyller ett eller flera villkor baserade på metadatafält. Flera villkor kan kombineras med AND- eller OR-operatorer (t.ex. "fält A = värde1 AND fält B = värde2" eller "fält A = värde1 OR fält B = värde2") för att möjliggöra mer sofistikerad regelmatching.
+* Metadatafält: om arkivobjektet uppfyller ett eller flera villkor baserade på metadatafält. Flera villkor kan kombineras med AND- eller OR-operatorer (t.ex. "fält A = värde1 AND fält B = värde2" eller "fält A = värde1 OR fält B = värde2") för att möjliggöra mer sofistikerad regelmatchning. Villkoren utvärderas från vänster till höger.
 
 ### 4. Hur fungerar det?
 

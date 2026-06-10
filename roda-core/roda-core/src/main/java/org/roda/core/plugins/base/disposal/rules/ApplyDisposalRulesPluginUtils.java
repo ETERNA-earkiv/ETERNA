@@ -48,7 +48,8 @@ public class ApplyDisposalRulesPluginUtils {
    * @param index
    *          the index service used for metadata-field matching
    * @param allowedConditionFields
-   *          the whitelist of allowed metadata condition fields (see {@link #allowedMetadataConditionFields()})
+   *          the whitelist of allowed metadata condition fields (see
+   *          {@link org.roda.core.common.DisposalRuleConditionFields#allowedMetadataConditionFields()})
    * @return the first matching rule, or {@link Optional#empty()} if none matched
    * @throws GenericException
    *           if rule evaluation against the index fails

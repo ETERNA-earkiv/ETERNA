@@ -33,10 +33,15 @@ public final class DisposalRuleConditions {
    * Folds the conditions into a single {@link FilterParameter}.
    *
    * @param conditions
-   *          the conditions to combine; must not be empty
+   *          the conditions to combine; must not be {@code null} or empty
    * @return the combined filter parameter
+   * @throws IllegalArgumentException
+   *           if {@code conditions} is {@code null} or empty
    */
   public static FilterParameter toFilterParameter(List<DisposalRuleCondition> conditions) {
+    if (conditions == null || conditions.isEmpty()) {
+      throw new IllegalArgumentException("conditions must not be null or empty");
+    }
     FilterParameter accumulated = new SimpleFilterParameter(conditions.get(0).getKey(), conditions.get(0).getValue());
     for (int i = 1; i < conditions.size(); i++) {
       DisposalRuleCondition condition = conditions.get(i);

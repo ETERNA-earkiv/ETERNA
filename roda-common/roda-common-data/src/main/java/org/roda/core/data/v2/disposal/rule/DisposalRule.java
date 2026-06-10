@@ -170,26 +170,37 @@ public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRu
     this.conditionValue = conditionValue;
   }
 
+  /**
+   * Returns the metadata-field conditions stored on this rule (a defensive copy), or {@code null} if none are set.
+   *
+   * @return a copy of the conditions, or {@code null}
+   */
   public List<DisposalRuleCondition> getConditions() {
-    return conditions;
-  }
-
-  public void setConditions(List<DisposalRuleCondition> conditions) {
-    this.conditions = conditions;
+    return conditions == null ? null : new ArrayList<>(conditions);
   }
 
   /**
-   * Returns the metadata-field conditions normalised across storage formats. Rules saved with multi-condition support
-   * carry them in {@link #conditions}; rules saved before that carry a single condition in
+   * Sets the metadata-field conditions for this rule, storing a defensive copy.
+   *
+   * @param conditions
+   *          the conditions to combine when the rule is evaluated; may be {@code null} or empty
+   */
+  public void setConditions(List<DisposalRuleCondition> conditions) {
+    this.conditions = conditions == null ? null : new ArrayList<>(conditions);
+  }
+
+  /**
+   * Returns the metadata-field conditions normalised across storage formats (a defensive copy). Rules saved with
+   * multi-condition support carry them in {@link #conditions}; rules saved before that carry a single condition in
    * {@link #conditionKey}/{@link #conditionValue}. All METADATA_FIELD evaluation and validation should go through this
    * method so both shapes behave identically.
    *
-   * @return the conditions to AND together; never {@code null}
+   * @return the conditions to combine (with their per-condition AND/OR operators); never {@code null}
    */
   @JsonIgnore
   public List<DisposalRuleCondition> getMetadataConditions() {
     if (conditions != null && !conditions.isEmpty()) {
-      return conditions;
+      return new ArrayList<>(conditions);
     }
     List<DisposalRuleCondition> normalised = new ArrayList<>();
     if (conditionKey != null && !conditionKey.isEmpty()) {
