@@ -90,6 +90,8 @@ jobs:
           sudo chmod a+rx /usr/bin/clamscan /usr/bin/clamdscan
       - name: Get release version
         run: echo "release_version=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
+      - name: Get project (pom) version
+        run: echo "project_version=$(mvn -q -DforceStdout -Dexpression=project.version help:evaluate)" >> $GITHUB_ENV
       - name: Run tests & install
         run:
           mvn $MAVEN_CLI_OPTS -Dtestng.groups="travis" -Denforcer.skip=true clean org.jacoco:jacoco-maven-plugin:prepare-agent install
@@ -108,7 +110,7 @@ jobs:
       - name: Copy target to docker context
         run: |
           mkdir -p docker/target
-          cp -r roda-ui/roda-wui/target/roda-wui-${{ env.release_version }}.jar docker/target
+          cp -r roda-ui/roda-wui/target/roda-wui-${{ env.project_version }}.jar docker/target
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
@@ -141,8 +143,8 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: roda-ui/roda-wui/target/roda-wui-${{ env.release_version }}.jar
-          asset_name: roda-wui-${{ env.release_version }}.jar
+          file: roda-ui/roda-wui/target/roda-wui-${{ env.project_version }}.jar
+          asset_name: roda-wui-${{ env.project_version }}.jar
           tag: ${{ github.ref }}
           release_name: ${{ github.ref_name }}
           draft: true
