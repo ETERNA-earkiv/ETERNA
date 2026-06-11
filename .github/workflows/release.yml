@@ -118,7 +118,7 @@ jobs:
           cp -r roda-ui/roda-wui/target/roda-wui-${{ env.project_version }}.jar docker/target
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: |
             ghcr.io/eterna-earkiv/eterna
