@@ -1,22 +1,11 @@
 name: 'Test Build'
 
+# Manual-only for now. The automatic push trigger on "main" was removed so that
+# merges to the stable/release branch don't publish test images. When the dev
+# branch exists, restore a push trigger on "dev" and repoint the test server's
+# image tag accordingly.
 on:
-  push:
-    branches:
-      - "main"
-    paths-ignore:
-      - "README.md"
-      - "README_sv_SE.md"
-      - ".github/ISSUE_TEMPLATE/**"
-      - "CHANGELOG.md"
-      - "SECURITY.md"
-      - "CODE_OF_CONDUCT.md"
-      - "CONTRIBUTING.md"
-      - "DEV_NOTES.md"
-      - "LICENSE"
-      - "LICENSE_HEADER.txt"
-      - "openapi.json"
-      - "code-style/**"
+  workflow_dispatch:
 
 permissions:
   actions: write
