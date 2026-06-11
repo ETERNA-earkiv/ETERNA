@@ -108,7 +108,10 @@ jobs:
           LDAP_SERVER_URL: ldap://localhost
           LDAP_SERVER_PORT: 1389
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/roda_core_db
+      # Only deploy Maven artifacts for final releases — a pre-release tag
+      # would re-deploy the same POM version (1.0.0) and break the final release.
       - name: Deploy to GitHub packages
+        if: ${{ github.ref_type == 'tag' && startsWith(github.ref_name, 'v') && !contains(github.ref_name, '-') }}
         run: mvn $MAVEN_CLI_OPTS clean deploy -Dmaven.test.skip=true -Pcore
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
