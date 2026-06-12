@@ -7,6 +7,12 @@ services:
     volumes:
       - zookeeper_data:/data
       - zookeeper_datalog:/datalog
+    healthcheck:
+      test: ["CMD", "zkServer.sh", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
   solr:
     image: ghcr.io/eterna-earkiv/solr:9.10.1
@@ -18,8 +24,17 @@ services:
       SOLR_HEAP: 2g
       ZK_HOST: zoo:2181
     command: -c
+    depends_on:
+      zoo:
+        condition: service_healthy
     volumes:
       - solr_data:/var/solr
+    healthcheck:
+      test: ["CMD", "solr", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
 
   clamd:
     image: docker.io/clamav/clamav:stable
@@ -27,6 +42,12 @@ services:
     volumes:
       - clam_data:/var/lib/clamav
       - roda_data:/roda/data/
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/clamdcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
 
   siegfried:
     image: ghcr.io/eterna-earkiv/siegfried:v1.11.4
@@ -37,6 +58,12 @@ services:
     volumes:
       - siegfried_data:/root/siegfried/
       - roda_data:/roda/data/
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:5138/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
   openldap:
     image: docker.io/bitnamilegacy/openldap:2.6
@@ -54,6 +81,12 @@ services:
       - LDAP_EXTRA_SCHEMAS=cosine,inetorgperson,nis,pbkdf2
     volumes:
       - ./ldap/ldif/pbkdf2.ldif:/opt/bitnami/openldap/etc/schema/pbkdf2.ldif
+    healthcheck:
+      test: ["CMD-SHELL", "ldapwhoami -H ldap://localhost:1389 -D cn=admin,dc=roda,dc=org -w $$LDAP_ADMIN_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
   unoserver:
     image: ghcr.io/eterna-earkiv/eterna-unoserver:latest
@@ -72,11 +105,13 @@ services:
       - "8080:8080"
     depends_on:
       solr:
-        condition: service_started
+        condition: service_healthy
       clamd:
-        condition: service_started
+        condition: service_healthy
       siegfried:
-        condition: service_started
+        condition: service_healthy
+      openldap:
+        condition: service_healthy
       # postgres:
       #   condition: service_started
       unoserver:
