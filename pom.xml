@@ -419,6 +419,12 @@
                 <artifactId>jetty-alpn-client</artifactId>
                 <version>10.0.26</version>
             </dependency>
+            <!-- Security: fix http2-common GHSA-mmxm-8w33-wc4h (High) -->
+            <dependency>
+                <groupId>org.eclipse.jetty.http2</groupId>
+                <artifactId>http2-common</artifactId>
+                <version>10.0.26</version>
+            </dependency>
             <!-- Security: fix commons-configuration2 GHSA-337m-mw94-2v6g -->
             <dependency>
                 <groupId>org.apache.commons</groupId>
