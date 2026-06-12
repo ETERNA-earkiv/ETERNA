@@ -16,9 +16,9 @@ This example is intended as a starting point. Every production environment shoul
 The compose file expects a `./config/` directory with site-specific files. Create the layout before starting services:
 
 ```sh
-mkdir -p ./data/{storage,log}
-mkdir -p ./integration/{drop,transfer,reports}
-mkdir -p ./config/{theme,ldap,plugins,traefik}
+mkdir -p ./data/storage ./data/log
+mkdir -p ./integration/drop ./integration/transfer ./integration/reports
+mkdir -p ./config/theme ./config/ldap ./config/plugins ./config/traefik
 ```
 
 Minimum required files:
