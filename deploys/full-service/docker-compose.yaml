@@ -45,7 +45,7 @@ services:
 
   # ---- Reverse proxy --------------------------------------------------------
   traefik:
-    image: docker.io/traefik:v3.2
+    image: docker.io/traefik:v3.7.5
     container_name: traefik
     ports:
       - "80:80"
@@ -150,7 +150,7 @@ services:
 
   # ---- Directory service ----------------------------------------------------
   openldap:
-    image: docker.io/bitnamilegacy/openldap:2.6
+    image: docker.io/bitnamilegacy/openldap:2.6.10
     container_name: openldap
     user: 1001:root
     environment:
