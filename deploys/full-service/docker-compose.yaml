@@ -55,6 +55,8 @@ services:
       - "${CONFIG_PATH:-./config}/traefik/config.yaml:/etc/traefik/config.yaml:ro"
       # Uncomment to supply your own TLS certificates instead of using ACME:
       # - "${CONFIG_PATH:-./config}/traefik/certs:/etc/traefik/certs:ro"
+      # Uncomment when enabling ACME to persist certificates across recreates:
+      # - traefik_acme:/var/lib/traefik
     command:
       - "--providers.docker=true"
       - "--providers.docker.network=${NETWORK_NAME:-eterna_net}"
@@ -64,7 +66,7 @@ services:
       - "--entrypoints.web-secure.address=:443"
       # Uncomment to enable ACME / Let's Encrypt:
       # - "--certificatesresolvers.myresolver.acme.email=${ACME_EMAIL}"
-      # - "--certificatesresolvers.myresolver.acme.storage=/etc/traefik/acme.json"
+      # - "--certificatesresolvers.myresolver.acme.storage=/var/lib/traefik/acme.json"
       # - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
     labels:
       traefik.enable: "true"
@@ -85,6 +87,12 @@ services:
     volumes:
       - zookeeper_data:/data
       - zookeeper_datalog:/datalog
+    healthcheck:
+      test: ["CMD", "zkServer.sh", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     <<: *config
 
   solr:
@@ -97,9 +105,16 @@ services:
       SOLR_OPTS: "-Dsolr.environment=prod,label=PROD+ENV"
     command: -c
     depends_on:
-      - zoo
+      zoo:
+        condition: service_healthy
     volumes:
       - solr_data:/var/solr
+    healthcheck:
+      test: ["CMD", "solr", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
     # Solr admin UI is exposed via Traefik behind basic-auth middleware defined
     # in your traefik/config.yaml. Remove the labels block to keep Solr internal.
     labels:
@@ -135,6 +150,12 @@ services:
     volumes:
       - siegfried_data:/root/siegfried/
       - "${DATA_PATH:-./data}/storage:/roda/data/storage:ro"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:5138/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     <<: *config
 
   unoserver:
@@ -165,6 +186,12 @@ services:
       - "${CONFIG_PATH:-./config}/ldap/groups.ldif:/docker-entrypoint-initdb.d/groups.ldif"
       - "${CONFIG_PATH:-./config}/ldap/users.ldif:/docker-entrypoint-initdb.d/users.ldif"
       - ldap_data:/bitnami/openldap
+    healthcheck:
+      test: ["CMD-SHELL", "ldapwhoami -H ldap://localhost:1389 -D cn=admin,dc=roda,dc=org -w $$LDAP_ADMIN_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     <<: *config
 
   # ---- ETERNA application ---------------------------------------------------
@@ -173,15 +200,15 @@ services:
     container_name: eterna
     depends_on:
       solr:
-        condition: service_started
+        condition: service_healthy
       clamd:
         condition: service_healthy
       siegfried:
-        condition: service_started
+        condition: service_healthy
       unoserver:
         condition: service_healthy
       openldap:
-        condition: service_started
+        condition: service_healthy
     volumes:
       # Bind-mount data directories so backups are operator-controlled
       - "${DATA_PATH:-./data}/storage:/roda/data/storage"
@@ -319,6 +346,7 @@ networks:
 # backup tooling can reach the files directly.
 # ---------------------------------------------------------------------------
 volumes:
+  # traefik_acme:  # Uncomment when enabling ACME
   zookeeper_data:
   zookeeper_datalog:
   solr_data:
