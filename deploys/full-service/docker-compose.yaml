@@ -148,14 +148,14 @@ services:
       SIEGFRIED_HOST: 0.0.0.0
       SIEGFRIED_PORT: "5138"
     volumes:
-      - siegfried_data:/root/siegfried/
+      - siegfried_data:/home/siegfried/
       - "${DATA_PATH:-./data}/storage:/roda/data/storage:ro"
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:5138/ || exit 1"]
+      test: ["CMD", "sf", "-v"]
       interval: 10s
       timeout: 5s
       retries: 3
-      start_period: 30s
+      start_period: 60s
     <<: *config
 
   unoserver:
