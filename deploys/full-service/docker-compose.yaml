@@ -148,14 +148,14 @@ services:
       SIEGFRIED_HOST: 0.0.0.0
       SIEGFRIED_PORT: "5138"
     volumes:
-      - siegfried_data:/root/siegfried/
+      - siegfried_data:/home/siegfried/
       - "${DATA_PATH:-./data}/storage:/roda/data/storage:ro"
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:5138/ || exit 1"]
+      test: ["CMD", "sf", "-v"]
       interval: 10s
       timeout: 5s
       retries: 3
-      start_period: 30s
+      start_period: 60s
     <<: *config
 
   unoserver:
@@ -173,19 +173,17 @@ services:
   openldap:
     image: docker.io/bitnamilegacy/openldap:2.6.10
     container_name: openldap
+    restart: unless-stopped
     user: 1001:root
     environment:
-      - BITNAMI_DEBUG=false
       - LDAP_ROOT=dc=roda,dc=org
       - LDAP_SKIP_DEFAULT_TREE=yes
-      - LDAP_ADMIN_USERNAME=admin
-      - LDAP_ADMIN_PASSWORD=${LDAP_ADMIN_PASSWORD:-eterna}
+      - LDAP_ADMIN_PASSWORD=eterna
       - LDAP_EXTRA_SCHEMAS=cosine,inetorgperson,nis,pbkdf2
     volumes:
-      - "${CONFIG_PATH:-./config}/ldap/pbkdf2.ldif:/opt/bitnami/openldap/etc/schema/pbkdf2.ldif"
+      - "${CONFIG_PATH:-./config}/ldap/pbkdf2.ldif:/opt/bitnami/openldap/etc/schema/pbkdf2.ldif:ro"
       - "${CONFIG_PATH:-./config}/ldap/groups.ldif:/docker-entrypoint-initdb.d/groups.ldif"
       - "${CONFIG_PATH:-./config}/ldap/users.ldif:/docker-entrypoint-initdb.d/users.ldif"
-      - ldap_data:/bitnami/openldap
     healthcheck:
       test: ["CMD-SHELL", "ldapwhoami -H ldap://localhost:1389 -D cn=admin,dc=roda,dc=org -w $$LDAP_ADMIN_PASSWORD"]
       interval: 10s
@@ -196,7 +194,7 @@ services:
 
   # ---- ETERNA application ---------------------------------------------------
   eterna:
-    image: ghcr.io/eterna-earkiv/eterna:1.0.0
+    image: ghcr.io/eterna-earkiv/eterna:v1.0.0
     container_name: eterna
     depends_on:
       solr:
@@ -352,4 +350,3 @@ volumes:
   solr_data:
   clam_data:
   siegfried_data:
-  ldap_data:

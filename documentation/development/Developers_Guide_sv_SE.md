@@ -31,7 +31,7 @@ Förutsättningarna för att bygga ETERNA är:
 * Git-klient
 * Apache Maven 3.8+
 * GitHub-konto, [konfigurera Maven att använda ditt Github-konto](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry#authenticating-with-a-personal-access-token).
-* Oracle Java 21
+* Java 21
 
 
 ### Kompilering

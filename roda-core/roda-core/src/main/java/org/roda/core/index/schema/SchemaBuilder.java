@@ -17,6 +17,7 @@ import java.util.Set;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest.MultiUpdate;
+import org.apache.solr.client.solrj.request.schema.SchemaRequest.ReplaceField;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest.Update;
 import org.roda.core.data.exceptions.GenericException;
 import org.slf4j.Logger;
@@ -26,8 +27,14 @@ public class SchemaBuilder {
   private static final Logger LOGGER = LoggerFactory.getLogger(SchemaBuilder.class);
 
   private final Set<Field> fields = new HashSet<>();
+  private final Set<Field> replaceFields = new HashSet<>();
   private final Set<CopyField> copyFields = new HashSet<>();
   private final Set<DynamicField> dynamicFields = new HashSet<>();
+
+  public Field replaceField(Field field) {
+    replaceFields.add(field);
+    return field;
+  }
 
   public Field addField(Field field) {
     fields.add(field);
@@ -68,20 +75,21 @@ public class SchemaBuilder {
   }
 
   public boolean isEmpty() {
-    return fields.isEmpty() && dynamicFields.isEmpty() && copyFields.isEmpty();
+    return fields.isEmpty() && replaceFields.isEmpty() && dynamicFields.isEmpty() && copyFields.isEmpty();
   }
 
   public void build(SolrClient client, String collection) throws GenericException {
     List<Update> updates = new ArrayList<>();
 
     fields.forEach(f -> updates.add(f.buildCreate()));
+    replaceFields.forEach(f -> updates.add(new ReplaceField(f.getFieldAttributes())));
     dynamicFields.forEach(df -> updates.add(df.buildCreate()));
     copyFields.forEach(cf -> updates.add(cf.buildCreate()));
 
     MultiUpdate multi = new MultiUpdate(updates);
     try {
-      LOGGER.info("Updating {} collection schema with {} fields, {} dynamic fields and {} copy fields", collection,
-        fields.size(), dynamicFields.size(), copyFields.size());
+      LOGGER.info("Updating {} collection schema: {} new fields, {} replaced fields, {} dynamic fields, {} copy fields",
+        collection, fields.size(), replaceFields.size(), dynamicFields.size(), copyFields.size());
 
       multi.process(client, collection);
 

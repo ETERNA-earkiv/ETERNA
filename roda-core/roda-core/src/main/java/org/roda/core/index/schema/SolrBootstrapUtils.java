@@ -81,11 +81,9 @@ public class SolrBootstrapUtils {
       if (!fields.containsKey(f.getName())) {
         b.addField(f);
       } else if (!fields.get(f.getName()).isEquivalentTo(f)) {
-        // TODO this check doesn't work well because attribute omissions are set
-        // to default values, should only compare attributes that are not
-        // Optional.empty()
-        LOGGER.warn("Field {} of collection {} should be updated. Existing: {}. Required: {}", f.getName(),
+        LOGGER.info("Replacing field {} in collection {} (existing: {}, required: {})", f.getName(),
           collection.getIndexName(), fields.get(f.getName()), f);
+        b.replaceField(f);
       }
     });
 

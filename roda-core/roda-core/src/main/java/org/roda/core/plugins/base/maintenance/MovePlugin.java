@@ -89,12 +89,12 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
   @Override
   public String getName() {
-    return "Move action over RODA entity";
+    return "Move action over ETERNA entity";
   }
 
   @Override
   public String getDescription() {
-    return "Executes move actions over RODA entity faster";
+    return "Executes move actions over ETERNA entity faster";
   }
 
   @Override
