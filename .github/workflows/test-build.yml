@@ -1,13 +1,11 @@
 name: 'Test Build'
 
+# Manual-only for now. The automatic push trigger on "main" was removed so that
+# merges to the stable/release branch don't publish test images. When the dev
+# branch exists, restore a push trigger on "dev" and repoint the test server's
+# image tag accordingly.
 on:
-  push:
-    branches:
-      - "eterna-v1-alpha"
-    paths-ignore:
-      - "README.md"
-      - "docs/**"
-      - ".github/ISSUE_TEMPLATE/**"
+  workflow_dispatch:
 
 permissions:
   actions: write
@@ -22,43 +20,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
-
-    services:
-      zookeeper:
-        image: zookeeper:3.9.1-jre-17
-        ports:
-          - 2181:2181
-      solr:
-        image: solr:9
-        ports:
-          - 8983:8983
-        env:
-          ZK_HOST: zookeeper:2181
-        options: -e cloud
-      postgres:
-        image: postgres:17
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_USER: admin
-          POSTGRES_PASSWORD: roda
-          POSTGRES_DB: roda_core_db
-      mailhog:
-        image: mailhog/mailhog:v1.0.1
-        ports:
-          - 1025:1025
-      openldap:
-        image: docker.io/bitnamilegacy/openldap:2.6
-        ports:
-          - 1389:1389
-          - 1636:1636
-        env:
-          BITNAMI_DEBUG: true
-          LDAP_ROOT: dc=roda,dc=org
-          LDAP_SKIP_DEFAULT_TREE: yes
-          LDAP_ADMIN_USERNAME: admin
-          LDAP_ADMIN_PASSWORD: eterna
-          LDAP_EXTRA_SCHEMAS: cosine,inetorgperson,nis,pbkdf2
 
     steps:
       - uses: actions/checkout@v5
@@ -129,12 +90,12 @@ jobs:
 
       - name: Docker meta for test images
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: |
             ghcr.io/eterna-earkiv/eterna
           tags: |
-            type=raw,value=test-${{ env.branch_name }}-${{ env.commit_sha }}
+            type=raw,value=test-${{ env.branch_name }}-{{date 'YYYYMMDD'}}-${{ env.commit_sha }}
             type=raw,value=test-${{ env.branch_name }}-latest
             type=raw,value=latest-test
 
@@ -164,6 +125,4 @@ jobs:
       - name: Test image availability
         run: |
           echo "Test image built and available at:"
-          echo "ghcr.io/eterna-earkiv/eterna:test-${{ env.branch_name }}-${{ env.commit_sha }}"
-          echo "ghcr.io/eterna-earkiv/eterna:test-${{ env.branch_name }}-latest"
-          echo "ghcr.io/eterna-earkiv/eterna:latest-test"
+          echo "${{ steps.meta.outputs.tags }}"

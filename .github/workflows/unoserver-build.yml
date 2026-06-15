@@ -3,7 +3,7 @@ name: 'Unoserver Build'
 on:
   push:
     branches:
-      - "eterna-v1-alpha"
+      - "main"
     paths:
       - "deploys/standalone/unoserver/Dockerfile"
   workflow_dispatch:
