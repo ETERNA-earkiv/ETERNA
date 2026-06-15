@@ -75,7 +75,7 @@ services:
       - "8025:8025" # web ui
 
   openldap:
-    image: docker.io/bitnamilegacy/openldap:2.6
+    image: docker.io/bitnamilegacy/openldap:2.6.10
     restart: unless-stopped
     user: 1001:root
     ports:
