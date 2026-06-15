@@ -23,5 +23,5 @@ Om du vill bidra med källkod, översättningsresurser eller dokumentation, föl
 
 För information om hur du sätter upp din utvecklingsmiljö se:
 
-- [Developers guide](/documentation/development/Developers_Guide_sv_SE.md) (Engelska)
+- [Developers guide](/documentation/development/Developers_Guide_sv_SE.md)
 - [Developer notes](/DEV_NOTES.md) (Engelska)

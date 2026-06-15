@@ -181,7 +181,9 @@ services:
       - LDAP_ADMIN_PASSWORD=eterna
       - LDAP_EXTRA_SCHEMAS=cosine,inetorgperson,nis,pbkdf2
     volumes:
-      - ./ldap/ldif/pbkdf2.ldif:/opt/bitnami/openldap/etc/schema/pbkdf2.ldif
+      - "${CONFIG_PATH:-./config}/ldap/pbkdf2.ldif:/opt/bitnami/openldap/etc/schema/pbkdf2.ldif:ro"
+      - "${CONFIG_PATH:-./config}/ldap/groups.ldif:/docker-entrypoint-initdb.d/groups.ldif"
+      - "${CONFIG_PATH:-./config}/ldap/users.ldif:/docker-entrypoint-initdb.d/users.ldif"
     healthcheck:
       test: ["CMD-SHELL", "ldapwhoami -H ldap://localhost:1389 -D cn=admin,dc=roda,dc=org -w $$LDAP_ADMIN_PASSWORD"]
       interval: 10s
@@ -192,7 +194,7 @@ services:
 
   # ---- ETERNA application ---------------------------------------------------
   eterna:
-    image: ghcr.io/eterna-earkiv/eterna:1.0.0
+    image: ghcr.io/eterna-earkiv/eterna:v1.0.0
     container_name: eterna
     depends_on:
       solr:
