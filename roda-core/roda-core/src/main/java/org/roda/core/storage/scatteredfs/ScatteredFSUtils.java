@@ -143,9 +143,11 @@ public class ScatteredFSUtils extends FSUtils {
         }
 
         String id = scatteredRoot.getFileName().toString();
-        Path scatteredPath = fsConfig.getScatteredPath(id);
-        if(scatteredPath.equals(scatteredRoot) && fsConfig.isValidName(scatteredRoot)) {
-          return fsConfig.getStoragePath(relativePath);
+        if(fsConfig.isValidName(scatteredRoot)) {
+          Path scatteredPath = fsConfig.getScatteredPath(id);
+          if(scatteredPath.equals(scatteredRoot)) {
+            return fsConfig.getStoragePath(relativePath);
+          }
         }
       }
     }
@@ -593,14 +595,14 @@ public class ScatteredFSUtils extends FSUtils {
                             return false;
                           }
 
+                          if (!scatteredFSConfig.isValidName(relativePath)) {
+                            return false;
+                          }
+
                           String id = p.getFileName().toString();
                           Path scatteredPath = scatteredFSConfig.getScatteredPath(id);
 
                           if (!relativePath.equals(scatteredPath)) {
-                            return false;
-                          }
-
-                          if (!scatteredFSConfig.isValidName(relativePath)) {
                             return false;
                           }
 

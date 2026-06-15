@@ -140,7 +140,7 @@ public class ReindexPreservationRepositoryEventPlugin extends AbstractPlugin<Voi
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
     } catch (Exception e) {
-      LOGGER.error("Error reindexing RODA entity", e);
+      LOGGER.error("Error reindexing ETERNA entity", e);
       pluginReport.setPluginState(PluginState.FAILURE)
         .setPluginDetails("Could not list preservation repository events");
     }
