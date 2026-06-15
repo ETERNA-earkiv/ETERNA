@@ -7,6 +7,7 @@ RUN apt-get update && \
     fc-cache -f && \
     useradd -r -u 1001 -m unoserver && \
     mkdir -p /home/unoserver/.cache/dconf && \
+    mkdir -p /home/unoserver/.cache/fontconfig && \
     chown -R unoserver:unoserver /home/unoserver
 USER unoserver
 ENV UNOSERVER_CONVERSION_TIMEOUT=360
