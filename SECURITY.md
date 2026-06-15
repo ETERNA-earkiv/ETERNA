@@ -1,29 +1,3 @@
----
-title: Support Policy
----
-# Maintenance and Security Policy
-
-## Supported Versions
-
-The following versions are supported with security updates
-
-| Version | Release date ¹     | End of Standard Support | End of Life |
-| ------- | ------------------ | ----------------------- | ----------- |
-| 1.X     | 2026-06            | TBD                     | TBD         |
-| 0.X     | 2025-05            | 2027-06                 | 2027-06     |
-
-¹ Release date = date of first release in the series (not the latest patch).
-
-
-Note: After *End of Standard Support* a release will only get security patches.
-
-## Dependencies support
-
-| ETERNA  | Java          | Apache Tomcat     | Apache Solr             | E-ARK IP           |
-| ------- | ------------- | ----------------- | ----------------------- | ------------------ |
-| 1.X     | Java 21 (LTS) | Apache Tomcat 10  | Apache Solr 9.X         | E-ARK IP 2.X       | 
-| 0.X     | Java 17 (LTS) | Apache Tomcat 9   | Apache Solr 9.X         | E-ARK IP 2.X       |
-
 ## Reporting a Vulnerability
 
 To report on a vulnerability, please use the github forms for vulnerability reporting:
