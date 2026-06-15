@@ -21,6 +21,7 @@
 - Added welcome page quick-actions configurable via `roda-wui.properties`, time-based greeting, and forum integration (Flarum API proxy showing latest threads) [#320](https://github.com/ETERNA-earkiv/ETERNA/pull/320)
 - Added configurable CSV export and expanded the export module to support all entity types: RepresentationInformation, User/Groups, Ingest, and remaining types [#315](https://github.com/ETERNA-earkiv/ETERNA/pull/315) [#575](https://github.com/ETERNA-earkiv/ETERNA/pull/575)
 - Added infrastructure support for office document conversion via unoserver (LibreOffice/unoconvert); includes dedicated `unoserver` Docker image and client installation in main image [#309](https://github.com/ETERNA-earkiv/ETERNA/pull/309)
+- Added `deploys/full-service/` Docker Compose example for ETERNA 1.0 production-like deployments; includes unoserver, OpenLDAP container, Traefik reverse proxy, ACME TLS, and `ldap_data` named volume for persistence
 - Added Swedish translations for set password screen [#536](https://github.com/ETERNA-earkiv/ETERNA/pull/536) and email templates [#583](https://github.com/ETERNA-earkiv/ETERNA/pull/583)
 - Added plugin names, descriptions, and parameter labels translated to Swedish for all ingest, preservation, and support plugins [#311](https://github.com/ETERNA-earkiv/ETERNA/pull/311) [#314](https://github.com/ETERNA-earkiv/ETERNA/pull/314)
 - Updated PDF redactor integration to `se.whitered.eterna:pdf-redactor` 1.1.0 with async save callbacks, user-defined version suffix (empty → timestamp), and mandatory redaction reason at save time (configurable via `ui.redaction.reason.mandatory`) [#238](https://github.com/ETERNA-earkiv/ETERNA/pull/238) [#319](https://github.com/ETERNA-earkiv/ETERNA/pull/319) [#321](https://github.com/ETERNA-earkiv/ETERNA/pull/321)
@@ -75,6 +76,9 @@
 - Fixed highlight.js dark theme applied incorrectly; switched to light (github) theme
 - Fixed statistics API calls migrated from v1 to v2 endpoints [#547](https://github.com/ETERNA-earkiv/ETERNA/pull/547)
 - Fixed WhiteRed support portal URL [#473](https://github.com/ETERNA-earkiv/ETERNA/pull/473)
+- Fixed `StringIndexOutOfBoundsException` in `ScatteredFSUtils` when AIP-IDs are shorter than the configured scatter interval; `isValidName` is now called before `getScatteredPath` in `listResourcesUnderContainer` and `getStoragePath`
+- Fixed Solr schema fields that deviate from the Java model definition being silently ignored; `SchemaBuilder` now supports `replaceField()` and `SolrBootstrapUtils` calls it on mismatch — resolves `RepresentationInformation` reindex failures caused by `required=true` in Solr when the Java model has `required=false`
+- Fixed `NoClassDefFoundError` for `OutputPropertiesFactory` during `RepresentationInformation` deserialization; caused by `xalan:xalan:2.7.3` shipping an empty POM that dropped `xalan:serializer` from the classpath — pinned `xalan:serializer:2.7.2` explicitly
 
 #### Configuration changes
 
@@ -111,6 +115,9 @@
 - Dependencies upgraded: Spring Boot 3.4.10, Spring Core 6.2.18, Solr 9.10.1, Logback 1.5.34, Tomcat 10.1.55, PostgreSQL driver 42.7.11, commons-ip2 2.11.2, ReplayWeb.page 2.4.4, Handlebars 4.4.0
 - Docker Compose: updated service images for ZooKeeper, Solr, ClamAV, and Siegfried; switched OpenLDAP image to `docker.io/bitnamilegacy/openldap:2.6` [#591](https://github.com/ETERNA-earkiv/ETERNA/pull/591)
 - Docker Compose: added unoserver service with restart policy and healthcheck; added Swagger UI and Mailpit to distributed dev environments (not standalone); removed Swagger UI and Mailpit from standalone configuration and changed SMTP host to `mailserver` [#591](https://github.com/ETERNA-earkiv/ETERNA/pull/591)
+- Upgraded unoserver from 3.3.2 to 3.7; added `apt upgrade` step for base image security patches, rebuilt font cache, set `FONTCONFIG_CACHE`, and created home directory and dconf cache for the unoserver user
+- Added healthchecks for ZooKeeper, Solr, Siegfried, and OpenLDAP in both `docker-compose.yaml` and `full-service/docker-compose.yaml`; upgraded `eterna` `depends_on` conditions from `service_started` to `service_healthy` where healthchecks are defined
+- Fixed ACME certificate persistent storage in full-service Docker Compose: updated path to `/var/lib/traefik/acme.json` so certificates survive container recreates
 
 #### Security updates
 - Fixed GHSA-wxr5-93ph-8wr9: upgraded `commons-beanutils` to 1.11.0
