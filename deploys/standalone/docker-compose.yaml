@@ -66,17 +66,12 @@ services:
       start_period: 30s
 
   openldap:
-    image: docker.io/bitnamilegacy/openldap:2.6
+    image: docker.io/bitnamilegacy/openldap:2.6.10
     restart: unless-stopped
     user: 1001:root
-    ports:
-      - "1389:1389"
-      - "1636:1636"
     environment:
-      - BITNAMI_DEBUG=true
       - LDAP_ROOT=dc=roda,dc=org
       - LDAP_SKIP_DEFAULT_TREE=yes
-      - LDAP_ADMIN_USERNAME=admin
       - LDAP_ADMIN_PASSWORD=eterna
       - LDAP_EXTRA_SCHEMAS=cosine,inetorgperson,nis,pbkdf2
     volumes:
@@ -99,7 +94,7 @@ services:
       start_period: 60s
 
   eterna:
-    image: ghcr.io/eterna-earkiv/eterna:test-main-latest
+    image: ghcr.io/eterna-earkiv/eterna:v1.0.0
     restart: unless-stopped
     ports:
       - "8080:8080"
