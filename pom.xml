@@ -977,6 +977,12 @@
                 <artifactId>xalan</artifactId>
                 <version>2.7.3</version>
             </dependency>
+            <!-- xalan 2.7.3 pom declares no dependencies; serializer must be pinned explicitly -->
+            <dependency>
+                <groupId>xalan</groupId>
+                <artifactId>serializer</artifactId>
+                <version>2.7.2</version>
+            </dependency>
             <!-- Security: fix commons-net GHSA-cgp8-4m63-fhh5 -->
             <dependency>
                 <groupId>commons-net</groupId>

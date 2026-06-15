@@ -442,6 +442,13 @@
         </dependency>
         <!-- /gwt -->
 
+        <!-- xalan 2.7.3 pom has no declared dependencies; serializer must be explicit -->
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>serializer</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>it.burning</groupId>
             <artifactId>cron-expression-descriptor</artifactId>

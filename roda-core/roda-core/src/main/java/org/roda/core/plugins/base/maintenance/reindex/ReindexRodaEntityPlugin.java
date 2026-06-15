@@ -135,7 +135,7 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
         clearSpecificIndexes(index, ids);
       }
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | RouteException e) {
-      LOGGER.error("Error clearing specific indexes of a RODA entity", e);
+      LOGGER.error("Error clearing specific indexes of a ETERNA entity", e);
     }
 
     // executing reindex
