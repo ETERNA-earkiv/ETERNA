@@ -1,0 +1,30 @@
+{{~field name="companyName"        order='1' auto-generate='title' labeli18n="crosswalks.dissemination.html.sie5.companyName"      label="{\"en\": \"Company name\"}"      xpath="//*:Company/@name"}}
+{{~field name="orgId"              order='2'                          labeli18n="crosswalks.dissemination.html.sie5.orgId"             label="{\"en\": \"Organization number\"}" xpath="//*:Company/@clientId"}}
+{{~field name="companyType"        order='3'                          labeli18n="crosswalks.dissemination.html.sie5.companyType"        label="{\"en\": \"Company type\"}"        xpath="//*:CompanyTypeInfo/@type"}}
+{{~field name="fiscalYearStart"    order='4' type='date'              labeli18n="crosswalks.dissemination.html.sie5.fiscalYearStart"    label="{\"en\": \"Fiscal year start\"}"   xpath="//*:FiscalYear[1]/@start"}}
+{{~field name="fiscalYearEnd"      order='5' type='date'              labeli18n="crosswalks.dissemination.html.sie5.fiscalYearEnd"      label="{\"en\": \"Fiscal year end\"}"     xpath="//*:FiscalYear[1]/@end"}}
+{{~field name="accountingPlanType" order='6'                          labeli18n="crosswalks.dissemination.html.sie5.accountingPlanType" label="{\"en\": \"Accounting plan\"}"     xpath="//*:AccountingPlan/@type"}}
+{{~field name="softwareProduct"    order='7'                          labeli18n="crosswalks.dissemination.html.sie5.softwareProduct"    label="{\"en\": \"Software product\"}"    xpath="//*:SoftwareProduct/@name"}}
+{{~field name="fileCreationTime"   order='8'                          labeli18n="crosswalks.dissemination.html.sie5.fileCreationTime"   label="{\"en\": \"File creation time\"}"  xpath="//*:FileCreation/@time"~}}
+<?xml version="1.0" encoding="UTF-8"?>
+<sie:SIE xmlns:sie="http://www.sie.se/sie5"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.sie.se/sie5 ../schemas/sie5.xsd">
+  <sie:FileInfo>
+    <sie:SoftwareProduct name="{{#if softwareProduct}}{{softwareProduct}}{{/if}}"/>
+    <sie:FileCreation time="{{#if fileCreationTime}}{{fileCreationTime}}{{/if}}"/>
+    {{~#if companyType}}
+    <sie:CompanyTypeInfo type="{{companyType}}"/>
+    {{~/if}}
+  </sie:FileInfo>
+  <sie:Company clientId="{{#if orgId}}{{orgId}}{{/if}}" name="{{#if companyName}}{{companyName}}{{/if}}">
+    {{~#if fiscalYearStart}}
+    <sie:FiscalYears>
+      <sie:FiscalYear id="1" start="{{fiscalYearStart}}" end="{{#if fiscalYearEnd}}{{fiscalYearEnd}}{{else}}{{fiscalYearStart}}{{/if}}" primaryYear="true"/>
+    </sie:FiscalYears>
+    {{~/if}}
+    {{~#if accountingPlanType}}
+    <sie:AccountingPlan type="{{accountingPlanType}}"/>
+    {{~/if}}
+  </sie:Company>
+</sie:SIE>
