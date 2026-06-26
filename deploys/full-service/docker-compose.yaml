@@ -184,6 +184,7 @@ services:
       - "${CONFIG_PATH:-./config}/ldap/pbkdf2.ldif:/opt/bitnami/openldap/etc/schema/pbkdf2.ldif:ro"
       - "${CONFIG_PATH:-./config}/ldap/groups.ldif:/docker-entrypoint-initdb.d/groups.ldif"
       - "${CONFIG_PATH:-./config}/ldap/users.ldif:/docker-entrypoint-initdb.d/users.ldif"
+      - openldap_data:/bitnami/openldap
     healthcheck:
       test: ["CMD-SHELL", "ldapwhoami -H ldap://localhost:1389 -D cn=admin,dc=roda,dc=org -w $$LDAP_ADMIN_PASSWORD"]
       interval: 10s
@@ -350,3 +351,4 @@ volumes:
   solr_data:
   clam_data:
   siegfried_data:
+  openldap_data:
