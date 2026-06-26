@@ -76,6 +76,7 @@ services:
       - LDAP_EXTRA_SCHEMAS=cosine,inetorgperson,nis,pbkdf2
     volumes:
       - ./ldap/ldif/pbkdf2.ldif:/opt/bitnami/openldap/etc/schema/pbkdf2.ldif
+      - openldap_data:/bitnami/openldap
     healthcheck:
       test: ["CMD-SHELL", "ldapwhoami -H ldap://localhost:1389 -D cn=admin,dc=roda,dc=org -w $$LDAP_ADMIN_PASSWORD"]
       interval: 10s
@@ -154,4 +155,5 @@ volumes:
   clam_data:
   siegfried_data:
   roda_data:
+  openldap_data:
   #pg_data:
