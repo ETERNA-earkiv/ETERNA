@@ -107,7 +107,45 @@ def build_group_membership_ldif(g, base):
     return "\n".join(lines)
 
 
-def transform(users_path, groups_path, base, ldif_path, membership_ldif_path, csv_path, include_protected):
+def build_roles_ldif(groups, users, base):
+    """Generate ldapmodify to restore roleOccupant assignments on existing role entries.
+
+    Roles in OpenLDAP are created empty by ETERNA's syncMissingRoles on startup.
+    This assigns groups/users to each role based on the v0.6.1 export.
+    Must be applied AFTER ETERNA has started (role entries must already exist).
+    Uses replace: roleOccupant so the result is authoritative — run once only.
+    """
+    role_occupants = {}  # role_name -> set of occupant DNs
+
+    for g in groups:
+        cn = g.get("id") or g.get("name") or ""
+        group_dn = f"cn={cn},ou=groups,{base}"
+        for role in g.get("directRoles", []):
+            role_occupants.setdefault(role, set()).add(group_dn)
+
+    for u in users:
+        uid = u.get("id") or u.get("name") or ""
+        user_dn = f"uid={uid},ou=users,{base}"
+        for role in u.get("directRoles", []):
+            role_occupants.setdefault(role, set()).add(user_dn)
+
+    if not role_occupants:
+        return ""
+
+    blocks = []
+    for role, occupants in sorted(role_occupants.items()):
+        lines = [
+            f"dn: cn={role},ou=roles,{base}",
+            "changetype: modify",
+            "replace: roleOccupant",
+        ]
+        lines += [f"roleOccupant: {o}" for o in sorted(occupants)]
+        blocks.append("\n".join(lines))
+
+    return "\n\n".join(blocks) + "\n"
+
+
+def transform(users_path, groups_path, base, ldif_path, membership_ldif_path, roles_ldif_path, csv_path, include_protected):
     users = load_json(users_path, "users", "results")
     groups = load_json(groups_path, "groups", "results")
 
@@ -169,6 +207,12 @@ def transform(users_path, groups_path, base, ldif_path, membership_ldif_path, cs
         if modify_blocks:
             f.write("\n")
 
+    # Roles: build from ALL groups (including protected — administrators has all roles)
+    roles_ldif = build_roles_ldif(groups, users, base)
+    with open(roles_ldif_path, "w") as f:
+        f.write(roles_ldif)
+    stats["roles"] = roles_ldif.count("changetype: modify")
+
     with open(csv_path, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=["uid", "fullName", "email", "active", "groups", "note"])
         w.writeheader()
@@ -183,20 +227,26 @@ def main():
     p.add_argument("--groups", required=True, help="Path to groups.json from API v1")
     p.add_argument("--ldif-out", required=True)
     p.add_argument("--membership-ldif-out", default=None,
-                   help="Output path for group membership modify LDIF (default: <ldif-out>.membership.ldif)")
+                   help="Output path for group membership modify LDIF (default: derived from --ldif-out)")
+    p.add_argument("--roles-ldif-out", default=None,
+                   help="Output path for role assignments modify LDIF (default: derived from --ldif-out)")
     p.add_argument("--csv-out", required=True)
     p.add_argument("--base", default="dc=roda,dc=org")
     p.add_argument("--include-protected", action="store_true",
                    help="Also include admin/guest/administrators/users/guests")
     args = p.parse_args()
 
-    membership_path = args.membership_ldif_out or args.ldif_out.replace(".ldif", "") + "-membership.ldif"
+    stem = args.ldif_out.replace(".ldif", "")
+    membership_path = args.membership_ldif_out or stem + "-membership.ldif"
+    roles_path = args.roles_ldif_out or stem + "-roles.ldif"
     stats = transform(args.users, args.groups, args.base,
-                      args.ldif_out, membership_path, args.csv_out, args.include_protected)
-    print(f"Done: {stats['users']} users, {stats['groups']} groups "
+                      args.ldif_out, membership_path, roles_path, args.csv_out, args.include_protected)
+    print(f"Done: {stats['users']} users, {stats['groups']} groups, "
+          f"{stats['roles']} role assignments "
           f"({stats['skipped_users']} protected users skipped)", file=sys.stderr)
     print(f"  Add LDIF:        {args.ldif_out}", file=sys.stderr)
     print(f"  Membership LDIF: {membership_path}", file=sys.stderr)
+    print(f"  Roles LDIF:      {roles_path}", file=sys.stderr)
 
 
 if __name__ == "__main__":
