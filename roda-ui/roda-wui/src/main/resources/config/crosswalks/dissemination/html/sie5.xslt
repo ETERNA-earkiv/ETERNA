@@ -5,14 +5,17 @@
   exclude-result-prefixes="sie">
   <xsl:output method="xml" indent="yes" encoding="UTF-8" omit-xml-declaration="yes"/>
 
-  <xsl:param name="i18n.companyName"/>
-  <xsl:param name="i18n.orgId"/>
-  <xsl:param name="i18n.companyType"/>
+  <xsl:param name="i18n.supplierName"/>
+  <xsl:param name="i18n.supplierInvoiceId"/>
+  <xsl:param name="i18n.invoiceId"/>
+  <xsl:param name="i18n.invoiceDate"/>
+  <xsl:param name="i18n.supplierOrgId"/>
+  <xsl:param name="i18n.currency"/>
+  <xsl:param name="i18n.approvedBy"/>
+  <xsl:param name="i18n.approvedDate"/>
+  <xsl:param name="i18n.paymentDate"/>
   <xsl:param name="i18n.fiscalYearStart"/>
   <xsl:param name="i18n.fiscalYearEnd"/>
-  <xsl:param name="i18n.accountingPlanType"/>
-  <xsl:param name="i18n.softwareProduct"/>
-  <xsl:param name="i18n.fileCreationTime"/>
 
   <xsl:template match="/">
     <div class="descriptiveMetadata">
@@ -21,19 +24,51 @@
   </xsl:template>
 
   <xsl:template match="sie:SIE">
+    <xsl:variable name="inv" select="sie:Company/sie:SupplierInvoices/sie:SupplierInvoice[1]"/>
+    <xsl:variable name="sup" select="sie:Company/sie:Suppliers/sie:Supplier[@id = $inv/@supplierRef][1]"/>
+
     <xsl:call-template name="field">
-      <xsl:with-param name="label" select="$i18n.companyName"/>
-      <xsl:with-param name="value" select="normalize-space(sie:Company/@name)"/>
+      <xsl:with-param name="label" select="$i18n.supplierName"/>
+      <xsl:with-param name="value" select="normalize-space($sup/@name)"/>
     </xsl:call-template>
 
     <xsl:call-template name="field">
-      <xsl:with-param name="label" select="$i18n.orgId"/>
-      <xsl:with-param name="value" select="normalize-space(sie:Company/@clientId)"/>
+      <xsl:with-param name="label" select="$i18n.supplierInvoiceId"/>
+      <xsl:with-param name="value" select="normalize-space($inv/@supplierInvoiceId)"/>
     </xsl:call-template>
 
     <xsl:call-template name="field">
-      <xsl:with-param name="label" select="$i18n.companyType"/>
-      <xsl:with-param name="value" select="normalize-space(sie:FileInfo/sie:CompanyTypeInfo/@type)"/>
+      <xsl:with-param name="label" select="$i18n.invoiceId"/>
+      <xsl:with-param name="value" select="normalize-space($inv/@id)"/>
+    </xsl:call-template>
+
+    <xsl:call-template name="field">
+      <xsl:with-param name="label" select="$i18n.invoiceDate"/>
+      <xsl:with-param name="value" select="normalize-space($inv/@invoiceDate)"/>
+    </xsl:call-template>
+
+    <xsl:call-template name="field">
+      <xsl:with-param name="label" select="$i18n.supplierOrgId"/>
+      <xsl:with-param name="value" select="normalize-space($sup/@organizationId)"/>
+    </xsl:call-template>
+
+    <xsl:call-template name="field">
+      <xsl:with-param name="label" select="$i18n.currency"/>
+      <xsl:with-param name="value" select="normalize-space($inv/@currency)"/>
+    </xsl:call-template>
+
+    <xsl:call-template name="field">
+      <xsl:with-param name="label" select="$i18n.approvedBy"/>
+      <xsl:with-param name="value" select="normalize-space($inv/@approvedBy)"/>
+    </xsl:call-template>
+
+    <xsl:call-template name="field">
+      <xsl:with-param name="label" select="$i18n.approvedDate"/>
+      <xsl:with-param name="value" select="normalize-space($inv/@approvedDate)"/>
+    </xsl:call-template>
+    <xsl:call-template name="field">
+      <xsl:with-param name="label" select="$i18n.paymentDate"/>
+      <xsl:with-param name="value" select="normalize-space($inv/@paymentDate)"/>
     </xsl:call-template>
 
     <xsl:variable name="primaryYear" select="sie:Company/sie:FiscalYears/sie:FiscalYear[@primaryYear='true'][1]"/>
@@ -48,21 +83,6 @@
     <xsl:call-template name="field">
       <xsl:with-param name="label" select="$i18n.fiscalYearEnd"/>
       <xsl:with-param name="value" select="normalize-space($fiscalYear/@end)"/>
-    </xsl:call-template>
-
-    <xsl:call-template name="field">
-      <xsl:with-param name="label" select="$i18n.accountingPlanType"/>
-      <xsl:with-param name="value" select="normalize-space(sie:Company/sie:AccountingPlan/@type)"/>
-    </xsl:call-template>
-
-    <xsl:call-template name="field">
-      <xsl:with-param name="label" select="$i18n.softwareProduct"/>
-      <xsl:with-param name="value" select="normalize-space(sie:FileInfo/sie:SoftwareProduct/@name)"/>
-    </xsl:call-template>
-
-    <xsl:call-template name="field">
-      <xsl:with-param name="label" select="$i18n.fileCreationTime"/>
-      <xsl:with-param name="value" select="normalize-space(sie:FileInfo/sie:FileCreation/@time)"/>
     </xsl:call-template>
   </xsl:template>
 
