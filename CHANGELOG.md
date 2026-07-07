@@ -3,6 +3,7 @@
 ## v1.0.1 (unreleased)
 
 #### Bug fixes
+- Fixed Swedish label "Start datum" → "Startdatum" in the internal actions (job) detail view [#542](https://github.com/ETERNA-earkiv/ETERNA/issues/542)
 - Catalog tree no longer shows AIPs at description level `item` or `file` [#604](https://github.com/ETERNA-earkiv/ETERNA/issues/604)
 - Fixed flickering horizontal scrollbar on data table list pages (e.g. ingest process); the footer no longer scrolls horizontally with the table [#605](https://github.com/ETERNA-earkiv/ETERNA/issues/605) [#609](https://github.com/ETERNA-earkiv/ETERNA/pull/609)
 
