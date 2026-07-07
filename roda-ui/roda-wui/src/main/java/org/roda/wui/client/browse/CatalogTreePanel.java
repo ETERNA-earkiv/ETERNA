@@ -197,7 +197,8 @@ public class CatalogTreePanel extends Composite {
     FindRequest findRequest = new FindRequest.FindRequestBuilder(
       new Filter(
         new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID),
-        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file")),
+        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file"),
+        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "item")),
       true)
       .withSorter(new Sorter(new SortParameter(RodaConstants.AIP_TITLE_SORT, false)))
       .withSublist(new Sublist(0, TREE_MAX_CHILDREN))
@@ -247,7 +248,9 @@ public class CatalogTreePanel extends Composite {
    */
   private void loadSupplementaryGhostRoots(Set<String> accessibleRootIds, int myGeneration) {
     FindRequest findRequest = new FindRequest.FindRequestBuilder(
-      new Filter(new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file")),
+      new Filter(
+        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file"),
+        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "item")),
       true)
       .withSorter(new Sorter(new SortParameter(RodaConstants.AIP_TITLE_SORT, false)))
       .withSublist(new Sublist(0, TREE_MAX_CHILDREN))
@@ -352,7 +355,9 @@ public class CatalogTreePanel extends Composite {
     final int myGeneration = loadGeneration;
     rootsLoading = true;
     FindRequest findRequest = new FindRequest.FindRequestBuilder(
-      new Filter(new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file")),
+      new Filter(
+        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file"),
+        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "item")),
       true)
       .withSorter(new Sorter(new SortParameter(RodaConstants.AIP_TITLE_SORT, false)))
       .withSublist(new Sublist(0, TREE_MAX_CHILDREN))
