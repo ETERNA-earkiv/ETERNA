@@ -1627,6 +1627,18 @@ a.btn-hero:visited, a.btn-welcome:visited {
     background: rgba(0,0,0,0.2);
 }
 
+.my-asyncdatagrid-autoupdate-signal {
+    overflow: hidden;
+    position: relative;
+}
+
+.my-asyncdatagrid-footer {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background-color: var(--eterna-paper);
+}
+
 /* Representations section */
 
 .representationSection {

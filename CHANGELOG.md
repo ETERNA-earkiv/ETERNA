@@ -1,5 +1,10 @@
 # ETERNA Changelog
 
+## v1.0.1 (unreleased)
+
+#### Bug fixes
+- Fixed flickering horizontal scrollbar on data table list pages (e.g. ingest process); the footer no longer scrolls horizontally with the table [#605](https://github.com/ETERNA-earkiv/ETERNA/issues/605) [#609](https://github.com/ETERNA-earkiv/ETERNA/pull/609)
+
 ## v1.0.0 (2026-06-15)
 
 #### New features
