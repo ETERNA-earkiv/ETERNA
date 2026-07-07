@@ -1,11 +1,13 @@
 name: 'Test Build'
 
-# Manual-only for now. The automatic push trigger on "main" was removed so that
-# merges to the stable/release branch don't publish test images. When the dev
-# branch exists, restore a push trigger on "dev" and repoint the test server's
-# image tag accordingly.
+# The automatic push trigger on "main" was removed so that merges to the
+# stable/release branch don't publish test images. Push builds now run on
+# "dev-1.x" instead.
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - dev-1.x
 
 permissions:
   actions: write
