@@ -967,8 +967,12 @@ public class PluginManager {
     PluginInfo pluginInfo = getPluginInfo(plugin.getClass().getName());
     pluginInfo.setInstalled(true);
     pluginInfo.setVerified(true);
-    pluginInfo.setHasLicenseFile(true);
-    pluginInfo.setLicenseFilePath(RodaConstants.CORE_LICENSE_MARKDOWN_FILE);
+    // Only advertise a license file when the internal LICENSE.md theme resource actually exists;
+    if (RodaCoreFactory.getConfigurationFile(
+      RodaConstants.CORE_THEME_FOLDER + "/" + RodaConstants.CORE_LICENSE_MARKDOWN_FILE) != null) {
+      pluginInfo.setHasLicenseFile(true);
+      pluginInfo.setLicenseFilePath(RodaConstants.CORE_LICENSE_MARKDOWN_FILE);
+    }
     processAndCachePluginInformation(plugin, pluginInfo);
   }
 
