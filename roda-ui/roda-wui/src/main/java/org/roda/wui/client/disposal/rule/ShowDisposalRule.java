@@ -172,9 +172,7 @@ public class ShowDisposalRule extends Composite {
       });
       conditionsPanel.add(condition);
     } else if (disposalRule.getType().equals(ConditionType.METADATA_FIELD)) {
-      String conditionTxt = disposalRule.getConditionKey() + " " + messages.disposalRuleConditionOperator() + " "
-        + disposalRule.getConditionValue();
-      condition.setHTML(SafeHtmlUtils.fromString(conditionTxt));
+      condition.setHTML(SafeHtmlUtils.fromString(DisposalRuleConditionFormatter.describeMetadataConditions(disposalRule)));
       conditionsPanel.add(condition);
     }
   }

@@ -8,7 +8,9 @@
 package org.roda.core.data.v2.disposal.rule;
 
 import java.io.Serial;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import org.roda.core.data.common.RodaConstants;
@@ -25,6 +27,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRule> {
 
+  // Stays at 1 on purpose: the new conditions list is an optional, additive field and old rules are read transparently
+  // via getMetadataConditions(), so no stored-data migration is required. Bumping this would trip RODA's model-version
+  // mismatch check (MigrationManager) and abort primary-node startup for an existing installation.
   private static final int VERSION = 1;
   @Serial
   private static final long serialVersionUID = 6903251340335265336L;
@@ -37,8 +42,13 @@ public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRu
   private ConditionType type;
 
   // condition
+  // For IS_CHILD_OF: conditionKey holds the parent AIP id (single condition).
+  // For METADATA_FIELD: conditions holds one or more field/value pairs that are ANDed together. conditionKey/
+  // conditionValue are kept for backward compatibility with rules stored before multi-condition support;
+  // getMetadataConditions() normalises both shapes (so no model-version migration is required).
   private String conditionKey;
   private String conditionValue;
+  private List<DisposalRuleCondition> conditions;
 
   private String disposalScheduleId;
   private String disposalScheduleName;
@@ -160,6 +170,45 @@ public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRu
     this.conditionValue = conditionValue;
   }
 
+  /**
+   * Returns the metadata-field conditions stored on this rule (a defensive copy), or {@code null} if none are set.
+   *
+   * @return a copy of the conditions, or {@code null}
+   */
+  public List<DisposalRuleCondition> getConditions() {
+    return conditions == null ? null : new ArrayList<>(conditions);
+  }
+
+  /**
+   * Sets the metadata-field conditions for this rule, storing a defensive copy.
+   *
+   * @param conditions
+   *          the conditions to combine when the rule is evaluated; may be {@code null} or empty
+   */
+  public void setConditions(List<DisposalRuleCondition> conditions) {
+    this.conditions = conditions == null ? null : new ArrayList<>(conditions);
+  }
+
+  /**
+   * Returns the metadata-field conditions normalised across storage formats (a defensive copy). Rules saved with
+   * multi-condition support carry them in {@link #conditions}; rules saved before that carry a single condition in
+   * {@link #conditionKey}/{@link #conditionValue}. All METADATA_FIELD evaluation and validation should go through this
+   * method so both shapes behave identically.
+   *
+   * @return the conditions to combine (with their per-condition AND/OR operators); never {@code null}
+   */
+  @JsonIgnore
+  public List<DisposalRuleCondition> getMetadataConditions() {
+    if (conditions != null && !conditions.isEmpty()) {
+      return new ArrayList<>(conditions);
+    }
+    List<DisposalRuleCondition> normalised = new ArrayList<>();
+    if (conditionKey != null && !conditionKey.isEmpty()) {
+      normalised.add(new DisposalRuleCondition(conditionKey, conditionValue));
+    }
+    return normalised;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o)
@@ -170,6 +219,7 @@ public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRu
     return Objects.equals(id, that.id) && Objects.equals(title, that.title)
       && Objects.equals(description, that.description) && type == that.type
       && Objects.equals(conditionKey, that.conditionKey) && Objects.equals(conditionValue, that.conditionValue)
+      && Objects.equals(conditions, that.conditions)
       && Objects.equals(disposalScheduleId, that.disposalScheduleId)
       && Objects.equals(disposalScheduleName, that.disposalScheduleName) && Objects.equals(order, that.order)
       && Objects.equals(createdOn, that.createdOn) && Objects.equals(createdBy, that.createdBy)
@@ -178,7 +228,7 @@ public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRu
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, title, description, type, conditionKey, conditionValue, disposalScheduleId,
+    return Objects.hash(id, title, description, type, conditionKey, conditionValue, conditions, disposalScheduleId,
       disposalScheduleName, order, createdOn, createdBy, updatedOn, updatedBy);
   }
 
@@ -186,7 +236,7 @@ public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRu
   public String toString() {
     return "DisposalRule{" + "id='" + id + '\'' + ", title='" + title + '\'' + ", description='" + description + '\''
       + ", type=" + type + ", conditionKey='" + conditionKey + '\'' + ", conditionValue='" + conditionValue + '\''
-      + ", disposalScheduleId='" + disposalScheduleId + '\'' + ", disposalScheduleName='" + disposalScheduleName + '\''
+      + ", conditions=" + conditions + ", disposalScheduleId='" + disposalScheduleId + '\'' + ", disposalScheduleName='" + disposalScheduleName + '\''
       + ", order=" + order + ", createdOn=" + createdOn + ", createdBy='" + createdBy + '\'' + ", updatedOn="
       + updatedOn + ", updatedBy='" + updatedBy + '\'' + '}';
   }

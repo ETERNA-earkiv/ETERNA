@@ -264,14 +264,10 @@ public class OrderDisposalRules extends Composite {
         }), new BasicTablePanel.ColumnInfo<>(messages.disposalRuleCondition(), 24, new TextColumn<DisposalRule>() {
           @Override
           public String getValue(DisposalRule rule) {
-            String condition;
             if (rule.getType().equals(ConditionType.METADATA_FIELD)) {
-              condition = rule.getConditionKey() + " " + messages.disposalRuleConditionOperator() + " "
-                + rule.getConditionValue();
-            } else {
-              condition = rule.getConditionValue();
+              return DisposalRuleConditionFormatter.describeMetadataConditions(rule);
             }
-            return messages.disposalRuleTypeValue(condition);
+            return messages.disposalRuleTypeValue(rule.getConditionValue());
           }
         }),
 

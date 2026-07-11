@@ -81,7 +81,7 @@ Selection method is the mechanism responsible for matching the rules with the re
 There are two types of selection method available on ETERNA:
 
 * Child of: if the record is directly under a certain AIP.
-* Metadata field: if the record has a descriptive metadata value. 
+* Metadata field: if the record matches one or more descriptive metadata conditions. Multiple conditions can be defined for a single rule and combined using AND or OR logic operators (e.g., "field A = value1 AND field B = value2" or "field A = value1 OR field B = value2"). Conditions are evaluated left to right. 
 
 ### 4. How it works?
 
