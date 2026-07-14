@@ -5173,6 +5173,29 @@ body.catalogTreeResizing * {
     font-size: 1.4rem;
 }
 
+.table-empty-inner .table-empty-inner-hints {
+    margin: 0 0 1rem 0;
+    padding-left: 3rem;
+    font-size: 1.4rem;
+    color: #9a9a9a;
+}
+
+.table-empty-inner .table-empty-inner-hints li {
+    margin-bottom: 0.25rem;
+    line-height: 1.4;
+}
+
+.table-empty-inner .table-empty-inner-facets {
+    margin: 1rem 0 1rem 1.5rem;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #9a9a9a;
+}
+
+.table-empty-inner .table-empty-inner-facets .table-empty-inner-link {
+    display: inline;
+}
+
 /**********************************************
 				SEARCH
 ************************************************/
