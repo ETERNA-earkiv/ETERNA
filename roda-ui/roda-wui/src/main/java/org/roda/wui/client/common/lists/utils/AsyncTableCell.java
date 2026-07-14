@@ -26,7 +26,9 @@ import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetParameter;
 import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
@@ -614,8 +616,10 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
     if (hasSelectedFacets()) {
 
-      Label msgBeforeLink = new InlineLabel(messages.noItemsToDisplayButFacetsActive(someOfAObject) + " ");
-      msgBeforeLink.addStyleName("table-empty-inner-label");
+      FlowPanel facetsMessage = new FlowPanel();
+      facetsMessage.addStyleName("table-empty-inner-facets");
+
+      InlineLabel msgBeforeLink = new InlineLabel(messages.noItemsToDisplayButFacetsActive(someOfAObject) + " ");
 
       Anchor resetFacetsAnchor = new Anchor(messages.resetFacetsLink());
       resetFacetsAnchor.addStyleName("table-empty-inner-link");
@@ -624,16 +628,29 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
         refresh();
       });
 
-      emptyTablewidget.add(msgBeforeLink);
-      emptyTablewidget.add(resetFacetsAnchor);
+      facetsMessage.add(msgBeforeLink);
+      facetsMessage.add(resetFacetsAnchor);
+      emptyTablewidget.add(facetsMessage);
+    } else if (hasActiveSearch() || !originalFilter.equals(this.getFilter())) {
+      Label heading = new Label(messages.noItemsToDisplay(someOfAObject));
+      heading.addStyleName("table-empty-inner-label");
+      emptyTablewidget.add(heading);
+
+      Label intro = new Label(messages.noItemsToDisplayTryFollowing());
+      intro.addStyleName("table-empty-inner-label");
+      emptyTablewidget.add(intro);
+
+      SafeHtmlBuilder hints = new SafeHtmlBuilder();
+      hints.appendHtmlConstant("<ul class=\"table-empty-inner-hints\">");
+      hints.appendHtmlConstant("<li>").appendEscaped(messages.noItemsToDisplayHintSpelling()).appendHtmlConstant("</li>");
+      hints.appendHtmlConstant("<li>").appendEscaped(messages.noItemsToDisplayHintKeywords()).appendHtmlConstant("</li>");
+      hints.appendHtmlConstant("<li>").appendEscaped(messages.noItemsToDisplayHintFilters()).appendHtmlConstant("</li>");
+      hints.appendHtmlConstant("</ul>");
+      emptyTablewidget.add(new HTML(hints.toSafeHtml()));
     } else {
       Label label = new Label();
       label.addStyleName("table-empty-inner-label");
-      if (originalFilter.equals(this.getFilter())) {
-        label.setText(messages.noItemsToDisplayPreFilters(someOfAObject));
-      } else {
-        label.setText(messages.noItemsToDisplay(someOfAObject));
-      }
+      label.setText(messages.noItemsToDisplayPreFilters(someOfAObject));
       emptyTablewidget.add(label);
     }
     display.setEmptyTableWidget(emptyTablewidget);
@@ -1352,6 +1369,26 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     }
 
     return innerFacetPanels;
+  }
+
+  /**
+   * Returns {@code true} when the current filter contains a non-empty basic (free-text) search parameter. Used to detect
+   * an active search independently of {@code originalFilter}, which can already carry the search parameter when the list
+   * is built with a search filter as its initial filter (e.g. via history tokens).
+   */
+  private boolean hasActiveSearch() {
+    Filter currentFilter = this.getFilter();
+    if (currentFilter != null) {
+      for (FilterParameter parameter : currentFilter.getParameters()) {
+        if (parameter instanceof BasicSearchFilterParameter) {
+          String value = ((BasicSearchFilterParameter) parameter).getValue();
+          if (value != null && !value.trim().isEmpty() && !"*".equals(value.trim())) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
   }
 
   private boolean hasSelectedFacets() {

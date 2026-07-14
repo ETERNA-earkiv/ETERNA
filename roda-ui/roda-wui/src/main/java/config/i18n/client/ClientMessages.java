@@ -293,6 +293,14 @@ public interface ClientMessages extends Messages {
 
   String noItemsToDisplay(String itemLabel);
 
+  String noItemsToDisplayTryFollowing();
+
+  String noItemsToDisplayHintSpelling();
+
+  String noItemsToDisplayHintKeywords();
+
+  String noItemsToDisplayHintFilters();
+
   String noItemsToDisplayPreFilters(String itemLabel);
 
   String noItemsToDisplayButFacetsActive(String itemLabel);
