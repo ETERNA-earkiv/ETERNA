@@ -8,6 +8,7 @@
 - Catalog tree no longer shows AIPs at description level `item` or `file` [#604](https://github.com/ETERNA-earkiv/ETERNA/issues/604)
 - Fixed flickering horizontal scrollbar on data table list pages (e.g. ingest process); the footer no longer scrolls horizontally with the table [#605](https://github.com/ETERNA-earkiv/ETERNA/issues/605) [#609](https://github.com/ETERNA-earkiv/ETERNA/pull/609)
 - Empty-search results now show a single, consistent message with troubleshooting tips regardless of the search term (previously a wildcard search such as `blå*` showed a different, mistranslated message); corrected the Swedish text and fixed the misaligned reset-filters link [#378](https://github.com/ETERNA-earkiv/ETERNA/issues/378)
+- Fixed `ClassCastException` that broke list rendering when a column used a rendering hint (e.g. `DATE_FORMAT_SIMPLE`) on a multivalued field; each element is now formatted with the hint and shown as a comma-separated list [#607](https://github.com/ETERNA-earkiv/ETERNA/issues/607)
 
 ## v1.0.0 (2026-06-15)
 

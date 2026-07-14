@@ -349,6 +349,14 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
               return value.toString();
             }
 
+            // multivalued (e.g. multivalued Solr) fields arrive as a List: render each
+            // element with the same hint and join them into a single string
+            if (value instanceof List) {
+              List<String> renderedList = ((List<?>) value).stream().map(v -> renderValue(v, hint))
+                .collect(Collectors.toList());
+              return StringUtils.prettyPrint(renderedList);
+            }
+
             switch (hint) {
               case FILE_SIZE:
                 Long size;
@@ -365,8 +373,8 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
               case DATE_FORMAT_SIMPLE:
                 return Humanize.formatDate((String) value, false);
               case LIST:
-                List<String> renderedList = ((List<?>) value).stream().map(v -> renderValue(v, hint)).collect(Collectors.toList());
-                return StringUtils.prettyPrint(renderedList);
+                // a LIST value is joined element-wise by the guard above; a single element
+                // reaches here and is rendered as plain text
               default:
                 return value.toString();
             }
