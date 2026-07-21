@@ -97,6 +97,7 @@ public class SelectAipTreeDialog extends DialogBox
   private SelectAipTreeNode selectedNode = null;
   private IndexedAIP selectedAip = null;
   private boolean rootsLoaded = false;
+  private int loadGeneration = 0;
 
   public SelectAipTreeDialog(String title) {
     this(title, null, true);
@@ -124,6 +125,9 @@ public class SelectAipTreeDialog extends DialogBox
         String query = filterInput.getText().trim().toLowerCase();
         for (SelectAipTreeNode node : rootNodes.values()) {
           node.applyFilter(query);
+        }
+        if (selectedNode != null && !selectedNode.isVisible()) {
+          clearSelection();
         }
       }
     });
@@ -153,6 +157,7 @@ public class SelectAipTreeDialog extends DialogBox
   }
 
   private void loadRootNodes() {
+    final int myGeneration = ++loadGeneration;
     rootsLoaded = true;
     treeBody.clear();
     rootNodes.clear();
@@ -167,6 +172,9 @@ public class SelectAipTreeDialog extends DialogBox
     Services service = new Services(messages.catalogTreeReasonListRoots(), "get");
     service.rodaEntityRestService(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
       IndexedAIP.class).whenComplete((result, error) -> {
+        if (myGeneration != loadGeneration) {
+          return;
+        }
         if (error != null) {
           LOGGER.error("Failed to load parent-node selector root nodes", error);
           showRootLoadError();

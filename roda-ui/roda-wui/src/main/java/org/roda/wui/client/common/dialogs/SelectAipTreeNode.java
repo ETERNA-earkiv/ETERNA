@@ -279,19 +279,7 @@ public class SelectAipTreeNode extends Composite {
     rowPanel.removeStyleName("selected");
   }
 
-  public boolean isDisabled() {
-    return disabled;
-  }
-
   public IndexedAIP getAip() {
     return aip;
-  }
-
-  public String getAipId() {
-    return aip.getId();
-  }
-
-  public Map<String, SelectAipTreeNode> getChildNodes() {
-    return childNodes;
   }
 }
