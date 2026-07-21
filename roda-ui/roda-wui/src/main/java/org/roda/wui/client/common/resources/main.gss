@@ -3612,6 +3612,37 @@ body.catalogTreeResizing * {
     color: COLOR_GREY_MEDIUM;
 }
 
+.catalogTreeNode.disabled {
+    cursor: default;
+    color: COLOR_GREY_MEDIUM;
+    opacity: 0.6;
+}
+
+.catalogTreeNode.disabled:hover {
+    background: transparent;
+}
+
+.catalogTreeNode.disabled .catalogTreeIcon {
+    color: COLOR_GREY_MEDIUM;
+}
+
+.selectAipTreeBodyScroll {
+    max-height: 55vh;
+    min-height: 120px;
+    overflow-y: auto;
+    padding: 4px 0;
+    border: 1px solid COLOR_GREY_VERYLIGHT;
+    border-top: none;
+}
+
+.selectAipTree .catalogTreeFilter {
+    border: 1px solid COLOR_GREY_VERYLIGHT;
+}
+
+.selectAipTreeEmptyParentButton {
+    margin-right: 10px;
+}
+
 .browseSidePanel .actionable-menu {
     display: flex;
     flex-direction: column;
