@@ -159,7 +159,7 @@ services:
     <<: *config
 
   unoserver:
-    image: ghcr.io/eterna-earkiv/eterna-unoserver:latest
+    image: ghcr.io/eterna-earkiv/eterna-unoserver:v3.7.0
     container_name: unoserver
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 2003 || exit 1"]

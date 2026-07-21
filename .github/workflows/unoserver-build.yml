@@ -12,9 +12,24 @@ permissions:
   packages: write
   contents: read
 
+# Serialize runs so two concurrent builds cannot both pass the version-tag
+# guard below and race to publish the same immutable tag. Queue rather than
+# cancel so an in-progress publish always completes.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
 jobs:
   unoserver-build:
     runs-on: ubuntu-latest
+    env:
+      IMAGE: ghcr.io/eterna-earkiv/eterna-unoserver
+      # Bump this immutable version tag whenever the image changes (e.g. a new
+      # unoserver version or Dockerfile change), then pin the deploy compose
+      # files to the new tag. The guard step below refuses to overwrite an
+      # existing tag, so a forgotten bump fails the build instead of silently
+      # remapping the tag to a different image.
+      VERSION_TAG: v3.7.0
 
     steps:
       - uses: actions/checkout@v5
@@ -29,6 +44,22 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Ensure version tag is not already published
+        run: |
+          # Fail closed: only proceed when the registry definitively reports the
+          # tag as missing. Any other error (network, auth, registry outage) must
+          # stop the build rather than risk overwriting the immutable tag.
+          if output=$(docker manifest inspect "${IMAGE}:${VERSION_TAG}" 2>&1); then
+            echo "::error::${IMAGE}:${VERSION_TAG} already exists in the registry. Bump VERSION_TAG before rebuilding so the immutable tag is never overwritten."
+            exit 1
+          fi
+          if printf '%s\n' "$output" | grep -qiE '(^|[[:space:]:])(no such manifest|manifest unknown)([[:space:]:]|$)'; then
+            echo "${IMAGE}:${VERSION_TAG} not found in registry; proceeding with build."
+          else
+            echo "::error::Could not determine whether ${IMAGE}:${VERSION_TAG} exists (registry error). Refusing to build. Details: ${output}"
+            exit 1
+          fi
+
       - name: Build and push unoserver image
         uses: docker/build-push-action@v6
         with:
@@ -36,7 +67,8 @@ jobs:
           context: ./deploys/standalone/unoserver
           file: ./deploys/standalone/unoserver/Dockerfile
           tags: |
-            ghcr.io/eterna-earkiv/eterna-unoserver:latest
+            ${{ env.IMAGE }}:latest
+            ${{ env.IMAGE }}:${{ env.VERSION_TAG }}
           sbom: true
           provenance: mode=max
           cache-from: type=gha

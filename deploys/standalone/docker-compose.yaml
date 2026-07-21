@@ -85,7 +85,7 @@ services:
       start_period: 30s
 
   unoserver:
-    image: ghcr.io/eterna-earkiv/eterna-unoserver:latest
+    image: ghcr.io/eterna-earkiv/eterna-unoserver:v3.7.0
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 2003 || exit 1"]
