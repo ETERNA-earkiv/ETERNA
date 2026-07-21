@@ -2,6 +2,9 @@
 
 ## v1.0.1 (unreleased)
 
+#### Improvements
+- Pinned the `eterna-unoserver` image to an immutable version tag (`v3.7.0`) in the deploy compose files, and updated the build workflow to publish `v3.7.0` alongside `:latest`, so deployments are reproducible [#600](https://github.com/ETERNA-earkiv/ETERNA/issues/600)
+
 #### Bug fixes
 - License button on built-in plugins (archive maintenance jobs) is now hidden when no license file exists, instead of opening an empty dialog [#366](https://github.com/ETERNA-earkiv/ETERNA/issues/366)
 - Fixed Swedish label "Start datum" → "Startdatum" in the internal actions (job) detail view [#542](https://github.com/ETERNA-earkiv/ETERNA/issues/542)
