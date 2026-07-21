@@ -53,7 +53,7 @@ jobs:
             echo "::error::${IMAGE}:${VERSION_TAG} already exists in the registry. Bump VERSION_TAG before rebuilding so the immutable tag is never overwritten."
             exit 1
           fi
-          if echo "$output" | grep -qiE 'no such manifest|manifest unknown|not found'; then
+          if printf '%s\n' "$output" | grep -qiE '(^|[[:space:]:])(no such manifest|manifest unknown)([[:space:]:]|$)'; then
             echo "${IMAGE}:${VERSION_TAG} not found in registry; proceeding with build."
           else
             echo "::error::Could not determine whether ${IMAGE}:${VERSION_TAG} exists (registry error). Refusing to build. Details: ${output}"
