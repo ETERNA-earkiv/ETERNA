@@ -33,7 +33,7 @@ import org.roda.core.data.v2.properties.ReindexPluginObject;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.SeverityLevel;
 import org.roda.wui.client.common.IncrementalAssociativeList;
-import org.roda.wui.client.common.dialogs.SelectAipDialog;
+import org.roda.wui.client.common.dialogs.SelectAipTreeDialog;
 import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.client.ingest.process.model.DisseminationParameter;
 import org.roda.wui.client.ingest.process.model.RepresentationParameter;
@@ -360,14 +360,14 @@ public class PluginParameterPanel extends Composite {
 
     final AipIdPluginParameterRenderingHints finalRenderingHints = renderingHints;
     ClickHandler editClickHandler = event -> {
-      SelectAipDialog selectAipDialog;
+      SelectAipTreeDialog selectAipDialog;
       if (finalRenderingHints != null) {
 
-        selectAipDialog = new SelectAipDialog(parameter.getName(), finalRenderingHints.getFilter(),
+        selectAipDialog = new SelectAipTreeDialog(parameter.getName(), finalRenderingHints.getFilter(),
           finalRenderingHints.isJustActive(), finalRenderingHints.isExportCsvVisible());
 
       } else {
-        selectAipDialog = new SelectAipDialog(parameter.getName());
+        selectAipDialog = new SelectAipTreeDialog(parameter.getName());
       }
       selectAipDialog.showAndCenter();
       // default behaviour of selectAipDialog enabled

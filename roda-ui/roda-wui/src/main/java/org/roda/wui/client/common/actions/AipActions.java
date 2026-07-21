@@ -23,10 +23,7 @@ import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.disposal.schedule.DisposalScheduleState;
 import org.roda.core.data.v2.generics.DeleteRequest;
 import org.roda.core.data.v2.generics.select.SelectedItemsListRequest;
-import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
@@ -45,7 +42,7 @@ import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.DisposalDialogs;
 import org.roda.wui.client.common.dialogs.RepresentationDialogs;
-import org.roda.wui.client.common.dialogs.SelectAipDialog;
+import org.roda.wui.client.common.dialogs.SelectAipTreeDialog;
 import org.roda.wui.client.common.dialogs.utils.DisposalHoldDialogResult;
 import org.roda.wui.client.common.dialogs.utils.DisposalScheduleDialogResult;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
@@ -308,10 +305,10 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
             final String aipId = aip.getId();
             boolean justActive = AIPState.ACTIVE.equals(aip.getState());
 
-            Filter filter = new Filter(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, aipId));
-            SelectAipDialog selectAipDialog = new SelectAipDialog(
+            SelectAipTreeDialog selectAipDialog = new SelectAipTreeDialog(
               messages.moveItemTitle() + " " + (StringUtils.isNotBlank(aip.getTitle()) ? aip.getTitle() : aip.getId()),
-              filter, justActive);
+              null, justActive);
+            selectAipDialog.setDisabledSubtreeIds(Collections.singleton(aipId));
             selectAipDialog.setEmptyParentButtonVisible(true);
             selectAipDialog.setSingleSelectionMode();
             selectAipDialog.showAndCenter();
@@ -384,26 +381,17 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
               if (confirmed) {
                 int counter = 0;
                 boolean justActive = parentAipState != null ? AIPState.ACTIVE.equals(parentAipState) : true;
-                Filter filter = new Filter();
+                Set<String> disabledSubtreeIds = new HashSet<>();
 
                 if (selected instanceof SelectedItemsList) {
                   SelectedItemsList<IndexedAIP> list = (SelectedItemsList<IndexedAIP>) selected;
                   counter = list.getIds().size();
-                  if (counter <= RodaConstants.DIALOG_FILTER_LIMIT_NUMBER) {
-                    for (String id : list.getIds()) {
-                      filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, id));
-                      filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, id));
-                    }
-                  }
-
-                  if (parentAipId != null) {
-                    filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, parentAipId));
-                  }
-                } else if (selected instanceof SelectedItemsFilter && parentAipId != null) {
-                  filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, parentAipId));
+                  disabledSubtreeIds.addAll(list.getIds());
                 }
 
-                SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter, justActive);
+                SelectAipTreeDialog selectAipDialog = new SelectAipTreeDialog(messages.moveItemTitle(), null,
+                  justActive);
+                selectAipDialog.setDisabledSubtreeIds(disabledSubtreeIds);
                 selectAipDialog.setEmptyParentButtonVisible(parentAipId != null);
                 selectAipDialog.showAndCenter();
                 if (counter > 0 && counter <= RodaConstants.DIALOG_FILTER_LIMIT_NUMBER) {
