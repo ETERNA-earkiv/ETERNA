@@ -12,6 +12,13 @@ permissions:
   packages: write
   contents: read
 
+# Serialize runs so two concurrent builds cannot both pass the version-tag
+# guard below and race to publish the same immutable tag. Queue rather than
+# cancel so an in-progress publish always completes.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
 jobs:
   unoserver-build:
     runs-on: ubuntu-latest
@@ -39,11 +46,19 @@ jobs:
 
       - name: Ensure version tag is not already published
         run: |
-          if docker manifest inspect "${IMAGE}:${VERSION_TAG}" > /dev/null 2>&1; then
+          # Fail closed: only proceed when the registry definitively reports the
+          # tag as missing. Any other error (network, auth, registry outage) must
+          # stop the build rather than risk overwriting the immutable tag.
+          if output=$(docker manifest inspect "${IMAGE}:${VERSION_TAG}" 2>&1); then
             echo "::error::${IMAGE}:${VERSION_TAG} already exists in the registry. Bump VERSION_TAG before rebuilding so the immutable tag is never overwritten."
             exit 1
           fi
-          echo "${IMAGE}:${VERSION_TAG} not found in registry; proceeding with build."
+          if echo "$output" | grep -qiE 'no such manifest|manifest unknown|not found'; then
+            echo "${IMAGE}:${VERSION_TAG} not found in registry; proceeding with build."
+          else
+            echo "::error::Could not determine whether ${IMAGE}:${VERSION_TAG} exists (registry error). Refusing to build. Details: ${output}"
+            exit 1
+          fi
 
       - name: Build and push unoserver image
         uses: docker/build-push-action@v6
