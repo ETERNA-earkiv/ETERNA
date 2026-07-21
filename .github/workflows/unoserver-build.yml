@@ -35,8 +35,12 @@ jobs:
           push: true
           context: ./deploys/standalone/unoserver
           file: ./deploys/standalone/unoserver/Dockerfile
+          # Bump the immutable version tag below whenever the image changes
+          # (e.g. a new unoserver version or Dockerfile change), then pin the
+          # deploy compose files to the new tag.
           tags: |
             ghcr.io/eterna-earkiv/eterna-unoserver:latest
+            ghcr.io/eterna-earkiv/eterna-unoserver:v3.7.0
           sbom: true
           provenance: mode=max
           cache-from: type=gha
