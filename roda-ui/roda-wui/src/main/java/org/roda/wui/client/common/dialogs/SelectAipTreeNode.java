@@ -78,6 +78,7 @@ public class SelectAipTreeNode extends Composite implements Selectable {
 
   private boolean expanded = false;
   private boolean loaded = false;
+  private boolean loading = false;
   private boolean isLeaf = false;
   private Command pendingOnComplete = null;
 
@@ -181,6 +182,13 @@ public class SelectAipTreeNode extends Composite implements Selectable {
   }
 
   private void loadChildren(final Command onComplete) {
+    // Guard against a second toggle click while the request is in flight: loaded/expanded are still
+    // false during loading, so without this a repeated click would fire another find and append the
+    // children twice.
+    if (loading) {
+      return;
+    }
+    loading = true;
     this.pendingOnComplete = onComplete;
     toggleHtml.setHTML(ICON_TOGGLE_LOADING);
 
@@ -195,6 +203,7 @@ public class SelectAipTreeNode extends Composite implements Selectable {
     Services service = new Services(messages.catalogTreeReasonListChildren(), "get");
     service.rodaEntityRestService(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
       IndexedAIP.class).whenComplete((result, error) -> {
+        loading = false;
         if (error != null) {
           LOGGER.error("Failed to load children for AIP " + aip.getId(), error);
           toggleHtml.setHTML(ICON_TOGGLE_COLLAPSED);
