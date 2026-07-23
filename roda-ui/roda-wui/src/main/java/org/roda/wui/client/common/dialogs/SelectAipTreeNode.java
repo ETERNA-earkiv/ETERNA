@@ -7,9 +7,7 @@
  */
 package org.roda.wui.client.common.dialogs;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
@@ -48,11 +46,11 @@ import config.i18n.client.ClientMessages;
  * ghost-node handling.
  * </p>
  */
-public class SelectAipTreeNode extends Composite {
+public class SelectAipTreeNode extends Composite implements Selectable {
 
   /** Listener notified when a (selectable) node is selected. */
   public interface SelectionListener {
-    void onSelect(SelectAipTreeNode node);
+    void onSelect(IndexedAIP aip, Selectable widget);
   }
 
   private static final ClientLogger LOGGER = new ClientLogger(SelectAipTreeNode.class.getName());
@@ -77,7 +75,6 @@ public class SelectAipTreeNode extends Composite {
   private final FlowPanel childrenPanel;
   private final HTML toggleHtml;
   private final Label titleLabel;
-  private final Map<String, SelectAipTreeNode> childNodes = new HashMap<>();
 
   private boolean expanded = false;
   private boolean loaded = false;
@@ -136,7 +133,7 @@ public class SelectAipTreeNode extends Composite {
       @Override
       public void onClick(ClickEvent event) {
         if (!disabled && SelectAipTreeNode.this.listener != null) {
-          SelectAipTreeNode.this.listener.onSelect(SelectAipTreeNode.this);
+          SelectAipTreeNode.this.listener.onSelect(aip, SelectAipTreeNode.this);
         }
       }
     }, ClickEvent.getType());
@@ -216,7 +213,6 @@ public class SelectAipTreeNode extends Composite {
         for (IndexedAIP child : children) {
           SelectAipTreeNode childNode = new SelectAipTreeNode(child, depth + 1, listener, baseFilter, justActive,
             disabledSubtreeIds, disabled);
-          childNodes.put(child.getId(), childNode);
           childrenPanel.add(childNode);
         }
         childrenPanel.setVisible(true);
@@ -252,31 +248,13 @@ public class SelectAipTreeNode extends Composite {
     rootPanel.insert(errorPanel, 1);
   }
 
-  /**
-   * Recursively filters this node and its children against a shared query (case-insensitive substring
-   * match against the title). A node is shown if it matches itself or if any descendant matches.
-   *
-   * @return {@code true} if this node or any descendant matches.
-   */
-  public boolean applyFilter(String query) {
-    boolean childMatches = false;
-    for (SelectAipTreeNode child : childNodes.values()) {
-      if (child.applyFilter(query)) {
-        childMatches = true;
-      }
+  @Override
+  public void setSelected(boolean selected) {
+    if (selected) {
+      rowPanel.addStyleName("selected");
+    } else {
+      rowPanel.removeStyleName("selected");
     }
-    boolean selfMatches = query.isEmpty()
-      || (aip.getTitle() != null && aip.getTitle().toLowerCase().contains(query));
-    setVisible(selfMatches || childMatches);
-    return selfMatches || childMatches;
-  }
-
-  public void select() {
-    rowPanel.addStyleName("selected");
-  }
-
-  public void deselect() {
-    rowPanel.removeStyleName("selected");
   }
 
   public IndexedAIP getAip() {

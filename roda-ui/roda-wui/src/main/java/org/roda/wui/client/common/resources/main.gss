@@ -3629,7 +3629,7 @@ body.catalogTreeResizing * {
 .wui-dialog-layout.selectAipTree {
     width: 640px;
     max-width: 40vw;
-    max-height: 40vh;
+    height: 60vh;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
@@ -3653,6 +3653,56 @@ body.catalogTreeResizing * {
 .selectAipTree .wui-dialog-layout-footer {
     flex: 0 0 auto;
     padding-top: 10px;
+}
+
+.selectAipTreeSearchResult {
+    display: flex;
+    align-items: center;
+    padding: 5px 8px;
+    cursor: pointer;
+    color: #333333;
+}
+
+.selectAipTreeSearchResult:hover {
+    background: COLOR_GREY_BGDARKER;
+}
+
+.selectAipTreeSearchResult.selected {
+    background: COLOR_PRIMARY;
+    color: white;
+}
+
+.selectAipTreeSearchResult.selected .catalogTreeIcon {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.selectAipTreeSearchResult.disabled {
+    cursor: default;
+    color: COLOR_GREY_MEDIUM;
+    opacity: 0.6;
+}
+
+.selectAipTreeSearchResult.disabled:hover {
+    background: transparent;
+}
+
+.selectAipTreeSearchResultText {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+}
+
+.selectAipTreeBreadcrumb {
+    font-size: 11px;
+    color: COLOR_GREY_DARK;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.selectAipTreeSearchResult.selected .selectAipTreeBreadcrumb {
+    color: rgba(255, 255, 255, 0.8);
 }
 
 .selectAipTreeEmptyParentButton {

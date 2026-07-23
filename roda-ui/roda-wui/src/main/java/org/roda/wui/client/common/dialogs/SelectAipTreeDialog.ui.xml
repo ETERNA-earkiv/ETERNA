@@ -11,6 +11,7 @@
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="selectAipTreeBodyScroll">
 				<g:FlowPanel ui:field="treeBody" />
+				<g:FlowPanel ui:field="searchResults" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="wui-dialog-layout-footer">
 				<g:Button addStyleNames="btn btn-link" ui:field="cancelButton">
