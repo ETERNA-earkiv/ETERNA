@@ -3626,8 +3626,23 @@ body.catalogTreeResizing * {
     color: COLOR_GREY_MEDIUM;
 }
 
+.wui-dialog-layout.selectAipTree {
+    width: 640px;
+    max-width: 40vw;
+    max-height: 40vh;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.selectAipTree .catalogTreeFilter {
+    flex: 0 0 auto;
+    border: 1px solid COLOR_GREY_VERYLIGHT;
+}
+
 .selectAipTreeBodyScroll {
-    max-height: 55vh;
+    flex: 1 1 auto;
     min-height: 120px;
     overflow-y: auto;
     padding: 4px 0;
@@ -3635,8 +3650,9 @@ body.catalogTreeResizing * {
     border-top: none;
 }
 
-.selectAipTree .catalogTreeFilter {
-    border: 1px solid COLOR_GREY_VERYLIGHT;
+.selectAipTree .wui-dialog-layout-footer {
+    flex: 0 0 auto;
+    padding-top: 10px;
 }
 
 .selectAipTreeEmptyParentButton {
