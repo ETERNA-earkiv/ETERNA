@@ -1635,7 +1635,6 @@ a.btn-hero:visited, a.btn-welcome:visited {
 .my-asyncdatagrid-footer {
     position: sticky;
     left: 0;
-    z-index: 1;
     background-color: var(--eterna-paper);
 }
 
