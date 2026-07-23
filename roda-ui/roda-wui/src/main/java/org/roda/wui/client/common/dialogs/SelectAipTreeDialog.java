@@ -205,6 +205,9 @@ public class SelectAipTreeDialog extends DialogBox
     searchResults.clear();
     searchResults.setVisible(false);
     treeBody.setVisible(true);
+    // Reset the selection: a search-result row may have been selected and is now gone, so a stale
+    // (invisible) selection must not stay armed on the select button.
+    clearSelection();
   }
 
   private void loadRootNodes() {
@@ -264,6 +267,9 @@ public class SelectAipTreeDialog extends DialogBox
    */
   private void runSearch(String query) {
     final int myGeneration = ++searchGeneration;
+    // Switching to search mode hides the browse tree, so a tree-node selection would become invisible;
+    // drop it so it cannot be submitted from behind the search results.
+    clearSelection();
     treeBody.setVisible(false);
     searchResults.setVisible(true);
     searchResults.clear();
