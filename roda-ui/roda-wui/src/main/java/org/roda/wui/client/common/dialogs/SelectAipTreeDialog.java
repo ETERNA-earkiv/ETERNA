@@ -190,13 +190,20 @@ public class SelectAipTreeDialog extends DialogBox
 
   private void onFilterChanged() {
     String query = filterInput.getText().trim();
+    searchTimer.cancel();
+    // Bump the generation on every edit so any in-flight search is invalidated at once. Otherwise the
+    // response for an earlier query (e.g. "ab") could still repaint and be selected after the user typed
+    // on to "abc", during the debounce window before the new search fires.
+    searchGeneration++;
+    clearSelection();
     if (query.length() < MIN_QUERY_LENGTH) {
-      searchTimer.cancel();
-      // Bump the generation so a slower in-flight search cannot repaint the results after we return.
-      searchGeneration++;
       showBrowseTree();
     } else {
-      searchTimer.cancel();
+      // Show the loading state right away so stale results are not left on screen during the debounce.
+      treeBody.setVisible(false);
+      searchResults.setVisible(true);
+      searchResults.clear();
+      searchResults.add(infoLabel(messages.catalogTreeLoadingLabel()));
       searchTimer.schedule(SEARCH_DEBOUNCE_MS);
     }
   }
