@@ -916,6 +916,8 @@ public interface ClientMessages extends Messages {
 
   String selectAipSearchResults();
 
+  String selectAipTreeNoResults();
+
   String selectTransferredResourcesSearchResults();
 
   String renameTransferredResourcesDialogTitle();
