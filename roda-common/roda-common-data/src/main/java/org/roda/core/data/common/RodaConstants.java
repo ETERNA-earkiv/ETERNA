@@ -833,6 +833,10 @@ public final class RodaConstants {
   public static final String CONTROLLER_REQUEST_METRICS_PARAM = "metricsToObtain";
   public static final String CONTROLLER_LOGIN_METHOD_PARAM = "loginMethod";
   public static final String CONTROLLER_TRANSACTION_ID_PARAM = "transactionID";
+  public static final String CONTROLLER_FILE_UUIDS_PARAM = "fileUUIDs";
+  public static final String CONTROLLER_FILE_COUNT_PARAM = "fileCount";
+  public static final String CONTROLLER_TOTAL_SIZE_PARAM = "totalSize";
+  public static final String CONTROLLER_DOWNLOAD_TOKEN_PARAM = "downloadToken";
 
   /*
    * Core (storage, index, orchestrator, etc.)
@@ -925,6 +929,12 @@ public final class RodaConstants {
    * USER REGISTRATION SETTINGS
    */
   public static final String USER_REGISTRATION_DISABLED = "core.user_registration.disabled";
+
+  /*
+   * SELECTION-BASED DOWNLOAD SETTINGS
+   */
+  public static final String CORE_DOWNLOAD_MAX_FILES = "core.download.max_files";
+  public static final int DEFAULT_CORE_DOWNLOAD_MAX_FILES = 0;
 
   /*
    * INDEX NAMES

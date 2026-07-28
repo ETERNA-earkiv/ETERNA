@@ -7,6 +7,8 @@
  */
 package org.roda.wui.api.v2.utils;
 
+import java.nio.charset.StandardCharsets;
+import java.text.Normalizer;
 import java.time.Duration;
 import java.util.Date;
 
@@ -31,6 +33,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+import org.springframework.web.util.UriUtils;
 
 public class ApiUtils {
 
@@ -60,6 +63,43 @@ public class ApiUtils {
     }
 
     return ResponseEntity.ok().headers(responseHeaders).body(responseStream);
+  }
+
+  /**
+   * Like {@link #okResponse(StreamResponse)}, but with the file name encoded
+   * per RFC 6266 so that non-ASCII characters survive, and without a
+   * {@code Content-Length} when the length is not known up front (as is the
+   * case while streaming a zip).
+   * <p>
+   * The plain {@code okResponse} interpolates the file name raw; fixing that
+   * for every download in the system is a separate job.
+   */
+  public static ResponseEntity<StreamingResponseBody> okResponseWithEncodedFileName(StreamResponse streamResponse) {
+    ConsumesOutputStream stream = streamResponse.getStream();
+    HttpHeaders responseHeaders = new HttpHeaders();
+    StreamingResponseBody responseStream = stream::consumeOutputStream;
+
+    responseHeaders.add(HttpHeaders.CONTENT_TYPE, stream.getMediaType());
+    responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION, contentDispositionAttachment(stream.getFileName()));
+    if (stream.getSize() >= 0) {
+      responseHeaders.add(HttpHeaders.CONTENT_LENGTH, String.valueOf(stream.getSize()));
+    }
+
+    return ResponseEntity.ok().headers(responseHeaders).body(responseStream);
+  }
+
+  /**
+   * Builds an RFC 6266 {@code Content-Disposition}: an ASCII fallback for
+   * clients that only understand {@code filename}, plus the UTF-8 form that
+   * carries the real name.
+   */
+  static String contentDispositionAttachment(String fileName) {
+    String asciiFallback = Normalizer.normalize(fileName, Normalizer.Form.NFD)
+      .replaceAll("\\p{InCombiningDiacriticalMarks}+", "").replaceAll("[^\\x20-\\x7E]", "_").replace("\"", "_")
+      .replace("\\", "_");
+
+    return "attachment; filename=\"" + asciiFallback + "\"; filename*=UTF-8''"
+      + UriUtils.encode(fileName, StandardCharsets.UTF_8);
   }
 
   public static ResponseEntity<StreamingResponseBody> rangeResponse(HttpHeaders headers,
