@@ -46,7 +46,9 @@ public class LdapUtilityTestHelper {
     openldap.withEnv("LDAP_ROOT", ldapBaseDN);
     openldap.withEnv("LDAP_SKIP_DEFAULT_TREE", "yes");
     openldap.withEnv("LDAP_ADMIN_USERNAME", "admin");
-    openldap.withEnv("LDAP_ADMIN_PASSWORD", "roda");
+    // must match the password LdapConfig binds with, otherwise every
+    // LDAP-backed test fails with "error code 49 - Invalid Credentials"
+    openldap.withEnv("LDAP_ADMIN_PASSWORD", "eterna");
     openldap.withEnv("LDAP_EXTRA_SCHEMAS", "cosine,inetorgperson,nis,pbkdf2");
     openldap.withCopyFileToContainer(MountableFile.forClasspathResource("/config/ldap/schema/pbkdf2.ldif"),
       "/opt/bitnami/openldap/etc/schema/pbkdf2.ldif");
