@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.roda.core.data.v2.file.CreateFolderRequest;
 import org.roda.core.data.v2.file.MoveFilesRequest;
+import org.roda.core.data.v2.file.PreparedDownloadResponse;
 import org.roda.core.data.v2.file.RenameFolderRequest;
 import org.roda.core.data.v2.generics.DeleteRequest;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
@@ -63,6 +64,14 @@ public interface FileRestService extends RODAEntityRestService<IndexedFile> {
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   Job deleteFiles(
     @Parameter(description = "Selected disposal confirmations", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) DeleteRequest deleteRequest);
+
+  @RequestMapping(path = "/download/prepare", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Requests a download of selected files", description = "Expands and validates a selection of files and issues a token for downloading it as a zip, or refuses it", responses = {
+    @ApiResponse(responseCode = "200", description = "A token, or a refusal", content = @Content(schema = @Schema(implementation = PreparedDownloadResponse.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  PreparedDownloadResponse requestSelectedFilesDownload(
+    @Parameter(name = "selectedItems", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItemsRequest selected);
 
   @RequestMapping(path = "/rename", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Rename folder", description = "Renames a folder", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RenameFolderRequest.class))), responses = {

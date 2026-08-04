@@ -36,6 +36,7 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectFileDialog;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.FileFormatSharedUtils;
+import org.roda.wui.client.common.utils.SelectedFilesDownload;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
@@ -61,21 +62,26 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
   private static final Set<FileSearchWrapperAction> POSSIBLE_ACTIONS_WITH_REPRESENTATION = new HashSet<>(
     Arrays.asList(FileSearchWrapperAction.UPLOAD_FILES, FileSearchWrapperAction.CREATE_FOLDER));
 
+  // DOWNLOAD belongs in the single-file sets too: a list dispatches to these
+  // as soon as exactly one checkbox is ticked, and one ticked file is still a
+  // selection, which is delivered as a zip like any other. The download action
+  // of the file one has clicked into is a different one, on FileToolbarActions,
+  // and is left alone.
   private static final Set<Action<IndexedFile>> POSSIBLE_ACTIONS_ON_SINGLE_FILE_DIRECTORY = new HashSet<>(
-    Arrays.asList(FileSearchWrapperAction.MOVE, FileSearchWrapperAction.REMOVE, FileSearchWrapperAction.NEW_PROCESS,
-      FileSearchWrapperAction.IDENTIFY_FORMATS));
+    Arrays.asList(FileSearchWrapperAction.DOWNLOAD, FileSearchWrapperAction.MOVE, FileSearchWrapperAction.REMOVE,
+      FileSearchWrapperAction.NEW_PROCESS, FileSearchWrapperAction.IDENTIFY_FORMATS));
 
   private static final Set<Action<IndexedFile>> POSSIBLE_ACTIONS_ON_SINGLE_FILE_BITSTREAM = new HashSet<>(
-    Arrays.asList(FileSearchWrapperAction.MOVE, FileSearchWrapperAction.REMOVE, FileSearchWrapperAction.NEW_PROCESS,
-      FileSearchWrapperAction.IDENTIFY_FORMATS));
+    Arrays.asList(FileSearchWrapperAction.DOWNLOAD, FileSearchWrapperAction.MOVE, FileSearchWrapperAction.REMOVE,
+      FileSearchWrapperAction.NEW_PROCESS, FileSearchWrapperAction.IDENTIFY_FORMATS));
 
   private static final Set<Action<IndexedFile>> POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_THE_SAME_REPRESENTATION = new HashSet<>(
-    Arrays.asList(FileSearchWrapperAction.MOVE, FileSearchWrapperAction.REMOVE, FileSearchWrapperAction.NEW_PROCESS,
-      FileSearchWrapperAction.IDENTIFY_FORMATS));
+    Arrays.asList(FileSearchWrapperAction.DOWNLOAD, FileSearchWrapperAction.MOVE, FileSearchWrapperAction.REMOVE,
+      FileSearchWrapperAction.NEW_PROCESS, FileSearchWrapperAction.IDENTIFY_FORMATS));
 
   private static final Set<Action<IndexedFile>> POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_DIFFERENT_REPRESENTATIONS = new HashSet<>(
-    Arrays.asList(FileSearchWrapperAction.REMOVE, FileSearchWrapperAction.NEW_PROCESS,
-      FileSearchWrapperAction.IDENTIFY_FORMATS));
+    Arrays.asList(FileSearchWrapperAction.DOWNLOAD, FileSearchWrapperAction.REMOVE,
+      FileSearchWrapperAction.NEW_PROCESS, FileSearchWrapperAction.IDENTIFY_FORMATS));
 
   private static final Set<Action<IndexedFile>> POSSIBLE_ACTIONS_ON_SINGLE_FILE_UNDER_APPRAISAL = new HashSet<>(
     Arrays.asList(FileSearchWrapperAction.MOVE, FileSearchWrapperAction.REMOVE));
@@ -209,7 +215,9 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
 
   @Override
   public void act(Action<IndexedFile> action, IndexedFile file, AsyncCallback<ActionImpact> callback) {
-    if (FileSearchWrapperAction.MOVE.equals(action)) {
+    if (FileSearchWrapperAction.DOWNLOAD.equals(action)) {
+      SelectedFilesDownload.start(SelectedItemsList.create(IndexedFile.class, file.getUUID()), callback);
+    } else if (FileSearchWrapperAction.MOVE.equals(action)) {
       move(file, callback);
     } else if (FileSearchWrapperAction.REMOVE.equals(action)) {
       remove(file, callback);
@@ -230,7 +238,9 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
   @Override
   public void act(Action<IndexedFile> action, SelectedItems<IndexedFile> selectedItems,
     AsyncCallback<ActionImpact> callback) {
-    if (FileSearchWrapperAction.MOVE.equals(action) && aipId != null && representationId != null) {
+    if (FileSearchWrapperAction.DOWNLOAD.equals(action)) {
+      SelectedFilesDownload.start(selectedItems, callback);
+    } else if (FileSearchWrapperAction.MOVE.equals(action) && aipId != null && representationId != null) {
       move(aipId, representationId, selectedItems, callback);
     } else if (FileSearchWrapperAction.REMOVE.equals(action)) {
       remove(selectedItems, callback);
@@ -573,6 +583,8 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
 
     // MANAGEMENT
     ActionableGroup<IndexedFile> managementGroup = new ActionableGroup<>(messages.sidebarFoldersFilesTitle());
+    managementGroup.addButton(messages.downloadSelectedFilesButton(), FileSearchWrapperAction.DOWNLOAD,
+      ActionImpact.NONE, "btn-download", "fileDownloadSelectedButton");
     managementGroup.addButton(messages.moveButton(), FileSearchWrapperAction.MOVE, ActionImpact.UPDATED, "btn-edit",
       "fileMoveButton");
     managementGroup.addButton(messages.uploadFilesButton(), FileSearchWrapperAction.UPLOAD_FILES, ActionImpact.UPDATED,
@@ -597,7 +609,9 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
 
   // MANAGEMENT
   public enum FileSearchWrapperAction implements Action<IndexedFile> {
-    MOVE(RodaConstants.PERMISSION_METHOD_MOVE_FILES), REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_FILE),
+    // no permission method: READ on the files is what the endpoint checks, and
+    // that is already required to see them in the list at all
+    DOWNLOAD(), MOVE(RodaConstants.PERMISSION_METHOD_MOVE_FILES), REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_FILE),
     UPLOAD_FILES(RodaConstants.PERMISSION_METHOD_CREATE_FILE),
     CREATE_FOLDER(RodaConstants.PERMISSION_METHOD_CREATE_FOLDER),
     NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),

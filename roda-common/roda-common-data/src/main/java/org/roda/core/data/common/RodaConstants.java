@@ -398,6 +398,7 @@ public final class RodaConstants {
 
   // files
   public static final String API_REST_V2_FILES = "api/v2/files/";
+  public static final String API_REST_V2_FILES_DOWNLOAD_PREPARED = "api/v2/files/download/prepared/";
   public static final String API_REST_V2_FILES_TECHNICAL_METADATA_TYPE_HTML = "metadata/technical";
   public static final String API_REST_V2_FILES_TECHNICAL_METADATA_TYPE_HTML_SUFFIX = "/html";
   public static final String API_REST_V2_FILES_TECHNICAL_METADATA_HTML = "metadata/preservation/html";
@@ -935,6 +936,10 @@ public final class RodaConstants {
    */
   public static final String CORE_DOWNLOAD_MAX_FILES = "core.download.max_files";
   public static final int DEFAULT_CORE_DOWNLOAD_MAX_FILES = 0;
+  public static final String UI_DOWNLOAD_CONFIRMATION_FILES_THRESHOLD = "ui.download.confirmation_files_threshold";
+  public static final int DEFAULT_UI_DOWNLOAD_CONFIRMATION_FILES_THRESHOLD = 500;
+  public static final String UI_DOWNLOAD_CONFIRMATION_SIZE_THRESHOLD = "ui.download.confirmation_size_threshold";
+  public static final long DEFAULT_UI_DOWNLOAD_CONFIRMATION_SIZE_THRESHOLD = 1073741824L;
 
   /*
    * INDEX NAMES
