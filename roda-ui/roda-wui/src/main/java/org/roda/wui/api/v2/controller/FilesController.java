@@ -140,10 +140,11 @@ public class FilesController implements FileRestService, Exportable {
         controllerAssistant.checkObjectPermissions(requestContext.getUser(),
           SelectedItemsList.create(IndexedFile.class, prepared.fileUUIDs()));
 
-        // only once the selection has cleared the permission check: the
-        // parameters are written to the log whatever the outcome, and a denied
-        // request must not leave a list of UUIDs the user never got near
-        auditDisclosedFiles(controllerAssistant, prepared);
+        // deliberately not audited as a disclosure, on the same reasoning as
+        // the check endpoint: preparing hands nothing out, and the request can
+        // still be refused below. The selection itself is on the entry either
+        // way, and the UUIDs of what was actually delivered are recorded by the
+        // download endpoint from this very list
 
         // a refusal is part of the ordinary response rather than an HTTP error,
         // so that the client can tell the reasons apart and name the numbers
@@ -212,7 +213,6 @@ public class FilesController implements FileRestService, Exportable {
         // check, nor a way to probe for other users' downloads
         PreparedDownload prepared = downloadSelectionService.retrievePreparedDownload(token,
           requestContext.getUser().getName());
-        auditDisclosedFiles(controllerAssistant, prepared);
 
         // browser navigation cannot send the x-request-reason header, so the
         // reason from the preparing request is reused rather than leaving the
@@ -235,6 +235,12 @@ public class FilesController implements FileRestService, Exportable {
             + prepared.files().size() + " prepared files can no longer be delivered");
         }
 
+        // last, once nothing can refuse the request any more: the parameters go
+        // to the log whatever the outcome, so recording them any earlier would
+        // enter a list of UUIDs as disclosed that a revoked permission or
+        // vanished content then kept from being handed out
+        auditDisclosedFiles(controllerAssistant, prepared);
+
         StreamResponse response = DownloadSelection.createZipStreamResponse(requestContext.getModelService(),
           requestContext.getIndexService(), prepared.files());
         return ApiUtils.okResponseWithEncodedFileName(response);
@@ -246,6 +252,10 @@ public class FilesController implements FileRestService, Exportable {
    * Records which records were disclosed. Logging the selection is not enough:
    * a filter cannot be reconstructed once the index has changed, and the audit
    * question is "which records were handed out?".
+   * <p>
+   * Belongs to the delivery endpoint alone, and there only once every check has
+   * passed. Preparing and checking a download hand nothing out, and an entry
+   * that names UUIDs as disclosed is a claim that they were.
    */
   private static void auditDisclosedFiles(RequestControllerAssistant controllerAssistant, PreparedDownload prepared) {
     controllerAssistant.addParameters(RodaConstants.CONTROLLER_FILE_UUIDS_PARAM, prepared.fileUUIDs(),
