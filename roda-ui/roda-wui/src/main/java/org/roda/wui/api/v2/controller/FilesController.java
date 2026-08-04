@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.DownloadSelection;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.StreamResponse;
@@ -159,6 +160,39 @@ public class FilesController implements FileRestService, Exportable {
     });
   }
 
+  @GetMapping(path = "/download/prepared/{token}/check", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Checks whether a prepared download can still be delivered", description = "Revalidates a token without delivering anything, so that the client can show a refusal instead of navigating the browser to a download that will fail", responses = {
+    @ApiResponse(responseCode = "200", description = "The token, or a refusal", content = @Content(schema = @Schema(implementation = PreparedDownloadResponse.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "404", description = "Unknown, expired or foreign token", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  public PreparedDownloadResponse checkPreparedDownload(
+    @Parameter(description = "The token issued when the download was prepared", required = true) @PathVariable(name = "token") String token) {
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<PreparedDownloadResponse>() {
+      @Override
+      public PreparedDownloadResponse process(RequestContext requestContext,
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_DOWNLOAD_TOKEN_PARAM, token);
+
+        PreparedDownload prepared = downloadSelectionService.retrievePreparedDownload(token,
+          requestContext.getUser().getName());
+
+        // deliberately not audited as a disclosure: a check hands nothing out,
+        // and an entry per check would bury the entries that record an actual
+        // download
+        controllerAssistant.checkObjectPermissions(requestContext.getUser(),
+          SelectedItemsList.create(IndexedFile.class, prepared.fileUUIDs()));
+
+        Optional<DownloadRefusal> refusal = DownloadSelection.checkDeliverability(prepared.files());
+        if (refusal.isPresent()) {
+          return new PreparedDownloadResponse(refusal.get(), prepared.files().size(), prepared.totalSize());
+        }
+
+        return new PreparedDownloadResponse(token, prepared.files().size(), prepared.totalSize());
+      }
+    });
+  }
+
   @GetMapping(path = "/download/prepared/{token}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
   @Operation(summary = "Downloads a prepared selection of files", description = "Streams a previously prepared selection of files as a zip containing file content only", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = StreamingResponseBody.class))),
@@ -190,6 +224,16 @@ public class FilesController implements FileRestService, Exportable {
         // permissions may have been revoked since the token was issued
         controllerAssistant.checkObjectPermissions(requestContext.getUser(),
           SelectedItemsList.create(IndexedFile.class, prepared.fileUUIDs()));
+
+        // the client checks this before it navigates, so getting here means the
+        // referenced content went away in between — or that the URL was
+        // followed directly. Either way, failing outright is better than the
+        // truncated zip under status 200 that a mid-stream failure delivers.
+        Optional<DownloadRefusal> refusal = DownloadSelection.checkDeliverability(prepared.files());
+        if (refusal.isPresent()) {
+          throw new GenericException("The content of " + refusal.get().getUndeliverableFileCount() + " of the "
+            + prepared.files().size() + " prepared files can no longer be delivered");
+        }
 
         StreamResponse response = DownloadSelection.createZipStreamResponse(requestContext.getModelService(),
           requestContext.getIndexService(), prepared.files());

@@ -1523,6 +1523,8 @@ public interface ClientMessages extends Messages {
 
   String downloadSelectedFilesUndeliverableContent(int undeliverableFileCount, int fileCount);
 
+  String downloadSelectedFilesExpired();
+
   String downloadSelectedFilesFailed();
 
   /***** Dissemination ****/

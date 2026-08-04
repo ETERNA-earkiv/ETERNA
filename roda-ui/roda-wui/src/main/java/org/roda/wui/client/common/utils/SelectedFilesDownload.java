@@ -9,6 +9,7 @@ package org.roda.wui.client.common.utils;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.file.DownloadRefusal;
 import org.roda.core.data.v2.file.DownloadRefusalReason;
@@ -102,8 +103,23 @@ public final class SelectedFilesDownload {
       });
   }
 
+  /**
+   * Revalidates the token before navigating away. The navigation itself cannot
+   * fail gracefully: the browser leaves the application for the download URL,
+   * so a server-side refusal would be rendered as a JSON error page. Asking
+   * first keeps every refusal in a dialog, with ETERNA still on screen.
+   */
   private static void startDownload(String token) {
-    Window.Location.assign(RestUtils.createPreparedDownloadUri(token).asString());
+    Services services = new Services(messages.filesReasonDownloadSelectedFiles(), "download");
+    services.fileResource(s -> s.checkPreparedDownload(token)).whenComplete((response, throwable) -> {
+      if (throwable != null) {
+        showFailure(throwable);
+      } else if (response.getRefusal() != null) {
+        showRefusal(response.getRefusal());
+      } else {
+        Window.Location.assign(RestUtils.createPreparedDownloadUri(token).asString());
+      }
+    });
   }
 
   private static void showRefusal(DownloadRefusal refusal) {
@@ -124,16 +140,21 @@ public final class SelectedFilesDownload {
   /**
    * A missing read permission on any of the selected files arrives as a plain
    * 403, like every other permission failure in the API, so it is recognised
-   * here rather than carried in the refusal.
+   * here rather than carried in the refusal. A token that has outlived its ten
+   * minutes arrives as a 404 — the confirmation dialog can be left standing
+   * that long — and telling the user to simply ask again is more useful than a
+   * general failure.
    */
   private static void showFailure(Throwable throwable) {
+    String message = messages.downloadSelectedFilesFailed();
+
     if (throwable instanceof AuthorizationDeniedException) {
-      Dialogs.showInformationDialog(messages.downloadSelectedFilesRefusedTitle(),
-        messages.downloadSelectedFilesNoPermission(), messages.dialogOk(), false);
-    } else {
-      Dialogs.showInformationDialog(messages.downloadSelectedFilesRefusedTitle(),
-        messages.downloadSelectedFilesFailed(), messages.dialogOk(), false);
+      message = messages.downloadSelectedFilesNoPermission();
+    } else if (throwable instanceof NotFoundException) {
+      message = messages.downloadSelectedFilesExpired();
     }
+
+    Dialogs.showInformationDialog(messages.downloadSelectedFilesRefusedTitle(), message, messages.dialogOk(), false);
   }
 
 }

@@ -73,6 +73,15 @@ public interface FileRestService extends RODAEntityRestService<IndexedFile> {
   PreparedDownloadResponse requestSelectedFilesDownload(
     @Parameter(name = "selectedItems", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItemsRequest selected);
 
+  @RequestMapping(method = RequestMethod.GET, path = "/download/prepared/{token}/check", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Checks whether a prepared download can still be delivered", description = "Revalidates a token without delivering anything, so that the client can show a refusal instead of navigating the browser to a download that will fail", responses = {
+    @ApiResponse(responseCode = "200", description = "The token, or a refusal", content = @Content(schema = @Schema(implementation = PreparedDownloadResponse.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "404", description = "Unknown, expired or foreign token", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  PreparedDownloadResponse checkPreparedDownload(
+    @Parameter(description = "The token issued when the download was prepared", required = true) @PathVariable(name = "token") String token);
+
   @RequestMapping(path = "/rename", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Rename folder", description = "Renames a folder", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RenameFolderRequest.class))), responses = {
     @ApiResponse(responseCode = "200", description = "Folder renamed", content = @Content(schema = @Schema(implementation = IndexedFile.class))),
