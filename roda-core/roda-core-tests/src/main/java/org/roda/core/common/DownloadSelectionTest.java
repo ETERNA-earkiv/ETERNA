@@ -229,22 +229,44 @@ public class DownloadSelectionTest {
   }
 
   @Test
-  public void testAvailabilityIsCheckedOncePerProtocolAndHostAndNotOncePerFile() {
-    List<IndexedFile> manyFilesSameHost = new ArrayList<>();
+  public void testEveryDistinctUrlIsProbedButFilesSharingOneUrlCostASingleProbe() {
+    List<IndexedFile> filesSameHost = new ArrayList<>();
     for (int i = 0; i < 50; i++) {
-      manyFilesSameHost.add(referenceFile("http://archive.example.org/records/" + i + ".pdf"));
+      filesSameHost.add(referenceFile("http://archive.example.org/records/" + i + ".pdf"));
     }
-    manyFilesSameHost.add(referenceFile("http://archive.example.org:8080/records/1.pdf"));
-    manyFilesSameHost.add(referenceFile("http://other.example.org/records/1.pdf"));
+    filesSameHost.add(referenceFile("http://archive.example.org/records/0.pdf"));
 
     List<URI> probed = new ArrayList<>();
-    assertTrue(DownloadSelection.checkDeliverability(manyFilesSameHost, uri -> {
+    assertTrue(DownloadSelection.checkDeliverability(filesSameHost, uri -> {
       probed.add(uri);
       return true;
     }).isEmpty());
 
-    assertEquals(probed.size(), 3,
-      "52 files against three distinct protocol/host/port endpoints must cost three probes");
+    assertEquals(probed.size(), 50, "one probe per distinct URL, and the repeated URL must not cost a second one");
+  }
+
+  @Test
+  public void testOneMissingUrlDoesNotCondemnItsSiblingsOnTheSameHost() {
+    IndexedFile missing = referenceFile("http://archive.example.org/records/missing.pdf");
+    IndexedFile present = referenceFile("http://archive.example.org/records/present.pdf");
+
+    DownloadRefusal refusal = DownloadSelection
+      .checkDeliverability(List.of(missing, present), uri -> !uri.getPath().endsWith("missing.pdf")).orElseThrow();
+
+    assertEquals(refusal.getUndeliverableFileCount(), 1,
+      "availability answers for one resource, not for every file on its host");
+  }
+
+  @Test
+  public void testAMissingUrlIsFoundEvenBehindAnAvailableSibling() {
+    IndexedFile present = referenceFile("file:///data/present.pdf");
+    IndexedFile missing = referenceFile("file:///data/missing.pdf");
+
+    DownloadRefusal refusal = DownloadSelection
+      .checkDeliverability(List.of(present, missing), uri -> !uri.getPath().endsWith("missing.pdf")).orElseThrow();
+
+    assertEquals(refusal.getUndeliverableFileCount(), 1,
+      "file: URLs have no host to share, so they must not share an availability answer either");
   }
 
   @Test

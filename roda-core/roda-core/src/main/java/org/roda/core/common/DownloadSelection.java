@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -162,11 +161,13 @@ public final class DownloadSelection {
   }
 
   /**
-   * Verifies that referenced (shallow) content can actually be fetched. The
-   * availability check costs a network round trip, so it is made once per
-   * unique protocol and host and reused for every file pointing there — a
-   * selection of hundreds of reference files against one host must not become
-   * hundreds of requests.
+   * Verifies that referenced (shallow) content can actually be fetched.
+   * Availability is a property of the individual resource — an HTTP probe is a
+   * HEAD against the reference URL, a file probe an existence check on the path
+   * — so every distinct URL has to be probed. Files pointing at the same URL
+   * share one probe, which is as far as deduplication can go without answering
+   * for a resource nobody looked at: two files on the same host say nothing
+   * about each other.
    */
   public static Optional<DownloadRefusal> checkDeliverability(List<IndexedFile> files) {
     return checkDeliverability(files, DownloadSelection::isAvailable);
@@ -176,7 +177,7 @@ public final class DownloadSelection {
    * Seam for the tests, which need to count how many probes are actually made.
    */
   static Optional<DownloadRefusal> checkDeliverability(List<IndexedFile> files, Predicate<URI> availabilityProbe) {
-    Map<String, Boolean> availabilityByEndpoint = new HashMap<>();
+    Map<URI, Boolean> availabilityByURI = new HashMap<>();
     int undeliverable = 0;
 
     for (IndexedFile file : files) {
@@ -190,8 +191,7 @@ public final class DownloadSelection {
         continue;
       }
 
-      if (!availabilityByEndpoint.computeIfAbsent(endpointKey(referenceURI),
-        key -> availabilityProbe.test(referenceURI))) {
+      if (!availabilityByURI.computeIfAbsent(referenceURI, availabilityProbe::test)) {
         undeliverable++;
       }
     }
@@ -215,17 +215,12 @@ public final class DownloadSelection {
     }
   }
 
-  private static String endpointKey(URI uri) {
-    return StringUtils.lowerCase(uri.getScheme(), Locale.ROOT) + "://"
-      + StringUtils.lowerCase(uri.getHost(), Locale.ROOT) + ":" + uri.getPort();
-  }
-
   private static boolean isAvailable(URI uri) {
     try {
       Protocol protocol = RodaCoreFactory.getProtocol(uri);
       return Boolean.TRUE.equals(protocol.isAvailable());
     } catch (GenericException e) {
-      LOGGER.warn("Content at {} is not available", endpointKey(uri));
+      LOGGER.warn("Content at {} is not available", uri);
       return false;
     }
   }
