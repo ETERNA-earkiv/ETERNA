@@ -29,6 +29,7 @@ import org.roda.core.TestsHelper;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.file.DownloadRefusal;
 import org.roda.core.data.v2.file.DownloadRefusalReason;
@@ -338,6 +339,35 @@ public class DownloadSelectionTest {
     assertEquals(DownloadSelection.sanitizeFileName("///"), "files");
   }
 
+  /**
+   * A name that would turn into more than one path segment, or climb out of
+   * one, must not reach the zip: the recipient's extraction tool is what would
+   * act on it.
+   */
+  @Test
+  public void testASegmentThatCouldEscapeTheZipRootIsRefused() {
+    for (IndexedFile unsafe : List.of(named(List.of(".."), "brev.pdf"), named(List.of("."), "brev.pdf"),
+      named(List.of("handlingar/2024"), "brev.pdf"), named(List.of("handlingar\\2024"), "brev.pdf"),
+      named(List.of(), "../../etc/passwd"), named(List.of(), ".."), named(List.of(""), "brev.pdf"))) {
+      assertThrows(RequestNotValidException.class, () -> DownloadSelection.zipEntryName(unsafe, false, false));
+    }
+  }
+
+  @Test
+  public void testAnUnsafePrefixIsRefusedEvenThoughItComesFromTheArchiveItself() {
+    IndexedFile file = named(List.of(), "brev.pdf");
+    file.setAipId("..");
+    file.setRepresentationId(REPRESENTATION_ID);
+
+    assertThrows(RequestNotValidException.class, () -> DownloadSelection.zipEntryName(file, true, true));
+  }
+
+  @Test
+  public void testOrdinaryNamesPassIncludingDotsAndSwedishCharacters() throws RequestNotValidException {
+    assertEquals(DownloadSelection.zipEntryName(named(List.of("Bygglov Åre", "2024"), "brev.slutlig.pdf"), false, false),
+      "Bygglov Åre/2024/brev.slutlig.pdf");
+  }
+
   // -- corpus helpers ------------------------------------------------------
 
   private AIP createAIP(Permissions permissions) throws RODAException {
@@ -374,6 +404,18 @@ public class DownloadSelectionTest {
   private IndexedFile stub(AIP aip, String representationId, List<String> directoryPath, String fileId) {
     IndexedFile file = new IndexedFile();
     file.setUUID(IdUtils.getFileId(aip.getId(), representationId, directoryPath, fileId));
+    return file;
+  }
+
+  /**
+   * A file that exists only to be named: {@code zipEntryName} reads the path
+   * and the ids, and nothing else.
+   */
+  private IndexedFile named(List<String> directoryPath, String fileId) {
+    IndexedFile file = new IndexedFile();
+    file.setUUID(IdUtils.createUUID());
+    file.setPath(directoryPath);
+    file.setId(fileId);
     return file;
   }
 

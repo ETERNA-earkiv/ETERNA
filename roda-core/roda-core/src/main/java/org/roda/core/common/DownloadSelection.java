@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
@@ -66,6 +67,12 @@ public final class DownloadSelection {
 
   private static final int MAX_ZIP_NAME_LENGTH = 80;
   private static final String FALLBACK_ZIP_NAME = "files";
+
+  /** A path separator or a control character inside a single path segment. */
+  private static final Pattern UNSAFE_IN_SEGMENT = Pattern.compile("[/\\\\\\p{Cntrl}]");
+
+  /** {@code .}, {@code ..} and anything else made up of dots alone. */
+  private static final Pattern DOTS_ONLY_SEGMENT = Pattern.compile("\\.+");
 
   /**
    * Everything the expansion, the validation, the zip entries and the zip name
@@ -254,23 +261,46 @@ public final class DownloadSelection {
    * the representation id alone is not unique either, so the AIP id is
    * prepended as well.
    */
-  static String zipEntryName(IndexedFile file, boolean multipleAIPs, boolean multipleRepresentations) {
+  static String zipEntryName(IndexedFile file, boolean multipleAIPs, boolean multipleRepresentations)
+    throws RequestNotValidException {
     StringBuilder name = new StringBuilder();
 
     if (multipleRepresentations) {
       if (multipleAIPs) {
-        name.append(file.getAipId()).append(DownloadUtils.ZIP_PATH_DELIMITER);
+        name.append(checkedSegment(file.getAipId(), file)).append(DownloadUtils.ZIP_PATH_DELIMITER);
       }
-      name.append(file.getRepresentationId()).append(DownloadUtils.ZIP_PATH_DELIMITER);
+      name.append(checkedSegment(file.getRepresentationId(), file)).append(DownloadUtils.ZIP_PATH_DELIMITER);
     }
 
     if (file.getPath() != null) {
       for (String segment : file.getPath()) {
-        name.append(segment).append(DownloadUtils.ZIP_PATH_DELIMITER);
+        name.append(checkedSegment(segment, file)).append(DownloadUtils.ZIP_PATH_DELIMITER);
       }
     }
 
-    return name.append(file.getId()).toString();
+    return name.append(checkedSegment(file.getId(), file)).toString();
+  }
+
+  /**
+   * Keeps a single name from turning into more than one path segment once the
+   * recipient extracts the zip: a segment carrying a separator of its own, or
+   * one that is nothing but dots, would let an entry point above the zip root.
+   * <p>
+   * Checked rather than sanitized. Storage encodes separators away
+   * ({@code FSUtils.encodePathPartial}), so such a segment cannot come from an
+   * ordinary ingest, and quietly renaming it would hand the recipient a file
+   * under a name the archive never held. Refusing costs nothing here: every
+   * entry name is built before the response is returned, so this still happens
+   * before the first header goes out — unlike a failure once the zip is
+   * streaming.
+   */
+  private static String checkedSegment(String segment, IndexedFile file) throws RequestNotValidException {
+    if (StringUtils.isEmpty(segment) || UNSAFE_IN_SEGMENT.matcher(segment).find()
+      || DOTS_ONLY_SEGMENT.matcher(segment).matches()) {
+      throw new RequestNotValidException(
+        "File " + file.getUUID() + " cannot be placed in a zip: unsafe path segment \"" + segment + "\"");
+    }
+    return segment;
   }
 
   /**
