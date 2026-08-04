@@ -127,7 +127,6 @@ public class FilesController implements FileRestService, Exportable {
         List<IndexedFile> files = DownloadSelection.expand(requestContext.getIndexService(), selection);
         PreparedDownload prepared = new PreparedDownload(requestContext.getUser().getName(),
           requestContext.getRequest() == null ? null : requestContext.getRequest().getReason(), files);
-        auditDisclosedFiles(controllerAssistant, prepared);
 
         if (files.isEmpty()) {
           return new PreparedDownloadResponse(DownloadRefusal.noFiles(), 0, 0);
@@ -139,6 +138,11 @@ public class FilesController implements FileRestService, Exportable {
         // worst possible outcome.
         controllerAssistant.checkObjectPermissions(requestContext.getUser(),
           SelectedItemsList.create(IndexedFile.class, prepared.fileUUIDs()));
+
+        // only once the selection has cleared the permission check: the
+        // parameters are written to the log whatever the outcome, and a denied
+        // request must not leave a list of UUIDs the user never got near
+        auditDisclosedFiles(controllerAssistant, prepared);
 
         // a refusal is part of the ordinary response rather than an HTTP error,
         // so that the client can tell the reasons apart and name the numbers
