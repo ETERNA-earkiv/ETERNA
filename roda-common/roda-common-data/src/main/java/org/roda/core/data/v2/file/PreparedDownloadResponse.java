@@ -13,6 +13,13 @@ import java.io.Serializable;
 /**
  * Result of preparing a selection-based download: the token the client uses to
  * fetch the zip, plus what the client needs to decide whether to confirm first.
+ * <p>
+ * A refusal travels here too, rather than as an HTTP error, because the client
+ * has to tell the reasons apart and name the numbers behind them — and the
+ * error channel conveys neither: every refusal would arrive as the same
+ * "Request was not valid" with the numbers buried in an English sentence.
+ * The size and the count are filled in either way, so a refusal can say how
+ * large the selection was that got turned down.
  */
 public class PreparedDownloadResponse implements Serializable {
 
@@ -22,6 +29,7 @@ public class PreparedDownloadResponse implements Serializable {
   private String token;
   private int fileCount;
   private long totalSize;
+  private DownloadRefusal refusal;
 
   public PreparedDownloadResponse() {
     // empty constructor
@@ -29,6 +37,12 @@ public class PreparedDownloadResponse implements Serializable {
 
   public PreparedDownloadResponse(String token, int fileCount, long totalSize) {
     this.token = token;
+    this.fileCount = fileCount;
+    this.totalSize = totalSize;
+  }
+
+  public PreparedDownloadResponse(DownloadRefusal refusal, int fileCount, long totalSize) {
+    this.refusal = refusal;
     this.fileCount = fileCount;
     this.totalSize = totalSize;
   }
@@ -55,5 +69,14 @@ public class PreparedDownloadResponse implements Serializable {
 
   public void setTotalSize(long totalSize) {
     this.totalSize = totalSize;
+  }
+
+  /** {@code null} when the download was prepared and a token was issued. */
+  public DownloadRefusal getRefusal() {
+    return refusal;
+  }
+
+  public void setRefusal(DownloadRefusal refusal) {
+    this.refusal = refusal;
   }
 }

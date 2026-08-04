@@ -11,7 +11,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertThrows;
 import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.expectThrows;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -30,8 +29,9 @@ import org.roda.core.TestsHelper;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.StreamResponse;
+import org.roda.core.data.v2.file.DownloadRefusal;
+import org.roda.core.data.v2.file.DownloadRefusalReason;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -146,7 +146,7 @@ public class DownloadSelectionTest {
   }
 
   @Test
-  public void testHardLimitRejectsTheSelectionWithBothTheCountAndTheLimit() throws RODAException {
+  public void testHardLimitRefusesTheSelectionWithBothTheCountAndTheLimit() throws RODAException {
     AIP aip = createAIP(new Permissions());
     createRepresentation(aip, REPRESENTATION_ID);
     IndexedFile first = createFile(aip, REPRESENTATION_ID, List.of(), "one.pdf", "1");
@@ -156,14 +156,14 @@ public class DownloadSelectionTest {
     List<IndexedFile> files = DownloadSelection.expand(index, selectionOf(first.getUUID(), second.getUUID()));
     RodaCoreFactory.getRodaConfiguration().setProperty(RodaConstants.CORE_DOWNLOAD_MAX_FILES, 1);
 
-    RequestNotValidException thrown = expectThrows(RequestNotValidException.class,
-      () -> DownloadSelection.validateFileCount(files));
-    assertTrue(thrown.getMessage().contains("2"), "the message must state how many files were selected");
-    assertTrue(thrown.getMessage().contains("1"), "the message must state the configured limit");
+    DownloadRefusal refusal = DownloadSelection.checkFileCount(files).orElseThrow();
+    assertEquals(refusal.getReason(), DownloadRefusalReason.TOO_MANY_FILES);
+    assertEquals(refusal.getFileCount(), 2, "the refusal must state how many files were selected");
+    assertEquals(refusal.getFileLimit(), 1, "the refusal must state the configured limit");
   }
 
   @Test
-  public void testLimitOfZeroRejectsNothing() throws RODAException {
+  public void testLimitOfZeroRefusesNothing() throws RODAException {
     AIP aip = createAIP(new Permissions());
     createRepresentation(aip, REPRESENTATION_ID);
     IndexedFile first = createFile(aip, REPRESENTATION_ID, List.of(), "one.pdf", "1");
@@ -173,7 +173,7 @@ public class DownloadSelectionTest {
     List<IndexedFile> files = DownloadSelection.expand(index, selectionOf(first.getUUID(), second.getUUID()));
     RodaCoreFactory.getRodaConfiguration().setProperty(RodaConstants.CORE_DOWNLOAD_MAX_FILES, 0);
 
-    DownloadSelection.validateFileCount(files);
+    assertTrue(DownloadSelection.checkFileCount(files).isEmpty());
   }
 
   /**
@@ -204,19 +204,20 @@ public class DownloadSelectionTest {
   }
 
   @Test
-  public void testUnreachableReferenceContentRejectsTheSelectionAndOnlyProbesReferences() throws RODAException {
+  public void testUnreachableReferenceContentRefusesTheSelectionAndOnlyProbesReferences() {
     IndexedFile reference = referenceFile("http://archive.example.org/records/1.pdf");
     IndexedFile plainFile = new IndexedFile();
     plainFile.setUUID(IdUtils.createUUID());
 
     List<URI> probed = new ArrayList<>();
-    RequestNotValidException thrown = expectThrows(RequestNotValidException.class,
-      () -> DownloadSelection.validateDeliverability(List.of(plainFile, reference), uri -> {
-        probed.add(uri);
-        return false;
-      }));
+    DownloadRefusal refusal = DownloadSelection.checkDeliverability(List.of(plainFile, reference), uri -> {
+      probed.add(uri);
+      return false;
+    }).orElseThrow();
 
-    assertTrue(thrown.getMessage().contains("1"), "the message must state how many files are affected");
+    assertEquals(refusal.getReason(), DownloadRefusalReason.UNDELIVERABLE_CONTENT);
+    assertEquals(refusal.getUndeliverableFileCount(), 1, "the refusal must state how many files are affected");
+    assertEquals(refusal.getFileCount(), 2, "and out of how many");
     assertEquals(probed.size(), 1, "only the reference file may cost a probe");
   }
 
@@ -224,12 +225,11 @@ public class DownloadSelectionTest {
   public void testAnUnresolvableProtocolCountsAsUndeliverable() {
     IndexedFile reference = referenceFile("unreachable-protocol://archive.example.org/records/1.pdf");
 
-    assertThrows(RequestNotValidException.class,
-      () -> DownloadSelection.validateDeliverability(List.of(reference)));
+    assertTrue(DownloadSelection.checkDeliverability(List.of(reference)).isPresent());
   }
 
   @Test
-  public void testAvailabilityIsCheckedOncePerProtocolAndHostAndNotOncePerFile() throws RODAException {
+  public void testAvailabilityIsCheckedOncePerProtocolAndHostAndNotOncePerFile() {
     List<IndexedFile> manyFilesSameHost = new ArrayList<>();
     for (int i = 0; i < 50; i++) {
       manyFilesSameHost.add(referenceFile("http://archive.example.org/records/" + i + ".pdf"));
@@ -238,10 +238,10 @@ public class DownloadSelectionTest {
     manyFilesSameHost.add(referenceFile("http://other.example.org/records/1.pdf"));
 
     List<URI> probed = new ArrayList<>();
-    DownloadSelection.validateDeliverability(manyFilesSameHost, uri -> {
+    assertTrue(DownloadSelection.checkDeliverability(manyFilesSameHost, uri -> {
       probed.add(uri);
       return true;
-    });
+    }).isEmpty());
 
     assertEquals(probed.size(), 3,
       "52 files against three distinct protocol/host/port endpoints must cost three probes");

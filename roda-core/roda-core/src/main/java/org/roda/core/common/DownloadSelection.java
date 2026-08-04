@@ -29,6 +29,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.StreamResponse;
+import org.roda.core.data.v2.file.DownloadRefusal;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -144,20 +145,20 @@ public final class DownloadSelection {
   }
 
   /**
-   * Rejects the request when the selection is larger than
+   * Refuses the request when the selection is larger than
    * {@code core.download.max_files}. The limit is off by default: the
    * confirmation dialog, not this check, is what protects against
    * accidentally large selections — an archivist with a legitimately large
    * disclosure should be able to confirm and proceed.
    */
-  public static void validateFileCount(List<IndexedFile> files) throws RequestNotValidException {
+  public static Optional<DownloadRefusal> checkFileCount(List<IndexedFile> files) {
     int maxFiles = RodaCoreFactory.getRodaConfigurationAsInt(RodaConstants.DEFAULT_CORE_DOWNLOAD_MAX_FILES,
       RodaConstants.CORE_DOWNLOAD_MAX_FILES);
 
     if (maxFiles > 0 && files.size() > maxFiles) {
-      throw new RequestNotValidException("The selection contains " + files.size()
-        + " files, which exceeds the configured maximum of " + maxFiles + " files per download");
+      return Optional.of(DownloadRefusal.tooManyFiles(files.size(), maxFiles));
     }
+    return Optional.empty();
   }
 
   /**
@@ -167,15 +168,14 @@ public final class DownloadSelection {
    * selection of hundreds of reference files against one host must not become
    * hundreds of requests.
    */
-  public static void validateDeliverability(List<IndexedFile> files) throws RequestNotValidException {
-    validateDeliverability(files, DownloadSelection::isAvailable);
+  public static Optional<DownloadRefusal> checkDeliverability(List<IndexedFile> files) {
+    return checkDeliverability(files, DownloadSelection::isAvailable);
   }
 
   /**
    * Seam for the tests, which need to count how many probes are actually made.
    */
-  static void validateDeliverability(List<IndexedFile> files, Predicate<URI> availabilityProbe)
-    throws RequestNotValidException {
+  static Optional<DownloadRefusal> checkDeliverability(List<IndexedFile> files, Predicate<URI> availabilityProbe) {
     Map<String, Boolean> availabilityByEndpoint = new HashMap<>();
     int undeliverable = 0;
 
@@ -197,9 +197,9 @@ public final class DownloadSelection {
     }
 
     if (undeliverable > 0) {
-      throw new RequestNotValidException(
-        "The content of " + undeliverable + " of the " + files.size() + " selected files cannot be delivered");
+      return Optional.of(DownloadRefusal.undeliverableContent(undeliverable, files.size()));
     }
+    return Optional.empty();
   }
 
   private static URI parseReferenceURI(IndexedFile file) {

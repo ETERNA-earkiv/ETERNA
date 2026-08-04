@@ -14,10 +14,12 @@ import java.nio.file.StandardCopyOption;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Optional;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.DownloadSelection;
 import org.roda.core.data.common.RodaConstants;
@@ -25,6 +27,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.file.CreateFolderRequest;
+import org.roda.core.data.v2.file.DownloadRefusal;
 import org.roda.core.data.v2.file.MoveFilesRequest;
 import org.roda.core.data.v2.file.PreparedDownloadResponse;
 import org.roda.core.data.v2.file.RenameFolderRequest;
@@ -108,9 +111,9 @@ public class FilesController implements FileRestService, Exportable {
   DownloadSelectionService downloadSelectionService;
 
   @PostMapping(path = "/download/prepare", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Requests a download of selected files", description = "Expands and validates a selection of files and, if it is deliverable, issues a token that can be used to download the selection as a zip", responses = {
-    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = PreparedDownloadResponse.class))),
-    @ApiResponse(responseCode = "400", description = "The selection was rejected", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+  @Operation(summary = "Requests a download of selected files", description = "Expands and validates a selection of files and, if it is deliverable, issues a token that can be used to download the selection as a zip; a selection that is refused for its size or for undeliverable content comes back as a refusal in the same response", responses = {
+    @ApiResponse(responseCode = "200", description = "A token, or a refusal", content = @Content(schema = @Schema(implementation = PreparedDownloadResponse.class))),
+    @ApiResponse(responseCode = "400", description = "The selection was not valid", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   public PreparedDownloadResponse requestSelectedFilesDownload(@RequestBody SelectedItemsRequest selected) {
@@ -122,11 +125,12 @@ public class FilesController implements FileRestService, Exportable {
         SelectedItems<IndexedFile> selection = CommonServicesUtils.convertSelectedItems(selected, IndexedFile.class);
 
         List<IndexedFile> files = DownloadSelection.expand(requestContext.getIndexService(), selection);
-        PreparedDownload prepared = new PreparedDownload(requestContext.getUser().getName(), files);
+        PreparedDownload prepared = new PreparedDownload(requestContext.getUser().getName(),
+          requestContext.getRequest() == null ? null : requestContext.getRequest().getReason(), files);
         auditDisclosedFiles(controllerAssistant, prepared);
 
         if (files.isEmpty()) {
-          throw new RequestNotValidException("The selection does not contain any file to download");
+          return new PreparedDownloadResponse(DownloadRefusal.noFiles(), 0, 0);
         }
 
         // All or nothing, and on the expanded list rather than the selection:
@@ -136,8 +140,14 @@ public class FilesController implements FileRestService, Exportable {
         controllerAssistant.checkObjectPermissions(requestContext.getUser(),
           SelectedItemsList.create(IndexedFile.class, prepared.fileUUIDs()));
 
-        DownloadSelection.validateFileCount(files);
-        DownloadSelection.validateDeliverability(files);
+        // a refusal is part of the ordinary response rather than an HTTP error,
+        // so that the client can tell the reasons apart and name the numbers
+        // behind them
+        Optional<DownloadRefusal> refusal = DownloadSelection.checkFileCount(files)
+          .or(() -> DownloadSelection.checkDeliverability(files));
+        if (refusal.isPresent()) {
+          return new PreparedDownloadResponse(refusal.get(), files.size(), prepared.totalSize());
+        }
 
         String token = downloadSelectionService.prepareDownload(prepared);
         return new PreparedDownloadResponse(token, files.size(), prepared.totalSize());
@@ -165,6 +175,13 @@ public class FilesController implements FileRestService, Exportable {
         PreparedDownload prepared = downloadSelectionService.retrievePreparedDownload(token,
           requestContext.getUser().getName());
         auditDisclosedFiles(controllerAssistant, prepared);
+
+        // browser navigation cannot send the x-request-reason header, so the
+        // reason from the preparing request is reused rather than leaving the
+        // entry that records the actual disclosure without one
+        if (requestContext.getRequest() != null && StringUtils.isBlank(requestContext.getRequest().getReason())) {
+          requestContext.getRequest().setReason(prepared.reason());
+        }
 
         // permissions may have been revoked since the token was issued
         controllerAssistant.checkObjectPermissions(requestContext.getUser(),
