@@ -1506,6 +1506,27 @@ public interface ClientMessages extends Messages {
 
   String selectedFileRemoveMessage();
 
+  /***** Download of selected files ****/
+  String downloadSelectedFilesButton();
+
+  String downloadSelectedFilesConfirmTitle();
+
+  String downloadSelectedFilesConfirmMessage(int fileCount, String totalSize);
+
+  String downloadSelectedFilesRefusedTitle();
+
+  String downloadSelectedFilesNoFiles();
+
+  String downloadSelectedFilesTooManyFiles(int fileCount, int fileLimit);
+
+  String downloadSelectedFilesNoPermission();
+
+  String downloadSelectedFilesUndeliverableContent(int undeliverableFileCount, int fileCount);
+
+  String downloadSelectedFilesExpired();
+
+  String downloadSelectedFilesFailed();
+
   /***** Dissemination ****/
   String dissemination();
 
@@ -2827,4 +2848,6 @@ public interface ClientMessages extends Messages {
   String catalogTreeGhostNodeLabel();
 
   String browseAIPReasonViewAIP();
+
+  String filesReasonDownloadSelectedFiles();
 }

@@ -2,6 +2,9 @@
 
 ## v1.0.1 (unreleased)
 
+#### New features
+- Added a "Ladda ner valda filer" action that downloads selected files and folders as a zip of file content only, with paths relative to the representation's `data/`; the selection is validated before anything is streamed and again just before delivery, a selection that cannot be delivered is refused with an explanation instead of a technical error, large selections ask for confirmation, and the disclosed file UUIDs, count and total size are recorded in the audit log [#589](https://github.com/ETERNA-earkiv/ETERNA/issues/589)
+
 #### Improvements
 - Pinned the `eterna-unoserver` image to an immutable version tag (`v3.7.0`) in the deploy compose files, and updated the build workflow to publish `v3.7.0` alongside `:latest`, so deployments are reproducible [#600](https://github.com/ETERNA-earkiv/ETERNA/issues/600)
 - The parent-node selector now shows a lazy-loading tree of logical units instead of a flat list when picking a target during ingest, move and disposal-rule editing; the filter field runs a search that lists matching units with their ancestor path (breadcrumb), only structural levels are selectable (`file`/`item` are hidden), and when moving, the moved node and its subtree are shown but greyed out so a package cannot be moved into its own hierarchy [#301](https://github.com/ETERNA-earkiv/ETERNA/issues/301)
