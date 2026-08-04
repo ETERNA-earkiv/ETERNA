@@ -32,12 +32,31 @@ public class DownloadSelectionService {
   private static final long TOKEN_TTL_MINUTES = 10;
 
   /**
+   * Keeps the number of live tokens bounded, since the TTL alone does not:
+   * preparing a download is cheap and repeatable, and the key comes from the
+   * caller. This is a backstop against unbounded growth, not a memory limit —
+   * what a token retains is its whole expanded file list, so the size of a
+   * single selection dominates. Bounding the token count rather than that list
+   * keeps one legitimately large disclosure deliverable;
+   * {@code core.download.max_files} is what limits a single selection.
+   * <p>
+   * Set well above ordinary concurrent use, which for a handful of
+   * simultaneous downloads per node never comes close.
+   */
+  private static final long MAX_PREPARED_DOWNLOADS = 500;
+
+  /**
    * Token to prepared download. Per node and in memory, following the Guava
    * pattern already used for schemas, disposal rules and i18n in core. A token
-   * stays valid for its whole TTL so that browser resumption works.
+   * stays valid for its whole TTL so that browser resumption works, unless it
+   * is evicted first — eviction is approximately least-recently-used and pays
+   * no attention to which user a token belongs to, so a flood of requests can
+   * cost somebody else their token. That surfaces as the ordinary refusal
+   * dialog rather than a broken download, since the client revalidates before
+   * it navigates.
    */
   private final Cache<String, PreparedDownload> preparedDownloads = CacheBuilder.newBuilder()
-    .expireAfterWrite(TOKEN_TTL_MINUTES, TimeUnit.MINUTES).build();
+    .maximumSize(MAX_PREPARED_DOWNLOADS).expireAfterWrite(TOKEN_TTL_MINUTES, TimeUnit.MINUTES).build();
 
   /**
    * Caches a validated file list under a fresh token and returns the token.
