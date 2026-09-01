@@ -46,10 +46,29 @@ export interface VisibilityConfig {
   knownMetadataFields?: Record<string, string[]>;
 }
 
+export interface AboutSection {
+  heading?: string;
+  body: string;
+}
+
+export interface AboutSourceLink {
+  label: string;
+  url: string;
+}
+
+/** Innehåll för "Om"-sidan — unikt per installation/kund */
+export interface AboutConfig {
+  menuLabel: string;
+  title: string;
+  sections: AboutSection[];
+  sourceLinks?: AboutSourceLink[];
+}
+
 export interface AppConfig {
   siteConfig: SiteConfig;
   searchConfig: SearchConfig;
   visibilityConfig: VisibilityConfig;
+  aboutConfig?: AboutConfig;
 }
 
 const DEFAULT_CONFIG: AppConfig = {

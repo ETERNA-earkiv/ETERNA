@@ -3,13 +3,6 @@
   padding: 24px;
 }
 
-.expanded-content__actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
 .expanded-content__download-btn {
   display: inline-flex;
   align-items: center;
@@ -76,11 +69,11 @@
 }
 
 .expanded-content__meta-item dt {
-  font-size: 0.78rem;
+  font-size: 0.95rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: #374151;
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 6px;
 }
 
@@ -111,7 +104,7 @@
 }
 
 .expanded-content__files-header {
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 
 .expanded-content__files-header h3 {
@@ -119,6 +112,10 @@
   font-weight: 500;
   color: #202124;
   margin: 0;
+}
+
+.expanded-content__files-actions {
+  margin-top: 16px;
 }
 
 .expanded-content__no-files {

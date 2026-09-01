@@ -64,6 +64,8 @@ export async function searchAIPsWithFacets(
   filters: FilterParameter[] = [],
   offset = 0,
   limit = 10,
+  sortField = 'title',
+  sortDescending = false,
 ): Promise<AIPIndexResult> {
   const allFilters: FilterParameter[] = [];
 
@@ -88,6 +90,9 @@ export async function searchAIPsWithFacets(
     sublist: {
       firstElementIndex: offset,
       maximumElementCount: limit,
+    },
+    sorter: {
+      parameters: [{ name: sortField, descending: sortDescending }],
     },
   };
 

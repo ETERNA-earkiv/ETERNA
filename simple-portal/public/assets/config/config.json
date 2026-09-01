@@ -36,6 +36,13 @@
         "label": "Omfattning och innehåll",
         "type": "text",
         "enabled": true
+      },
+      {
+        "fieldName": "origination",
+        "label": "Arkivbildare",
+        "type": "text",
+        "enabled": true,
+        "clientFilter": true
       }
     ],
     "resultsPerPage": 10
@@ -43,7 +50,8 @@
   "visibilityConfig": {
     "allowedLevels": [
       "item",
-      "file"
+      "file",
+      "recordgrp"
     ],
     "xpathRulesEnabled": false,
     "xpathRules": [],
@@ -54,9 +62,16 @@
       ],
       "ead_3": [
         "Titel",
-        "Dokumenttitel",
-        "Datum",
-        "Agencyname"
+        "Filnamn",
+        "Startdatum",
+        "Slutdatum",
+        "Arkivbildare",
+        "Omfattning och innehåll",
+        "Biografi och historia",
+        "Agencyname",
+        "Agent",
+        "Eventdatetime",
+        "Recordid"
       ]
     },
     "knownMetadataFields": {
@@ -73,10 +88,15 @@
       ],
       "ead_3": [
         "Titel",
-        "Dokumenttitel",
+        "Filnamn",
         "Datum",
+        "Startdatum",
+        "Slutdatum",
         "Beskrivningsnivå",
         "Referenskod",
+        "Arkivbildare",
+        "Omfattning och innehåll",
+        "Biografi och historia",
         "Övrig information",
         "Recordid",
         "Agencyname",
@@ -85,5 +105,27 @@
         "Eventdescription"
       ]
     }
+  },
+  "aboutConfig": {
+    "menuLabel": "Om Jämtlands läns arkiv",
+    "title": "Om Jämtlands läns arkiv",
+    "sections": [
+      {
+        "heading": "Om verksamheten",
+        "body": "Föreningsarkivet i Jämtlands län (FAJ) är en ideell kulturförening som arbetar för att bevara, tillgängliggöra och levandegöra enskilda arkiv som en del av kulturarvet.\n\nFöreningen har drygt 460 medlemmar och erbjuder både arkivtjänster och ett brett programutbud: originalarkiv och läsesal, föreläsningar och kurser, skolverksamhet samt forsknings- och dokumentationsprogram.\n\nVerksamheten regleras av föreningens stadgar och en kulturplan, och bedrivs med stöd av årliga avtal med Region Jämtland Härjedalen samt bidrag från Kulturrådet."
+      },
+      {
+        "heading": "Om arkivet",
+        "body": "Arkivet bevarar handlingar från omkring 5 000 föreningar i länet — bland annat från nykterhetsrörelsen, arbetarrörelsen, frikyrkorörelsen och idrottsrörelsen — samt företags-, gårds- och personarkiv.\n\nSamlingarna omfattar administrativt material som protokoll, matriklar, kassaböcker och verksamhetsberättelser, fotografier och affischer, samt omkring 300 fanor och standar från folkrörelser, fackföreningar och sångkörer. Fanor och standar tas emot för permanent förvaring och kan inte lämnas tillbaka.\n\nArkivet finns på Arkivvägen 1 i Östersund. En sökbar databas över materialet finns via Riksarkivets webbplats."
+      },
+      {
+        "heading": "Kontakt",
+        "body": "Arkivvägen 1, 831 52 Östersund\nTelefon: 063-10 06 07\nE-post: info@jamtlandsarkivet.se"
+      }
+    ],
+    "sourceLinks": [
+      { "label": "Om FAJ:s verksamhet (faj.se)", "url": "https://faj.se/about/verksamhet/" },
+      { "label": "Om arkivet (faj.se)", "url": "https://faj.se/arkiv/" }
+    ]
   }
 }

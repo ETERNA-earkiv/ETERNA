@@ -9,6 +9,7 @@ import { formatStandardName } from '../utils/i18n';
 
 const htmlCache = new TtlCache<string>();
 const xmlCache = new TtlCache<string>();
+const idsCache = new TtlCache<string[]>();
 
 export interface MetadataField {
   label: string;
@@ -74,15 +75,17 @@ export async function evaluateMetadataXpath(
 export async function getAvailableMetadataIds(
   aipId: string,
 ): Promise<string[]> {
-  try {
-    const data = await apiGet<{ descriptiveMetadataInfoList?: { id: string }[] }>(
-      `/api/v2/aips/${aipId}/metadata/descriptive/information`,
-    );
-    const list = data?.descriptiveMetadataInfoList || [];
-    return list.map((info) => info.id).filter(Boolean);
-  } catch {
-    return [];
-  }
+  return idsCache.getOrFetch(`ids:${aipId}`, async () => {
+    try {
+      const data = await apiGet<{ descriptiveMetadataInfoList?: { id: string }[] }>(
+        `/api/v2/aips/${aipId}/metadata/descriptive/information`,
+      );
+      const list = data?.descriptiveMetadataInfoList || [];
+      return list.map((info) => info.id).filter(Boolean);
+    } catch {
+      return [];
+    }
+  });
 }
 
 /**
@@ -127,6 +130,37 @@ function parseHtmlToFields(html: string): MetadataField[] {
   } catch {
     return [];
   }
+}
+
+/**
+ * Get list of available descriptive metadata standard IDs for a representation.
+ * Representationer kan ha egen beskrivande metadata, separat från AIP:ens.
+ */
+export async function getAvailableRepresentationMetadataIds(
+  aipId: string,
+  representationId: string,
+): Promise<string[]> {
+  return idsCache.getOrFetch(`repids:${aipId}:${representationId}`, async () => {
+    try {
+      const data = await apiGet<{ descriptiveMetadataInfoList?: { id: string }[] }>(
+        `/api/v2/aips/${aipId}/representations/${representationId}/metadata/descriptive`,
+      );
+      const list = data?.descriptiveMetadataInfoList || [];
+      return list.map((info) => info.id).filter(Boolean);
+    } catch {
+      return [];
+    }
+  });
+}
+
+export async function getRepresentationMetadataXml(
+  aipId: string,
+  representationId: string,
+  metadataId: string,
+): Promise<string> {
+  return xmlCache.getOrFetch(`repxml:${aipId}:${representationId}:${metadataId}`, () =>
+    apiGetXml(`/api/v2/aips/${aipId}/representations/${representationId}/metadata/descriptive/${metadataId}/download`),
+  );
 }
 
 export function invalidateMetadataCache(aipId?: string): void {

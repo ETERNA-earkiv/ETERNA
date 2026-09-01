@@ -3,8 +3,10 @@ import { useStore } from '@nanostores/react';
 import {
   $query, $results, $totalCount, $loading, $error,
   $currentPage, $totalPages,
-  search, goToPage, resetSearch,
+  $sortOptionId, $sortDescending, $filters, $clientFilters,
+  search, goToPage, resetSearch, setSort, sortByOriginator,
 } from '@lib/stores/search';
+
 import { initConfig } from '@lib/stores/config';
 import { loadRemoteLabels } from '@lib/utils/i18n';
 import { SearchResultCard } from './SearchResultCard';
@@ -42,9 +44,14 @@ function SearchPageContent() {
   const error = useStore($error);
   const currentPage = useStore($currentPage);
   const totalPages = useStore($totalPages);
+  const sortOptionId = useStore($sortOptionId);
+  const sortDescending = useStore($sortDescending);
+  const filters = useStore($filters);
+  const clientFilters = useStore($clientFilters);
   const [localQuery, setLocalQuery] = useState('');
   const [initialized, setInitialized] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showSearchInfo, setShowSearchInfo] = useState(false);
 
   useEffect(() => {
     Promise.all([initConfig(), loadRemoteLabels()]).then(() => {
@@ -79,12 +86,39 @@ function SearchPageContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  function handleSort(id: string, field: string, clientSort: boolean) {
+    const isActive = sortOptionId === id;
+    const newDesc = isActive ? !sortDescending : false;
+    if (clientSort) {
+      sortByOriginator(newDesc);
+    } else {
+      setSort(id, field, newDesc);
+    }
+  }
+
   if (!initialized) return <PortalSpinner />;
 
   return (
     <div className="search-page">
       <header className="search-header">
-        <h2>Sök i arkivet</h2>
+        <div className="search-title-row">
+          <h2>Sök i arkivet</h2>
+          <button
+            type="button"
+            className="search-info-btn"
+            onClick={() => setShowSearchInfo((prev) => !prev)}
+            aria-expanded={showSearchInfo}
+            aria-label="Mer information om sökningen"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" />
+            </svg>
+          </button>
+        </div>
+
+        {showSearchInfo && (
+          <p className="search-info-text">Så här söker du i arkivet! Lägg till valfri text och beskrivning</p>
+        )}
 
         <form
           className="search-form"
@@ -128,8 +162,8 @@ function SearchPageContent() {
 
         {showAdvanced && (
           <SearchFilterPanel
-            onFiltersChange={(filters: FilterParameter[]) => {
-              search(localQuery, filters);
+            onFiltersChange={(newFilters: FilterParameter[], newClientFilters: Record<string, string>) => {
+              search(localQuery, newFilters, newClientFilters);
             }}
           />
         )}
@@ -144,10 +178,43 @@ function SearchPageContent() {
 
         {!loading && !error && results.length > 0 && (
           <>
-            <div className="search-results-list" role="list">
-              {results.map((aip) => (
-                <SearchResultCard key={aip.uuid || aip.id} aip={aip} />
-              ))}
+            <div className="results-table">
+              <div className="results-count">{totalCount} träffar</div>
+
+              <div className="results-column-headers" role="row">
+                <span aria-hidden="true" />
+                <button
+                  type="button"
+                  className={`results-column-headers__label${sortOptionId === 'title' ? ' results-column-headers__label--active' : ''}`}
+                  onClick={() => handleSort('title', 'title', false)}
+                  aria-pressed={sortOptionId === 'title'}
+                >
+                  Titel{sortOptionId === 'title' ? (sortDescending ? ' ↓' : ' ↑') : ''}
+                </button>
+                <button
+                  type="button"
+                  className={`results-column-headers__label results-column-headers__label--creator${sortOptionId === 'originator' ? ' results-column-headers__label--active' : ''}`}
+                  onClick={() => handleSort('originator', '', true)}
+                  aria-pressed={sortOptionId === 'originator'}
+                >
+                  Arkivbildare{sortOptionId === 'originator' ? (sortDescending ? ' ↓' : ' ↑') : ''}
+                </button>
+                <button
+                  type="button"
+                  className={`results-column-headers__label results-column-headers__label--date${sortOptionId === 'createdOn' ? ' results-column-headers__label--active' : ''}`}
+                  onClick={() => handleSort('createdOn', 'createdOn', false)}
+                  aria-pressed={sortOptionId === 'createdOn'}
+                >
+                  Datum{sortOptionId === 'createdOn' ? (sortDescending ? ' ↓' : ' ↑') : ''}
+                </button>
+                <span aria-hidden="true" />
+              </div>
+
+              <div className="search-results-list" role="list">
+                {results.map((aip) => (
+                  <SearchResultCard key={aip.uuid || aip.id} aip={aip} />
+                ))}
+              </div>
             </div>
 
             {totalPages > 1 && (
@@ -162,10 +229,12 @@ function SearchPageContent() {
           </>
         )}
 
-        {!loading && !error && results.length === 0 && query && (
+        {!loading && !error && results.length === 0 && (query || filters.length > 0 || Object.keys(clientFilters).length > 0) && (
           <PortalEmptyState
             title="Inga resultat"
-            message={`Inga arkivobjekt matchade "${query}". Prova ett annat sökord.`}
+            message={query
+              ? `Inga arkivobjekt matchade "${query}". Prova ett annat sökord.`
+              : 'Inga arkivobjekt matchade de valda filtren.'}
           />
         )}
 

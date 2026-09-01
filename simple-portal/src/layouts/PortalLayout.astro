@@ -18,6 +18,7 @@ interface Props {
 let siteName = 'E-Arkiv Portal';
 let primaryColor = '#C4122A';
 let logoUrl = '';
+let aboutMenuLabel = '';
 try {
   const configPath = join(process.cwd(), 'public', 'assets', 'config', 'config.json');
   const raw = await readFile(configPath, 'utf-8');
@@ -25,6 +26,7 @@ try {
   if (config?.siteConfig?.siteName) siteName = config.siteConfig.siteName;
   if (config?.siteConfig?.primaryColor) primaryColor = config.siteConfig.primaryColor;
   if (config?.siteConfig?.logoUrl) logoUrl = config.siteConfig.logoUrl;
+  if (config?.aboutConfig?.menuLabel) aboutMenuLabel = config.aboutConfig.menuLabel;
 } catch { /* använd defaults */ }
 
 const { title = siteName, description = 'Sök och utforska arkivet' } = Astro.props;
@@ -42,7 +44,7 @@ const { title = siteName, description = 'Sök och utforska arkivet' } = Astro.pr
   </head>
   <body>
     <a class="skip-link" href="#main-content" aria-label="Hoppa till huvudinnehåll">Hoppa till huvudinnehåll</a>
-    <Header siteName={siteName} logoUrl={logoUrl} />
+    <Header siteName={siteName} logoUrl={logoUrl} aboutMenuLabel={aboutMenuLabel} />
     <main id="main-content" tabindex="-1">
       <slot />
     </main>

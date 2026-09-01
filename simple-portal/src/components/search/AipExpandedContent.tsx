@@ -3,9 +3,12 @@ import DOMPurify from 'dompurify';
 import { getMetadataHtml } from '@lib/api/aip';
 import { getRepresentationsForAIP } from '@lib/api/representations';
 import { getFilesForRepresentation, buildFileTree } from '@lib/api/files';
-import { getAvailableMetadataIds, getMetadataXml } from '@lib/api/metadata';
+import {
+  getAvailableMetadataIds, getMetadataXml,
+  getAvailableRepresentationMetadataIds, getRepresentationMetadataXml,
+} from '@lib/api/metadata';
 import { parseXmlToFields } from '@lib/utils/metadata-parser';
-import { formatStandardName, normalizeMetadataStandardId } from '@lib/utils/i18n';
+import { normalizeMetadataStandardId } from '@lib/utils/i18n';
 import type { FileNode } from '@lib/types/api';
 import type { MetadataField } from '@lib/api/metadata';
 import { PortalSpinner } from '../portal-ui/PortalSpinner';
@@ -34,8 +37,8 @@ export default function AipExpandedContent({ aipId, showHeaderButtons = true }: 
   const [error, setError] = useState<string | null>(null);
   const [warning, setWarning] = useState<string | null>(null);
   const [metadata, setMetadata] = useState<MetadataSection[]>([]);
+  const [representationMetadata, setRepresentationMetadata] = useState<MetadataSection[]>([]);
   const [allFiles, setAllFiles] = useState<FileNode[]>([]);
-  const [fileCount, setFileCount] = useState(0);
   const [isDownloading, setIsDownloading] = useState(false);
   const [visibleFields, setVisibleFields] = useState<Record<string, string[]>>({});
 
@@ -98,13 +101,33 @@ export default function AipExpandedContent({ aipId, showHeaderButtons = true }: 
         ),
         Promise.all(
           reps.map(async (rep) => {
+            let files: FileNode[] = [];
             try {
               const raw = await getFilesForRepresentation(rep.uuid);
-              return { files: flattenFiles(buildFileTree(raw)), count: raw.filter(f => !f.isDirectory).length };
+              files = flattenFiles(buildFileTree(raw));
             } catch {
               warnings.push('En representation kunde inte laddas');
-              return { files: [] as FileNode[], count: 0 };
             }
+
+            let repSections: MetadataSection[] = [];
+            try {
+              const repMetaIds = await getAvailableRepresentationMetadataIds(aipId, rep.uuid);
+              const sections = await Promise.all(
+                repMetaIds.map(async (id): Promise<MetadataSection | null> => {
+                  try {
+                    const xml = await getRepresentationMetadataXml(aipId, rep.uuid, id);
+                    const fields = parseXmlToFields(xml);
+                    return fields.length > 0 ? { id, label: id, fields, html: '' } : null;
+                  } catch {
+                    warnings.push(`Representationens metadata "${id}" kunde inte laddas`);
+                    return null;
+                  }
+                }),
+              );
+              repSections = sections.filter((s): s is MetadataSection => s !== null);
+            } catch { /* ingen beskrivande metadata på representationen */ }
+
+            return { files, repSections };
           }),
         ),
       ]);
@@ -112,9 +135,9 @@ export default function AipExpandedContent({ aipId, showHeaderButtons = true }: 
       setMetadata(metaSections.filter((s): s is MetadataSection => s !== null));
 
       const allFetchedFiles = fileData.flatMap(d => d.files);
-      const totalFileCount = fileData.reduce((sum, d) => sum + d.count, 0);
+      const allRepSections = fileData.flatMap(d => d.repSections);
       setAllFiles(allFetchedFiles);
-      setFileCount(totalFileCount);
+      setRepresentationMetadata(allRepSections);
 
       if (warnings.length > 0) {
         setWarning(`Delar av informationen kunde inte laddas: ${warnings.join(', ')}.`);
@@ -159,26 +182,6 @@ export default function AipExpandedContent({ aipId, showHeaderButtons = true }: 
       {warning && (
         <PortalAlert variant="warning" size="small">{warning}</PortalAlert>
       )}
-      {showHeaderButtons && (
-        <div className="expanded-content__actions">
-          <button
-            type="button"
-            className="expanded-content__download-btn"
-            onClick={downloadPackage}
-            disabled={isDownloading}
-            aria-busy={isDownloading}
-            aria-label="Ladda ner komplett paket som ZIP-fil"
-          >
-            {isDownloading ? (
-              <svg className="spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
-            ) : (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" x2="12" y1="15" y2="3" /></svg>
-            )}
-            Ladda ner komplett paket (.zip)
-          </button>
-        </div>
-      )}
-
       {/* Metadata per standard — filtrerat på synliga fält */}
       {metadata.map((section) => {
         // Filtrera per standard
@@ -186,12 +189,22 @@ export default function AipExpandedContent({ aipId, showHeaderButtons = true }: 
         const allowed = visibleFields[nid];
         const filteredFields = allowed && allowed.length > 0
           ? section.fields.filter((f) => allowed.includes(f.label))
-          : section.fields;
+          : [...section.fields];
+
+        // Slutdatum ska alltid visas (även utan värde) för att posten inte
+        // ska tappa sin plats i kolumnparningen med Startdatum. Gäller bara EAD 3,
+        // där Slutdatum är ett definierat begrepp (daterange/fromdate+todate).
+        if (nid === 'ead_3' && (!allowed || allowed.includes('Slutdatum')) && !filteredFields.some((f) => f.label === 'Slutdatum')) {
+          const startIdx = filteredFields.findIndex((f) => f.label === 'Startdatum');
+          const placeholder = { label: 'Slutdatum', value: '' };
+          if (startIdx >= 0) filteredFields.splice(startIdx + 1, 0, placeholder);
+          else filteredFields.push(placeholder);
+        }
 
         return filteredFields.length > 0 ? (
           <div key={section.id} className="expanded-content__meta-section">
             <h3 className="expanded-content__standard-heading">
-              Information enligt: {formatStandardName(section.id)}
+              Ytterligare information
             </h3>
             <div className="expanded-content__section-card">
               <dl className="expanded-content__metadata-grid">
@@ -207,7 +220,7 @@ export default function AipExpandedContent({ aipId, showHeaderButtons = true }: 
         ) : section.html ? (
           <div key={section.id} className="expanded-content__meta-section">
             <h3 className="expanded-content__standard-heading">
-              Information enligt: {formatStandardName(section.id)}
+              Ytterligare information
             </h3>
             <div
               className="expanded-content__section-card expanded-content__meta-html"
@@ -217,9 +230,36 @@ export default function AipExpandedContent({ aipId, showHeaderButtons = true }: 
         ) : null;
       })}
 
+      {/* Beskrivande metadata på representationen — separat från AIP:ens egen metadata */}
+      {representationMetadata.map((section, sectionIndex) => {
+        const nid = normalizeMetadataId(section.id);
+        const allowed = visibleFields[nid];
+        const filteredFields = allowed && allowed.length > 0
+          ? section.fields.filter((f) => allowed.includes(f.label))
+          : section.fields;
+
+        return filteredFields.length > 0 ? (
+          <div key={`${section.id}-${sectionIndex}`} className="expanded-content__meta-section">
+            <h3 className="expanded-content__standard-heading">
+              Metadata för representationen
+            </h3>
+            <div className="expanded-content__section-card">
+              <dl className="expanded-content__metadata-grid">
+                {filteredFields.map((field, i) => (
+                  <div key={i} className="expanded-content__meta-item">
+                    <dt>{field.label}</dt>
+                    <dd>{field.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </div>
+        ) : null;
+      })}
+
       {/* Files */}
       <div className="expanded-content__files-header">
-        <h3>Filer ({fileCount})</h3>
+        <h3>Se och ladda ner fil</h3>
       </div>
       <div className="expanded-content__files-container">
         {allFiles.length > 0 ? (
@@ -228,6 +268,25 @@ export default function AipExpandedContent({ aipId, showHeaderButtons = true }: 
           <p className="expanded-content__no-files">Inga filer hittades i detta paket.</p>
         )}
       </div>
+      {showHeaderButtons && (
+        <div className="expanded-content__files-actions">
+          <button
+            type="button"
+            className="expanded-content__download-btn"
+            onClick={downloadPackage}
+            disabled={isDownloading}
+            aria-busy={isDownloading}
+            aria-label="Ladda ner fil och metadata som ZIP-fil"
+          >
+            {isDownloading ? (
+              <svg className="spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" x2="12" y1="15" y2="3" /></svg>
+            )}
+            Ladda ner fil och metadata
+          </button>
+        </div>
+      )}
     </div>
   );
 }

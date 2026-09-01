@@ -2,11 +2,23 @@
 
 .filter-panel {
   padding: 20px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background: color-mix(in srgb, var(--brand1) 3%, white);
+  border: 1px solid color-mix(in srgb, var(--brand1) 18%, #e5e7eb);
+  border-top: 3px solid var(--brand1);
   border-radius: 0;
   display: grid;
   gap: 16px;
+
+  /* Ger digi-form-input/select en egen bakgrundsfärg (annars ärver de
+     rent vitt från temat och smälter ihop med panelens ljusa bakgrund).
+     Custom properties går igenom Shadow DOM, så detta träffar bara
+     fälten i denna panel — inte andra formulär i portalen. */
+  --digi--color--background--interactive--default--input-elements: color-mix(in srgb, var(--brand1) 6%, white);
+  --digi--color--background--interactive--default--secondary: color-mix(in srgb, var(--brand1) 6%, white);
+
+  /* Tydligare ram runt fälten: tjockare kant, grå. */
+  --digi--border-width--input-regular: 2px;
+  --digi--color--border--interactive--default--on-input: #333;
 }
 
 .filter-panel__fields {
@@ -25,14 +37,14 @@
 .filter-panel__label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #333;
+  color: color-mix(in srgb, var(--brand1) 55%, #333);
 }
 
 .filter-panel__input,
 .filter-panel__select {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #333;
+  border: 1px solid color-mix(in srgb, var(--brand1) 12%, #333);
   border-radius: 0;
   font-size: 1rem;
   font-family: inherit;
@@ -59,7 +71,8 @@
 }
 
 .filter-panel__date-sep {
-  color: #666;
+  color: color-mix(in srgb, var(--brand1) 40%, #666);
+  font-weight: 600;
   flex-shrink: 0;
 }
 

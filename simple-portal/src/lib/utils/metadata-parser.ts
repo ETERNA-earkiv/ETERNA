@@ -7,11 +7,11 @@ import type { MetadataField } from '../api/metadata';
 import { translateLabel } from './i18n';
 
 const PREFERRED_FIELD_ORDER: string[] = [
-  'Titel', 'Beskrivningsnivå', 'EAD-identifierare', 'Skapad', 'Dokumenttitel',
-  'Referenskod', 'Startdatum', 'Slutdatum', 'Datum', 'Landskod',
+  'Titel', 'Filnamn', 'Startdatum', 'Slutdatum', 'Arkivbildare', 'Omfattning och innehåll',
+  'Beskrivningsnivå', 'EAD-identifierare', 'Skapad', 'Referenskod', 'Datum', 'Landskod',
   'Förvaringsplats', 'Fysisk beskrivning', 'Sammanfattning',
-  'Ursprung', 'Biografisk historik', 'Förvaringshistorik', 'Förvärvsuppgifter',
-  'Omfattning och innehåll', 'Gallring', 'Tillägg', 'Ordning och struktur',
+  'Biografi och historia', 'Förvaringshistorik', 'Förvärvsuppgifter',
+  'Gallring', 'Tillägg', 'Ordning och struktur',
   'Villkor för tillträde', 'Villkor för användning', 'Materialets språk', 'Språk',
   'Anmärkning', 'Övrig information', 'Beskrivningsregler', 'Bearbetningsinformation',
   'Kontrollerade termer', 'Ämne', 'Geografiskt namn', 'Person', 'Organisation',
@@ -24,7 +24,7 @@ const ELEMENT_LABELS: Record<string, string> = {
   'unittitle': 'Titel',
   'unitdate': 'Datum',
   'physdesc': 'Fysisk beskrivning',
-  'origination': 'Ursprung',
+  'origination': 'Arkivbildare',
   'repository': 'Förvaringsplats',
   'abstract': 'Sammanfattning',
   'langmaterial': 'Materialets språk',
@@ -32,7 +32,7 @@ const ELEMENT_LABELS: Record<string, string> = {
   'accessrestrict': 'Villkor för tillträde',
   'userestrict': 'Villkor för användning',
   'scopecontent': 'Omfattning och innehåll',
-  'bioghist': 'Biografisk historik',
+  'bioghist': 'Biografi och historia',
   'arrangement': 'Ordning och struktur',
   'acqinfo': 'Förvärvsuppgifter',
   'custodhist': 'Förvaringshistorik',
@@ -48,7 +48,7 @@ const ELEMENT_LABELS: Record<string, string> = {
   'persname': 'Person',
   'corpname': 'Organisation',
   'eadid': 'EAD-identifierare',
-  'titleproper': 'Dokumenttitel',
+  'titleproper': 'Filnamn',
   'creation': 'Skapad',
   'title': 'Titel',
   'creator': 'Skapare',
@@ -85,7 +85,17 @@ const SKIP_ELEMENTS = new Set([
   'publicationstmt', 'profiledesc', 'revisiondesc', 'did',
   'dsc', 'change', 'langusage', 'simpledc', 'dc', 'metadata',
   'record', 'head', 'c', 'c01', 'c02', 'c03',
+  // EAD 3 date structures (extracted separately in extractAttributeFields)
+  'unitdatestructured', 'daterange', 'fromdate', 'todate', 'datesingle',
+  // EAD 3 physical description
+  'physdescstructured', 'quantity', 'unittype', 'dimensions',
 ]);
+
+// Elements whose text content should inherit the nearest ancestor label
+// (they are transparent "wrappers" in EAD's name/date structures)
+const INHERIT_ANCESTOR_LABEL = new Set(['p', 'item', 'part', 'corpname', 'persname', 'famname', 'name']);
+// When walking ancestors for label, skip these transparent containers
+const TRANSPARENT_CONTAINERS = new Set(['corpname', 'persname', 'famname', 'name']);
 
 /**
  * Parse metadata XML into label/value fields.
@@ -134,9 +144,22 @@ function walkXmlTree(el: Element, fields: MetadataField[], seen: Set<string>): v
       if (!text) continue;
 
       let label: string | null = null;
-      if (tag === 'p' || tag === 'item') {
-        const parentTag = child.parentElement?.tagName?.toLowerCase() || '';
-        label = resolveMetadataLabel(parentTag);
+      if (INHERIT_ANCESTOR_LABEL.has(tag)) {
+        // Walk ancestors (skipping transparent name containers) to find context label
+        let ancestor: Element | null = child.parentElement;
+        while (ancestor) {
+          const aTag = ancestor.tagName.toLowerCase();
+          if (SKIP_ELEMENTS.has(aTag)) break;
+          if (!TRANSPARENT_CONTAINERS.has(aTag)) {
+            const aLabel = resolveMetadataLabel(aTag);
+            if (aLabel) { label = aLabel; break; }
+          }
+          ancestor = ancestor.parentElement;
+        }
+        // Fallback: use element's own label (e.g. corpname → Organisation)
+        if (!label && !SKIP_ELEMENTS.has(tag)) {
+          label = resolveMetadataLabel(tag);
+        }
       } else if (!SKIP_ELEMENTS.has(tag)) {
         label = resolveMetadataLabel(tag);
       }
@@ -180,6 +203,33 @@ function extractAttributeFields(root: Element, fields: MetadataField[], seen: Se
         fields.push({ label: 'Slutdatum', value: end });
         seen.add(`Slutdatum::${end}`);
       }
+    } else if (normal && !seen.has(`Startdatum::${normal}`)) {
+      fields.push({ label: 'Startdatum', value: normal });
+      seen.add(`Startdatum::${normal}`);
+    }
+  });
+
+  // EAD 3: unitdatestructured (daterange)
+  root.querySelectorAll('unitdatestructured fromdate').forEach(fd => {
+    const date = fd.getAttribute('standarddate') || fd.textContent?.trim() || '';
+    if (date && !seen.has(`Startdatum::${date}`)) {
+      fields.push({ label: 'Startdatum', value: date });
+      seen.add(`Startdatum::${date}`);
+    }
+  });
+  root.querySelectorAll('unitdatestructured todate').forEach(td => {
+    const date = td.getAttribute('standarddate') || td.textContent?.trim() || '';
+    if (date && !seen.has(`Slutdatum::${date}`)) {
+      fields.push({ label: 'Slutdatum', value: date });
+      seen.add(`Slutdatum::${date}`);
+    }
+  });
+  // EAD 3: unitdatestructured (datesingle)
+  root.querySelectorAll('unitdatestructured datesingle').forEach(ds => {
+    const date = ds.getAttribute('standarddate') || ds.textContent?.trim() || '';
+    if (date && !seen.has(`Startdatum::${date}`)) {
+      fields.push({ label: 'Startdatum', value: date });
+      seen.add(`Startdatum::${date}`);
     }
   });
 

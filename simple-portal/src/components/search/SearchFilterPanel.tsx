@@ -12,7 +12,7 @@ import './SearchFilterPanel.css';
 type FieldConfig = AdvancedSearchFieldConfig;
 
 interface Props {
-  onFiltersChange: (filters: FilterParameter[]) => void;
+  onFiltersChange: (filters: FilterParameter[], clientFilters: Record<string, string>) => void;
 }
 
 export function SearchFilterPanel({ onFiltersChange }: Props) {
@@ -50,8 +50,9 @@ export function SearchFilterPanel({ onFiltersChange }: Props) {
     }).finally(() => setLoaded(true));
   }, []);
 
-  function buildFilters(): FilterParameter[] {
+  function buildFilters(): { filters: FilterParameter[]; clientFilters: Record<string, string> } {
     const filters: FilterParameter[] = [];
+    const clientFilters: Record<string, string> = {};
 
     for (const field of fields) {
       if (field.type === 'date-range') {
@@ -65,6 +66,10 @@ export function SearchFilterPanel({ onFiltersChange }: Props) {
             toValue: to || undefined,
           } as FilterParameter);
         }
+      } else if (field.clientFilter) {
+        // Fältet finns inte i Solr-indexet — filtreras client-side (se lib/stores/search.ts).
+        const val = values[field.fieldName];
+        if (val?.trim()) clientFilters[field.fieldName] = val.trim();
       } else if (field.type === 'select') {
         const val = values[field.fieldName];
         if (val?.trim()) {
@@ -86,18 +91,19 @@ export function SearchFilterPanel({ onFiltersChange }: Props) {
       }
     }
 
-    return filters;
+    return { filters, clientFilters };
   }
 
   function handleApply() {
-    onFiltersChange(buildFilters());
+    const { filters, clientFilters } = buildFilters();
+    onFiltersChange(filters, clientFilters);
   }
 
   function handleClear() {
     setValues({});
     setDateFrom({});
     setDateTo({});
-    onFiltersChange([]);
+    onFiltersChange([], {});
   }
 
   if (!loaded || fields.length === 0) return null;

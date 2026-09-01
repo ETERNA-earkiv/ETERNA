@@ -1,0 +1,88 @@
+---
+import PortalLayout from '../layouts/PortalLayout.astro';
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import type { AboutConfig } from '@lib/api/config';
+
+// Läs config.json server-side — innehållet är unikt per installation/kund
+let about: AboutConfig = {
+  menuLabel: 'Om arkivet',
+  title: 'Om arkivet',
+  sections: [],
+};
+
+try {
+  const configPath = join(process.cwd(), 'public', 'assets', 'config', 'config.json');
+  const raw = await readFile(configPath, 'utf-8');
+  const config = JSON.parse(raw);
+  if (config?.aboutConfig) about = { ...about, ...config.aboutConfig };
+} catch { /* använd defaults */ }
+---
+
+<PortalLayout title={about.title}>
+  <div class="about-page">
+    <h2>{about.title}</h2>
+
+    {about.sections.map((section) => (
+      <section class="about-page__section">
+        {section.heading && <h3>{section.heading}</h3>}
+        {section.body.split('\n\n').map((paragraph) => (
+          <p>{paragraph}</p>
+        ))}
+      </section>
+    ))}
+
+    {about.sourceLinks && about.sourceLinks.length > 0 && (
+      <p class="about-page__sources">
+        Källor:
+        {about.sourceLinks.map((link, i) => (
+          <>
+            {' '}<a href={link.url} target="_blank" rel="noopener noreferrer">{link.label}</a>{i < about.sourceLinks!.length - 1 ? ',' : ''}
+          </>
+        ))}
+      </p>
+    )}
+  </div>
+</PortalLayout>
+
+<style>
+  .about-page {
+    max-width: 52rem;
+    margin: 0 auto;
+  }
+
+  .about-page h2 {
+    margin: 0 0 24px;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #202124;
+  }
+
+  .about-page__section {
+    margin-bottom: 28px;
+  }
+
+  .about-page__section h3 {
+    margin: 0 0 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #202124;
+  }
+
+  .about-page__section p {
+    margin: 0 0 12px;
+    line-height: 1.6;
+    color: #333;
+    white-space: pre-line;
+  }
+
+  .about-page__sources {
+    margin-top: 8px;
+    font-size: 0.8rem;
+    color: #6b7280;
+  }
+
+  .about-page__sources a {
+    color: var(--brand1);
+  }
+</style>
