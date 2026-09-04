@@ -30,31 +30,31 @@
 		</style>
 	</head>
 	<body>
-		<p>Dear <em>{{recipient}}</em>,</p>
-		<p>ETERNA wants to inform you that an ingest process has just finished. The details of the job are as follows:</p>
-		
-		<h2><strong>Job details</strong></h2>	
-		<strong>Name:</strong> {{name}}<br/>
-		<strong>Creator:</strong> {{creator}}<br/>
-		<strong>Start date:</strong> {{start}}<br/>
-		<strong>Duration:</strong> {{duration}}<br/>
+		<p>Hej <em>{{recipient}}</em>,</p>
+		<p>ETERNA vill informera dig om att en inleveransprocess just har avslutats. Information om jobbet finns nedan:</p>
 
-		<h2><strong>Summary</strong></h2>
-		<strong>Outcome:</strong> {{outcome}}<br/>
-		<strong>Job Type:</strong> {{type}}<br/>
-		<strong>Total SIPs processed:</strong> {{sips}}<br/>
-		<strong>Successful:</strong> {{success}}<br/>
-		<strong>Failed:</strong> {{failed}}<br/>
+		<h2><strong>Jobbdetaljer</strong></h2>
+		<strong>Namn:</strong> {{name}}<br/>
+		<strong>Skapare:</strong> {{creator}}<br/>
+		<strong>Startdatum:</strong> {{start}}<br/>
+		<strong>Varaktighet:</strong> {{duration}}<br/>
 
-		<h2><strong>Failure details</strong></h2>
+		<h2><strong>Sammanfattning</strong></h2>
+		<strong>Resultat:</strong> {{outcome}}<br/>
+		<strong>Jobbtyp:</strong> {{type}}<br/>
+		<strong>Totalt antal bearbetade SIP:ar:</strong> {{sips}}<br/>
+		<strong>Lyckade:</strong> {{success}}<br/>
+		<strong>Misslyckade:</strong> {{failed}}<br/>
+
+		<h2><strong>Feldetaljer</strong></h2>
 		<div class="pre"><div class="code">{{failures}}</div></div>
 
-		<h2><strong>Acknowledgement</strong></h2>		
-		<p>To acknowledge this message, please click on the following link: <a href="{{acknowledge}}">Message received</a></p>
-					
-		<p>If you are not related to the ingest process before mentioned, please ignore this e-mail.</p>
+		<h2><strong>Bekräftelse</strong></h2>
+		<p>För att bekräfta detta meddelande, klicka på följande länk: <a href="{{acknowledge}}">Meddelande mottaget</a></p>
+
+		<p>Om du inte är kopplad till den ovan nämnda inleveransprocessen, vänligen ignorera detta e-postmeddelande.</p>
 		<hr>
-		<p>ETERNA - Repository of Authentic Digital Objects</p>
-		<p>An open-source digital repository designed for preservation</p>
+		<p>ETERNA - Arkiv för autentiska digitala objekt</p>
+		<p>Ett digitalt arkiv med öppen källkod, utformat för bevarande</p>
 	</body>
 <html>
