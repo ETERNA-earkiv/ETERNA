@@ -6,13 +6,21 @@
   padding: 24px;
 }
 
+/* Samma färgsättning som avancerad sök (.filter-panel i SearchFilterPanel.css) */
 .login-card {
-  background: white;
+  background: color-mix(in srgb, var(--brand1) 3%, white);
+  border: 1px solid color-mix(in srgb, var(--brand1) 18%, #e5e7eb);
+  border-top: 3px solid var(--brand1);
   border-radius: 0;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   padding: 40px;
   width: 100%;
   max-width: 400px;
+
+  /* Digi-fälten: samma tonade bakgrund och grå 2px-ram som i sökpanelen */
+  --digi--color--background--interactive--default--input-elements: color-mix(in srgb, var(--brand1) 6%, white);
+  --digi--color--background--interactive--default--secondary: color-mix(in srgb, var(--brand1) 6%, white);
+  --digi--border-width--input-regular: 2px;
+  --digi--color--border--interactive--default--on-input: #333;
 }
 
 .login-header {
@@ -21,15 +29,10 @@
 }
 
 .login-header h1 {
-  margin: 12px 0 4px;
+  margin: 12px 0 0;
   font-size: 1.5rem;
   font-weight: 600;
-}
-
-.login-header p {
-  margin: 0;
-  color: #6b7280;
-  font-size: 0.9rem;
+  color: #202124;
 }
 
 .login-lock-icon {
@@ -40,6 +43,36 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+/* Samma stil som headerns "Logga in som administratör" (.nav-link--accent) */
+.login-submit {
+  width: 100%;
+  margin-top: 8px;
+  padding: 12px 24px;
+  background-color: var(--brand1);
+  color: var(--portal-primary-fg, #fff);
+  border: none;
+  border-radius: var(--border-radius);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.login-submit:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--brand1) 85%, #000);
+}
+
+.login-submit:focus-visible {
+  outline: 3px solid var(--brand1);
+  outline-offset: 2px;
+}
+
+.login-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .login-back {

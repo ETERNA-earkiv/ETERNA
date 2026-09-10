@@ -26,10 +26,11 @@
         "enabled": true
       },
       {
-        "fieldName": "createdOn",
+        "fieldName": "dates",
         "label": "Datum",
         "type": "date-range",
-        "enabled": true
+        "enabled": true,
+        "clientFilter": true
       },
       {
         "fieldName": "scope",
@@ -107,8 +108,8 @@
     }
   },
   "aboutConfig": {
-    "menuLabel": "Om Jämtlands läns arkiv",
-    "title": "Om Jämtlands läns arkiv",
+    "menuLabel": "Om arkivet",
+    "title": "Om arkivet",
     "sections": [
       {
         "heading": "Om verksamheten",
@@ -127,5 +128,8 @@
       { "label": "Om FAJ:s verksamhet (faj.se)", "url": "https://faj.se/about/verksamhet/" },
       { "label": "Om arkivet (faj.se)", "url": "https://faj.se/arkiv/" }
     ]
+  },
+  "downloadConfig": {
+    "sourceText": "Informationen är hämtad från Jämtlands läns e-arkiv"
   }
 }

@@ -1,5 +1,7 @@
 ---
 /* Header — Sticky navigation bar */
+import { isAuthenticatedNonGuest } from '@lib/server/user-session';
+
 interface Props {
   siteName?: string;
   logoUrl?: string;
@@ -7,12 +9,13 @@ interface Props {
 }
 const { siteName = 'E-Arkiv Portal', logoUrl = '', aboutMenuLabel = '' } = Astro.props;
 
-// Admin-länken ska bara synas för inloggade — anonyma besökare (och service-
-// account-anrop) får aldrig ett JSESSIONID-cookie satt i webbläsaren
-// (se src/pages/api/v2/[...path].ts), så cookien är ett tillförlitligt tecken
-// på en verklig inloggad session. Den faktiska åtkomstkontrollen sker separat
-// i src/middleware.ts — detta styr bara om länken visas.
-const isLoggedIn = Boolean(Astro.cookies.get('JSESSIONID')?.value);
+// Admin-länken ska bara synas för riktigt inloggade (icke-guest) användare.
+// En kvarliggande JSESSIONID-cookie räcker inte som tecken på detta — den
+// kan vara ogiltig/utgången (t.ex. efter en backend-omstart) medan den
+// fortfarande finns kvar i webbläsaren. Därför valideras den mot RODA på
+// samma sätt som src/middleware.ts gör för själva åtkomstskyddet.
+const sessionCookie = Astro.cookies.get('JSESSIONID');
+const isLoggedIn = await isAuthenticatedNonGuest(sessionCookie?.value);
 ---
 
 <header class="header" role="banner">
@@ -55,12 +58,23 @@ const isLoggedIn = Boolean(Astro.cookies.get('JSESSIONID')?.value);
           <span>Admin</span>
         </a>
       )}
-      <a href="/logga-in" class="nav-link nav-link--accent" aria-label="Logga in">
-        <svg class="nav-icon" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3" />
-        </svg>
-        <span>Logga in</span>
-      </a>
+      {isLoggedIn ? (
+        <form method="post" action="/api/auth/logout" class="nav-form">
+          <button type="submit" class="nav-link nav-link--accent nav-link--button" aria-label="Logga ut">
+            <svg class="nav-icon" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+            </svg>
+            <span>Logga ut</span>
+          </button>
+        </form>
+      ) : (
+        <a href="/logga-in" class="nav-link nav-link--accent" aria-label="Logga in som administratör">
+          <svg class="nav-icon" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3" />
+          </svg>
+          <span>Logga in som administratör</span>
+        </a>
+      )}
     </nav>
   </div>
 </header>
@@ -171,6 +185,19 @@ const isLoggedIn = Boolean(Astro.cookies.get('JSESSIONID')?.value);
 
   .nav-link--accent:hover {
     background-color: color-mix(in srgb, var(--brand1) 85%, #000);
+  }
+
+  .nav-form {
+    display: inline;
+    margin: 0;
+  }
+
+  .nav-link--button {
+    border: 0;
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
   }
 
   .nav-icon {

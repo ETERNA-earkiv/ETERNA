@@ -8,7 +8,6 @@ import { jsPDF } from 'jspdf';
 import { saveAs } from 'file-saver';
 import type { FileNode } from '../types/api';
 import type { MetadataField } from '../api/metadata';
-import { formatStandardName } from './i18n';
 
 interface MetadataSection {
   id: string;
@@ -20,26 +19,31 @@ interface MetadataSection {
  * Skapar och laddar ner ett förenklat ZIP-paket:
  * 1. metadata.pdf (eller metadata.html som fallback)
  * 2. Alla filer i en undermapp
+ *
+ * `sourceText` är kundspecifik (t.ex. "Informationen är hämtad från …") och
+ * kommer från config.json (downloadConfig.sourceText). Tom sträng = ingen rad.
  */
 export async function downloadSimplifiedPackage(
   title: string,
   aipId: string,
   metadata: MetadataSection[],
   files: FileNode[],
+  sourceText = '',
 ): Promise<void> {
   const zip = new JSZip();
   const folderName = sanitizeFilename(title || aipId);
   const rootFolder = zip.folder(folderName);
   if (!rootFolder) throw new Error('Kunde inte skapa ZIP-mapp');
 
-  // 1. Generera metadata-PDF (prefix undviker namnkrock med filer i paketet)
-  const pdfName = `${folderName}-metadata.pdf`;
+  // 1. Generera metadata-PDF. Kort namn med underscore-prefix: sorterar först,
+  //    krockar inte med innehållsfiler och håller sökvägen kort (Windows MAX_PATH).
+  const pdfName = '_metadata.pdf';
   try {
-    const pdfBlob = generateMetadataPdf(title, aipId, metadata);
+    const pdfBlob = generateMetadataPdf(title, metadata, sourceText);
     rootFolder.file(pdfName, pdfBlob);
   } catch {
-    const htmlName = `${folderName}-metadata.html`;
-    const html = generateMetadataHtml(title, aipId, metadata);
+    const htmlName = '_metadata.html';
+    const html = generateMetadataHtml(title, metadata, sourceText);
     rootFolder.file(htmlName, html);
     rootFolder.file('metadata_note.txt', `PDF-generering misslyckades. Metadata finns i ${htmlName}.`);
   }
@@ -97,12 +101,12 @@ export async function downloadSimplifiedPackage(
 
 /**
  * Generera metadata-PDF med jsPDF.
- * Samma layout som Angular: rubrik + AIP-ID + metadata per standard i 2-kolumns grid.
+ * Rubrik (radbruten) + källa + hämtningsdatum, därefter alla metadatafält.
  */
 function generateMetadataPdf(
   title: string,
-  aipId: string,
   sections: MetadataSection[],
+  sourceText: string,
 ): Blob {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const pw = doc.internal.pageSize.getWidth();
@@ -111,21 +115,25 @@ function generateMetadataPdf(
   const maxW = pw - m * 2;
   let y = 30;
 
-  // Rubrik
+  // Rubrik — radbryts så att hela titeln syns
   doc.setFontSize(22);
   doc.setFont('helvetica', 'bold');
-  doc.text(title, m, y);
-  y += 10;
+  const titleLines: string[] = doc.splitTextToSize(title, maxW);
+  doc.text(titleLines, m, y);
+  y += titleLines.length * 9 + 1;
 
-  // AIP-ID
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(100);
-  doc.text(aipId, m, y);
-  y += 6;
+
+  // Källa (kundspecifik, från config)
+  if (sourceText) {
+    doc.text(sourceText, m, y);
+    y += 6;
+  }
 
   // Datum
-  doc.text(`Genererad: ${new Date().toLocaleDateString('sv-SE')} ${new Date().toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' })}`, m, y);
+  doc.text(`Hämtad: ${new Date().toLocaleDateString('sv-SE')} ${new Date().toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' })}`, m, y);
   doc.setTextColor(0);
   y += 4;
 
@@ -135,21 +143,11 @@ function generateMetadataPdf(
   doc.line(m, y, pw - m, y);
   y += 12;
 
-  // Metadata per standard
+  // Metadatafält
+  doc.setFontSize(9);
   for (const section of sections) {
     if (section.fields.length === 0) continue;
 
-    // Sidbrytning om nära slutet
-    if (y > ph - 40) { doc.addPage(); y = 20; }
-
-    // Standardrubrik
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text(`Information enligt: ${formatStandardName(section.id)}`, m, y);
-    y += 8;
-
-    // Fält
-    doc.setFontSize(9);
     for (const field of section.fields) {
       if (y > ph - 25) { doc.addPage(); y = 20; }
 
@@ -170,27 +168,16 @@ function generateMetadataPdf(
     y += 6;
   }
 
-  // Footer — addPage räcker, footern positioneras absolut nedanför
-  if (y > ph - 20) doc.addPage();
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'italic');
-  doc.setTextColor(136);
-  doc.text(
-    `Genererat av Simple Portal den ${new Date().toLocaleDateString('sv-SE')} ${new Date().toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' })}.`,
-    m, ph - 15,
-  );
-
   return doc.output('blob');
 }
 
 /**
  * Generera HTML-metadata (fallback om PDF misslyckas).
- * Exakt samma layout som Angular.
  */
 function generateMetadataHtml(
   title: string,
-  aipId: string,
   sections: MetadataSection[],
+  sourceText: string,
 ): string {
   const sectionsHtml = sections
     .filter((s) => s.fields.length > 0)
@@ -200,10 +187,11 @@ function generateMetadataHtml(
       ).join('');
       return `
         <div class="section"${i > 0 ? ' style="page-break-before:always"' : ''}>
-          <h2>Information enligt: ${esc(formatStandardName(s.id))}</h2>
           <div class="section-card"><dl class="metadata-grid">${fieldsHtml}</dl></div>
         </div>`;
     }).join('');
+
+  const sourceHtml = sourceText ? `<p class="source">${esc(sourceText)}</p>` : '';
 
   return `<!DOCTYPE html>
 <html lang="sv"><head><meta charset="UTF-8"><title>${esc(title)}</title>
@@ -211,25 +199,30 @@ function generateMetadataHtml(
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',Arial,sans-serif;font-size:14px;line-height:1.5;color:#333;padding:40px;background:#fff}
 .header{border-bottom:3px solid #333;padding-bottom:20px;margin-bottom:30px}
-h1{font-size:28px;font-weight:500;margin-bottom:8px}
-.aip-id{font-family:Consolas,monospace;font-size:13px;color:#666;background:#f5f5f5;padding:4px 8px;border-radius:4px;display:inline-block}
+h1{font-size:28px;font-weight:500;margin-bottom:8px;overflow-wrap:anywhere}
+.source{font-size:13px;color:#666}
 .section{margin-bottom:30px}
-h2{font-size:18px;font-weight:500;margin-bottom:15px;padding-bottom:8px;border-bottom:1px solid #e0e0e0}
 .section-card{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:24px;margin-top:10px}
 .metadata-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px 32px}
 .meta-item{display:flex;flex-direction:column;gap:4px}
 .meta-item dt{font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:#5f6368;font-weight:600}
 .meta-item dd{font-size:14px;color:#202124;margin:0;word-break:break-word}
-.footer{margin-top:40px;padding-top:20px;border-top:1px solid #e0e0e0;font-size:12px;color:#888;font-style:italic}
 </style></head><body>
-<div class="header"><h1>${esc(title)}</h1><span class="aip-id">${esc(aipId)}</span></div>
+<div class="header"><h1>${esc(title)}</h1>${sourceHtml}</div>
 ${sectionsHtml}
-<div class="footer">Genererat av Simple Portal den ${new Date().toLocaleDateString('sv-SE')}.</div>
 </body></html>`;
 }
 
+/** Max längd på mapp-/zipnamn — titeln upprepas i den extraherade sökvägen
+ * (Explorer-mapp + rotmapp) och Windows har en gräns på 260 tecken totalt. */
+const MAX_FOLDER_NAME_LENGTH = 50;
+
 function sanitizeFilename(name: string): string {
-  return name.replace(/[^a-z0-9à-ö]/gi, '_').replace(/_{2,}/g, '_');
+  const cleaned = name
+    .replace(/[^a-z0-9à-ö]/gi, '_')
+    .replace(/_{2,}/g, '_')
+    .replace(/^_+|_+$/g, '');
+  return (cleaned || 'paket').slice(0, MAX_FOLDER_NAME_LENGTH).replace(/_+$/, '');
 }
 
 function esc(text: string): string {

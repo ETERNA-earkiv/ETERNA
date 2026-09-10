@@ -7,6 +7,7 @@ import { searchAIPsWithFacets } from '../api/aip';
 import { loadConfig } from '../api/config';
 import { getAvailableMetadataIds, getMetadataXml } from '../api/metadata';
 import { parseXmlToFields } from '../utils/metadata-parser';
+import { dateRangesOverlap } from '../utils/date-range';
 import type { IndexedAIP, FilterParameter, FacetResult } from '../types/api';
 import { $resultsPerPage } from './config';
 
@@ -81,12 +82,12 @@ function needsClientSideSearch(): boolean {
   return Object.values($clientFilters.get()).some((v) => v?.trim());
 }
 
-/** Hämtar alla matchande AIP:er, läser Arkivbildare och Startdatum ur
- * metadata-XML för varje, filtrerar/sorterar client-side och paginerar
- * resultatet lokalt. Används när ett client-filter (t.ex. Arkivbildare) är
- * aktivt, eller när sortering på Arkivbildare eller Datum (Startdatum)
- * valts — allt detta kräver hela listan i minnet eftersom fälten saknas i
- * Solr-indexet. */
+/** Hämtar alla matchande AIP:er, läser Arkivbildare, Startdatum och Slutdatum
+ * ur metadata-XML för varje, filtrerar/sorterar client-side och paginerar
+ * resultatet lokalt. Används när ett client-filter (Arkivbildare eller
+ * datumintervall) är aktivt, eller när sortering på Arkivbildare eller Datum
+ * (Startdatum) valts — allt detta kräver hela listan i minnet eftersom fälten
+ * saknas i Solr-indexet (EAD3-datum med <datesingle> indexeras inte alls). */
 async function runClientSideSearch(): Promise<void> {
   $loading.set(true);
   $error.set(null);
@@ -114,6 +115,7 @@ async function runClientSideSearch(): Promise<void> {
       allItems.map(async (aip) => {
         let originator = '';
         let startDate = '';
+        let endDate = '';
         try {
           const aipId = aip.uuid || aip.id;
           const ids = await getAvailableMetadataIds(aipId);
@@ -123,16 +125,24 @@ async function runClientSideSearch(): Promise<void> {
             const fields = parseXmlToFields(xml);
             originator = fields.find(f => f.label === 'Arkivbildare')?.value || '';
             startDate = fields.find(f => f.label === 'Startdatum')?.value || '';
+            endDate = fields.find(f => f.label === 'Slutdatum')?.value || '';
           }
         } catch {}
-        return { aip, originator, startDate };
+        return { aip, originator, startDate, endDate };
       })
     );
 
-    const originatorFilter = $clientFilters.get().origination?.trim().toLowerCase();
-    const filtered = originatorFilter
-      ? withMetadata.filter((x) => x.originator.toLowerCase().includes(originatorFilter))
-      : withMetadata;
+    const cf = $clientFilters.get();
+    const originatorFilter = cf.origination?.trim().toLowerCase() ?? '';
+    const datesFrom = cf.datesFrom?.trim() ?? '';
+    const datesTo = cf.datesTo?.trim() ?? '';
+    const hasDateFilter = Boolean(datesFrom || datesTo);
+
+    const filtered = withMetadata.filter((x) => {
+      if (originatorFilter && !x.originator.toLowerCase().includes(originatorFilter)) return false;
+      if (hasDateFilter && !dateRangesOverlap(x.startDate, x.endDate, datesFrom, datesTo)) return false;
+      return true;
+    });
 
     const descending = $sortDescending.get();
     const sortOptionId = $sortOptionId.get();

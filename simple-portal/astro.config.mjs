@@ -12,11 +12,19 @@ export default defineConfig({
     port: 4321,
   },
   vite: {
+    // Förbundla de lazy-laddade nedladdningsberoendena redan vid uppstart.
+    // Annars upptäcker Vite dem först vid första "Öppna och ladda ner fil",
+    // optimerar om och byter dep-hash — och eftersom hmr är avstängd kan den
+    // inte be webbläsaren ladda om, så importen failar mitt i klicket.
+    optimizeDeps: {
+      include: ['jspdf', 'jszip', 'file-saver'],
+    },
     server: {
       strictPort: true,
       hmr: false,
       proxy: {
-        // /api/v2 hanteras nu av Astro catch-all route med service account auth
+        // /api/v2 hanteras av Astro catch-all route (anonymt → RODA guest,
+        // inloggad → egen session)
         '/api/portal': {
           target: 'http://localhost:3000',
           changeOrigin: true,

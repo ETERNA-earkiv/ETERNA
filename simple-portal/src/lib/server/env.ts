@@ -20,5 +20,3 @@ function getEnv(key: string, fallback?: string): string {
 }
 
 export const RODA_API_URL = getEnv('RODA_API_URL', 'http://localhost:8080');
-export const PORTAL_SERVICE_USER = getEnv('PORTAL_SERVICE_USER');
-export const PORTAL_SERVICE_PASSWORD = getEnv('PORTAL_SERVICE_PASSWORD');

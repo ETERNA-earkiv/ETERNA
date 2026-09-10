@@ -12,6 +12,6 @@ export interface AdvancedSearchFieldConfig {
 export const DEFAULT_ADVANCED_SEARCH_FIELDS: AdvancedSearchFieldConfig[] = [
   { fieldName: 'level', label: 'Beskrivningsniva', type: 'select', enabled: true },
   { fieldName: 'type', label: 'Typ', type: 'select', enabled: true },
-  { fieldName: 'createdOn', label: 'Skapad', type: 'date-range', enabled: false },
+  { fieldName: 'dates', label: 'Datum', type: 'date-range', enabled: false, clientFilter: true },
   { fieldName: 'origination', label: 'Arkivbildare', type: 'text', enabled: true, clientFilter: true },
 ];

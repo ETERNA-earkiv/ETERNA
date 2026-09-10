@@ -4,14 +4,16 @@
  * Tre-vägs auth-logik:
  * 1. Request har Authorization-header → Login-försök, forward direkt
  * 2. Request har JSESSIONID cookie    → Inloggad user, forward session
- * 3. Inget av ovanstående             → Anonym, inject service account
+ * 3. Inget av ovanstående             → Anonym, forward utan auth
  *
- * Service account JSESSIONID exponeras ALDRIG till browsern.
+ * Anonyma requests skickas vidare till RODA helt utan Authorization/cookie.
+ * RODA hanterar dem själv som gäst-användare enligt de roller som är
+ * tilldelade "guests"-gruppen där (aip.read / descriptive_metadata.read /
+ * representation.read). Inget lösenord eller service-konto krävs i portalen.
  */
 
 import type { APIRoute } from 'astro';
 import { RODA_API_URL } from '@lib/server/env';
-import { getServiceSessionCookie, invalidateServiceSession } from '@lib/server/service-session';
 
 /** Headers som INTE ska forwarda (hop-by-hop) */
 const STRIP_REQUEST_HEADERS = new Set([
@@ -19,7 +21,7 @@ const STRIP_REQUEST_HEADERS = new Set([
   'upgrade', 'proxy-connection', 'proxy-authenticate', 'proxy-authorization',
 ]);
 
-type AuthMode = 'basic-auth' | 'user-session' | 'service-account';
+type AuthMode = 'basic-auth' | 'user-session' | 'anonymous';
 
 export function detectAuthMode(request: Request): AuthMode {
   if (request.headers.get('authorization')) {
@@ -29,7 +31,7 @@ export function detectAuthMode(request: Request): AuthMode {
   if (cookie.includes('JSESSIONID')) {
     return 'user-session';
   }
-  return 'service-account';
+  return 'anonymous';
 }
 
 async function proxyToRoda(
@@ -50,16 +52,18 @@ async function proxyToRoda(
     }
   }
 
-  // Injicera auth beroende på mode
-  if (authMode === 'service-account') {
-    // Ta bort eventuella cookie-headers (ska inte skicka browser-cookies)
+  if (authMode === 'anonymous') {
+    // Skicka aldrig med webbläsarens ev. cookie/Authorization för anonyma
+    // requests — ETERNA ska se dem som riktigt anonyma (gäst).
     headers.delete('cookie');
-    const serviceCookie = await getServiceSessionCookie();
-    headers.set('cookie', serviceCookie);
-    // Ta bort Authorization om det finns (ska inte finnas, men säkerhetsåtgärd)
     headers.delete('authorization');
+  } else if (authMode === 'basic-auth') {
+    // Ett inloggningsförsök ska bedömas på sina egna uppgifter. En kvarliggande
+    // sessionscookie (t.ex. en gäst-session från ett tidigare misslyckat
+    // försök) kan annars skugga Basic Auth i ETERNA.
+    headers.delete('cookie');
   }
-  // basic-auth och user-session: forward headers som de är
+  // user-session: forward headers som de är
 
   const rodaRes = await fetch(targetUrl, {
     method: request.method,
@@ -79,10 +83,15 @@ function buildResponse(
   const responseHeaders = new Headers();
   for (const [key, value] of rodaRes.headers.entries()) {
     const lower = key.toLowerCase();
-    // Forwarda Set-Cookie BARA för user sessions (login, explicit auth)
-    // ALDRIG för service account (förhindrar läckage av server-session)
+    // Forwarda Set-Cookie BARA för riktiga inloggningar. ALDRIG för anonyma
+    // requests, och inte heller för ett MISSLYCKAT inloggningsförsök: ETERNA
+    // svarar då ändå med en JSESSIONID för en gäst-session, och en sådan
+    // cookie i webbläsaren skulle skugga nästa (korrekta) inloggning.
+    // En cookie ska alltså bara finnas i webbläsaren om en verklig inloggning
+    // har skett (Header.astro/middleware.ts litar på detta).
     if (lower === 'set-cookie') {
-      if (authMode !== 'service-account') {
+      const isRealLogin = authMode === 'user-session' || (authMode === 'basic-auth' && rodaRes.ok);
+      if (isRealLogin) {
         responseHeaders.append(key, value);
       }
       continue;
@@ -100,21 +109,21 @@ function buildResponse(
 }
 
 /**
- * Tillåtna POST-endpoints för anonyma (service-account) requests.
+ * Tillåtna POST-endpoints för anonyma requests.
  * RODA V2 kräver POST för alla /find-sökningar — dessa är read-only.
  */
-const SERVICE_ACCOUNT_ALLOWED_POST_PATHS = [
+const ANONYMOUS_ALLOWED_POST_PATHS = [
   /^aips\/find$/,
   /^representations\/find$/,
   /^representations-information\/find$/,
   /^files\/find$/,
 ];
 
-/** Avgör om en request är tillåten för service-account */
+/** Avgör om en request är tillåten för anonyma (oautentiserade) besökare */
 export function isAllowedForServiceAccount(method: string, path: string): boolean {
   if (method === 'GET' || method === 'HEAD') return true;
   if (method === 'POST') {
-    return SERVICE_ACCOUNT_ALLOWED_POST_PATHS.some((re) => re.test(path));
+    return ANONYMOUS_ALLOWED_POST_PATHS.some((re) => re.test(path));
   }
   return false;
 }
@@ -123,42 +132,23 @@ const handler: APIRoute = async ({ params, request }) => {
   const path = params.path || '';
   const authMode = detectAuthMode(request);
 
-  // Begränsa anonyma requests till läsning + vitlistade sök-endpoints
-  if (authMode === 'service-account' && !isAllowedForServiceAccount(request.method, path)) {
+  // Begränsa anonyma requests till läsning + vitlistade sök-endpoints.
+  // RODA:s egna roller för "guests" är den auktoritativa spärren — detta
+  // är ett extra säkerhetslager i proxyn.
+  if (authMode === 'anonymous' && !isAllowedForServiceAccount(request.method, path)) {
     return new Response(
       JSON.stringify({ error: 'Autentisering krävs för denna operation.' }),
       { status: 401, headers: { 'Content-Type': 'application/json' } },
     );
   }
 
-  // Buffra body en gång så att retry kan återanvända den (ReadableStream är
-  // engångskonsumerad — utan buffring skickas tom body på retry).
+  // Buffra body en gång så att den kan återanvändas — ReadableStream är
+  // engångskonsumerad.
   const hasBody = !['GET', 'HEAD'].includes(request.method);
   const bufferedBody: ArrayBuffer | null = hasBody ? await request.arrayBuffer() : null;
 
   try {
     const rodaRes = await proxyToRoda(request, path, authMode, bufferedBody);
-
-    // Om RODA returnerar 401 och vi använde service account — retry
-    if (rodaRes.status === 401 && authMode === 'service-account') {
-      invalidateServiceSession();
-      try {
-        const retryRes = await proxyToRoda(request, path, 'service-account', bufferedBody);
-        if (retryRes.status === 401) {
-          return new Response(
-            JSON.stringify({ error: 'Arkivet är tillfälligt otillgängligt.' }),
-            { status: 503, headers: { 'Content-Type': 'application/json' } },
-          );
-        }
-        return buildResponse(retryRes, 'service-account');
-      } catch {
-        return new Response(
-          JSON.stringify({ error: 'Arkivet är tillfälligt otillgängligt.' }),
-          { status: 503, headers: { 'Content-Type': 'application/json' } },
-        );
-      }
-    }
-
     return buildResponse(rodaRes, authMode);
   } catch (err) {
     console.error('[proxy] Fel vid anslutning till RODA:', err);

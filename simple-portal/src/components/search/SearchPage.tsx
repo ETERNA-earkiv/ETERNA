@@ -111,7 +111,9 @@ function SearchPageContent() {
             aria-label="Mer information om sökningen"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" />
+              <circle cx="12" cy="12" r="10" />
+              <circle cx="12" cy="8" r="1" fill="currentColor" stroke="none" />
+              <path d="M12 11v5" strokeLinecap="round" />
             </svg>
           </button>
         </div>
@@ -134,7 +136,7 @@ function SearchPageContent() {
               className="search-input"
               value={localQuery}
               onChange={(e) => setLocalQuery(e.target.value)}
-              placeholder="Sök i arkivet"
+              placeholder=""
               aria-label="Sök i arkivet"
               autoComplete="off"
             />
@@ -157,8 +159,6 @@ function SearchPageContent() {
           </button>
           <button type="submit" className="search-submit-btn">Sök</button>
         </form>
-
-        <p className="search-help">Sök efter titel, beskrivning eller annat innehåll i arkivet.</p>
 
         {showAdvanced && (
           <SearchFilterPanel

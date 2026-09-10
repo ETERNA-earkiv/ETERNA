@@ -64,11 +64,18 @@ export interface AboutConfig {
   sourceLinks?: AboutSourceLink[];
 }
 
+/** Inställningar för paketnedladdningen (metadatafilen) — unikt per installation/kund */
+export interface DownloadConfig {
+  /** Källrad under titeln i metadatafilen, t.ex. "Informationen är hämtad från …". Tom = ingen rad. */
+  sourceText?: string;
+}
+
 export interface AppConfig {
   siteConfig: SiteConfig;
   searchConfig: SearchConfig;
   visibilityConfig: VisibilityConfig;
   aboutConfig?: AboutConfig;
+  downloadConfig?: DownloadConfig;
 }
 
 const DEFAULT_CONFIG: AppConfig = {

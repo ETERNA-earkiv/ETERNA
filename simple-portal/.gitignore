@@ -32,7 +32,7 @@ package-lock.json
 
 # Environment variables (credentials)
 .env
-.env.local
+.env.*
 !.env.example
 
 # Miscellaneous
@@ -60,6 +60,7 @@ docs/
 public/digi/digi-arbetsformedlingen.css
 
 # Debug/temp filer
+*.bak-*
 public/proof.html
 public/reset-browser-state.html
 public/debug.html

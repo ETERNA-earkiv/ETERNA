@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react';
 import { login } from '@lib/api/auth';
 import { PortalInput } from '../portal-ui/PortalInput';
-import { PortalButton } from '../portal-ui/PortalButton';
 import { PortalAlert } from '../portal-ui/PortalAlert';
 import { PortalLink } from '../portal-ui/PortalLink';
 import './LoginForm.css';
@@ -77,7 +76,6 @@ export function LoginForm() {
             <path d="M7 11V7a5 5 0 0 1 10 0v4" />
           </svg>
           <h1>Logga in</h1>
-          <p>Logga in med ditt RODA-konto.</p>
         </div>
 
         <form
@@ -115,14 +113,14 @@ export function LoginForm() {
             required
           />
 
-          <PortalButton
-            onClick={handleLogin}
+          <button
+            type="submit"
+            className="login-submit"
             disabled={loading}
-            loading={loading}
-            fullWidth
+            aria-busy={loading}
           >
-            Logga in
-          </PortalButton>
+            {loading ? 'Laddar...' : 'Logga in'}
+          </button>
         </form>
 
         <div className="login-back">

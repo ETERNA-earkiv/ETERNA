@@ -59,12 +59,19 @@ export function SearchFilterPanel({ onFiltersChange }: Props) {
         const from = dateFrom[field.fieldName];
         const to = dateTo[field.fieldName];
         if (from || to) {
-          filters.push({
-            type: 'DateRangeFilterParameter',
-            name: field.fieldName,
-            fromValue: from || undefined,
-            toValue: to || undefined,
-          } as FilterParameter);
+          if (field.clientFilter) {
+            // Arkivdatum (Startdatum/Slutdatum) finns inte i Solr-indexet för alla
+            // poster — filtreras client-side mot EAD-XML:en (se lib/stores/search.ts).
+            if (from) clientFilters[`${field.fieldName}From`] = from;
+            if (to) clientFilters[`${field.fieldName}To`] = to;
+          } else {
+            filters.push({
+              type: 'DateRangeFilterParameter',
+              name: field.fieldName,
+              fromValue: from || undefined,
+              toValue: to || undefined,
+            } as FilterParameter);
+          }
         }
       } else if (field.clientFilter) {
         // Fältet finns inte i Solr-indexet — filtreras client-side (se lib/stores/search.ts).

@@ -70,10 +70,11 @@ export async function validateSession(): Promise<boolean> {
 }
 
 /**
- * Logout — clear user state.
+ * Logout — rensar bara lokalt user-state.
  * JSESSIONID är HttpOnly (sätts av ETERNA) och kan inte rensas från
- * JavaScript. Servern invaliderar sessionen vid nästa request, eller
- * när cookien expirerar. Vi rensar bara lokalt user-state här.
+ * JavaScript. Riktig utloggning (radera cookien + avsluta sessionen i
+ * ETERNA) görs av server-routen POST /api/auth/logout, som headerns
+ * "Logga ut"-knapp anropar.
  */
 export function logout(): void {
   clearUser();

@@ -8,11 +8,6 @@ vi.mock('@lib/server/env', () => ({
   RODA_API_URL: 'http://mock-roda:8080',
 }));
 
-vi.mock('@lib/server/service-session', () => ({
-  getServiceSessionCookie: vi.fn().mockResolvedValue('JSESSIONID=mock-session'),
-  invalidateServiceSession: vi.fn(),
-}));
-
 import { detectAuthMode, isAllowedForServiceAccount, GET, POST, PUT, PATCH, DELETE } from './[...path]';
 
 describe('detectAuthMode', () => {
@@ -40,9 +35,9 @@ describe('detectAuthMode', () => {
     expect(detectAuthMode(req)).toBe('basic-auth');
   });
 
-  it('returns service-account when neither auth nor cookie is present', () => {
+  it('returns anonymous when neither auth nor cookie is present', () => {
     const req = new Request('http://localhost/api/v2/test');
-    expect(detectAuthMode(req)).toBe('service-account');
+    expect(detectAuthMode(req)).toBe('anonymous');
   });
 });
 
@@ -167,5 +162,44 @@ describe('proxy handler integration', () => {
     const ctx = mockContext('DELETE', 'aips/123', { Authorization: 'Basic dXNlcjpwYXNz' });
     const res = await DELETE(ctx);
     expect(res.status).toBe(200);
+  });
+
+  it('strips a stale Cookie header from basic-auth (login) requests but keeps Authorization', async () => {
+    const ctx = mockContext('POST', 'aips/find', {
+      Authorization: 'Basic dXNlcjpwYXNz',
+      Cookie: 'JSESSIONID=stale-guest-session',
+    });
+    await POST(ctx);
+    const forwarded: Headers = (globalThis.fetch as any).mock.calls[0][1].headers;
+    expect(forwarded.get('cookie')).toBeNull();
+    expect(forwarded.get('authorization')).toBe('Basic dXNlcjpwYXNz');
+  });
+
+  it('forwards Set-Cookie on a successful basic-auth login', async () => {
+    (globalThis.fetch as any).mockResolvedValue(new Response('{"ok": true}', {
+      status: 200,
+      headers: { 'Content-Type': 'application/json', 'Set-Cookie': 'JSESSIONID=admin-session; Path=/' },
+    }));
+    const res = await POST(mockContext('POST', 'aips/find', { Authorization: 'Basic dXNlcjpwYXNz' }));
+    expect(res.headers.get('set-cookie')).toContain('JSESSIONID=admin-session');
+  });
+
+  it('does NOT forward Set-Cookie on a failed basic-auth login (guest session must not be planted)', async () => {
+    (globalThis.fetch as any).mockResolvedValue(new Response('{"status":403}', {
+      status: 403,
+      headers: { 'Content-Type': 'application/json', 'Set-Cookie': 'JSESSIONID=guest-session; Path=/' },
+    }));
+    const res = await POST(mockContext('POST', 'aips/find', { Authorization: 'Basic dXNlcjpwYXNz' }));
+    expect(res.status).toBe(403);
+    expect(res.headers.get('set-cookie')).toBeNull();
+  });
+
+  it('never forwards Set-Cookie for anonymous requests', async () => {
+    (globalThis.fetch as any).mockResolvedValue(new Response('{"ok": true}', {
+      status: 200,
+      headers: { 'Content-Type': 'application/json', 'Set-Cookie': 'JSESSIONID=guest-session; Path=/' },
+    }));
+    const res = await GET(mockContext('GET', 'aips'));
+    expect(res.headers.get('set-cookie')).toBeNull();
   });
 });

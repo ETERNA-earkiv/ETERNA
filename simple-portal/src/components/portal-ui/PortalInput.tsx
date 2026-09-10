@@ -49,6 +49,12 @@ const validationMap: Record<string, FormInputValidation> = {
   warning: FormInputValidation.WARNING,
 };
 
+/** Digi lägger det nativa eventet i `detail`; värdet sitter på dess target. */
+function readDigiValue(e: CustomEvent): string {
+  const nativeEvent = e.detail;
+  return String(nativeEvent?.target?.value ?? nativeEvent?.value ?? '');
+}
+
 export function PortalInput({
   label,
   value,
@@ -80,11 +86,11 @@ export function PortalInput({
     afAriaLabel: ariaLabel,
     afAutocomplete: autoComplete,
     disabled,
-    onAfOnChange: (e: CustomEvent) => {
-      const nativeEvent = e.detail;
-      const val = nativeEvent?.target?.value ?? nativeEvent?.value ?? '';
-      onChange?.(val);
-    },
+    // Digi skickar afOnInput vid varje inmatning och afOnChange först vid nativt
+    // change. Vi lyssnar på båda så att värdet når React-state direkt — annars
+    // kan t.ex. ett datumfilter tillämpas innan datumet hunnit registreras.
+    onAfOnInput: (e: CustomEvent) => onChange?.(readDigiValue(e)),
+    onAfOnChange: (e: CustomEvent) => onChange?.(readDigiValue(e)),
     onAfOnBlur: () => onBlur?.(),
   }) as ComponentProps<typeof DigiFormInput>;
 

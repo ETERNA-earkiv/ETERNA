@@ -26,11 +26,13 @@ Portalen startar på `http://localhost:4321`.
 
 | Variabel | Beskrivning | Default |
 |---|---|---|
-| `PORTAL_SERVICE_USER` | RODA-användare för anonym sökning (obligatorisk) | — |
-| `PORTAL_SERVICE_PASSWORD` | Lösenord (stödjer åäö/UTF-8) (obligatorisk) | — |
 | `RODA_API_URL` | RODA/ETERNA backend-URL | `http://localhost:8080` |
 
-Credentials lagras **aldrig** i kod eller config.json — enbart i `.env` (gitignored).
+Portalen behöver **inga credentials** för anonym sökning. Oautentiserade anrop
+skickas vidare till RODA som gäst-användaren `guest`. För att sökningen ska
+fungera måste gruppen `guests` i RODA ha rollerna `aip.read`,
+`descriptive_metadata.read` och `representation.read`
+(Administration → Användare och grupper → guests → Redigera grupp).
 
 ---
 
@@ -49,8 +51,8 @@ Credentials lagras **aldrig** i kod eller config.json — enbart i `.env` (gitig
 ## Funktioner
 
 ### Sökning (utan inloggning)
-- Fulltextsökning mot RODA V2 API via portal service account
-- Besökare behöver **inte** logga in — portalen autentiserar server-side
+- Fulltextsökning mot RODA V2 API som gäst-användare (RODA:s `guest`)
+- Besökare behöver **inte** logga in — inga credentials i portalen
 - Expanderbara resultatkort med metadata och filer inline (lazy-loaded)
 - Avancerade filter: beskrivningsnivå, typ, datum, fritext
 - Filgrid med thumbnails, hover-overlay (förhandsgranska / ladda ner)
@@ -60,11 +62,11 @@ Credentials lagras **aldrig** i kod eller config.json — enbart i `.env` (gitig
 - Sökfält som inte finns i Solr-indexet hanteras gracefully (0 träffar, inte krasch)
 
 ### Paketnedladdning
-- "Ladda ner komplett paket (.zip)" skapar en ZIP med:
-  - `{titel}-metadata.pdf` — alla metadatafält i snygg 2-kolumns PDF (prefix undviker namnkrock med filer i paketet)
+- "Öppna och ladda ner fil" skapar en ZIP med:
+  - `_metadata.pdf` — alla metadatafält i PDF (kort namn: mapp-/zipnamnet kortas till 50 tecken så Windows sökvägsgräns på 260 tecken inte spräcks)
   - Alla filer från representationerna (med bevarad mappstruktur)
 - Metadata filtreras enligt admin-konfigurerade synlighetsfält
-- Fallback: `{titel}-metadata.html` om PDF-generering misslyckas
+- Fallback: `_metadata.html` om PDF-generering misslyckas
 - Partiella filfel: ZIP laddas ner med `_misslyckade_filer.txt` + varning (inte krasch)
 - jsPDF + JSZip lazy-loaded — laddas först vid nedladdning
 
@@ -96,7 +98,7 @@ Credentials lagras **aldrig** i kod eller config.json — enbart i `.env` (gitig
 
 ## Säkerhet
 
-- **Proxy-härdning:** Anonyma requests (service account) begränsas till GET + vitlistade POST `/find`-endpoints. PUT/PATCH/DELETE kräver inloggning.
+- **Proxy-härdning:** Anonyma requests begränsas till GET + vitlistade POST `/find`-endpoints. PUT/PATCH/DELETE kräver inloggning. RODA:s egna gäst-roller är den auktoritativa spärren — proxyn är ett extra lager.
 - **Middleware fail-closed:** Om RODA inte svarar returneras 503 (inte open access till admin).
 - **XSS-skydd:** HTML från RODA saneras med DOMPurify innan rendering.
 - **Request timeout:** 30s timeout på alla API-anrop via AbortController.
@@ -108,7 +110,7 @@ Credentials lagras **aldrig** i kod eller config.json — enbart i `.env` (gitig
 
 Testsvit med **Vitest** (38 tester):
 
-- **Proxy:** Auth mode detection, metod-begränsning för service account, vitlistade endpoints
+- **Proxy:** Auth mode detection, metod-begränsning för anonyma requests, vitlistade endpoints
 - **Middleware:** Fail-closed beteende, session-validering, redirect vid expired
 - **Sök-store:** Offset-reset vid ny query/filter, paginering, state management
 
@@ -125,7 +127,7 @@ Browser
   │
   ├── Publika sidor (sök, filvisning)
   │     └── /api/v2/* → Astro catch-all proxy → RODA
-  │           Ingen JSESSIONID? → inject service account (server-side)
+  │           Ingen JSESSIONID? → forward anonymt (RODA behandlar som guest)
   │
   └── Admin-sidor (/admin/*)
         └── Kräver inloggning (RODA-konto)
@@ -136,7 +138,7 @@ Browser
 
 | Besökare | Hur | Session |
 |---|---|---|
-| Anonym (sök) | Portal service account | Server-side, exponeras aldrig |
+| Anonym (sök) | Ingen auth — RODA:s `guest`-roller | Ingen cookie sätts |
 | Inloggad admin | Eget RODA-konto via login | Browser JSESSIONID |
 | Login-försök | Basic Auth header | Forward direkt till RODA |
 
