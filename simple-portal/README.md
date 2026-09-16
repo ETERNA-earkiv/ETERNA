@@ -14,13 +14,15 @@ bun install
 
 # 2. Konfigurera miljövariabler
 cp .env.example .env
-# Redigera .env med rätt RODA-credentials och URL
+# Redigera .env – ange URL till ETERNA (inga credentials behövs)
 
 # 3. Starta dev-server
 bun dev
 ```
 
 Portalen startar på `http://localhost:4321`.
+
+> **Drift, konfiguration och felsökning inför release:** se [HJALP.md](HJALP.md).
 
 ### Miljövariabler
 
