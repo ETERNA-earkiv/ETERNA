@@ -1,0 +1,9 @@
+# Läggs till i ETERNA:s externa roda-core.properties ($RODA_HOME/config/).
+# Slås ihop med den inbyggda filen – befintliga inställningar behålls.
+# Kräver omstart av ETERNA. Se README.md i denna katalog.
+#
+# Sökportalen: nya AIP:er blir automatiskt läsbara för gästgruppen (anonyma
+# besökare). Befintliga AIP:er hanteras med grant-guests-read.sh.
+
+core.aip.default_permissions.group[] = guests
+core.aip.default_permissions.group[].guests.permission[] = READ

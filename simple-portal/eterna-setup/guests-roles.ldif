@@ -1,0 +1,29 @@
+# Ger ETERNA:s gästgrupp (cn=guests) läsrollerna som sökportalen behöver.
+#
+# ETERNA lagrar roller som poster under ou=roles; den som har rollen listas
+# som roleOccupant. Gruppen guests är skyddad i ETERNA:s UI/API
+# (core.ldap.protectedGroups), men ETERNA läser rollerna direkt från LDAP,
+# så ändringen tar effekt omedelbart utan omstart.
+#
+# Körs mot ETERNA:s OpenLDAP med (obs -c = fortsätt vid fel):
+#   ldapmodify -c -x -H ldap://<ldap-host>:<port> \
+#     -D "cn=admin,dc=roda,dc=org" -w <ldap-adminlösenord> -f guests-roles.ldif
+#
+# Idempotent med -c: redan tillagda värden ger "Type or value exists" (kod 20)
+# och hoppas över, resten läggs till. Utan -c avbryter ldapmodify vid första
+# sådana rad och de följande posterna körs inte.
+
+dn: cn=aip.read,ou=roles,dc=roda,dc=org
+changetype: modify
+add: roleOccupant
+roleOccupant: cn=guests,ou=groups,dc=roda,dc=org
+
+dn: cn=descriptive_metadata.read,ou=roles,dc=roda,dc=org
+changetype: modify
+add: roleOccupant
+roleOccupant: cn=guests,ou=groups,dc=roda,dc=org
+
+dn: cn=representation.read,ou=roles,dc=roda,dc=org
+changetype: modify
+add: roleOccupant
+roleOccupant: cn=guests,ou=groups,dc=roda,dc=org

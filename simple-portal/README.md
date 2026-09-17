@@ -31,10 +31,10 @@ Portalen startar på `http://localhost:4321`.
 | `RODA_API_URL` | RODA/ETERNA backend-URL | `http://localhost:8080` |
 
 Portalen behöver **inga credentials** för anonym sökning. Oautentiserade anrop
-skickas vidare till RODA som gäst-användaren `guest`. För att sökningen ska
-fungera måste gruppen `guests` i RODA ha rollerna `aip.read`,
-`descriptive_metadata.read` och `representation.read`
-(Administration → Användare och grupper → guests → Redigera grupp).
+skickas vidare till ETERNA som gästanvändaren `guest`. I en standarduppsättning
+har gästen inga rättigheter – följ receptet i [eterna-setup/README.md](eterna-setup/README.md)
+(läsroller via LDAP, `READ` på AIP:erna, default-rättigheter för nya inleveranser).
+Gruppen `guests` är spärrad i ETERNA:s gränssnitt, så det går inte att göra där.
 
 ---
 

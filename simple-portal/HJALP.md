@@ -250,20 +250,27 @@ Allt admin-UI:t ändrar skrivs till samma `config.json`. `aboutConfig`,
 
 Portalen lägger inte till några egna roller. Det som styr är:
 
-- **Anonyma besökare** = ETERNA:s grupp `guests`. Behöver `aip.read`,
-  `descriptive_metadata.read` och `representation.read` för att kunna söka,
-  läsa metadata och ladda ner.
+- **Anonyma besökare** = ETERNA:s användare `guest` i gruppen `guests`. I en
+  standarduppsättning har den **inga rättigheter alls** – anonym sökning ger
+  403 – och gruppen är spärrad i ETERNA:s gränssnitt ("Illegal operation").
+  Öppna gäståtkomsten med receptet i [`eterna-setup/README.md`](eterna-setup/README.md):
+  1. läsroller till `guests` via LDAP (`guests-roles.ldif`),
+  2. `READ` för `guests` på alla befintliga AIP:er (`grant-guests-read.sh`),
+  3. default-`READ` för nya inleveranser i extern `roda-core.properties` + omstart.
+
+  Görs en gång per ETERNA-miljö. Ingen kod ändras, varken i portalen eller ETERNA.
 - **Administratörer** = vilket ETERNA-konto som helst som inte är gäst. Den som
   kan logga in kan ändra portalens inställningar. Begränsa därför vem som har
   konto i ETERNA snarare än att lita på portalen.
 
 ## 7. Kända begränsningar
 
-- **Anonym sökning kan ge 403 i en standarduppsättning av ETERNA.** Gruppen
-  `guests` saknar då läsrättigheter, och ETERNA tillåter inte att de skyddade
-  grupperna `guests`/`guest` redigeras ("Illegal operation"). Frågan är inte
-  löst i portalen. Tills vidare fungerar allt när man är inloggad, eftersom
-  sökningen då går via sessionen.
+- **Anonym sökning kräver förberedelse i ETERNA.** I en standarduppsättning
+  har gästen inga rättigheter (403), och gruppen `guests` kan inte redigeras i
+  ETERNA:s gränssnitt. Följ receptet i `eterna-setup/` (avsnitt 6.3) – tre steg
+  per miljö. Tills det är gjort fungerar portalen bara inloggad.
+- **Gästens roller ändras bara via LDAP**, inte i ETERNA:s gränssnitt, så länge
+  `guests` står i `core.ldap.protectedGroups` (ETERNA:s interna konfiguration).
 - **Datum och Arkivbildare filtreras i portalen**, inte i ETERNA:s index (se
   4.1). Prestandan sjunker med arkivets storlek.
 - **Vissa texter är hårdkodade**: hjälptexten bakom **i**-ikonen, rubrikerna
@@ -280,7 +287,9 @@ Portalen lägger inte till några egna roller. Det som styr är:
 |---|---|
 | **Inloggning misslyckas trots rätt uppgifter**; curl-testet i 3.3 ger 403 i stället för 401 | ETERNA:s API-filter låstes *av* vid uppstart. Filtret läser `ui.filter.internal.enabled` en gång vid det första anropet mot `/api/*`, och porten öppnas några sekunder innan inställningen är inläst. Träffar portalen, en öppen webbläsarflik eller en Docker-healthcheck API:t i det fönstret blir alla inloggningar gäst tills ETERNA startas om. **Åtgärd:** stoppa portalen, starta om ETERNA, vänta på `Started RODA in`, kör curl-testet (401), starta portalen. **Kör ni ETERNA i Docker med egen monterad `roda-core.properties`:** lägg `ui.filter.internal.enabled = true` i den filen (den läses vid init) och kopiera även in `roda-wui.properties`, `roda-roles.properties` och `roda-permissions.properties` – extern konfiguration ersätter, den slås inte ihop. |
 | **"Kunde inte ansluta till arkivet"** | Fel `RODA_API_URL`, eller ETERNA nere. Starta om portalen efter ändring i `.env`. |
-| **Sökning ger 403 / inga träffar utan inloggning**, men fungerar inloggad | Gästgruppen saknar läsrättigheter i ETERNA (avsnitt 7). |
+| **Sökning ger 403 utan inloggning**, men fungerar inloggad | Gästgruppen saknar roller – steg 1 i `eterna-setup/README.md` är inte gjort. |
+| **Sökning ger 200 men 0 träffar utan inloggning**, men fungerar inloggad | Rollerna finns men AIP:erna saknar `READ` för `guests` – kör steg 2 (`grant-guests-read.sh`). |
+| **Nyinlevererat material syns inte för anonyma**, äldre gör det | Steg 3 (default-rättigheter) saknas eller ETERNA är inte omstartad efter ändringen. Kör `grant-guests-read.sh` igen för att rätta de nya AIP:erna. |
 | **Inga träffar alls, även inloggad** | Kontrollera `visibilityConfig.allowedLevels` – posterna ligger på en nivå som inte är tillåten. Testa med `["fonds","series","file","item"]`. |
 | **Admin-menyn syns fast man loggat ut**, eller inte alls fast man loggat in | Ladda om hårt. Kvarstår det: kontrollera att ETERNA svarar på `GET /api/v2/members/users/authenticated` med cookien. |
 | **Datumfiltret ger alla poster** | Löst i version 92ad0f154. Uppstår det igen: notera exakt vad som skrevs i fälten och webbläsare – det är en regression. |
@@ -312,4 +321,4 @@ Manuellt mot kundens ETERNA:
 - [ ] Fel lösenord → tydligt felmeddelande; rätt lösenord direkt därefter → inloggad.
 - [ ] Inloggad: Admin-menyn syns; Logga ut → tillbaka till `/sok`, Admin borta (kontrollera även i inkognitofönster).
 - [ ] Admin → Konfiguration → Exportera ger en fil; spara den som kundens referenskonfiguration.
-- [ ] Gästgruppens rättigheter i ETERNA är genomgångna, eller så är det dokumenterat för kunden att sökning kräver inloggning.
+- [ ] Gäståtkomsten i ETERNA är uppsatt enligt `eterna-setup/README.md` (alla tre steg), och en anonym sökning i inkognitofönster ger träffar.
