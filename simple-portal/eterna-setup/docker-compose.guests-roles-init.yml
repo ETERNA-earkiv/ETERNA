@@ -1,0 +1,35 @@
+# Klistra in det har blocket i services: i Faj/Prod/compose/docker-compose.yml
+# (samma niva som "eterna:" och "openldap:"). Kraver ingen manuell
+# koerning - Docker koer det automatiskt varje gang stacken startas,
+# och det ar tryggt att koera om (ldapmodify -c hoppar bara over
+# roleOccupant-varden som redan finns).
+#
+# Forutsatter (redan sant i Faj/Prod):
+#  - en tjanst "openldap" pa natverket "faj-prod"
+#  - en tjanst "eterna" med image-inbyggd healthcheck mot /api/v2/openapi
+#  - x-config &config -ankaret (networks/logging) langst upp i filen
+#
+# Filen guests-roles.ldif maste ocksa laggas i
+# Faj/Prod/compose/eterna-setup/ (dvs samma relativa sokvag som volumes
+# nedan pekar pa - justera sokvagen om ni placerar mappen nagon
+# annanstans).
+
+  guests-roles-init:
+    image: docker.io/bitnamilegacy/openldap:2.6.10
+    container_name: guests-roles-init
+    depends_on:
+      eterna:
+        condition: service_healthy
+    volumes:
+      - ./eterna-setup/guests-roles.ldif:/guests-roles.ldif:ro
+    environment:
+      - LDAP_ADMIN_PASSWORD=eterna
+    entrypoint:
+      - /bin/sh
+      - -c
+      - >-
+        ldapmodify -c -x -H ldap://openldap:1389
+        -D 'cn=admin,dc=roda,dc=org' -w "$$LDAP_ADMIN_PASSWORD"
+        < /guests-roles.ldif
+    <<: *config
+    restart: "no"
