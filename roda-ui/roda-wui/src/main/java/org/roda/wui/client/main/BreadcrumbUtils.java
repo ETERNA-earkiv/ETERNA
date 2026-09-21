@@ -121,8 +121,11 @@ public class BreadcrumbUtils {
           BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel, breadcrumbTitle, historyTokens);
           breadcrumb.add(1, ancestorBreadcrumb);
         } else {
-          SafeHtml breadcrumbLabel = DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.AIP_GHOST, false);
-          BreadcrumbItem unknownAncestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel, "", new Command() {
+          // Otillgänglig förfader: samma etikett som katalogträdets spöknoder (#643)
+          SafeHtml breadcrumbLabel = getBreadcrumbLabel(messages.catalogTreeGhostNodeLabel(),
+            RodaConstants.AIP_GHOST);
+          BreadcrumbItem unknownAncestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel,
+            messages.catalogTreeGhostNodeLabel(), new Command() {
 
             @Override
             public void execute() {
@@ -175,8 +178,11 @@ public class BreadcrumbUtils {
             ListUtils.concat(BrowseTop.RESOLVER.getHistoryPath(), ancestor.getId()));
           breadcrumb.add(1, ancestorBreadcrumb);
         } else {
-          SafeHtml breadcrumbLabel = DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.AIP_GHOST, false);
-          BreadcrumbItem unknownAncestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel, "", new Command() {
+          // Otillgänglig förfader: samma etikett som katalogträdets spöknoder (#643)
+          SafeHtml breadcrumbLabel = getBreadcrumbLabel(messages.catalogTreeGhostNodeLabel(),
+            RodaConstants.AIP_GHOST);
+          BreadcrumbItem unknownAncestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel,
+            messages.catalogTreeGhostNodeLabel(), new Command() {
 
             @Override
             public void execute() {
