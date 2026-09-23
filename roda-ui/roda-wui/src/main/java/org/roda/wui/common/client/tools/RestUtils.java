@@ -96,6 +96,13 @@ public class RestUtils {
     return UriUtils.fromSafeConstant(b);
   }
 
+  public static SafeUri createPreparedDownloadUri(String token) {
+    // api/v2/files/download/prepared/{token}
+    String b = RodaConstants.API_REST_V2_FILES_DOWNLOAD_PREPARED + URL.encodeQueryString(token);
+
+    return UriUtils.fromSafeConstant(b);
+  }
+
   public static SafeUri createRepresentationFileHtmlPreviewUri(String fileUuid, String locale, String xsltId) {
     // api/v2/files/{file_uuid}/preview/html?lang={locale}&xslt={xsltId}
     StringBuilder b = new StringBuilder();

@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.roda.core.data.v2.file.CreateFolderRequest;
 import org.roda.core.data.v2.file.MoveFilesRequest;
+import org.roda.core.data.v2.file.PreparedDownloadResponse;
 import org.roda.core.data.v2.file.RenameFolderRequest;
 import org.roda.core.data.v2.generics.DeleteRequest;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
@@ -63,6 +64,23 @@ public interface FileRestService extends RODAEntityRestService<IndexedFile> {
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   Job deleteFiles(
     @Parameter(description = "Selected disposal confirmations", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) DeleteRequest deleteRequest);
+
+  @RequestMapping(path = "/download/prepare", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Requests a download of selected files", description = "Expands and validates a selection of files and issues a token for downloading it as a zip, or refuses it", responses = {
+    @ApiResponse(responseCode = "200", description = "A token, or a refusal", content = @Content(schema = @Schema(implementation = PreparedDownloadResponse.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  PreparedDownloadResponse requestSelectedFilesDownload(
+    @Parameter(name = "selectedItems", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItemsRequest selected);
+
+  @RequestMapping(method = RequestMethod.GET, path = "/download/prepared/{token}/check", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Checks whether a prepared download can still be delivered", description = "Revalidates a token without delivering anything, so that the client can show a refusal instead of navigating the browser to a download that will fail", responses = {
+    @ApiResponse(responseCode = "200", description = "The token, or a refusal", content = @Content(schema = @Schema(implementation = PreparedDownloadResponse.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "404", description = "Unknown, expired or foreign token", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  PreparedDownloadResponse checkPreparedDownload(
+    @Parameter(description = "The token issued when the download was prepared", required = true) @PathVariable(name = "token") String token);
 
   @RequestMapping(path = "/rename", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Rename folder", description = "Renames a folder", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RenameFolderRequest.class))), responses = {

@@ -161,6 +161,25 @@ public class ConfigurationManager {
   }
 
   /**
+   * @return The long property value for the provided keyParts. Or
+   *         {@code defaultValue} if the property value was null, not a long or
+   *         the key is not present. Use this rather than
+   *         {@link #getInt(Integer, String...)} for sizes in bytes, which
+   *         exceed an int past 2 GiB.
+   */
+  public static Long getLong(Long defaultValue, String... keyParts) {
+    String value = getString(keyParts);
+    if (value != null) {
+      try {
+        return Long.valueOf(value);
+      } catch (NumberFormatException e) {
+        // proceed with returning the default
+      }
+    }
+    return defaultValue;
+  }
+
+  /**
    * @return The double property value for the provided keyParts. Or
    *         {@code defaultValue} if the property value was null, not an double or
    *         the key is not present.

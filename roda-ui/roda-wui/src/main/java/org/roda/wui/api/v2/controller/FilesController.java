@@ -14,17 +14,23 @@ import java.nio.file.StandardCopyOption;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Optional;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.DownloadSelection;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.file.CreateFolderRequest;
+import org.roda.core.data.v2.file.DownloadRefusal;
 import org.roda.core.data.v2.file.MoveFilesRequest;
+import org.roda.core.data.v2.file.PreparedDownloadResponse;
 import org.roda.core.data.v2.file.RenameFolderRequest;
 import org.roda.core.data.v2.generics.DeleteRequest;
 import org.roda.core.data.v2.generics.LongResponse;
@@ -35,6 +41,7 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexedFileRequest;
 import org.roda.core.data.v2.index.SuggestRequest;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -49,8 +56,10 @@ import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
+import org.roda.wui.api.v2.services.DownloadSelectionService;
 import org.roda.wui.api.v2.services.FilesService;
 import org.roda.wui.api.v2.services.IndexService;
+import org.roda.wui.api.v2.services.PreparedDownload;
 import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.services.FileRestService;
@@ -98,6 +107,161 @@ public class FilesController implements FileRestService, Exportable {
 
   @Autowired
   RequestHandler requestHandler;
+
+  @Autowired
+  DownloadSelectionService downloadSelectionService;
+
+  @PostMapping(path = "/download/prepare", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Requests a download of selected files", description = "Expands and validates a selection of files and, if it is deliverable, issues a token that can be used to download the selection as a zip; a selection that is refused for its size or for undeliverable content comes back as a refusal in the same response", responses = {
+    @ApiResponse(responseCode = "200", description = "A token, or a refusal", content = @Content(schema = @Schema(implementation = PreparedDownloadResponse.class))),
+    @ApiResponse(responseCode = "400", description = "The selection was not valid", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  public PreparedDownloadResponse requestSelectedFilesDownload(@RequestBody SelectedItemsRequest selected) {
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<PreparedDownloadResponse>() {
+      @Override
+      public PreparedDownloadResponse process(RequestContext requestContext,
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_SELECTED_PARAM, selected);
+        SelectedItems<IndexedFile> selection = CommonServicesUtils.convertSelectedItems(selected, IndexedFile.class);
+
+        List<IndexedFile> files = DownloadSelection.expand(requestContext.getIndexService(), selection);
+        PreparedDownload prepared = new PreparedDownload(requestContext.getUser().getName(),
+          requestContext.getRequest() == null ? null : requestContext.getRequest().getReason(), files);
+
+        if (files.isEmpty()) {
+          return new PreparedDownloadResponse(DownloadRefusal.noFiles(), 0, 0);
+        }
+
+        // All or nothing, and on the expanded list rather than the selection:
+        // a filter may resolve to more files than the permission check's own
+        // query would see, and a partial disclosure that looks complete is the
+        // worst possible outcome.
+        controllerAssistant.checkObjectPermissions(requestContext.getUser(),
+          SelectedItemsList.create(IndexedFile.class, prepared.fileUUIDs()));
+
+        // deliberately not audited as a disclosure, on the same reasoning as
+        // the check endpoint: preparing hands nothing out, and the request can
+        // still be refused below. The selection itself is on the entry either
+        // way, and the UUIDs of what was actually delivered are recorded by the
+        // download endpoint from this very list
+
+        // a refusal is part of the ordinary response rather than an HTTP error,
+        // so that the client can tell the reasons apart and name the numbers
+        // behind them
+        Optional<DownloadRefusal> refusal = DownloadSelection.checkFileCount(files)
+          .or(() -> DownloadSelection.checkDeliverability(files));
+        if (refusal.isPresent()) {
+          return new PreparedDownloadResponse(refusal.get(), files.size(), prepared.totalSize());
+        }
+
+        String token = downloadSelectionService.prepareDownload(prepared);
+        return new PreparedDownloadResponse(token, files.size(), prepared.totalSize());
+      }
+    });
+  }
+
+  @GetMapping(path = "/download/prepared/{token}/check", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Checks whether a prepared download can still be delivered", description = "Revalidates a token without delivering anything, so that the client can show a refusal instead of navigating the browser to a download that will fail", responses = {
+    @ApiResponse(responseCode = "200", description = "The token, or a refusal", content = @Content(schema = @Schema(implementation = PreparedDownloadResponse.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "404", description = "Unknown, expired or foreign token", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  public PreparedDownloadResponse checkPreparedDownload(
+    @Parameter(description = "The token issued when the download was prepared", required = true) @PathVariable(name = "token") String token) {
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<PreparedDownloadResponse>() {
+      @Override
+      public PreparedDownloadResponse process(RequestContext requestContext,
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_DOWNLOAD_TOKEN_PARAM, token);
+
+        PreparedDownload prepared = downloadSelectionService.retrievePreparedDownload(token,
+          requestContext.getUser().getName());
+
+        // deliberately not audited as a disclosure: a check hands nothing out,
+        // and an entry per check would bury the entries that record an actual
+        // download
+        controllerAssistant.checkObjectPermissions(requestContext.getUser(),
+          SelectedItemsList.create(IndexedFile.class, prepared.fileUUIDs()));
+
+        Optional<DownloadRefusal> refusal = DownloadSelection.checkDeliverability(prepared.files());
+        if (refusal.isPresent()) {
+          return new PreparedDownloadResponse(refusal.get(), prepared.files().size(), prepared.totalSize());
+        }
+
+        return new PreparedDownloadResponse(token, prepared.files().size(), prepared.totalSize());
+      }
+    });
+  }
+
+  @GetMapping(path = "/download/prepared/{token}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  @Operation(summary = "Downloads a prepared selection of files", description = "Streams a previously prepared selection of files as a zip containing file content only", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = StreamingResponseBody.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "404", description = "Unknown, expired or foreign token", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  public ResponseEntity<StreamingResponseBody> downloadPreparedSelection(
+    @Parameter(description = "The token issued when the download was prepared", required = true) @PathVariable(name = "token") String token) {
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<ResponseEntity<StreamingResponseBody>>() {
+      @Override
+      public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_DOWNLOAD_TOKEN_PARAM, token);
+
+        // an unknown token, an expired one and one issued to another user are
+        // all a 404: the token must not become a way around the permission
+        // check, nor a way to probe for other users' downloads
+        PreparedDownload prepared = downloadSelectionService.retrievePreparedDownload(token,
+          requestContext.getUser().getName());
+
+        // browser navigation cannot send the x-request-reason header, so the
+        // reason from the preparing request is reused rather than leaving the
+        // entry that records the actual disclosure without one
+        if (requestContext.getRequest() != null && StringUtils.isBlank(requestContext.getRequest().getReason())) {
+          requestContext.getRequest().setReason(prepared.reason());
+        }
+
+        // permissions may have been revoked since the token was issued
+        controllerAssistant.checkObjectPermissions(requestContext.getUser(),
+          SelectedItemsList.create(IndexedFile.class, prepared.fileUUIDs()));
+
+        // the client checks this before it navigates, so getting here means the
+        // referenced content went away in between — or that the URL was
+        // followed directly. Either way, failing outright is better than the
+        // truncated zip under status 200 that a mid-stream failure delivers.
+        Optional<DownloadRefusal> refusal = DownloadSelection.checkDeliverability(prepared.files());
+        if (refusal.isPresent()) {
+          throw new GenericException("The content of " + refusal.get().getUndeliverableFileCount() + " of the "
+            + prepared.files().size() + " prepared files can no longer be delivered");
+        }
+
+        // last, once nothing can refuse the request any more: the parameters go
+        // to the log whatever the outcome, so recording them any earlier would
+        // enter a list of UUIDs as disclosed that a revoked permission or
+        // vanished content then kept from being handed out
+        auditDisclosedFiles(controllerAssistant, prepared);
+
+        StreamResponse response = DownloadSelection.createZipStreamResponse(requestContext.getModelService(),
+          requestContext.getIndexService(), prepared.files());
+        return ApiUtils.okResponseWithEncodedFileName(response);
+      }
+    });
+  }
+
+  /**
+   * Records which records were disclosed. Logging the selection is not enough:
+   * a filter cannot be reconstructed once the index has changed, and the audit
+   * question is "which records were handed out?".
+   * <p>
+   * Belongs to the delivery endpoint alone, and there only once every check has
+   * passed. Preparing and checking a download hand nothing out, and an entry
+   * that names UUIDs as disclosed is a claim that they were.
+   */
+  private static void auditDisclosedFiles(RequestControllerAssistant controllerAssistant, PreparedDownload prepared) {
+    controllerAssistant.addParameters(RodaConstants.CONTROLLER_FILE_UUIDS_PARAM, prepared.fileUUIDs(),
+      RodaConstants.CONTROLLER_FILE_COUNT_PARAM, prepared.files().size(), RodaConstants.CONTROLLER_TOTAL_SIZE_PARAM,
+      prepared.totalSize());
+  }
 
   @RequestMapping(path = "{uuid}/preview", method = RequestMethod.GET, produces = {
     MediaType.APPLICATION_OCTET_STREAM_VALUE})
