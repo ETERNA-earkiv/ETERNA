@@ -17,3 +17,6 @@ roda-cas/overlays/
 .vscode/
 **/**/*.log.txt
 .worktrees/
+
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+/graft/
