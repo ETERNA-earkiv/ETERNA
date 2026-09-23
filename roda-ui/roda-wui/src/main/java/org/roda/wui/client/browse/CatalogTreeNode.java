@@ -304,29 +304,31 @@ public class CatalogTreeNode extends Composite {
           return;
         }
 
-        // Hämta data för okända förfäder i ett enda batch-anrop
-        FindRequest ancestorRequest = new FindRequest.FindRequestBuilder(
-          new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID,
-            new ArrayList<>(ancestorIdsToResolve))),
-          false)
-          .withSublist(new Sublist(0, ancestorIdsToResolve.size()))
-          .build();
-
+        // Hämta data för okända förfäder i batchar. Solr tillåter max 1024 OR-led per
+        // fråga, så ett enda anrop för alla akter under en serie sprack och alla akter
+        // ritades felaktigt som "Åtkomst saknas" (#643).
         Services s2 = new Services(messages.catalogTreeReasonGetAncestors(), "get");
-        s2.rodaEntityRestService(
-          s -> s.find(ancestorRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
-          IndexedAIP.class)
-          .whenComplete((ancResult, err) -> {
-            if (err == null) {
-              for (IndexedAIP anc : ancResult.getResults()) {
-                resolvedAncestors.put(anc.getId(), anc);
-              }
-            } else {
-              LOGGER.warn("Ghost fallback: could not resolve ancestors for AIP " + aipId
-                + "; inaccessible intermediates become ghost nodes");
-            }
-            buildGhostChildrenFromDescendants(descendants, resolvedAncestors, onComplete);
-          });
+        AncestorBatchResolver.resolve(ancestorIdsToResolve, batch -> {
+          FindRequest ancestorRequest = new FindRequest.FindRequestBuilder(
+            new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, batch)),
+            false)
+            .withSublist(new Sublist(0, batch.size()))
+            .build();
+          return s2.rodaEntityRestService(
+            s -> s.find(ancestorRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
+            IndexedAIP.class);
+        }).whenComplete((resolvedBatch, err) -> {
+          if (err != null) {
+            // Tekniskt fel, inte behörighetsbrist: visa felmeddelande med "försök igen"
+            // i stället för att rita mellannivåerna som otillgängliga.
+            LOGGER.error("Ghost fallback: could not resolve ancestors for AIP " + aipId, err);
+            toggleHtml.setHTML(ICON_TOGGLE_COLLAPSED);
+            showLoadError();
+            return;
+          }
+          resolvedAncestors.putAll(resolvedBatch);
+          buildGhostChildrenFromDescendants(descendants, resolvedAncestors, onComplete);
+        });
       });
   }
 
