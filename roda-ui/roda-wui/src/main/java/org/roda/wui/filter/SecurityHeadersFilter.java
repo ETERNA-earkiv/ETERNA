@@ -77,16 +77,10 @@ public class SecurityHeadersFilter implements Filter {
       httpServletResponse.setHeader("Service-Worker-Allowed", REPLAY_SW_ALLOWED_SCOPE);
     }
 
-    // Cross-origin isolation for SharedArrayBuffer support (required by ReplayWeb.page in Firefox).
     // COOP is safe globally since CAS auth uses redirects, not popups.
-    // COEP uses "require-corp" on replay paths (all resources are same-origin) and
-    // "credentialless" elsewhere so third-party scripts (Google Analytics) are not blocked.
+    // No COEP: any COEP on a parent requires nested iframes to send COEP too, and the
+    // ReplayWeb.page service worker serves /replay/ without it, so the viewer iframe is blocked.
     httpServletResponse.setHeader("Cross-Origin-Opener-Policy", "same-origin");
-    if (requestPath.startsWith(replayPathPrefix) || requestPath.equals(replayViewerPath)) {
-      httpServletResponse.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
-    } else {
-      httpServletResponse.setHeader("Cross-Origin-Embedder-Policy", "credentialless");
-    }
 
     httpServletResponse.setHeader("X-XSS-Protection", "1; mode=block");
     httpServletResponse.setHeader("X-Permitted-Cross-Domain-Policies", "none");
