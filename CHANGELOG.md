@@ -20,6 +20,15 @@
 - Catalog tree now resolves ancestors in a single batch, so records the user has access to are no longer shown as "Åtkomst saknas"; an ancestor the user cannot access is shown as plain "Åtkomst saknas" text in the breadcrumb [#643](https://github.com/ETERNA-earkiv/ETERNA/issues/643) [#645](https://github.com/ETERNA-earkiv/ETERNA/pull/645)
 - Fixed the web archive (WARC/WACZ) viewer failing to load: removed the `Cross-Origin-Embedder-Policy` headers added in v1.0.0, since COEP on the parent page blocked the ReplayWeb.page iframe served by its service worker (`Cross-Origin-Opener-Policy` is kept) [#646](https://github.com/ETERNA-earkiv/ETERNA/pull/646)
 
+#### Security updates
+- Fixed GHSA-9xv2-5v5q-p794, GHSA-gcx9-497g-6cp6, GHSA-h3x4-894j-xpx5 (critical): upgraded embedded Tomcat to 10.1.60
+- Fixed GHSA-3qp7-7mw8-wx86, GHSA-c4c3-7fpv-j4q5, GHSA-c653-97m9-rcg9, GHSA-fccg-mwvh-qqg4, GHSA-x4gw-5cx5-pgmh, GHSA-558v-64gr-wgg4: upgraded `netty` to 4.1.138.Final via `netty-bom` (also aligns `netty-resolver` and epoll modules, previously 4.1.127)
+- Fixed GHSA-9pwp-9qqc-pr26, GHSA-qp49-qgx5-5m26: upgraded `bcprov`/`bcpkix-jdk18on` to 1.86
+- Fixed GHSA-3pjw-73gf-8qr5, GHSA-5jmj-h7xm-6q6v, GHSA-hgj6-7826-r7m5, GHSA-j3rv-43j4-c7qm, GHSA-rmj7-2vxq-3g9f, GHSA-72hv-8253-57qq, GHSA-r7wm-3cxj-wff9: upgraded Jackson to 2.21.7 via `jackson-bom` (all Jackson modules aligned)
+- Fixed GHSA-r4gv-qr8j-p3pg: upgraded `handlebars` to 4.5.5
+- Fixed GHSA-j92g-9f8w-j867: upgraded PostgreSQL driver to 42.7.13
+- Fixed GHSA-hjcp-jmpx-g3qm: upgraded `httpclient5` to 5.6.4 (with `httpcore5` 5.4.3)
+
 ## v1.0.0 (2026-06-15)
 
 #### New features
