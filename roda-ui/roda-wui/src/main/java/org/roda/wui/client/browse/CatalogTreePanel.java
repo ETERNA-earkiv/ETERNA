@@ -310,6 +310,14 @@ public class CatalogTreePanel extends Composite {
             // Tekniskt fel, inte behörighetsbrist: rita inte förfäderna som "Åtkomst saknas"
             LOGGER.error("Could not resolve ghost-root ancestors; supplementary roots not shown", err);
             finalizeFallbackTree(new ArrayList<>(), myGeneration);
+            FlowPanel errorPanel = new FlowPanel();
+            errorPanel.addStyleName("catalogTreeNodeError");
+            errorPanel.add(new com.google.gwt.user.client.ui.Label(messages.catalogTreeLoadError()));
+            com.google.gwt.user.client.ui.Anchor retry =
+              new com.google.gwt.user.client.ui.Anchor(messages.catalogTreeRetry());
+            retry.addClickHandler(event -> loadRootNodes());
+            errorPanel.add(retry);
+            treeBody.add(errorPanel);
             return;
           }
           resolvedAncestors.putAll(resolvedBatch);
