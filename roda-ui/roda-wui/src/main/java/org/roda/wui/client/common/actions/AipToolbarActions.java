@@ -40,6 +40,7 @@ import org.roda.wui.client.browse.CatalogTreePanel;
 import org.roda.wui.client.browse.CreateDescriptiveMetadata;
 import org.roda.wui.client.browse.EditPermissions;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
+import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
@@ -61,6 +62,7 @@ import org.roda.wui.client.search.Search;
 import org.roda.wui.client.services.DisposalHoldRestService;
 import org.roda.wui.client.services.DisposalScheduleRestService;
 import org.roda.wui.client.services.Services;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.StringUtils;
@@ -169,6 +171,10 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
     if (aip == NO_AIP_OBJECT) {
       return new CanActResult(hasPermissions(action, permissions), CanActResult.Reason.USER,
         messages.reasonUserLacksPermission());
+    } else if (SEARCH_WITHIN_ACTIONS.contains(action) && !userHasSearchRole()) {
+      // ETERNA 1.H (krav 2): sökgenvägarna öppnar globalsökningen och gate:as
+      // därför av samma roll som sökmenyn (ui.menu.search.role)
+      return new CanActResult(false, CanActResult.Reason.USER, messages.reasonUserLacksPermission());
     } else if ((AIPAction.REMOVE.equals(action) || AIPAction.NEW_CHILD_AIP_BELOW.equals(action)
       || AIPAction.MOVE_IN_HIERARCHY.equals(action) || AIPAction.CHANGE_TYPE.equals(action)
       || AIPAction.NEW_REPRESENTATION.equals(action) || AIPAction.CREATE_DESCRIPTIVE_METADATA.equals(action))
@@ -185,6 +191,14 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
       return new CanActResult(hasPermissions(action, aip.getPermissions()), CanActResult.Reason.USER,
         messages.reasonUserLacksPermission());
     }
+  }
+
+  private static boolean userHasSearchRole() {
+    List<String> roles = ConfigurationManager.getStringList("ui.menu.search.role");
+    if (roles.isEmpty()) {
+      return true;
+    }
+    return UserLogin.getInstance().getCachedUser().map(user -> user.hasRoles(roles)).orElse(true);
   }
 
   @Override

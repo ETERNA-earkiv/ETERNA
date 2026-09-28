@@ -27,6 +27,7 @@ import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.search.Search;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
@@ -400,7 +401,17 @@ public class NavigationToolbarLegacy<T extends IsIndexed> extends Composite impl
 
     @Override
     public CanActResult userCanAct(Action<IndexedAIP> action, IndexedAIP object) {
-      return new CanActResult(true, CanActResult.Reason.USER, null);
+      // ETERNA 1.H (krav 2): båda genvägarna öppnar globalsökningen och gate:as
+      // därför av samma roll som sökmenyn (ui.menu.search.role)
+      return new CanActResult(userHasSearchRole(), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
+    }
+
+    private static boolean userHasSearchRole() {
+      List<String> roles = ConfigurationManager.getStringList("ui.menu.search.role");
+      if (roles.isEmpty()) {
+        return true;
+      }
+      return UserLogin.getInstance().getCachedUser().map(user -> user.hasRoles(roles)).orElse(true);
     }
 
     @Override
