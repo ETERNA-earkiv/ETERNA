@@ -4,6 +4,7 @@
 
 #### New features
 - Added a "Ladda ner valda filer" action that downloads selected files and folders as a zip of file content only, with paths relative to the representation's `data/`; the selection is validated before anything is streamed and again just before delivery, a selection that cannot be delivered is refused with an explanation instead of a technical error, large selections ask for confirmation, and the disclosed file UUIDs, count and total size are recorded in the audit log [#589](https://github.com/ETERNA-earkiv/ETERNA/issues/589)
+- Added the administrative metadata schema `eterna_admin` for recording confidentiality and personal data assessments per AIP: mandatory `sekretess` and `personuppgifter` (controlled vocabularies, default `ej_bedomd`) and optional `sekretessgrund`, `pulGrund`, `granskningsdatum` and `anteckning`; XSD validation, metadata editor template with drop-downs, HTML view, Solr fields (`sekretess_s`, `personuppgifter_s`, `granskningsdatum_dt`, …) and controlled advanced-search fields. The metadata create/edit forms now also check fields marked `mandatory` in a template before saving [#675](https://github.com/ETERNA-earkiv/ETERNA/pull/675)
 
 #### Improvements
 - Pinned the `eterna-unoserver` image to an immutable version tag (`v3.7.0`) in the deploy compose files, and updated the build workflow to publish `v3.7.0` alongside `:latest`, so deployments are reproducible [#600](https://github.com/ETERNA-earkiv/ETERNA/issues/600)
