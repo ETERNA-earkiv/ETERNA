@@ -44,6 +44,7 @@ import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
+import org.roda.wui.client.common.dialogs.BulkEditMetadataDialog;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.DisposalDialogs;
 import org.roda.wui.client.common.dialogs.RepresentationDialogs;
@@ -93,12 +94,14 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
   private static final Set<AIPAction> POSSIBLE_ACTIONS_ON_SINGLE_AIP = new HashSet<>(
     Arrays.asList(AIPAction.DOWNLOAD, AIPAction.MOVE_IN_HIERARCHY, AIPAction.UPDATE_PERMISSIONS, AIPAction.REMOVE,
       AIPAction.NEW_PROCESS, AIPAction.DOWNLOAD_EVENTS, AIPAction.DOWNLOAD_DOCUMENTATION,
-      AIPAction.DOWNLOAD_SUBMISSIONS, AIPAction.CHANGE_TYPE, AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE,
+      AIPAction.DOWNLOAD_SUBMISSIONS, AIPAction.CHANGE_TYPE, AIPAction.BULK_EDIT_METADATA,
+      AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE,
       AIPAction.ASSOCIATE_DISPOSAL_HOLD, AIPAction.SEARCH_DESCENDANTS, AIPAction.SEARCH_PACKAGE,
       AIPAction.NEW_CHILD_AIP_BELOW, AIPAction.NEW_REPRESENTATION, AIPAction.CREATE_DESCRIPTIVE_METADATA));
   private static final Set<AIPAction> POSSIBLE_ACTIONS_ON_MULTIPLE_AIPS = new HashSet<>(
     Arrays.asList(AIPAction.MOVE_IN_HIERARCHY, AIPAction.UPDATE_PERMISSIONS, AIPAction.REMOVE, AIPAction.NEW_PROCESS,
-      AIPAction.CHANGE_TYPE, AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE, AIPAction.ASSOCIATE_DISPOSAL_HOLD));
+      AIPAction.CHANGE_TYPE, AIPAction.BULK_EDIT_METADATA, AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE,
+      AIPAction.ASSOCIATE_DISPOSAL_HOLD));
   private static final Set<AIPAction> APPRAISAL_ACTIONS = new HashSet<>(
     Arrays.asList(AIPAction.APPRAISAL_ACCEPT, AIPAction.APPRAISAL_REJECT));
   private static final Set<Action<IndexedAIP>> DOWNLOAD_ACTIONS = new HashSet<>(Arrays.asList(AIPAction.DOWNLOAD_EVENTS,
@@ -271,6 +274,8 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
       downloadDocumentation(aip, callback);
     } else if (AIPAction.CHANGE_TYPE.equals(action)) {
       changeType(aip, callback);
+    } else if (AIPAction.BULK_EDIT_METADATA.equals(action)) {
+      bulkEditMetadata(aip, callback);
     } else if (AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE.equals(action)) {
       associateDisposalSchedule(aip, callback);
     } else if (AIPAction.ASSOCIATE_DISPOSAL_HOLD.equals(action)) {
@@ -302,6 +307,8 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
       appraisalReject(aips, callback);
     } else if (AIPAction.CHANGE_TYPE.equals(action)) {
       changeType(aips, callback);
+    } else if (AIPAction.BULK_EDIT_METADATA.equals(action)) {
+      bulkEditMetadata(aips, callback);
     } else if (AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE.equals(action)) {
       associateDisposalSchedule(aips, callback);
     } else if (AIPAction.ASSOCIATE_DISPOSAL_HOLD.equals(action)) {
@@ -801,6 +808,24 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
     });
   }
 
+  /**
+   * ETERNA 1.H (krav 1): öppnar massredigeringsdialogen. Dialogen läser
+   * fälten ur formulärmallen och startar jobbet själv.
+   */
+  private void bulkEditMetadata(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
+    bulkEditMetadata(objectToSelectedItems(aip, IndexedAIP.class), callback);
+  }
+
+  private void bulkEditMetadata(final SelectedItems<IndexedAIP> aips, final AsyncCallback<ActionImpact> callback) {
+    ClientSelectedItemsUtils.size(IndexedAIP.class, aips, new ActionNoAsyncCallback<Long>(callback) {
+      @Override
+      public void onSuccess(final Long size) {
+        doActionCallbackNone();
+        new BulkEditMetadataDialog(aips, size).show();
+      }
+    });
+  }
+
   private void changeType(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
     changeType(objectToSelectedItems(aip, IndexedAIP.class), callback);
   }
@@ -1172,6 +1197,8 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
     managementGroup.addButton(messages.newRepresentationButton(), AIPAction.NEW_REPRESENTATION, ActionImpact.UPDATED,
       "btn-plus-circle");
     managementGroup.addButton(messages.changeTypeButton(), AIPAction.CHANGE_TYPE, ActionImpact.UPDATED, BTN_EDIT);
+    managementGroup.addButton(messages.bulkEditMetadataButton(), AIPAction.BULK_EDIT_METADATA,
+      ActionImpact.UPDATED, BTN_EDIT);
     managementGroup.addButton(messages.moveArchivalPackage(), AIPAction.MOVE_IN_HIERARCHY, ActionImpact.UPDATED,
       BTN_EDIT);
     managementGroup.addButton(messages.editArchivalPackagePermissions(), AIPAction.UPDATE_PERMISSIONS,
@@ -1210,6 +1237,7 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
     APPRAISAL_ACCEPT(RodaConstants.PERMISSION_METHOD_APPRAISAL),
     APPRAISAL_REJECT(RodaConstants.PERMISSION_METHOD_APPRAISAL), DOWNLOAD_DOCUMENTATION(),
     CHANGE_TYPE(RodaConstants.PERMISSION_METHOD_CHANGE_AIP_TYPE),
+    BULK_EDIT_METADATA(RodaConstants.PERMISSION_METHOD_BULK_UPDATE_DESCRIPTIVE_METADATA),
     ASSOCIATE_DISPOSAL_SCHEDULE(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_SCHEDULE),
     ASSOCIATE_DISPOSAL_HOLD(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_HOLD), SEARCH_DESCENDANTS(),
     SEARCH_PACKAGE(), NEW_REPRESENTATION(RodaConstants.PERMISSION_METHOD_CREATE_REPRESENTATION),

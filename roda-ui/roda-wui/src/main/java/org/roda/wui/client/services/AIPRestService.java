@@ -24,6 +24,7 @@ import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataPreview;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataPreviewRequest;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataVersions;
 import org.roda.core.data.v2.ip.metadata.SelectedType;
+import org.roda.core.data.v2.ip.metadata.BulkUpdateDescriptiveMetadataRequest;
 import org.roda.core.data.v2.ip.metadata.SupportedMetadataValue;
 import org.roda.core.data.v2.ip.metadata.TypeOptionsInfo;
 import org.roda.core.data.v2.jobs.Job;
@@ -145,12 +146,27 @@ public interface AIPRestService extends RODAEntityRestService<IndexedAIP> {
   ConfiguredDescriptiveMetadataList retrieveSupportedMetadataTypes(
     @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString);
 
+  @RequestMapping(path = "/configuration/descriptive/metadata/{metadata-type}/fields", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Gets the form template fields for a configured descriptive metadata type", description = "Returns the fields of the form template (label, type, controlled vocabulary) that the bulk update plugin can modify", responses = {
+    @ApiResponse(responseCode = "200", description = "Template fields", content = @Content(schema = @Schema(implementation = SupportedMetadataValue.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  SupportedMetadataValue retrieveConfiguredMetadataFields(
+    @Parameter(description = "The descriptive metadata type, including version", required = true) @PathVariable(name = "metadata-type") String metadataType,
+    @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString);
+
   @RequestMapping(path = "/configuration/types", method = RequestMethod.GET)
   @Operation(summary = "Retrieves the types associated to AIP", description = "Returns a list of controlled vocabulary from RODA configuration or list of AIP types available", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = TypeOptionsInfo.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   TypeOptionsInfo getTypeOptions(
     @Parameter(description = "The language to be used for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString);
+
+  @RequestMapping(path = "/metadata/descriptive/bulk-update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Bulk updates one descriptive metadata field for the selected AIPs", description = "Starts a job that updates a single template field in-place for all selected AIPs; the xpath is always resolved server-side from the form template", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = BulkUpdateDescriptiveMetadataRequest.class))), responses = {
+    @ApiResponse(responseCode = "200", description = "Job created", content = @Content(schema = @Schema(implementation = Job.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  Job bulkUpdateDescriptiveMetadata(BulkUpdateDescriptiveMetadataRequest request);
 
   @RequestMapping(path = "/type", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Changes the AIP type via search query", responses = {
