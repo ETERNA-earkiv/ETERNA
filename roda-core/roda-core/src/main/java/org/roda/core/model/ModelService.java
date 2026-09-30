@@ -93,7 +93,9 @@ import org.roda.core.storage.fs.FileStorageService;
  */
 public interface ModelService extends ModelObservable {
   enum JobName {
+	  CREATE_AIP,
 	  DELETE_AIP,
+	  CREATE_REPRESENTATION,
       DELETE_REPRESENTATION
   }
     
@@ -1023,7 +1025,7 @@ public interface ModelService extends ModelObservable {
   Date retrievePreservationMetadataCreationDate(PreservationMetadata pm)
     throws RequestNotValidException, GenericException;
 
-  void updateOriginalMETS(String aipId, String representationId, ModelService.JobName jobName)
+  void updateOriginalMETS(IsRODAObject object1, IsRODAObject object2, ModelService.JobName jobName)
     throws
 		AuthorizationDeniedException,
 		GenericException,

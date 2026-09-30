@@ -154,6 +154,8 @@ import org.roda.core.model.utils.ResourceListUtils;
 import org.roda.core.model.utils.ResourceParseUtils;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.base.ingest.PermissionUtils;
+import org.roda.core.plugins.base.originalmets.CreateLogicalMETS;
+import org.roda.core.plugins.base.originalmets.CreateRepresentationMETS;
 import org.roda.core.plugins.base.originalmets.UpdateOriginalMETS;
 import org.roda.core.protocols.Protocol;
 import org.roda.core.storage.Binary;
@@ -673,9 +675,25 @@ public class DefaultModelService implements ModelService {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     StoragePath aipPath = ModelUtils.getAIPStoragePath(aipId);
-    storage.deleteResource(aipPath);
     
-    updateOriginalMETS(aipId, null, ModelService.JobName.DELETE_AIP);
+    AIP aip = this.retrieveAIP(aipId);
+    AIP aip2 = null;
+    AIP parentAip = null;
+    if (aip.getParentId() != null) {
+		aip2 = new AIP();
+		aip2.setId(aipId);
+		parentAip = new AIP();
+		parentAip.setId(aip.getParentId());
+    }
+    
+    storage.deleteResource(aipPath);
+    aip = null;
+    
+    if (parentAip != null) {
+    	updateOriginalMETS(aip2, parentAip, ModelService.JobName.DELETE_AIP);
+    	aip2 = null;
+        parentAip = null;
+    }
     
     notifyAipDeleted(aipId).failOnError();
   }
@@ -1299,8 +1317,14 @@ public class DefaultModelService implements ModelService {
     for (Iterator<Representation> it = aip.getRepresentations().iterator(); it.hasNext();) {
       Representation representation = it.next();
       if (representation.getId().equals(representationId)) {
+    	Representation representation2 = new Representation();
+    	representation2.setId(representationId);
+    	
         it.remove();
-        updateOriginalMETS(aipId, representation.getId(), ModelService.JobName.DELETE_REPRESENTATION);
+ 
+        updateOriginalMETS(aip, representation2, ModelService.JobName.DELETE_REPRESENTATION);
+        representation2 = null;
+        
         break;
       }
     }
@@ -5871,48 +5895,47 @@ public class DefaultModelService implements ModelService {
   }
   
   @Override
-  public void updateOriginalMETS(String aipId, String representationId, ModelService.JobName jobName)
+  public void updateOriginalMETS(IsRODAObject object1, IsRODAObject object2, ModelService.JobName jobName)
     throws 
     	AuthorizationDeniedException, 
     	GenericException,
     	NotFoundException,
     	RequestNotValidException {
   
-	  if (jobName == ModelService.JobName.DELETE_AIP) { 
-		  updateOriginalMETSAipDeleted(aipId);
+	  if (jobName == ModelService.JobName.CREATE_AIP) {
+		  if (object1 instanceof AIP) {
+			  LOGGER.debug("updateOriginalMETS -> CreateLogicalMETS.create (manually created) (" + object1.getId()+ ")");
+			  CreateLogicalMETS.create((AIP) object1, this);
+		  }
+		
+	  } else if (jobName == ModelService.JobName.DELETE_AIP) { 
+		  updateOriginalMETSAipDeleted(object1.getId(), object2.getId());
+		  
+	  } else if (jobName == ModelService.JobName.CREATE_REPRESENTATION) {
+		  if (object1 instanceof Representation) {
+			  LOGGER.debug("updateOriginalMETS -> CreateRepresentationMETS.create (manually created) (" + object1.getId() + ")");
+			  CreateRepresentationMETS.create((Representation) object1, this);
+		  }
 		  
 	  } else if (jobName == ModelService.JobName.DELETE_REPRESENTATION) {
-		  updateOriginalMETSRepresentationDeleted(aipId, representationId);
+		  updateOriginalMETSRepresentationDeleted(object1.getId(), object2.getId());
 	  }
   }
   
-  private void updateOriginalMETSAipDeleted(String aipId)
+  private void updateOriginalMETSAipDeleted(String aipId, String parentAipId)
     throws 
 	    AuthorizationDeniedException, 
 	    GenericException,
 	    NotFoundException,
 	    RequestNotValidException {
 	  
-	LOGGER.debug("updateOriginalMETSAipDeleted -> UpdateOriginalMETS.handleParentWhenRemovedAIP ( {} )", aipId);
+	LOGGER.debug("updateOriginalMETSAipDeleted -> UpdateOriginalMETS.handleParentWhenRemovedAIP (aipId {} and parentAipId {})", aipId, parentAipId);
 	
 	try {
-		UpdateOriginalMETS.handleParentWhenRemovedAIP(this, aipId);
+		UpdateOriginalMETS.handleParentWhenRemovedAIP(this, aipId, parentAipId);
 	
-	} catch (IOException e) {
-		throw new GenericException(e.getMessage(), e.getCause());
-		
-	} catch (IPException e) {
-		throw new GenericException(e.getMessage(), e.getCause());
-		
-	} catch (JAXBException e) {
-		throw new GenericException(e.getMessage(), e.getCause());
-		
-	} catch (NotFoundException | NullPointerException e) {
-		// It,s fine, none parent...
-		LOGGER.debug("updateOriginalMETSAipDeleted - It,s fine, none parent...");
-		
-	} catch (SAXException e) {
-		throw new GenericException(e.getMessage(), e.getCause());
+	} catch (IOException | IPException | JAXBException | SAXException e) {
+		throw new GenericException(e.getMessage(), e.getCause());	
 	}	  
   }
   
@@ -5923,22 +5946,13 @@ public class DefaultModelService implements ModelService {
 	    NotFoundException,
 	    RequestNotValidException {
 	  
-	LOGGER.debug("updateOriginalMETSRepresentationDeleted -> UpdateOriginalMETS.handleMETSWhenRemovedRepresentation ( {} and {}", aipId, representationId);
+	LOGGER.debug("updateOriginalMETSRepresentationDeleted -> UpdateOriginalMETS.handleMETSWhenRemovedRepresentation (aipId {} and representationId {})", aipId, representationId);
 	
 	try {
 		UpdateOriginalMETS.handleMETSWhenRemovedRepresentation(this, aipId, representationId);
 	
-	} catch (IOException e) {
-		throw new GenericException(e.getMessage(), e.getCause());
-		
-	} catch (IPException e) {
-		throw new GenericException(e.getMessage(), e.getCause());
-		
-	} catch (JAXBException e) {
-		throw new GenericException(e.getMessage(), e.getCause());
-		
-	} catch (SAXException e) {
-		throw new GenericException(e.getMessage(), e.getCause());
+	} catch (IOException | IPException | JAXBException | SAXException  e) {
+		throw new GenericException(e.getMessage(), e.getCause());	
 	}	  
   }
 }

@@ -64,7 +64,7 @@ public class CreateRepresentationMETS {
 
 			try {
 			    // Bad test but necessary
-			    RodaCoreFactory.getStorageService().getBinary(path);
+				modelService.getStorage().getBinary(path);
 				return;
 
 			} catch (NotFoundException e) {

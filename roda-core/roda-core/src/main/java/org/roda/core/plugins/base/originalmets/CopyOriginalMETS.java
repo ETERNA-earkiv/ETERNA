@@ -82,8 +82,6 @@ public class CopyOriginalMETS {
                 .getMetsHdr()
                 .setLASTMODDATE(OriginalMETSUtils.currentDateAndTime());
 
-            //metsWrapper.getMets().getMetsHdr().setRECORDSTATUS("Complete");
-
             metsWrapper.getMets().setPROFILE(PROFILE);
 
             METSUtils.marshallMETS(mets, metsPath, true);

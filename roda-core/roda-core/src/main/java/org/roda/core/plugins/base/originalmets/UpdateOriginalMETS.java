@@ -219,10 +219,6 @@ public class UpdateOriginalMETS {
                     .toFile();
 
                 if (file.exists()) {
-                	if (pm.getFileDirectoryPath() != null) {
-                		
-                	}
-                	
                     String relativeFilePath =
                         IPConstants.METADATA +
                         java.io.File.separator +
@@ -602,7 +598,8 @@ public class UpdateOriginalMETS {
     // HANDLE PARENT WHEN REMOVED AIP
     public static void handleParentWhenRemovedAIP(
         ModelService modelService,
-        String removedAipId
+        String removedAipId,
+        String parentAipId
     )
         throws 
         	AuthorizationDeniedException, 
@@ -623,7 +620,6 @@ public class UpdateOriginalMETS {
             return;
         }
         
-        String parentAipId = modelService.retrieveAIP(removedAipId).getParentId();
         removeDescendentFromParent(modelService, removedAipId, parentAipId);
     }
 
@@ -736,12 +732,12 @@ public class UpdateOriginalMETS {
         mptr.setLOCTYPE("URL");
         mptr.setOTHERLOCTYPE("UUID");
         mptr.setType("simple");
-        mptr.setHref(REPRESENTATIONS.toLowerCase() + java.io.File.separator + representation.getId() + java.io.File.separator + IPConstants.METS_FILE);
+        mptr.setHref(REPRESENTATIONS.toLowerCase() + "/" + representation.getId() + "/" + IPConstants.METS_FILE);
         mptr.setTitle("UUID-" + UUID.randomUUID());
         
         DivType dt = new DivType();
         dt.setID("uuid-" + UUID.randomUUID().toString());
-        dt.setLABEL(REPRESENTATIONS + java.io.File.separator + representation.getId());
+        dt.setLABEL(REPRESENTATIONS + "/" + representation.getId());
         dt.getMptr().add(mptr);
         structMapType.setDiv(dt);
         metsWrapper.getMets().getStructMap().add(structMapType);
@@ -749,7 +745,7 @@ public class UpdateOriginalMETS {
         FileType.FLocat flocat = new FileType.FLocat();
         flocat.setID("uuid-" + UUID.randomUUID().toString());
         flocat.setType("simple");
-        flocat.setHref(REPRESENTATIONS.toLowerCase() + java.io.File.separator + representation.getId() + java.io.File.separator + IPConstants.METS_FILE);
+        flocat.setHref(REPRESENTATIONS.toLowerCase() + "/" + representation.getId() + "/" + IPConstants.METS_FILE);
         flocat.setLOCTYPE("URL");
         
         java.io.File file = modelService
@@ -774,7 +770,7 @@ public class UpdateOriginalMETS {
         
         FileSec.FileGrp fileGroup = new FileSec.FileGrp();
         fileGroup.setID("uuid-" + UUID.randomUUID().toString());
-        fileGroup.setUSE(REPRESENTATIONS + java.io.File.separator + representation.getId());
+        fileGroup.setUSE(REPRESENTATIONS + "/" + representation.getId());
         fileGroup.getFile().add(fileType);
         
         if (metsWrapper.getMets().getFileSec() == null) {
@@ -811,7 +807,7 @@ public class UpdateOriginalMETS {
         
         boolean doJob = false;
         
-        List<StructMapType> structMapTypeList = getStructMapList(metsWrapper, REPRESENTATION);
+        List<StructMapType> structMapTypeList = findStructMap(metsWrapper, REPRESENTATION);
         Optional<StructMapType> st = structMapTypeList
         	.stream()
         	.filter(s -> s.getDiv().getLABEL().endsWith(representationId))
@@ -826,7 +822,7 @@ public class UpdateOriginalMETS {
         if (fileSec != null) {
         	Optional<FileGrp> fG = fileSec.getFileGrp()
         		.stream()
-        		.filter(fg -> fg.getUSE().startsWith(REPRESENTATIONS) && fg.getUSE().endsWith(representationId))
+        		.filter(fg -> fg.getUSE().equals(REPRESENTATIONS + "/" + representationId))
         		.findFirst();
         	
         	if (fG.isPresent()) {

@@ -48,7 +48,6 @@ import org.roda.core.plugins.base.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.base.maintenance.ChangeRepresentationStatusPlugin;
 import org.roda.core.plugins.base.maintenance.ChangeTypePlugin;
 import org.roda.core.plugins.base.maintenance.DeleteRODAObjectPlugin;
-import org.roda.core.plugins.base.originalmets.CreateRepresentationMETS;
 import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.common.model.RequestContext;
@@ -125,9 +124,7 @@ public class RepresentationService {
     try {
       Representation representation = model.createRepresentation(aipId, representationId, true, type, true,
         user.getName());
-      
-      LOGGER.debug("createRepresentation (manually created) (" + representation.getId() + ")");
-      CreateRepresentationMETS.create(representation, model);
+      model.updateOriginalMETS(representation, null, ModelService.JobName.CREATE_REPRESENTATION);
 
       List<LinkingIdentifier> targets = new ArrayList<>();
       targets.add(PluginHelper.getLinkingIdentifier(aipId, representation.getId(),
