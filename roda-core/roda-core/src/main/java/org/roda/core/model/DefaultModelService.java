@@ -7,6 +7,8 @@
  */
 package org.roda.core.model;
 
+import jakarta.xml.bind.JAXBException;
+
 import static org.roda.core.common.DownloadUtils.ZIP_FILE_NAME_EXTENSION;
 import static org.roda.core.common.DownloadUtils.ZIP_MEDIA_TYPE;
 import static org.roda.core.common.DownloadUtils.ZIP_PATH_DELIMITER;
@@ -152,6 +154,7 @@ import org.roda.core.model.utils.ResourceListUtils;
 import org.roda.core.model.utils.ResourceParseUtils;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.base.ingest.PermissionUtils;
+import org.roda.core.plugins.base.originalmets.UpdateOriginalMETS;
 import org.roda.core.protocols.Protocol;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
@@ -176,8 +179,11 @@ import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.HTTPUtility;
 import org.roda.core.util.IdUtils;
 import org.roda.core.util.RESTClientUtility;
+import org.roda_project.commons_ip.utils.IPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.xml.sax.SAXException;
 
 /**
  * Class that "relates" Model & Storage
@@ -374,7 +380,6 @@ public class DefaultModelService implements ModelService {
     } else {
       throw new ValidationException(validationReport);
     }
-
     return aip;
   }
 
@@ -418,7 +423,6 @@ public class DefaultModelService implements ModelService {
     if (notify) {
       notifyAipCreated(aip).failOnError();
     }
-
     return aip;
   }
 
@@ -670,6 +674,9 @@ public class DefaultModelService implements ModelService {
 
     StoragePath aipPath = ModelUtils.getAIPStoragePath(aipId);
     storage.deleteResource(aipPath);
+    
+    updateOriginalMETS(aipId, null, ModelService.JobName.DELETE_AIP);
+    
     notifyAipDeleted(aipId).failOnError();
   }
 
@@ -1293,6 +1300,7 @@ public class DefaultModelService implements ModelService {
       Representation representation = it.next();
       if (representation.getId().equals(representationId)) {
         it.remove();
+        updateOriginalMETS(aipId, representation.getId(), ModelService.JobName.DELETE_REPRESENTATION);
         break;
       }
     }
@@ -5860,5 +5868,77 @@ public class DefaultModelService implements ModelService {
     throws RequestNotValidException, GenericException {
     StoragePath storagePath = DefaultStoragePath.parse(ModelUtils.getStoragePath(lite), pathPartials);
     return getStorage().exists(storagePath);
+  }
+  
+  @Override
+  public void updateOriginalMETS(String aipId, String representationId, ModelService.JobName jobName)
+    throws 
+    	AuthorizationDeniedException, 
+    	GenericException,
+    	NotFoundException,
+    	RequestNotValidException {
+  
+	  if (jobName == ModelService.JobName.DELETE_AIP) { 
+		  updateOriginalMETSAipDeleted(aipId);
+		  
+	  } else if (jobName == ModelService.JobName.DELETE_REPRESENTATION) {
+		  updateOriginalMETSRepresentationDeleted(aipId, representationId);
+	  }
+  }
+  
+  private void updateOriginalMETSAipDeleted(String aipId)
+    throws 
+	    AuthorizationDeniedException, 
+	    GenericException,
+	    NotFoundException,
+	    RequestNotValidException {
+	  
+	LOGGER.debug("updateOriginalMETSAipDeleted -> UpdateOriginalMETS.handleParentWhenRemovedAIP ( {} )", aipId);
+	
+	try {
+		UpdateOriginalMETS.handleParentWhenRemovedAIP(this, aipId);
+	
+	} catch (IOException e) {
+		throw new GenericException(e.getMessage(), e.getCause());
+		
+	} catch (IPException e) {
+		throw new GenericException(e.getMessage(), e.getCause());
+		
+	} catch (JAXBException e) {
+		throw new GenericException(e.getMessage(), e.getCause());
+		
+	} catch (NotFoundException | NullPointerException e) {
+		// It,s fine, none parent...
+		LOGGER.debug("updateOriginalMETSAipDeleted - It,s fine, none parent...");
+		
+	} catch (SAXException e) {
+		throw new GenericException(e.getMessage(), e.getCause());
+	}	  
+  }
+  
+  private void updateOriginalMETSRepresentationDeleted(String aipId, String representationId)
+    throws 
+	    AuthorizationDeniedException, 
+	    GenericException,
+	    NotFoundException,
+	    RequestNotValidException {
+	  
+	LOGGER.debug("updateOriginalMETSRepresentationDeleted -> UpdateOriginalMETS.handleMETSWhenRemovedRepresentation ( {} and {}", aipId, representationId);
+	
+	try {
+		UpdateOriginalMETS.handleMETSWhenRemovedRepresentation(this, aipId, representationId);
+	
+	} catch (IOException e) {
+		throw new GenericException(e.getMessage(), e.getCause());
+		
+	} catch (IPException e) {
+		throw new GenericException(e.getMessage(), e.getCause());
+		
+	} catch (JAXBException e) {
+		throw new GenericException(e.getMessage(), e.getCause());
+		
+	} catch (SAXException e) {
+		throw new GenericException(e.getMessage(), e.getCause());
+	}	  
   }
 }

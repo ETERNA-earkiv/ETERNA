@@ -4440,4 +4440,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       }
     }
   }
+
+  @Override
+  public void updateOriginalMETS(String aipId, String representationId, ModelService.JobName jobName)
+    throws
+		AuthorizationDeniedException,
+		GenericException,
+		NotFoundException,
+		RequestNotValidException
+  {
+	  // NOT USED ANYMORE
+  }
 }

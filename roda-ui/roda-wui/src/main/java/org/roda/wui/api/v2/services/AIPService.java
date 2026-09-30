@@ -333,8 +333,8 @@ public class AIPService {
     AlreadyExistsException {
     User user = requestContext.getUser();
     ModelService model = requestContext.getModelService();
-    //return model.createAIP(parentAipId, type, permissions, user.getName(), null);
     AIP aip = model.createAIP(parentAipId, type, permissions, user.getName(), null);
+    LOGGER.debug("createAIP -> CreateLogicalMETS.create (manually created) (" + aip.getId() + ")");
     CreateLogicalMETS.create(aip, model);
     return aip;
   }

@@ -120,10 +120,9 @@ public class IndexModelObserver implements ModelObserver {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
     try {
       List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
-
       indexAIP(aip, ancestors).addTo(ret);
       if (ret.isEmpty()) {
-        indexRepresentations(aip, ancestors).addTo(ret);
+        indexRepresentations(aip, ancestors).addTo(ret); 
         if (ret.isEmpty()) {
           indexPreservationsEvents(aip.getId(), null).addTo(ret);
           if (ret.isEmpty()) {
@@ -842,18 +841,6 @@ public class IndexModelObserver implements ModelObserver {
     if (deleteIncidences) {
       deleteDocumentsFromIndex(RiskIncidence.class, RodaConstants.RISK_INCIDENCE_AIP_ID, aipId).addTo(ret);
     }
-	
-    try {
-      String parentAipId = model.retrieveAIP(aipId).getParentId();
-      if (ret.getExceptions().isEmpty() && parentAipId != null) {
-        UpdateOriginalMETS.handleParentWhenRemovedAIP(model, aipId, parentAipId);
-      }
-    } catch (NotFoundException e) {
-      LOGGER.debug("AIP {} already removed from storage, skipping parent METS update", aipId);
-    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | IOException | IPException | JAXBException | SAXException e) {
-      LOGGER.error("Failed to update parentAIP when removing AIP", e);
-      ret.add(e);
-    }
 
     if (ret.isEmpty()) {
       try {
@@ -961,18 +948,19 @@ public class IndexModelObserver implements ModelObserver {
       List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
 
       indexRepresentation(aip, representation, ancestors).addTo(ret);
+      
       if (ret.isEmpty()) {
         indexPreservationsEvents(aip.getId(), representation.getId()).addTo(ret);
-        
         CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadata = model.listPreservationMetadata(aip.getId(), representation.getId());
         for (OptionalWithCause<PreservationMetadata> opm : preservationMetadata) {
           if (opm.isPresent()) {
             PreservationMetadata pm = opm.get();
             if (PreservationMetadataType.REPRESENTATION.equals(pm.getType())) {
+              LOGGER.debug("representationCreated -> UpdateOriginalMETS.handleRepresentation ( {} )", pm.getId());
               UpdateOriginalMETS.handleRepresentation(representation.getAipId(), representation.getId(), IdUtils.getRepresentationId(representation.getAipId(), representation.getId()), model);
             }
           }
-        }        
+        }
 
         if (aip.getRepresentations().size() == 1) {
           SolrUtils.update(index, IndexedAIP.class, aip.getId(),
@@ -1148,11 +1136,12 @@ public class IndexModelObserver implements ModelObserver {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
     PreservationMetadataType type = pm.getType();
-    
+
     if (pm != null && pm.getAipId() != null && pm.getId() != null) {
+      LOGGER.debug("preservationMetadataCreated -> UpdateOriginalMETS.update ( {} )", pm.getId());
       UpdateOriginalMETS.update(pm, model);
     }
-    
+
     if (PreservationMetadataType.EVENT.equals(type)) {
       indexPreservationEvent(pm).addTo(ret);
     } else if (PreservationMetadataType.AGENT.equals(type)) {
