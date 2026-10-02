@@ -370,9 +370,17 @@ public class BulkUpdateDescriptiveMetadataPlugin extends AbstractPlugin<AIP> {
     return new BulkUpdateDescriptiveMetadataPlugin();
   }
 
+  /**
+   * Massredigering är en användarinitierad arkivvårdsåtgärd och ska därför
+   * listas under Bevarande → Åtgärder (som t.ex. ExportAIPPlugin och
+   * FixAncestorsPlugin) och kunna väljas i "Nytt jobb". Med INTERNAL hamnar
+   * jobben enbart under Administration → Interna åtgärder, eftersom
+   * ActionProcess filtrerar bort INTERNAL/INGEST och CreateDefaultJob
+   * utesluter INTERNAL.
+   */
   @Override
   public PluginType getType() {
-    return PluginType.INTERNAL;
+    return PluginType.AIP_TO_AIP;
   }
 
   @Override
