@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test';
 import type { EternaClient } from '../../src/client';
+import { NO_OUTCOME_OBJECT_ID } from '../../src/ingest';
 import { FINAL_JOB_STATES, findStep, waitForJob, waitForReports } from '../../src/jobs';
 import type { Report } from '../../src/types';
 
-const NO_OUTCOME_OBJECT_ID = 'NO_OUTCOME_ID';
 const report = (overrides: Partial<Report>): Report => ({
   id: 'r',
   jobId: 'j',

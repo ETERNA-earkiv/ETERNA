@@ -1,4 +1,3 @@
-import { request, type APIRequestContext, type APIResponse } from '@playwright/test';
 import type { FilterParameter } from './filters';
 import type { IndexResult, TransferredResource } from './types';
 
@@ -47,13 +46,38 @@ export function parseJsonBody<T>(method: string, url: string, status: number, te
   }
 }
 
+export interface RawResponse {
+  status: number;
+  body: Buffer;
+}
+
+interface Reply extends RawResponse {
+  url: string;
+}
+
+/** Bygger på Nodes inbyggda fetch, så Playwright inte loggar anropen (och lösenordet) i sin rapport. */
 export class EternaClient {
-  private constructor(private readonly http: APIRequestContext) {}
+  private constructor(
+    private readonly baseURL: string,
+    private readonly authorization: string,
+  ) {}
+
+  static async create(baseURL: string, user: string, password: string): Promise<EternaClient> {
+    return new EternaClient(baseURL.replace(/\/+$/, ''), basicAuth(user, password));
+  }
+
+  async dispose(): Promise<void> {}
 
   /** Alla råa anrop går hit så att inloggningsuppgifter aldrig följer med i kastade fel. */
-  private async send<T>(fn: () => Promise<T>): Promise<T> {
+  private async send(method: string, path: string, init: { headers?: Record<string, string>; body?: BodyInit } = {}): Promise<Reply> {
+    const url = `${this.baseURL}${path}`;
     try {
-      return await fn();
+      const response = await fetch(url, {
+        method,
+        body: init.body,
+        headers: { Authorization: this.authorization, Accept: 'application/json', ...init.headers },
+      });
+      return { url, status: response.status, body: Buffer.from(await response.arrayBuffer()) };
     } catch (error) {
       if (error instanceof Error) {
         error.message = redactSecrets(error.message);
@@ -63,48 +87,41 @@ export class EternaClient {
     }
   }
 
-  static async create(baseURL: string, user: string, password: string): Promise<EternaClient> {
-    const http = await request.newContext({
-      baseURL,
-      extraHTTPHeaders: { Authorization: basicAuth(user, password), Accept: 'application/json' },
-    });
-    return new EternaClient(http);
-  }
-
-  dispose(): Promise<void> {
-    return this.http.dispose();
-  }
-
   async getJson<T>(path: string): Promise<T> {
-    return this.json<T>('GET', await this.send(() => this.http.get(path)));
+    return this.json<T>('GET', await this.send('GET', path));
   }
 
   async postJson<T>(path: string, data: unknown): Promise<T> {
-    return this.json<T>('POST', await this.send(() => this.http.post(path, { data })));
+    const reply = await this.send('POST', path, {
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    return this.json<T>('POST', reply);
   }
 
   async getBytes(path: string): Promise<Buffer> {
-    const response = await this.send(() => this.http.get(path, { headers: { Accept: '*/*' } }));
-    await this.ensureOk('GET', response);
-    return response.body();
+    const reply = await this.send('GET', path, { headers: { Accept: '*/*' } });
+    this.ensureOk('GET', reply);
+    return reply.body;
   }
 
   /** Råsvar utan statuskontroll, för tester som själva kontrollerar statuskoden. */
-  getRaw(path: string, headers?: Record<string, string>): Promise<APIResponse> {
-    return this.send(() => this.http.get(path, headers ? { headers } : undefined));
+  async getRaw(path: string, headers?: Record<string, string>): Promise<RawResponse> {
+    const { status, body } = await this.send('GET', path, { headers });
+    return { status, body };
   }
 
   async exists(path: string): Promise<boolean> {
-    const response = await this.send(() => this.http.get(path));
-    if (response.status() === 404) return false;
-    await this.ensureOk('GET', response);
+    const reply = await this.send('GET', path);
+    if (reply.status === 404) return false;
+    this.ensureOk('GET', reply);
     return true;
   }
 
   async deleteIfExists(path: string): Promise<void> {
-    const response = await this.send(() => this.http.delete(path));
-    if (response.status() === 404) return;
-    await this.ensureOk('DELETE', response);
+    const reply = await this.send('DELETE', path);
+    if (reply.status === 404) return;
+    this.ensureOk('DELETE', reply);
   }
 
   async find<T>(entity: Entity, parameters: FilterParameter[], max = 100): Promise<IndexResult<T>> {
@@ -116,26 +133,19 @@ export class EternaClient {
   }
 
   async upload(fileName: string, zip: Buffer): Promise<TransferredResource> {
-    const response = await this.send(() =>
-      this.http.post('/api/v2/transfers/create/resource', {
-        multipart: {
-          resource: { name: fileName, mimeType: 'application/zip', buffer: zip },
-          commit: 'true',
-        },
-      }),
-    );
-    return this.json<TransferredResource>('POST', response);
+    const form = new FormData();
+    form.append('resource', new Blob([new Uint8Array(zip)], { type: 'application/zip' }), fileName);
+    form.append('commit', 'true');
+    return this.json<TransferredResource>('POST', await this.send('POST', '/api/v2/transfers/create/resource', { body: form }));
   }
 
-  private async ensureOk(method: string, response: APIResponse): Promise<void> {
-    if (response.ok()) return;
-    const body = await response.text().catch(() => '<kunde inte läsa svaret>');
-    throw new ApiError(describeFailure(method, response.url(), response.status(), body), response.status());
+  private ensureOk(method: string, reply: Reply): void {
+    if (reply.status >= 200 && reply.status < 300) return;
+    throw new ApiError(describeFailure(method, reply.url, reply.status, reply.body.toString('utf8')), reply.status);
   }
 
-  private async json<T>(method: string, response: APIResponse): Promise<T> {
-    await this.ensureOk(method, response);
-    const text = await response.text();
-    return parseJsonBody<T>(method, response.url(), response.status(), text);
+  private json<T>(method: string, reply: Reply): T {
+    this.ensureOk(method, reply);
+    return parseJsonBody<T>(method, reply.url, reply.status, reply.body.toString('utf8'));
   }
 }
