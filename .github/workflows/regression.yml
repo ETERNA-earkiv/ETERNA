@@ -1,0 +1,96 @@
+name: 'Regression'
+
+on:
+  workflow_dispatch:
+    inputs:
+      eterna_image:
+        description: 'ETERNA-image (tom = förval i regression/env/docker-compose.yaml)'
+        required: false
+        default: ''
+      expected_version:
+        description: 'Förväntad git.build.version (tom = kontrolleras inte)'
+        required: false
+        default: ''
+      solr_image:
+        description: 'Solr-image (tom = förval)'
+        required: false
+        default: ''
+      zookeeper_image:
+        description: 'ZooKeeper-image (tom = förval)'
+        required: false
+        default: ''
+      clamav_image:
+        description: 'ClamAV-image (tom = förval)'
+        required: false
+        default: ''
+      siegfried_image:
+        description: 'Siegfried-image (tom = förval)'
+        required: false
+        default: ''
+      openldap_image:
+        description: 'OpenLDAP-image (tom = förval)'
+        required: false
+        default: ''
+  workflow_run:
+    workflows: ['Release']
+    types: [completed]
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  regression:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: regression
+    env:
+      # Efter en release testas den image som release-flödet just publicerade (taggen = v<version>).
+      ETERNA_IMAGE: ${{ github.event_name == 'workflow_run' && format('ghcr.io/eterna-earkiv/eterna:{0}', github.event.workflow_run.head_branch) || inputs.eterna_image }}
+      EXPECTED_VERSION: ${{ inputs.expected_version }}
+      SOLR_IMAGE: ${{ inputs.solr_image }}
+      ZOOKEEPER_IMAGE: ${{ inputs.zookeeper_image }}
+      CLAMAV_IMAGE: ${{ inputs.clamav_image }}
+      SIEGFRIED_IMAGE: ${{ inputs.siegfried_image }}
+      OPENLDAP_IMAGE: ${{ inputs.openldap_image }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Unit tests
+        run: bun run test:unit
+
+      - name: Regression (ephemeral stack)
+        run: ./scripts/regression.sh --project=smoke --project=core
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-report
+          path: |
+            regression/playwright-report
+            regression/test-results
+          if-no-files-found: ignore
