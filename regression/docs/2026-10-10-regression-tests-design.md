@@ -236,7 +236,7 @@ ETERNA_URL=https://stage.example ETERNA_PASSWORD=… bun run test:smoke
   `api-probes.md`.
 - `bun run test:smoke` fungerar mot en befintlig miljö med bara `ETERNA_URL` och
   inloggningsuppgifter.
-- `regression.yml` körs grönt via `workflow_dispatch`.
+- ~~`regression.yml` körs grönt via `workflow_dispatch`.~~ Uppskjutet: workflowen kräver att filen ligger på förvalda grenen (`main`). Beslut 2026-10-10: sviten körs lokalt tills vidare (se README, avsnittet CI).
 - README beskriver lokal körning, körning mot extern miljö, uppgraderingstest
   och vad som inte täcks.
 

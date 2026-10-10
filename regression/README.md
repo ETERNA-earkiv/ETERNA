@@ -119,7 +119,12 @@ stacken.
 
 ## CI
 
-`.github/workflows/regression.yml` körs manuellt (Actions → Regression → Run workflow,
-med valfria image-taggar) och automatiskt efter ett lyckat `Release`-flöde. Det
-blockerar inte releasen. `workflow_run` triggas bara om workflow-filen finns på
-repots förvalda gren.
+`.github/workflows/regression.yml` är förberedd för manuell körning (Actions →
+Regression → Run workflow, med valfria image-taggar) och för automatisk körning efter
+ett lyckat `Release`-flöde, utan att blockera releasen.
+
+**Inte aktiv än.** GitHub kör `workflow_dispatch` och `workflow_run` bara från
+workflow-filer på repots förvalda gren (`main`). Beslut 2026-10-10: sviten körs
+lokalt med `bun run regression` tills vidare. CI aktiveras genom att lägga in
+`regression.yml` på `main`. Den checkar ut den ref som testas, så själva testerna
+hämtas från `dev-1.x` eller release-taggen.
