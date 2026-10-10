@@ -14,17 +14,17 @@ Stack: images enligt `env/docker-compose.yaml`, ETERNA-version enligt `/version.
 | 3 | Fel lösenord ger 401, rätt ger 200 | Bekräftad | `admin:eterna` 200, `admin:fel` 401 (förutsätter att `InternalApiAuthFilter` är PÅ, se not 1) |
 | 4 | `POST /api/v2/jobs/count` ger 403 för admin, så sviten använder `find` | Avviker | `count` ger 200 `{"result":-1}` (inte 403, men värdet är oanvändbart). `jobs/find` ger 200 med `totalCount` och fungerar. Slutsatsen (använd `find`) står sig |
 | 5 | `GET /api/v2/members/users/{name}` har `type: "User"` | Bekräftad | `GET .../users/admin` ger `name` = `admin` och `type` = `User` (rökprovet `användaren kan läsas från LDAP`) |
-| 6 | Uppladdning ger `TransferredResource` med `uuid` | Bekräftas i uppgift 9 | |
-| 7 | Ingest av giltigt SIP: `COMPLETED`, 1 lyckat, rapportens `outcomeObjectId` = AIP-id | Bekräftas i uppgift 9 | |
-| 8 | `files/find` med `aipId` + `isDirectory=false` ger bara de två datafilerna, med `fileFormat.pronom` `x-fmt/111` och `fmt/101` | Bekräftas i uppgift 9 | |
-| 9 | Events med `aipID` innehåller `virus check`, `format identification`, `message digest calculation` med `SUCCESS` | Bekräftas i uppgift 9 | |
-| 10 | `GET /api/v2/aips/{id}/download` ger zip (`PK`) | Bekräftas i uppgift 9 | |
+| 6 | Uppladdning ger `TransferredResource` med `uuid` | Bekräftad | `POST /transfers/create/resource` (multipart `resource` + `commit=true`) ger `TransferredResource` med `uuid`, `id`, `name` (ingestflödet) |
+| 7 | Ingest av giltigt SIP: `COMPLETED`, 1 lyckat, rapportens `outcomeObjectId` = AIP-id | Bekräftad | Jobb `COMPLETED`, 1 lyckat, 0 misslyckade, exakt en AIP via rapportens `outcomeObjectId` (ingest ca 10-15 s totalt inkl. indexering) |
+| 8 | `files/find` med `aipId` + `isDirectory=false` ger bara de två datafilerna, med `fileFormat.pronom` `x-fmt/111` och `fmt/101` | Bekräftad | Exakt datafilerna, med `fileFormat.pronom` enligt `VALID_SIP_PRONOM` (`x-fmt/111`, `fmt/101`); inga METS-poster |
+| 9 | Events med `aipID` innehåller `virus check`, `format identification`, `message digest calculation` med `SUCCESS` | Bekräftad | Alla tre eventtyper finns med `eventOutcome` `SUCCESS` |
+| 10 | `GET /api/v2/aips/{id}/download` ger zip (`PK`) | Bekräftad | Svaret börjar med `PK` |
 | 11 | Användare skapad via API med `password: {"chars": ...}` kan logga in direkt | Bekräftas i uppgift 10 | |
 | 12 | Användare utan objektbehörighet: `find` utelämnar AIP:n, `find/{id}` och filnedladdning ger 403 | Bekräftas i uppgift 10 | |
 | 13 | SIP utan METS.xml: `COMPLETED`, 1 misslyckat, `outcomeObjectId` = `NO_OUTCOME_ID` | Bekräftas i uppgift 11 | |
 | 14 | EICAR: antivirussteget (plugin-klass innehåller `AntivirusPlugin`) har `FAILURE` | Bekräftas i uppgift 11 | |
 | 15 | EICAR: AIP skapas ändå och blir `ACTIVE` (virussteget `mandatory=false`) | Bekräftas i uppgift 11 | |
-| 16 | Radering av AIP och transfer via `POST .../delete` ger ett jobb som når `COMPLETED` | Bekräftas i uppgift 9 (rökproven skapar ingen data, så städningen körs först där) | |
+| 16 | Radering av AIP och transfer via `POST .../delete` ger ett jobb som når `COMPLETED` | Bekräftad | Städningen via `POST .../delete` nådde `COMPLETED`; efter körning ger sökning på `regtest*` `totalCount` 0 (med `KEEP_DATA=1` 1) |
 
 ## Noter om stacken
 
