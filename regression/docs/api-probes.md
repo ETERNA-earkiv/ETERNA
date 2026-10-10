@@ -48,4 +48,32 @@ Stack: images enligt `env/docker-compose.yaml`, ETERNA-version enligt `/version.
 
 ## Komponenttäckning
 
-Fylls i under uppgift 14: vilket test som fallerar när respektive container stoppas.
+Verifierat 2026-10-10 mot regressionsstacken (port 18080): en komponent stoppades i taget, sviten kördes
+(`JOB_TIMEOUT_MS=120000`), komponenten startades och stacken återhämtades innan nästa. Alla fyra
+komponenterna gav minst ett fallerande test, så inga hål i täckningen hittades.
+
+| Komponent | Test som fallerade | Felmeddelande |
+|---|---|---|
+| ClamAV (`clamd`) | `preservation.spec.ts` › event "virus check" (ClamAV) har utfallet SUCCESS | `Expected ["SUCCESS"] / Received ["FAILURE"]` |
+| ClamAV (`clamd`) | `negative.spec.ts` › EICAR › ClamAV hittar viruset och virus check-eventet får FAILURE | `Expected substring: "Eicar-Test-Signature FOUND" / Received string: ""` |
+| ClamAV (`clamd`) | `ingest.spec.ts` › giltigt SIP ingestas utan fel och ger exakt en AIP | `sourceObjectsProcessedWithSuccess: Expected 1 / Received 0` |
+| Siegfried (`siegfried`) | `aip.spec.ts` › datafilerna finns och har förväntat PRONOM-ID (Siegfried) | `{"document.txt": null, "record.xml": null}` i stället för `x-fmt/111` / `fmt/101` |
+| Siegfried (`siegfried`) | `preservation.spec.ts` › event "format identification" (Siegfried) har utfallet SUCCESS | `Expected ["SUCCESS"] / Received ["FAILURE"]` |
+| Siegfried (`siegfried`) | `ingest.spec.ts` › giltigt SIP ingestas utan fel och ger exakt en AIP | `sourceObjectsProcessedWithSuccess: Expected 1 / Received 0` |
+| OpenLDAP (`openldap`) | `auth.spec.ts` › rätt lösenord ger den inloggade användaren | `ApiError: GET /api/v2/members/users/authenticated → 401` |
+| OpenLDAP (`openldap`) | `auth.spec.ts` › användaren kan läsas från LDAP | `ApiError: GET /api/v2/members/users/admin → 401` |
+| OpenLDAP (`openldap`) | `health.spec.ts` › ETERNA svarar UP på /actuator/health | `Expected: 200 / Received: 503` |
+| OpenLDAP (`openldap`) | `index.spec.ts` › find på aips/jobs/transfers | `ApiError: POST /api/v2/<typ>/find → 401` (ingen inloggning utan LDAP) |
+| Solr (`solr`) | `index.spec.ts` › find på aips / jobs / transfers ger ett giltigt IndexResult (Solr) | `ApiError: POST /api/v2/<typ>/find → 400` |
+
+Med Solr nere fallerar bara `index.spec.ts` (auth och health förblir gröna). Med ClamAV/Siegfried nere
+fallerar kärnflödet utan att hänga: jobbet slutförs men med FAILURE-event.
+
+Återhämtning efter `start`:
+- `clamd`, `siegfried`: ETERNA återhämtade sig direkt, `test:smoke` grön.
+- `openldap`: containern blev healthy, men första `test:smoke` direkt efteråt var fortfarande röd
+  (401 och `/actuator/health` 503; ETERNA behöll sannolikt döda LDAP-anslutningar). Ett senare smoke-körning
+  (några minuter) var grön utan omstart av ETERNA. Vänta därför/polla innan smoke efter en LDAP-omstart.
+- `solr`: ETERNA återhämtade sig utan omstart, smoke grön direkt efter att Solr blev healthy.
+  Med Solr stoppad tar smoke-körningen ca 3 min (retries mot timeouts).
+- Ingen komponent krävde `down.sh`/`up.sh`.
