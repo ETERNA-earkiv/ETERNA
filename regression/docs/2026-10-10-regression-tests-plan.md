@@ -10,6 +10,8 @@
 
 **Spec:** [2026-10-10-regression-tests-design.md](2026-10-10-regression-tests-design.md)
 
+> **Ändrat efter kodgranskning av uppgift 1–5 (commit `8a72db4d5`):** koden i uppgift 3–5 nedan visar den ursprungliga versionen. Den committade koden har dessutom: `redactSecrets` och privat `http` ersatt av Nodes inbyggda `fetch` (så att inga headers hamnar i Playwrights rapport), publik `getRaw(path, headers?)` som ger `{ status, body }` i `client.ts`, `Cleanup.trackIngestJob` (ersätter `trackAip`; AIP:er hittas via `ingestJobId` vid städning), `waitForReports` som kastar vid timeout, validering av filnamn i `sip.ts` och scheman från `commons-ip/src/main/resources/schemas2/`. Uppgift 6 och framåt bygger på den committade koden.
+
 ---
 
 ## Bakgrund för den som genomför planen
@@ -643,7 +645,7 @@ SIP-formatet är en port av `/home/jerry/Git/eterna-stack/test-data/create_sip.p
 
 ```bash
 mkdir -p regression/fixtures/schemas
-cp ../commons-ip/src/test/resources/validation/Simple-EARK-SIP/schemas/{mets1_12.xsd,xlink.xsd,DILCISExtensionMETS.xsd,DILCISExtensionSIPMETS.xsd} regression/fixtures/schemas/
+cp ../commons-ip/src/main/resources/schemas2/{mets1_12.xsd,xlink.xsd,DILCISExtensionMETS.xsd,DILCISExtensionSIPMETS.xsd} regression/fixtures/schemas/
 ls regression/fixtures/schemas
 ```
 Förväntat: de fyra filerna listas.
@@ -1612,7 +1614,7 @@ export const test = base.extend<object, WorkerFixtures>({
       await use(cleanup);
       if (!cfg.keepData) await cleanup.run(admin, poll(cfg));
     },
-    { scope: 'worker', timeout: CONFIG.jobTimeoutMs * 2 },
+    { scope: 'worker', timeout: CONFIG.jobTimeoutMs * 2 + 60_000 },
   ],
   // Det giltiga SIP:et ingestas en gång per worker och delas av alla kärnflödestester.
   validIngest: [
@@ -1705,8 +1707,8 @@ test('rätt lösenord ger den inloggade användaren', async ({ admin, cfg }) => 
 test('fel lösenord ger 401', async ({ cfg }) => {
   const client = await EternaClient.create(cfg.url, cfg.user, `fel-${Date.now()}`);
   try {
-    const response = await client.http.get('/api/v2/members/users/authenticated');
-    expect(response.status()).toBe(401);
+    const response = await client.getRaw('/api/v2/members/users/authenticated');
+    expect(response.status).toBe(401);
   } finally {
     await client.dispose();
   }
@@ -1952,8 +1954,8 @@ test.describe('användare med läsroller men utan objektbehörighet', () => {
   });
 
   test('får 403 när AIP:n hämtas direkt', async ({ validIngest }) => {
-    const response = await outsider.http.get(`/api/v2/aips/find/${encodeURIComponent(requireAip(validIngest))}`);
-    expect(response.status()).toBe(403);
+    const response = await outsider.getRaw(`/api/v2/aips/find/${encodeURIComponent(requireAip(validIngest))}`);
+    expect(response.status).toBe(403);
   });
 
   test('får 403 vid filnedladdning', async ({ admin, validIngest }) => {
@@ -1962,10 +1964,10 @@ test.describe('användare med läsroller men utan objektbehörighet', () => {
       [equals('aipId', requireAip(validIngest)), equals('isDirectory', 'false')],
       1,
     );
-    const response = await outsider.http.get(`/api/v2/files/${encodeURIComponent(files.results[0].uuid)}/download`, {
-      headers: { Accept: '*/*' },
+    const response = await outsider.getRaw(`/api/v2/files/${encodeURIComponent(files.results[0].uuid)}/download`, {
+      Accept: '*/*',
     });
-    expect(response.status()).toBe(403);
+    expect(response.status).toBe(403);
   });
 });
 ```
