@@ -78,7 +78,7 @@ ETERNA_URL=https://stage.example ETERNA_USER=admin ETERNA_PASSWORD=… bun run t
 ```
 
 Rökproven skapar ingen data. `test:core` skapar AIP:er, transfers och en
-testanvändare, märkta med ett körnings-ID (`regtest<tidsstämpel>`), och tar bort dem
+testanvändare, märkta med ett körnings-ID (`regtest<tidsstämpel><4 hextecken>`), och tar bort dem
 efteråt. Kör `test:core` mot en delad miljö bara om det är okej att den får tillfälliga
 testobjekt. Inställningarna kan också läggas i `.env` (se `.env.example`).
 
@@ -110,7 +110,12 @@ stacken.
   Testet rapporteras som "expected to fail" och larmar när beteendet ändras. Se
   `docs/api-probes.md`, rad 15.
 - `GET /api/v2/members/users/{name}` ger 200 med `id: null` för en användare som inte
-  finns, inte 404. Sviten kontrollerar därför `id`. Se `docs/api-probes.md`, rad 11 och 12.
+  finns, inte 404. Den som verifierar att en användare är borttagen måste kontrollera
+  `id`, inte statuskoden. Se `docs/api-probes.md`, rad 11.
+- Om ett kärntest fallerar startar Playwright om workern, och då körs den delade
+  ingesten om (nytt körnings-ID). Följdfel efter det första felet är därför ofta
+  brus: titta alltid på det första felet. I CI avbryts körningen efter fem fel
+  (`maxFailures`) och jobb får högst 5 minuter (`JOB_TIMEOUT_MS`).
 
 ## CI
 

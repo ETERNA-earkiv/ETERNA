@@ -37,9 +37,8 @@ Stack: images enligt `env/docker-compose.yaml`, ETERNA-version enligt `/version.
    `up.sh` väntar dessutom på loggraden "Started RODA" (health blir UP före det).
    Anropa aldrig `/api/*` innan RODA startat. Loggraden "InternalApiAuthFilter is ON"
    finns i `/roda/log/*.log` i containern (inte i `docker logs`).
-   Racet reproducerades utanför regressionsstacken: användarens andra stack
-   `eterna_sie5_2` (v1.0.0, imagens healthcheck) observerades 2026-10-10 av controllern med
-   health DOWN och fel lösenord som gav 200. Den stacken är orörd.
+   Samma beteende observerades 2026-10-10 i en annan lokal v1.0.0-stack som använde
+   imagens egen healthcheck: health DOWN och fel lösenord gav 200.
 2. **Ingen PostgreSQL.** Deploy-compose kör utan PostgreSQL (utkommenterad), och
    regressionsstacken speglar det. Utan databas blir `/actuator/health` DOWN efter 30 s
    (DB-indikatorn), därför sätts `MANAGEMENT_HEALTH_DB_ENABLED=false`. Appen fungerar utan

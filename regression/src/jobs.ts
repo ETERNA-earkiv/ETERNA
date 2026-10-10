@@ -64,13 +64,3 @@ export async function waitForReports(
     await sleep(pollMs);
   }
 }
-
-/** Söker rekursivt efter det första delsteget vars plugin-klass innehåller `pluginFragment`. */
-export function findStep(reports: Report[], pluginFragment: string): Report | undefined {
-  for (const report of reports) {
-    if (report.plugin?.includes(pluginFragment)) return report;
-    const nested = findStep(report.reports ?? [], pluginFragment);
-    if (nested) return nested;
-  }
-  return undefined;
-}

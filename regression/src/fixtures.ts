@@ -41,9 +41,7 @@ export const test = base.extend<object, WorkerFixtures>({
   ],
   admin: [
     async ({ cfg }, use) => {
-      const client = await EternaClient.create(cfg.url, cfg.user, cfg.password);
-      await use(client);
-      await client.dispose();
+      await use(EternaClient.create(cfg.url, cfg.user, cfg.password));
     },
     { scope: 'worker' },
   ],

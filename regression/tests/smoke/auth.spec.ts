@@ -10,13 +10,9 @@ test('rätt lösenord ger den inloggade användaren', async ({ admin, cfg }) => 
 });
 
 test('fel lösenord ger 401', async ({ cfg }) => {
-  const client = await EternaClient.create(cfg.url, cfg.user, `fel-${Date.now()}`);
-  try {
-    const response = await client.getRaw('/api/v2/members/users/authenticated');
-    expect(response.status).toBe(401);
-  } finally {
-    await client.dispose();
-  }
+  const client = EternaClient.create(cfg.url, cfg.user, `fel-${Date.now()}`);
+  const response = await client.getRaw('/api/v2/members/users/authenticated');
+  expect(response.status).toBe(401);
 });
 
 test('användaren kan läsas från LDAP', async ({ admin, cfg }) => {

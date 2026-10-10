@@ -3,7 +3,7 @@ import { attachReports, expect, poll, test } from '../../src/fixtures';
 import { equals } from '../../src/filters';
 import { ingestSip, waitForIndexedAip, type IngestResult } from '../../src/ingest';
 import { buildBrokenSip } from '../../src/sip';
-import type { PreservationEvent } from '../../src/types';
+import type { IndexedAIP, PreservationEvent } from '../../src/types';
 
 test('SIP utan METS.xml ger ett misslyckat källobjekt och ingen AIP', async ({ admin, cfg, runId, cleanup }, testInfo) => {
   test.setTimeout(cfg.jobTimeoutMs + 120_000);
@@ -16,10 +16,13 @@ test('SIP utan METS.xml ger ett misslyckat källobjekt och ingen AIP', async ({ 
 
 test.describe('SIP med EICAR-testvirus', () => {
   let result: IngestResult;
+  let aip: IndexedAIP;
 
   test.beforeAll(async ({ admin, cfg, runId, cleanup }) => {
     test.setTimeout(cfg.jobTimeoutMs + 120_000);
     result = await ingestSip(admin, buildEicarSip(runId), poll(cfg), cleanup);
+    // Infrastrukturfel ska fälla hooken, inte testen. Att det är exakt en AIP kontrolleras i första testet.
+    if (result.aipIds.length === 1) aip = await waitForIndexedAip(admin, result.aipIds[0], cfg.jobPollMs);
   });
 
   test('ClamAV hittar viruset och virus check-eventet får FAILURE', async ({ admin }, testInfo) => {
@@ -36,15 +39,13 @@ test.describe('SIP med EICAR-testvirus', () => {
     expect(virusChecks.map((event) => event.eventOutcome)).toEqual(['FAILURE']);
   });
 
-  test('infekterat SIP blir inte en ACTIVE AIP', async ({ admin, cfg }) => {
-    // Förutsätter exakt en AIP, vilket föregående test kontrollerar (annars vore loop-passet tomt).
+  test('infekterat SIP blir inte en ACTIVE AIP', () => {
     // Känt beteende (docs/api-probes.md, rad 15): virussteget i ConfigurableIngestPlugin
     // är mandatory=false, så ett infekterat SIP blir ändå en ACTIVE AIP. test.fail()
     // dokumenterar avvikelsen. Testet larmar ("unexpected pass") när beteendet ändras.
+    // AIP:n är indexerad i beforeAll och exakt en AIP kontrolleras i föregående test.
     test.fail();
-    for (const id of result.aipIds) {
-      const aip = await waitForIndexedAip(admin, id, cfg.jobPollMs);
-      expect(aip.state).not.toBe('ACTIVE');
-    }
+    test.info().annotations.push({ type: 'known-issue', description: 'api-probes.md rad 15' });
+    expect(aip.state, 'Känt fynd (api-probes.md rad 15): infekterat SIP blir ACTIVE').not.toBe('ACTIVE');
   });
 });

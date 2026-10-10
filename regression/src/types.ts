@@ -38,7 +38,6 @@ export interface Report {
   pluginName: string;
   pluginState: string;
   pluginDetails: string;
-  reports?: Report[];
 }
 
 export interface IndexedAIP {

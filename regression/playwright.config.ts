@@ -15,6 +15,8 @@ export default defineConfig({
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   timeout: 120_000,
+  // I CI avbryts körningen efter fem fel, så att en följdfelskaskad inte tar en timme.
+  maxFailures: process.env.CI ? 5 : 0,
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
     baseURL: cfg.url,

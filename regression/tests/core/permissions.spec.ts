@@ -11,6 +11,7 @@ test.describe('användare med läsroller men utan objektbehörighet', () => {
   test.beforeAll(async ({ admin, cfg, runId, cleanup }) => {
     name = `${runId}u`;
     const password = `Rt-${randomUUID()}`;
+    cleanup.trackUser(name);
     await admin.postJson('/api/v2/members/users', {
       email: `${name}@example.org`,
       name,
@@ -21,12 +22,7 @@ test.describe('användare med läsroller men utan objektbehörighet', () => {
       password: { chars: password },
       values: [],
     });
-    cleanup.trackUser(name);
-    outsider = await EternaClient.create(cfg.url, name, password);
-  });
-
-  test.afterAll(async () => {
-    await outsider?.dispose();
+    outsider = EternaClient.create(cfg.url, name, password);
   });
 
   test('kan logga in', async () => {
@@ -50,6 +46,7 @@ test.describe('användare med läsroller men utan objektbehörighet', () => {
       [equals('aipId', requireAip(validIngest)), equals('isDirectory', 'false')],
       1,
     );
+    expect(files.results).toHaveLength(1);
     const response = await outsider.getRaw(`/api/v2/files/${encodeURIComponent(files.results[0].uuid)}/download`, {
       Accept: '*/*',
     });

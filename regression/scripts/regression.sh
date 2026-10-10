@@ -12,17 +12,35 @@ save_logs() {
   echo "Containerloggar sparade i regression/test-results/compose.log" >&2
 }
 
-if ! ./env/up.sh; then
-  save_logs
+# Stackens egna inloggningsuppgifter, så att en .env (t.ex. för stage) aldrig används mot den.
+export ETERNA_USER=admin ETERNA_PASSWORD=eterna
+
+# Riv alltid stacken vid avslut, även vid Ctrl-C eller avbruten CI-körning.
+status=1
+teardown() {
+  if [ "$status" -ne 0 ]; then
+    save_logs
+  fi
   ./env/down.sh
-  exit 1
-fi
+}
+trap teardown EXIT
+child=
+stop_child() {
+  if [ -n "$child" ]; then
+    pkill -TERM -P "$child" 2>/dev/null
+    kill -TERM "$child" 2>/dev/null
+    wait "$child" 2>/dev/null
+  fi
+}
+trap 'status=130; stop_child; exit 130' INT
+trap 'status=143; stop_child; exit 143' TERM
 
-bunx playwright test "$@"
-status=$?
-
-if [ "$status" -ne 0 ]; then
-  save_logs
+if ./env/up.sh; then
+  # I bakgrunden + wait, så att bash kör trap direkt i stället för efter att testerna är klara.
+  bunx playwright test "$@" &
+  child=$!
+  wait "$child"
+  status=$?
+  child=
 fi
-./env/down.sh
 exit "$status"

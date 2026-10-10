@@ -51,12 +51,20 @@ jobs:
       # Efter en release testas den image som release-flödet just publicerade (taggen = v<version>).
       ETERNA_IMAGE: ${{ github.event_name == 'workflow_run' && format('ghcr.io/eterna-earkiv/eterna:{0}', github.event.workflow_run.head_branch) || inputs.eterna_image }}
       EXPECTED_VERSION: ${{ inputs.expected_version }}
+      JOB_TIMEOUT_MS: '300000'
       SOLR_IMAGE: ${{ inputs.solr_image }}
       ZOOKEEPER_IMAGE: ${{ inputs.zookeeper_image }}
       CLAMAV_IMAGE: ${{ inputs.clamav_image }}
       SIEGFRIED_IMAGE: ${{ inputs.siegfried_image }}
       OPENLDAP_IMAGE: ${{ inputs.openldap_image }}
     steps:
+      # Taggen v1.0.1 ger förväntad version 1.0.1 (git.build.version).
+      - name: Sätt förväntad version från taggen
+        if: github.event_name == 'workflow_run'
+        env:
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+        run: echo "EXPECTED_VERSION=${HEAD_BRANCH#v}" >> "$GITHUB_ENV"
+
       - uses: actions/checkout@v5
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}

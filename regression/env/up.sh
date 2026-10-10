@@ -28,7 +28,10 @@ until curl -fsS --max-time 5 "$url" 2>/dev/null | grep -q '"status":"UP"'; do
 done
 # /actuator/health blir UP innan RODA initierat klart. Ett /api-anrop dessförinnan
 # gör InternalApiAuthFilter permanent AV (se docs/api-probes.md), så vänta på loggraden.
-until docker compose logs eterna 2>/dev/null | grep -q 'Started RODA'; do
+# --since containerns starttid utesluter rader från en tidigare start, och grep läser
+# all indata (grep -q kan ge SIGPIPE, exit 141, under pipefail).
+started=$(docker inspect -f '{{.State.StartedAt}}' "$(docker compose ps -q eterna)")
+until docker compose logs --since "$started" eterna 2>/dev/null | grep -F 'Started RODA' >/dev/null; do
   if (( SECONDS >= deadline )); then
     echo "RODA startade inte inom ${timeout_s}s. Status:" >&2
     show_status

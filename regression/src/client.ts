@@ -62,11 +62,9 @@ export class EternaClient {
     private readonly authorization: string,
   ) {}
 
-  static async create(baseURL: string, user: string, password: string): Promise<EternaClient> {
+  static create(baseURL: string, user: string, password: string): EternaClient {
     return new EternaClient(baseURL.replace(/\/+$/, ''), basicAuth(user, password));
   }
-
-  async dispose(): Promise<void> {}
 
   /** Alla råa anrop går hit så att inloggningsuppgifter aldrig följer med i kastade fel. */
   private async send(method: string, path: string, init: { headers?: Record<string, string>; body?: BodyInit } = {}): Promise<Reply> {

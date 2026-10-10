@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import type { EternaClient } from '../../src/client';
 import { NO_OUTCOME_OBJECT_ID } from '../../src/ingest';
-import { FINAL_JOB_STATES, findStep, waitForJob, waitForReports } from '../../src/jobs';
+import { FINAL_JOB_STATES, waitForJob, waitForReports } from '../../src/jobs';
 import type { Report } from '../../src/types';
 
 const report = (overrides: Partial<Report>): Report => ({
@@ -21,13 +21,6 @@ test('slutlägen innehåller COMPLETED men inte STARTED', () => {
   expect(FINAL_JOB_STATES.has('COMPLETED')).toBe(true);
   expect(FINAL_JOB_STATES.has('FAILED_TO_COMPLETE')).toBe(true);
   expect(FINAL_JOB_STATES.has('STARTED')).toBe(false);
-});
-
-test('findStep hittar ett nästlat delsteg på plugin-klass', () => {
-  const step = report({ plugin: 'org.roda.core.plugins.base.antivirus.AntivirusPlugin', pluginState: 'FAILURE' });
-  const tree = [report({ plugin: 'x.ConfigurableIngestPlugin', reports: [report({ plugin: 'x.Other' }), step] })];
-  expect(findStep(tree, 'AntivirusPlugin')).toBe(step);
-  expect(findStep(tree, 'Saknas')).toBeUndefined();
 });
 
 test('waitForJob returnerar vid slutläge efter att ha pollat icke-slutlägen', async () => {

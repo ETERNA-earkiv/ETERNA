@@ -36,14 +36,14 @@ test.beforeAll(async () => {
 test.afterAll(() => new Promise<void>((resolve) => server.close(() => resolve())));
 
 test('getJson skickar Authorization och Accept', async () => {
-  const client = await EternaClient.create(base, 'admin', 'pw');
+  const client = EternaClient.create(base, 'admin', 'pw');
   expect(await client.getJson('/api/x')).toEqual({ ok: true, uuid: 'u1' });
   expect(seen.headers.authorization).toBe(basicAuth('admin', 'pw'));
   expect(seen.headers.accept).toBe('application/json');
 });
 
 test('postJson skickar JSON med Content-Type', async () => {
-  const client = await EternaClient.create(base, 'admin', 'pw');
+  const client = EternaClient.create(base, 'admin', 'pw');
   await client.postJson('/api/y', { a: 1 });
   expect(seen.method).toBe('POST');
   expect(seen.headers['content-type']).toBe('application/json');
@@ -51,7 +51,7 @@ test('postJson skickar JSON med Content-Type', async () => {
 });
 
 test('upload skickar multipart med resource och commit', async () => {
-  const client = await EternaClient.create(base, 'admin', 'pw');
+  const client = EternaClient.create(base, 'admin', 'pw');
   await client.upload('sip.zip', Buffer.from('zipdata'));
   expect(seen.url).toBe('/api/v2/transfers/create/resource');
   expect(seen.headers['content-type']).toMatch(/^multipart\/form-data/);
@@ -61,7 +61,7 @@ test('upload skickar multipart med resource och commit', async () => {
 });
 
 test('getRaw ger status och kropp, och Accept kan ändras', async () => {
-  const client = await EternaClient.create(base, 'admin', 'pw');
+  const client = EternaClient.create(base, 'admin', 'pw');
   const raw = await client.getRaw('/bytes', { Accept: '*/*' });
   expect(raw.status).toBe(200);
   expect(raw.body.toString('utf8')).toBe('rå');
@@ -69,14 +69,14 @@ test('getRaw ger status och kropp, och Accept kan ändras', async () => {
 });
 
 test('icke-2xx ger ApiError med status', async () => {
-  const client = await EternaClient.create(base, 'admin', 'pw');
+  const client = EternaClient.create(base, 'admin', 'pw');
   const error = await client.getJson('/fel').catch((e: unknown) => e);
   expect(error).toBeInstanceOf(ApiError);
   expect((error as ApiError).status).toBe(500);
 });
 
 test('fel vid anslutning innehåller inte lösenordet', async () => {
-  const client = await EternaClient.create('http://127.0.0.1:9', 'admin', 'TOPSECRET');
+  const client = EternaClient.create('http://127.0.0.1:9', 'admin', 'TOPSECRET');
   const error = (await client.getJson('/x').catch((e: unknown) => e)) as Error;
   expect(error).toBeInstanceOf(Error);
   const text = `${error.message}\n${error.stack}`;
