@@ -70,7 +70,7 @@ regression/
     schemas/*.xsd           # METS/CSIP-scheman som läggs i genererade SIP:ar
   src/
     config.ts               # läser och validerar miljövariabler
-    run-id.ts               # körnings-ID (en enda Solr-token, t.ex. regtest20261010t120000)
+    run-id.ts               # körnings-ID (en enda Solr-token, t.ex. regtest20261010t120000a1b2)
     types.ts                # minimala typer för API-svaren
     filters.ts              # byggare för filterparametrar
     client.ts               # tunn API-klient (Basic Auth, JSON, fel-utskrift)
@@ -116,16 +116,17 @@ regression/
 - Bara ETERNA publicerar en port (`ETERNA_PORT`). Ett eget projektnamn
   (`eterna-regression`) och egna volymer gör att stacken inte krockar med
   dev-stacken. `down.sh` kör `down -v`.
-- `up.sh` väntar tills `/actuator/health` svarar `UP` (timeout 10 min, eftersom
-  ClamAV laddar ned virusdefinitioner vid första start). Vid timeout skriver den ut
+- `up.sh` väntar tills `/actuator/health` svarar `UP` och därefter på loggraden
+  "Started RODA" (timeout 10 min, eftersom ClamAV laddar ned virusdefinitioner vid
+  första start). Vid timeout skriver den ut
   status och health för containrarna och avslutar med en felkod.
 
 ## Testflöden
 
 Endpoints och fält är verifierade i koden och bekräftas mot en körande stack i
 `docs/api-probes.md`. Sviten använder `find` (och läser `totalCount`) i stället för
-`count`, eftersom `count` för jobb och medlemmar saknar rollnyckel och troligen
-ger 403.
+`count`, eftersom `count` för jobb ger 200 `{"result":-1}` (inte 403, men
+oanvändbart värde).
 
 ### Rökprov — `tests/smoke/` (cirka 1 minut, skapar ingen data)
 
@@ -169,7 +170,9 @@ gränssnittet) och alla steg påslagna.
 7. **`negative.spec.ts`**:
    - Ett SIP utan `METS.xml` gör att jobbet har 1 misslyckat källobjekt och att
      ingen AIP skapas.
-   - Ett SIP med EICAR-filen gör att antivirussteget rapporterar `FAILURE`.
+   - Ett SIP med EICAR-filen: jobbrapportens `pluginDetails` innehåller
+    `Eicar-Test-Signature FOUND` och `virus check`-eventet får `FAILURE`
+    (rapporterna är platta, så antivirussteget finns inte som egen rapport).
    - **Känt beteende att bekräfta:** virussteget i `ConfigurableIngestPlugin` är
      `mandatory=false`, så enligt koden kan ett infekterat SIP ändå bli en `ACTIVE`
      AIP. Testet "infekterat SIP blir inte en ACTIVE AIP" är markerat med
@@ -179,10 +182,10 @@ gränssnittet) och alla steg påslagna.
 
 ### Testdata och städning
 
-- All data som skapas märks med körnings-ID:t (`regtest<UTC-tidsstämpel>`, en
+- All data som skapas märks med körnings-ID:t (`regtest<UTC-tidsstämpel><4 hextecken>`, en
   enda Solr-token) i SIP-namn, titel och användarnamn.
-- En worker-fixture spårar AIP:er, transfers och användare. Vid teardown tas de
-  bort via API:t (asynkrona radera-jobb väntas in), utom om `KEEP_DATA=1`.
+- En worker-fixture spårar ingest-jobb (och därmed AIP:erna via `ingestJobId`),
+  transfers och användare. Vid teardown tas de bort via API:t (asynkrona radera-jobb väntas in), utom om `KEEP_DATA=1`.
   Fel vid städningen rapporteras och döljs inte.
 - EICAR-filen lagras base64-kodad i källkoden och avkodas bara i minnet, så att
   den inte triggar virusskydd eller GitHub-skanning.
@@ -250,6 +253,27 @@ ursprungligen godkända designen:
   infekterade SIP:ar (virussteget är inte obligatoriskt).
 - Mailpit lades till i stacken. Timeouten för `up.sh` höjdes till 10 min.
 - `count` ersattes av `find` och `totalCount`.
+- Körnings-ID:t fick fyra slumpade hextecken, och städningen spårar ingest-jobb.
 - Ingen webbläsarinstallation behövs.
 - CI-triggern för releaser är `workflow_run` efter `Release`, eftersom imagen
   först finns när release-flödet är klart.
+
+## Avvikelser vid implementation
+
+Detaljer och belägg finns i [api-probes.md](api-probes.md).
+
+- **Ingen PostgreSQL** i den kortlivade stacken, med `MANAGEMENT_HEALTH_DB_ENABLED=false`
+  (beslut av användaren). Se [noter om stacken, punkt 2](api-probes.md#noter-om-stacken).
+- **ETERNA:s healthcheck ersätts** med `/actuator/health`, och `up.sh` väntar på
+  loggraden "Started RODA" (race i `OnOffFilter`). Se
+  [noter om stacken, punkt 1](api-probes.md#noter-om-stacken).
+- **Klienten bygger på inbyggd `fetch`**, inte Playwrights `request`, så att
+  inloggningsuppgifter inte hamnar i rapporterna.
+- **Städning via `ingestJobId`**: AIP:er tas bort via jobbet som skapade dem.
+- **EICAR-testet** kontrollerar `pluginDetails` och `virus check`-eventet, eftersom
+  jobbrapporterna är platta (rad 14).
+- **`count`** ger 200 `{"result":-1}`, inte 403 (rad 4).
+- **Komponenttäckning** är verifierad för clamd, siegfried, openldap och solr.
+  ZooKeeper stoppades inte separat.
+- **Körnings-ID** har ett slumpat hexsuffix (4 tecken).
+- **CI** begränsas med `maxFailures` (5) och `JOB_TIMEOUT_MS` (300000).
