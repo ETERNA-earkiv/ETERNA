@@ -28,18 +28,23 @@ Stack: images enligt `env/docker-compose.yaml`, ETERNA-version enligt `/version.
 
 ## Noter om stacken
 
-1. **Startrace i ETERNA 1.0.0 (kringgås i compose-filen).** `OnOffFilter` avgör
-   `ui.filter.internal.enabled` vid första anropet mot `/api/*`. Imagens egen
-   healthcheck (`curl /api/v2/openapi`) körs redan under uppstart, innan konfigurationen
-   är laddad, så `InternalApiAuthFilter` blir permanent AV. Då ignoreras all basic auth
+1. **Startrace i ETERNA 1.0.0 (kringgås).** `OnOffFilter` avgör
+   `ui.filter.internal.enabled` vid första anropet mot `/api/*`. Sker det innan RODA
+   initierat klart blir `InternalApiAuthFilter` permanent AV. Då ignoreras all basic auth
    och varje anrop blir användaren `guest` (`/members/users/authenticated` ger 200 oavsett
-   lösenord, övriga anrop 403). Compose-filen ersätter därför healthchecken med
-   `/actuator/health`. Anropa aldrig `/api/*` innan ETERNA loggat "Started RODA".
-2. **Postgres krävs.** ETERNA 1.0.0 behöver en databas; deploy-compose saknar den (utkommenterad),
-   så `/actuator/health` blir aldrig UP. Regressionsstacken har en `postgres`-tjänst
-   och `SPRING_DATASOURCE_URL`.
-3. `/api/v2/members/users/authenticated` är inte ett bra inloggningsprov med fel lösenord
-   om filtret är AV (se 1); den ger 401 först när filtret är PÅ.
+   lösenord, övriga anrop 403). Imagens egen healthcheck (`curl /api/v2/openapi`) utlöser
+   detta under uppstart, så compose-filen ersätter den med `/actuator/health`, och
+   `up.sh` väntar dessutom på loggraden "Started RODA" (health blir UP före det).
+   Anropa aldrig `/api/*` innan RODA startat. Loggraden "InternalApiAuthFilter is ON"
+   finns i `/roda/log/*.log` i containern (inte i `docker logs`).
+   Racet reproducerades utanför regressionsstacken: användarens andra stack
+   `eterna_sie5_2` (v1.0.0, imagens healthcheck) observerades 2026-10-10 av controllern med
+   health DOWN och fel lösenord som gav 200. Den stacken är orörd.
+2. **Ingen PostgreSQL.** Deploy-compose kör utan PostgreSQL (utkommenterad), och
+   regressionsstacken speglar det. Utan databas blir `/actuator/health` DOWN efter 30 s
+   (DB-indikatorn), därför sätts `MANAGEMENT_HEALTH_DB_ENABLED=false`. Appen fungerar utan
+   databas (`jobs/find` ger 200 på ca 0,1 s).
+3. `/api/v2/members/users/authenticated` ger 401 med fel lösenord först när filtret är PÅ.
 
 ## Komponenttäckning
 

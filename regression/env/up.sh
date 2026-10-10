@@ -26,4 +26,14 @@ until curl -fsS --max-time 5 "$url" 2>/dev/null | grep -q '"status":"UP"'; do
   fi
   sleep 5
 done
+# /actuator/health blir UP innan RODA initierat klart. Ett /api-anrop dessförinnan
+# gör InternalApiAuthFilter permanent AV (se docs/api-probes.md), så vänta på loggraden.
+until docker compose logs eterna 2>/dev/null | grep -q 'Started RODA'; do
+  if (( SECONDS >= deadline )); then
+    echo "RODA startade inte inom ${timeout_s}s. Status:" >&2
+    show_status
+    exit 1
+  fi
+  sleep 2
+done
 echo "Stacken är redo på http://localhost:${ETERNA_PORT:-8080}"

@@ -91,23 +91,6 @@ services:
       retries: 3
       start_period: 60s
 
-  # Deploy-compose saknar postgres, men ETERNA 1.0.0 kräver en databas (annars blir
-  # /actuator/health aldrig UP). Uppgifter enligt application.properties.
-  postgres:
-    image: ${POSTGRES_IMAGE:-docker.io/postgres:17}
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: roda
-      POSTGRES_DB: roda_core_db
-    volumes:
-      - pg_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d roda_core_db"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 10s
-
   # Finns inte i deploy-compose, men ETERNA:s SMTP_HOST pekar på "mailserver".
   mailserver:
     image: ${MAILPIT_IMAGE:-axllent/mailpit:v1.24}
@@ -137,15 +120,14 @@ services:
         condition: service_healthy
       unoserver:
         condition: service_healthy
-      postgres:
-        condition: service_healthy
       mailserver:
         condition: service_started
     volumes:
       - roda_data:/roda/data/
       - ../../deploys/standalone/roda/config/roda-core.properties:/roda/config/roda-core.properties:ro
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/roda_core_db
+      # Deploy-compose kör utan PostgreSQL; annars blir /actuator/health DOWN efter 30 s.
+      - MANAGEMENT_HEALTH_DB_ENABLED=false
       - RODA_CORE_SOLR_TYPE=CLOUD
       - RODA_CORE_SOLR_CLOUD_URLS=zoo:2181
       - SOLR_NUM_SHARDS=4
@@ -166,4 +148,3 @@ volumes:
   siegfried_data:
   roda_data:
   openldap_data:
-  pg_data:
