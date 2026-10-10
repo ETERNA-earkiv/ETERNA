@@ -19,8 +19,8 @@ Stack: images enligt `env/docker-compose.yaml`, ETERNA-version enligt `/version.
 | 8 | `files/find` med `aipId` + `isDirectory=false` ger bara de två datafilerna, med `fileFormat.pronom` `x-fmt/111` och `fmt/101` | Bekräftad | Exakt datafilerna, med `fileFormat.pronom` enligt `VALID_SIP_PRONOM` (`x-fmt/111`, `fmt/101`); inga METS-poster |
 | 9 | Events med `aipID` innehåller `virus check`, `format identification`, `message digest calculation` med `SUCCESS` | Bekräftad | Alla tre eventtyper finns med `eventOutcome` `SUCCESS` |
 | 10 | `GET /api/v2/aips/{id}/download` ger zip (`PK`) | Bekräftad | Svaret börjar med `PK` |
-| 11 | Användare skapad via API med `password: {"chars": ...}` kan logga in direkt | Bekräftas i uppgift 10 | |
-| 12 | Användare utan objektbehörighet: `find` utelämnar AIP:n, `find/{id}` och filnedladdning ger 403 | Bekräftas i uppgift 10 | |
+| 11 | Användare skapad via API med `password: {"chars": ...}` kan logga in direkt | Bekräftad | `POST /api/v2/members/users` (email, name, fullName, roles, groups, guest=false, password.chars, values=[]) ger en användare som direkt kan logga in; ingen aktivering/e-postbekräftelse behövs. Radering via `DELETE /members/users/{name}`; efteråt ger `GET .../users/{name}` dock inte 404 utan 200 med `id: null`, `name: null` (kontrollera `id`) |
+| 12 | Användare utan objektbehörighet: `find` utelämnar AIP:n, `find/{id}` och filnedladdning ger 403 | Bekräftad | Användare med `aip.read` + `representation.read` ser AIP:n varken i `aips/find` (`totalCount` 0), får 403 på `aips/find/{id}` (admin får 200 på samma sökväg) eller på `files/{uuid}/download`. Nya AIP:er är alltså inte läsbara för alla som förval |
 | 13 | SIP utan METS.xml: `COMPLETED`, 1 misslyckat, `outcomeObjectId` = `NO_OUTCOME_ID` | Bekräftas i uppgift 11 | |
 | 14 | EICAR: antivirussteget (plugin-klass innehåller `AntivirusPlugin`) har `FAILURE` | Bekräftas i uppgift 11 | |
 | 15 | EICAR: AIP skapas ändå och blir `ACTIVE` (virussteget `mandatory=false`) | Bekräftas i uppgift 11 | |
