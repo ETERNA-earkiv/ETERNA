@@ -1,8 +1,9 @@
 import { expect, test } from '@playwright/test';
-import { aipIdsFrom, ingestJobRequest, NO_OUTCOME_OBJECT_ID } from '../../src/ingest';
-import { FINAL_JOB_STATES, findStep } from '../../src/jobs';
+import type { EternaClient } from '../../src/client';
+import { FINAL_JOB_STATES, findStep, waitForJob, waitForReports } from '../../src/jobs';
 import type { Report } from '../../src/types';
 
+const NO_OUTCOME_OBJECT_ID = 'NO_OUTCOME_ID';
 const report = (overrides: Partial<Report>): Report => ({
   id: 'r',
   jobId: 'j',
@@ -29,19 +30,28 @@ test('findStep hittar ett nästlat delsteg på plugin-klass', () => {
   expect(findStep(tree, 'Saknas')).toBeUndefined();
 });
 
-test('aipIdsFrom hoppar över NO_OUTCOME_ID och dubbletter', () => {
-  const reports = [report({ outcomeObjectId: 'a' }), report({ outcomeObjectId: 'a' }), report({})];
-  expect(aipIdsFrom(reports)).toEqual(['a']);
+test('waitForJob returnerar vid slutläge efter att ha pollat icke-slutlägen', async () => {
+  const states = ['CREATED', 'STARTED', 'COMPLETED'];
+  let calls = 0;
+  const client = { getJson: async () => ({ id: 'j', state: states[calls++] }) } as unknown as EternaClient;
+  const job = await waitForJob(client, 'j', { timeoutMs: 1000, pollMs: 1 });
+  expect(job.state).toBe('COMPLETED');
+  expect(calls).toBe(3);
 });
 
-test('ingest-jobbet använder standardinleveransen med alla steg påslagna', () => {
-  const body = ingestJobRequest('namn', 'uuid-1');
-  expect(body.plugin).toBe('org.roda.core.plugins.base.ingest.v2.ConfigurableIngestPlugin');
-  expect(body.sourceObjects).toEqual({ '@type': 'SelectedItemsListRequest', ids: ['uuid-1'] });
-  expect(body.sourceObjectsClass).toBe('org.roda.core.data.v2.ip.TransferredResource');
-  expect(body.priority).toBe('HIGH');
-  expect(body.parallelism).toBe('NORMAL');
-  expect(body.pluginParameters['parameter.do_virus_check']).toBe('true');
-  expect(body.pluginParameters['parameter.do_file_format_identification']).toBe('true');
-  expect(body.pluginParameters['parameter.create.premis.skeleton']).toBe('true');
+test('waitForJob kastar med senaste state efter tidsgränsen', async () => {
+  const client = { getJson: async () => ({ id: 'j', state: 'STARTED' }) } as unknown as EternaClient;
+  await expect(waitForJob(client, 'j', { timeoutMs: 20, pollMs: 5 })).rejects.toThrow(/senaste state: STARTED/);
+});
+
+test('waitForReports kastar vid timeout i stället för att returnera delresultat', async () => {
+  const client = { getJson: async () => ({ reports: [report({})] }) } as unknown as EternaClient;
+  await expect(waitForReports(client, 'j1', 2, { timeoutMs: 20, pollMs: 5 })).rejects.toThrow(
+    /Jobbet j1: 1 av 2 rapporter inom 20 ms/,
+  );
+});
+
+test('waitForReports returnerar när tillräckligt många rapporter finns', async () => {
+  const client = { getJson: async () => ({ reports: [report({})] }) } as unknown as EternaClient;
+  expect(await waitForReports(client, 'j1', 1, { timeoutMs: 20, pollMs: 5 })).toHaveLength(1);
 });

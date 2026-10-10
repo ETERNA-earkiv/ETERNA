@@ -1,7 +1,10 @@
 import type { EternaClient } from './client';
 import type { Job, Report } from './types';
 
-/** Slutlägen enligt Job.isFinalState i roda-common-data. */
+/**
+ * Slutlägen enligt Job.isFinalState i roda-common-data.
+ * PENDING_APPROVAL och SCHEDULED räknas med avsiktligt (speglar Job.isFinalState); testerna kontrollerar COMPLETED.
+ */
 export const FINAL_JOB_STATES = new Set([
   'COMPLETED',
   'FAILED_TO_COMPLETE',
@@ -54,7 +57,10 @@ export async function waitForReports(
   const deadline = Date.now() + timeoutMs;
   for (;;) {
     const reports = await getReports(client, jobId);
-    if (reports.length >= expected || Date.now() >= deadline) return reports;
+    if (reports.length >= expected) return reports;
+    if (Date.now() >= deadline) {
+      throw new Error(`Jobbet ${jobId}: ${reports.length} av ${expected} rapporter inom ${timeoutMs} ms`);
+    }
     await sleep(pollMs);
   }
 }

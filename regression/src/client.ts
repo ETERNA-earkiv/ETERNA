@@ -8,9 +8,7 @@ export type Entity =
   | 'files'
   | 'preservation/events'
   | 'jobs'
-  | 'job-reports'
-  | 'transfers'
-  | 'members';
+  | 'transfers';
 
 export class ApiError extends Error {
   constructor(
@@ -34,8 +32,36 @@ export function describeFailure(method: string, url: string, status: number, bod
   return `${method} ${url} → ${status}\n${shown}`;
 }
 
+/** Döljer värdet i authorization-rader, eftersom Playwrights felmeddelanden innehåller alla request-headers. */
+export function redactSecrets(text: string): string {
+  return text.replace(/(authorization:[ \t]*).*/gi, '$1<dold>');
+}
+
+/** Tolkar en JSON-kropp; en 2xx-kropp som inte är JSON blir ett tydligt fel. */
+export function parseJsonBody<T>(method: string, url: string, status: number, text: string): T {
+  if (!text) return undefined as T;
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    throw new Error(`Svaret var inte JSON: ${describeFailure(method, url, status, text)}`);
+  }
+}
+
 export class EternaClient {
-  private constructor(readonly http: APIRequestContext) {}
+  private constructor(private readonly http: APIRequestContext) {}
+
+  /** Alla råa anrop går hit så att inloggningsuppgifter aldrig följer med i kastade fel. */
+  private async send<T>(fn: () => Promise<T>): Promise<T> {
+    try {
+      return await fn();
+    } catch (error) {
+      if (error instanceof Error) {
+        error.message = redactSecrets(error.message);
+        if (error.stack) error.stack = redactSecrets(error.stack);
+      }
+      throw error;
+    }
+  }
 
   static async create(baseURL: string, user: string, password: string): Promise<EternaClient> {
     const http = await request.newContext({
@@ -50,28 +76,33 @@ export class EternaClient {
   }
 
   async getJson<T>(path: string): Promise<T> {
-    return this.json<T>('GET', await this.http.get(path));
+    return this.json<T>('GET', await this.send(() => this.http.get(path)));
   }
 
   async postJson<T>(path: string, data: unknown): Promise<T> {
-    return this.json<T>('POST', await this.http.post(path, { data }));
+    return this.json<T>('POST', await this.send(() => this.http.post(path, { data })));
   }
 
   async getBytes(path: string): Promise<Buffer> {
-    const response = await this.http.get(path, { headers: { Accept: '*/*' } });
+    const response = await this.send(() => this.http.get(path, { headers: { Accept: '*/*' } }));
     await this.ensureOk('GET', response);
     return response.body();
   }
 
+  /** Råsvar utan statuskontroll, för tester som själva kontrollerar statuskoden. */
+  getRaw(path: string, headers?: Record<string, string>): Promise<APIResponse> {
+    return this.send(() => this.http.get(path, headers ? { headers } : undefined));
+  }
+
   async exists(path: string): Promise<boolean> {
-    const response = await this.http.get(path);
+    const response = await this.send(() => this.http.get(path));
     if (response.status() === 404) return false;
     await this.ensureOk('GET', response);
     return true;
   }
 
   async deleteIfExists(path: string): Promise<void> {
-    const response = await this.http.delete(path);
+    const response = await this.send(() => this.http.delete(path));
     if (response.status() === 404) return;
     await this.ensureOk('DELETE', response);
   }
@@ -85,12 +116,14 @@ export class EternaClient {
   }
 
   async upload(fileName: string, zip: Buffer): Promise<TransferredResource> {
-    const response = await this.http.post('/api/v2/transfers/create/resource', {
-      multipart: {
-        resource: { name: fileName, mimeType: 'application/zip', buffer: zip },
-        commit: 'true',
-      },
-    });
+    const response = await this.send(() =>
+      this.http.post('/api/v2/transfers/create/resource', {
+        multipart: {
+          resource: { name: fileName, mimeType: 'application/zip', buffer: zip },
+          commit: 'true',
+        },
+      }),
+    );
     return this.json<TransferredResource>('POST', response);
   }
 
@@ -103,6 +136,6 @@ export class EternaClient {
   private async json<T>(method: string, response: APIResponse): Promise<T> {
     await this.ensureOk(method, response);
     const text = await response.text();
-    return (text ? JSON.parse(text) : undefined) as T;
+    return parseJsonBody<T>(method, response.url(), response.status(), text);
   }
 }

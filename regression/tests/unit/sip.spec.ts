@@ -1,4 +1,6 @@
 import { expect, test } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { strFromU8, strToU8, unzipSync } from 'fflate';
 import { buildBrokenSip, buildSip, buildValidSip, sha256 } from '../../src/sip';
 
@@ -49,4 +51,28 @@ test('trasigt SIP saknar METS.xml', () => {
   const sip = buildBrokenSip(`${RUN}-broken`);
   expect(sip.fileName).toBe(`${RUN}-broken.zip`);
   expect(Object.keys(unzipSync(sip.zip))).toEqual([`${RUN}-broken/README.txt`]);
+});
+
+test('ogiltiga filnamn avvisas', () => {
+  for (const name of ['../x.txt', '.hidden', '..', 'a/b.txt', 'a b.txt']) {
+    expect(() => buildSip('x', 't', [{ name, mimeType: 'text/plain', content: strToU8('a') }])).toThrow(
+      `Ogiltigt filnamn "${name}"`,
+    );
+  }
+});
+
+test('mimeType XML-escapas i representationens METS', () => {
+  const sip = buildSip('x', 't', [{ name: 'a.txt', mimeType: 'a"b&c', content: strToU8('a') }]);
+  const mets = strFromU8(unzipSync(sip.zip)['x/representations/representation_1/METS.xml']);
+  expect(mets).toContain('MIMETYPE="a&quot;b&amp;c"');
+});
+
+test('medföljande DILCIS-scheman har rätt targetNamespace', () => {
+  const dir = join(__dirname, '..', '..', 'fixtures', 'schemas');
+  expect(readFileSync(join(dir, 'DILCISExtensionMETS.xsd'), 'utf8')).toContain(
+    'targetNamespace="https://DILCIS.eu/XML/METS/CSIPExtensionMETS"',
+  );
+  expect(readFileSync(join(dir, 'DILCISExtensionSIPMETS.xsd'), 'utf8')).toContain(
+    'targetNamespace="https://DILCIS.eu/XML/METS/SIPExtensionMETS"',
+  );
 });

@@ -82,7 +82,7 @@ function representationMets(files: SipInputFile[], created: string): string {
   const entries = files.map((file) => {
     const id = newId();
     const xml =
-      `            <file ID="${id}" MIMETYPE="${file.mimeType}" SIZE="${file.content.length}" CREATED="${created}" ` +
+      `            <file ID="${id}" MIMETYPE="${escapeXml(file.mimeType)}" SIZE="${file.content.length}" CREATED="${created}" ` +
       `CHECKSUM="${sha256(file.content)}" CHECKSUMTYPE="SHA-256">\n` +
       `                <FLocat xlink:type="simple" xlink:href="${href(`data/${file.name}`)}" LOCTYPE="URL"/>\n` +
       `            </file>`;
@@ -157,8 +157,13 @@ function assertSipId(sipId: string): void {
   if (!/^[A-Za-z0-9_-]+$/.test(sipId)) throw new Error(`Ogiltigt sipId "${sipId}": bara A-Z, a-z, 0-9, _ och - är tillåtna`);
 }
 
+function assertFileName(name: string): void {
+  if (!/^[A-Za-z0-9_.-]+$/.test(name) || name.startsWith('.')) throw new Error(`Ogiltigt filnamn "${name}"`);
+}
+
 export function buildSip(sipId: string, title: string, files: SipInputFile[]): BuiltSip {
   assertSipId(sipId);
+  files.forEach((file) => assertFileName(file.name));
   const created = new Date().toISOString();
   const dc = strToU8(dublinCore(title, sipId));
   const repMets = strToU8(representationMets(files, created));

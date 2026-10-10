@@ -13,7 +13,7 @@ type Env = Record<string, string | undefined>;
 export function loadConfig(env: Env = process.env): Config {
   const url = (env.ETERNA_URL || 'http://localhost:8080').replace(/\/+$/, '');
   if (!/^https?:\/\/\S+$/.test(url)) {
-    throw new Error(`ETERNA_URL måste börja med http:// eller https://, fick "${url}"`);
+    throw new Error('ETERNA_URL måste börja med http:// eller https://');
   }
   return {
     url,

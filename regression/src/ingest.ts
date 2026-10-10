@@ -57,10 +57,10 @@ export async function ingestSip(
   const transfer = await client.upload(sip.fileName, sip.zip);
   cleanup.trackTransfer(transfer.uuid);
   const created = await client.postJson<Job>('/api/v2/jobs', ingestJobRequest(`regression ${sip.sipId}`, transfer.uuid));
+  cleanup.trackIngestJob(created.id);
   const job = await waitForJob(client, created.id, poll);
   const reports = await waitForReports(client, job.id, 1, { timeoutMs: INDEX_WAIT_MS, pollMs: poll.pollMs });
   const aipIds = aipIdsFrom(reports);
-  for (const id of aipIds) cleanup.trackAip(id);
   return { transfer, job, reports, aipIds };
 }
 

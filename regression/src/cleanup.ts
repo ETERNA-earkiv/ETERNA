@@ -1,6 +1,7 @@
 import type { EternaClient } from './client';
+import { equals } from './filters';
 import { runJob, type PollOptions } from './jobs';
-import type { Job } from './types';
+import type { IndexedAIP, Job } from './types';
 
 const selected = (ids: string[]) => ({ '@type': 'SelectedItemsListRequest', ids });
 
@@ -14,12 +15,13 @@ function assertCompleted(what: string, job: Job): void {
 
 /** Spårar testdata och tar bort den via API:t. Fel samlas och rapporteras i stället för att döljas. */
 export class Cleanup {
-  private readonly aips = new Set<string>();
+  private readonly ingestJobs = new Set<string>();
   private readonly transfers = new Set<string>();
   private readonly users = new Set<string>();
 
-  trackAip(id: string): void {
-    this.aips.add(id);
+  /** Spåras direkt när jobbet skapats, så att AIP:erna hittas även om ingesten avbryts. */
+  trackIngestJob(jobId: string): void {
+    this.ingestJobs.add(jobId);
   }
 
   trackTransfer(uuid: string): void {
@@ -46,9 +48,15 @@ export class Cleanup {
       );
     }
 
-    if (this.aips.size > 0) {
+    if (this.ingestJobs.size > 0) {
       await attempt('AIP:er', async () => {
-        const body = { itemsToDelete: selected([...this.aips]), details: 'Städning efter regressionstest' };
+        const aips = new Set<string>();
+        for (const jobId of this.ingestJobs) {
+          const found = await client.find<IndexedAIP>('aips', [equals('ingestJobId', jobId)], 100);
+          for (const aip of found.results) aips.add(aip.id);
+        }
+        if (aips.size === 0) return;
+        const body = { itemsToDelete: selected([...aips]), details: 'Städning efter regressionstest' };
         assertCompleted('Radering av AIP:er', await runJob(client, '/api/v2/aips/delete', body, poll));
       });
     }
