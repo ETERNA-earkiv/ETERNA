@@ -1,6 +1,6 @@
 # ETERNA Changelog
 
-## v1.0.1 (unreleased)
+## v1.0.1 (2026-10-14)
 
 #### Bug fixes
 - Catalog tree no longer shows AIPs at description level `item` or `file` [#604](https://github.com/ETERNA-earkiv/ETERNA/issues/604)
