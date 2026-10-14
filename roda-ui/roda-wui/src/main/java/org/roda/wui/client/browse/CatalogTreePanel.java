@@ -16,6 +16,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.FindRequest;
@@ -197,7 +198,8 @@ public class CatalogTreePanel extends Composite {
     FindRequest findRequest = new FindRequest.FindRequestBuilder(
       new Filter(
         new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID),
-        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file")),
+        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file"),
+        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "item")),
       true)
       .withSorter(new Sorter(new SortParameter(RodaConstants.AIP_TITLE_SORT, false)))
       .withSublist(new Sublist(0, TREE_MAX_CHILDREN))
@@ -211,14 +213,7 @@ public class CatalogTreePanel extends Composite {
         rootsLoading = false;
         if (error != null) {
           LOGGER.error("Failed to load catalog tree root nodes", error);
-          treeBody.clear();
-          FlowPanel errorPanel = new FlowPanel();
-          errorPanel.addStyleName("catalogTreeNodeError");
-          errorPanel.add(new com.google.gwt.user.client.ui.Label(messages.catalogTreeLoadError()));
-          com.google.gwt.user.client.ui.Anchor retry = new com.google.gwt.user.client.ui.Anchor(messages.catalogTreeRetry());
-          retry.addClickHandler(event -> loadRootNodes());
-          errorPanel.add(retry);
-          treeBody.add(errorPanel);
+          showRootLoadError();
           return;
         }
         if (result.getResults().isEmpty()) {
@@ -247,7 +242,9 @@ public class CatalogTreePanel extends Composite {
    */
   private void loadSupplementaryGhostRoots(Set<String> accessibleRootIds, int myGeneration) {
     FindRequest findRequest = new FindRequest.FindRequestBuilder(
-      new Filter(new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file")),
+      new Filter(
+        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file"),
+        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "item")),
       true)
       .withSorter(new Sorter(new SortParameter(RodaConstants.AIP_TITLE_SORT, false)))
       .withSublist(new Sublist(0, TREE_MAX_CHILDREN))
@@ -309,29 +306,58 @@ public class CatalogTreePanel extends Composite {
           return;
         }
 
-        FindRequest ancestorRequest = new FindRequest.FindRequestBuilder(
-          new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID,
-            new ArrayList<>(ancestorIdsToResolve))),
-          false)
-          .withSublist(new Sublist(0, ancestorIdsToResolve.size()))
-          .build();
-
-        Services s2 = new Services(messages.catalogTreeReasonGetAncestors(), "get");
-        s2.rodaEntityRestService(
-          s -> s.find(ancestorRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
-          IndexedAIP.class)
-          .whenComplete((ancResult, err) -> {
-            if (myGeneration != loadGeneration) return;
-            if (err == null) {
-              for (IndexedAIP anc : ancResult.getResults()) {
-                resolvedAncestors.put(anc.getId(), anc);
-              }
-            } else {
-              LOGGER.warn("Could not batch-resolve ghost ancestors; inaccessible intermediates become ghost nodes");
-            }
-            buildAndMergeGhostRoots(needsGhostRoot, resolvedAncestors, myGeneration);
-          });
+        // Slå upp okända förfäder i batchar (#643)
+        resolveAncestors(ancestorIdsToResolve).whenComplete((resolvedBatch, err) -> {
+          if (myGeneration != loadGeneration) return;
+          if (err != null) {
+            // Tekniskt fel, inte behörighetsbrist: rita inte förfäderna som "Åtkomst saknas"
+            LOGGER.error("Could not resolve ghost-root ancestors; supplementary roots not shown", err);
+            finalizeFallbackTree(new ArrayList<>(), myGeneration);
+            FlowPanel errorPanel = new FlowPanel();
+            errorPanel.addStyleName("catalogTreeNodeError");
+            errorPanel.add(new com.google.gwt.user.client.ui.Label(messages.catalogTreeLoadError()));
+            com.google.gwt.user.client.ui.Anchor retry =
+              new com.google.gwt.user.client.ui.Anchor(messages.catalogTreeRetry());
+            retry.addClickHandler(event -> loadRootNodes());
+            errorPanel.add(retry);
+            treeBody.add(errorPanel);
+            return;
+          }
+          resolvedAncestors.putAll(resolvedBatch);
+          buildAndMergeGhostRoots(needsGhostRoot, resolvedAncestors, myGeneration);
+        });
       });
+  }
+
+  /** Visar felmeddelande med "försök igen" i stället för trädet. */
+  private void showRootLoadError() {
+    treeBody.clear();
+    FlowPanel errorPanel = new FlowPanel();
+    errorPanel.addStyleName("catalogTreeNodeError");
+    errorPanel.add(new com.google.gwt.user.client.ui.Label(messages.catalogTreeLoadError()));
+    com.google.gwt.user.client.ui.Anchor retry = new com.google.gwt.user.client.ui.Anchor(messages.catalogTreeRetry());
+    retry.addClickHandler(event -> loadRootNodes());
+    errorPanel.add(retry);
+    treeBody.add(errorPanel);
+  }
+
+  /**
+   * Slår upp AIP:er för förfäder-ID:n i batchar. Solr tillåter max 1024 OR-led
+   * per fråga; ett enda anrop för alla ID:n sprack och gjorde att alla
+   * mellannivåer ritades som spöknoder (#643).
+   */
+  private CompletableFuture<Map<String, IndexedAIP>> resolveAncestors(Set<String> ancestorIds) {
+    Services service = new Services(messages.catalogTreeReasonGetAncestors(), "get");
+    return AncestorBatchResolver.resolve(ancestorIds, batch -> {
+      FindRequest ancestorRequest = new FindRequest.FindRequestBuilder(
+        new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, batch)),
+        false)
+        .withSublist(new Sublist(0, batch.size()))
+        .build();
+      return service.rodaEntityRestService(
+        s -> s.find(ancestorRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
+        IndexedAIP.class);
+    });
   }
 
   private void buildAndMergeGhostRoots(List<IndexedAIP> aips,
@@ -352,7 +378,9 @@ public class CatalogTreePanel extends Composite {
     final int myGeneration = loadGeneration;
     rootsLoading = true;
     FindRequest findRequest = new FindRequest.FindRequestBuilder(
-      new Filter(new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file")),
+      new Filter(
+        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file"),
+        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "item")),
       true)
       .withSorter(new Sorter(new SortParameter(RodaConstants.AIP_TITLE_SORT, false)))
       .withSublist(new Sublist(0, TREE_MAX_CHILDREN))
@@ -404,29 +432,20 @@ public class CatalogTreePanel extends Composite {
           return;
         }
 
-        // Hämta data för okända förfäder i ett enda batch-anrop
-        FindRequest ancestorRequest = new FindRequest.FindRequestBuilder(
-          new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID,
-            new ArrayList<>(ancestorIdsToResolve))),
-          false)
-          .withSublist(new Sublist(0, ancestorIdsToResolve.size()))
-          .build();
-
-        Services s2 = new Services(messages.catalogTreeReasonGetAncestors(), "get");
-        s2.rodaEntityRestService(
-          s -> s.find(ancestorRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
-          IndexedAIP.class)
-          .whenComplete((ancestorResult, err) -> {
-            if (myGeneration != loadGeneration) return;
-            if (err == null) {
-              for (IndexedAIP anc : ancestorResult.getResults()) {
-                resolvedAncestors.put(anc.getId(), anc);
-              }
-            } else {
-              LOGGER.warn("Could not batch-resolve ancestors; inaccessible intermediates become ghost nodes");
-            }
-            buildAndFinalizeFallbackTree(aips, resolvedAncestors, myGeneration);
-          });
+        // Slå upp okända förfäder i batchar (#643)
+        resolveAncestors(ancestorIdsToResolve).whenComplete((resolvedBatch, err) -> {
+          if (myGeneration != loadGeneration) return;
+          if (err != null) {
+            // Tekniskt fel, inte behörighetsbrist: rita inte förfäderna som "Åtkomst saknas"
+            LOGGER.error("Could not resolve fallback-tree ancestors", err);
+            rootsLoading = false;
+            rootsLoaded = true;
+            showRootLoadError();
+            return;
+          }
+          resolvedAncestors.putAll(resolvedBatch);
+          buildAndFinalizeFallbackTree(aips, resolvedAncestors, myGeneration);
+        });
       });
   }
 

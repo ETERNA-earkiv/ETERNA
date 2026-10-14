@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.roda-project</groupId>
         <artifactId>roda-ui</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <properties>
@@ -392,6 +392,11 @@
         </profile>
     </profiles>
     <dependencies>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.roda-project</groupId>
             <artifactId>roda-common-data</artifactId>

@@ -1,5 +1,12 @@
 # ETERNA Changelog
 
+## v1.0.1 (2026-10-14)
+
+#### Bug fixes
+- Catalog tree no longer shows AIPs at description level `item` or `file` [#604](https://github.com/ETERNA-earkiv/ETERNA/issues/604)
+- Catalog tree now resolves ancestors in a single batch, so records the user has access to are no longer shown as "Åtkomst saknas"; an ancestor the user cannot access is shown as plain "Åtkomst saknas" text in the breadcrumb [#643](https://github.com/ETERNA-earkiv/ETERNA/issues/643) [#645](https://github.com/ETERNA-earkiv/ETERNA/pull/645)
+- Fixed the web archive (WARC/WACZ) viewer failing to load: removed the `Cross-Origin-Embedder-Policy` headers added in v1.0.0, since COEP on the parent page blocked the ReplayWeb.page iframe served by its service worker (`Cross-Origin-Opener-Policy` is kept) [#646](https://github.com/ETERNA-earkiv/ETERNA/pull/646)
+
 ## v1.0.0 (2026-06-15)
 
 #### New features
