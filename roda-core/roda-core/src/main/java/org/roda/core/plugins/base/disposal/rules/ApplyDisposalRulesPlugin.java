@@ -14,7 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
+import org.roda.core.common.DisposalRuleConditionFields;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -23,6 +25,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.disposal.rule.ConditionType;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.rule.DisposalRules;
 import org.roda.core.data.v2.ip.AIP;
@@ -186,8 +189,21 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
     }
   }
 
+  private boolean hasMetadataFieldRule(DisposalRules disposalRules) {
+    return disposalRules.getObjects().stream().anyMatch(rule -> ConditionType.METADATA_FIELD.equals(rule.getType()));
+  }
+
   private void processDisposalRules(List<AIP> aips, DisposalRules disposalRules, IndexService index, ModelService model,
     Report report, Job cachedJob, JobPluginInfo jobPluginInfo) {
+    // Compute the metadata-field whitelist once per job run (not per AIP/rule) to avoid repeated config I/O.
+    Set<String> allowedConditionFields = DisposalRuleConditionFields.allowedMetadataConditionFields();
+    boolean metadataRulesSkipped = allowedConditionFields.isEmpty() && hasMetadataFieldRule(disposalRules);
+    if (metadataRulesSkipped) {
+      LOGGER.warn("No allowed metadata condition fields are configured (ui.search.fields.IndexedAIP in "
+        + "roda-wui.properties); METADATA_FIELD disposal rules will be skipped. If this job runs without the WUI "
+        + "configuration loaded, the allowlist will be empty.");
+    }
+
     for (AIP aip : aips) {
       LOGGER.debug("Processing AIP: {}", aip.getId());
 
@@ -207,7 +223,8 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
           reportItem.setPluginState(state).setPluginDetails(outcomeDetailsText);
           jobPluginInfo.incrementObjectsProcessedWithSkipped();
         } else {
-          disposalRuleUsed = ApplyDisposalRulesPluginUtils.applyRule(aip, disposalRules, index);
+          disposalRuleUsed = ApplyDisposalRulesPluginUtils.applyRule(aip, disposalRules, index,
+            allowedConditionFields);
 
           if (disposalRuleUsed.isPresent()) {
             // Schedule was applied
@@ -227,14 +244,17 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
             }
           } else {
             state = PluginState.SKIPPED;
-            outcomeDetailsText = "The AIP '" + aip.getId()
-              + "' did not match any disposal rule therefore the disposal schedule association was skipped";
+            outcomeDetailsText = metadataRulesSkipped
+              ? "No disposal rule matched AIP '" + aip.getId() + "'; METADATA_FIELD rules were skipped because no "
+                + "allowed metadata condition fields are configured (ui.search.fields.IndexedAIP in roda-wui.properties)"
+              : "The AIP '" + aip.getId()
+                + "' did not match any disposal rule therefore the disposal schedule association was skipped";
             reportItem.setPluginState(state).setPluginDetails(outcomeDetailsText);
             jobPluginInfo.incrementObjectsProcessedWithSkipped();
           }
 
         }
-      } catch (GenericException | NotFoundException e) {
+      } catch (GenericException e) {
         LOGGER.error("Failed to obtain index version of AIP '{}'", aip.getId(), e);
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         state = PluginState.FAILURE;

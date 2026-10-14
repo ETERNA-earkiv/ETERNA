@@ -2149,6 +2149,14 @@ public interface ClientMessages extends Messages {
 
   String disposalRuleConditionOperator();
 
+  String disposalRuleConditionAnd();
+
+  String disposalRuleConditionOr();
+
+  String disposalRuleAddCondition();
+
+  String disposalRuleRemoveCondition();
+
   String disposalScheduleTitle();
 
   String disposalScheduleIdentifier();

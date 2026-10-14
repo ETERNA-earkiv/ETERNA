@@ -15,6 +15,8 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.disposal.rule.ConditionType;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.rule.DisposalRuleCondition;
+import org.roda.core.data.v2.disposal.rule.DisposalRuleConditions;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.disposal.schedule.DisposalScheduleState;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
@@ -98,8 +100,9 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
   private Label previewHelpText;
 
   public DisposalRuleDataPanel(DisposalRule disposalRule, DisposalSchedules disposalSchedules, boolean editMode) {
-    metadataFieldsPanel = new MetadataFieldsPanel(disposalRule.getConditionKey(), disposalRule.getConditionValue(),
-      editMode, disposalRule);
+    metadataFieldsPanel = new MetadataFieldsPanel(
+      ConditionType.METADATA_FIELD.equals(disposalRule.getType()) ? disposalRule.getMetadataConditions() : null,
+      editMode);
     childOfPanel = new ChildOfPanel(disposalRule.getConditionKey(), disposalRule.getConditionValue(), editMode,
       disposalRule);
     initWidget(uiBinder.createAndBindUi(this));
@@ -148,12 +151,10 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
           }
           break;
         case METADATA_FIELD:
-          String solrField = metadataFieldsPanel.getValue().getFirst();
-          String searchCriteria = metadataFieldsPanel.getValue().getSecond();
-
-          if (StringUtils.isNotBlank(solrField) && StringUtils.isNotBlank(searchCriteria)) {
+          List<DisposalRuleCondition> conditions = metadataFieldsPanel.getValue();
+          if (hasCompleteConditions(conditions)) {
             previewHelpText.setVisible(false);
-            refreshPreviewAIPList(solrField, searchCriteria);
+            refreshPreviewAIPList(conditions);
           } else {
             previewHelpText.setVisible(true);
             previewAIPListCard.setVisible(false);
@@ -175,15 +176,38 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
   }
 
   private void refreshPreviewAIPList(final String solrMetadataField, final String searchCriteria) {
+    showPreview(new Filter(new SimpleFilterParameter(solrMetadataField, searchCriteria),
+      new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name())));
+  }
+
+  private void refreshPreviewAIPList(final List<DisposalRuleCondition> conditions) {
+    // Conditions folded with their per-condition AND/OR operators (shared helper) — the exact filter the apply job
+    // builds, so the preview shows precisely the AIPs that will be matched.
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name()));
+    filter.add(DisposalRuleConditions.toFilterParameter(conditions));
+    showPreview(filter);
+  }
+
+  private void showPreview(final Filter filter) {
     ListBuilder<IndexedAIP> aipsListBuilder = new ListBuilder<>(ConfigurableAsyncTableCell::new,
-      new AsyncTableCellOptions<>(IndexedAIP.class, "ShowDisposalSchedule_aips")
-        .withFilter(new Filter(new SimpleFilterParameter(solrMetadataField, searchCriteria),
-          new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name())))
+      new AsyncTableCellOptions<>(IndexedAIP.class, "ShowDisposalSchedule_aips").withFilter(filter)
         .withSummary(messages.listOfAIPs()).bindOpener());
 
     SearchWrapper aipsSearchWrapper = new SearchWrapper(false).createListAndSearchPanel(aipsListBuilder);
     previewAIPListCard.setWidget(aipsSearchWrapper);
     previewAIPListCard.setVisible(true);
+  }
+
+  private boolean hasCompleteConditions(final List<DisposalRuleCondition> conditions) {
+    if (conditions.isEmpty()) {
+      return false;
+    }
+    for (DisposalRuleCondition condition : conditions) {
+      if (StringUtils.isBlank(condition.getKey()) || StringUtils.isBlank(condition.getValue())) {
+        return false;
+      }
+    }
+    return true;
   }
 
   private void setEditMode() {
@@ -266,6 +290,8 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
 
     ValueChangeHandler<Pair<String, String>> valueChangeHandler = valueChangeEvent -> DisposalRuleDataPanel.this
       .onChange();
+    ValueChangeHandler<List<DisposalRuleCondition>> conditionsChangeHandler = valueChangeEvent -> DisposalRuleDataPanel.this
+      .onChange();
 
     title.addChangeHandler(changeHandler);
     description.addChangeHandler(changeHandler);
@@ -275,7 +301,7 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
     conditionTypeList.addChangeHandler(changeHandler);
     conditionTypeList.addChangeHandler(typeListChangeHandler);
 
-    metadataFieldsPanel.addValueChangeHandler(valueChangeHandler);
+    metadataFieldsPanel.addValueChangeHandler(conditionsChangeHandler);
     childOfPanel.addValueChangeHandler(valueChangeHandler);
   }
 
@@ -287,8 +313,14 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
     disposalRule.setDisposalScheduleName(disposalSchedulesList.getSelectedItemText());
     if (conditionTypeList.getSelectedValue().equals(ConditionType.METADATA_FIELD.name())) {
       disposalRule.setType(ConditionType.METADATA_FIELD);
-      disposalRule.setConditionKey(metadataFieldsPanel.getValue().getFirst());
-      disposalRule.setConditionValue(metadataFieldsPanel.getValue().getSecond());
+      List<DisposalRuleCondition> conditions = metadataFieldsPanel.getValue();
+      disposalRule.setConditions(conditions);
+      // Keep the legacy single-condition fields in sync with the first condition for backward compatibility with any
+      // reader that has not yet been migrated to getMetadataConditions().
+      if (!conditions.isEmpty()) {
+        disposalRule.setConditionKey(conditions.get(0).getKey());
+        disposalRule.setConditionValue(conditions.get(0).getValue());
+      }
     } else {
       disposalRule.setType(ConditionType.IS_CHILD_OF);
       if (childOfPanel.getValue() != null) {

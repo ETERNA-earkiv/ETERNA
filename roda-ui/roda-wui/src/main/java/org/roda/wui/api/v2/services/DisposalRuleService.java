@@ -9,8 +9,11 @@ package org.roda.wui.api.v2.services;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.roda.core.common.DisposalRuleConditionFields;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -20,6 +23,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.disposal.rule.ConditionType;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.rule.DisposalRuleCondition;
 import org.roda.core.data.v2.disposal.rule.DisposalRules;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.disposal.schedule.DisposalScheduleState;
@@ -96,13 +100,38 @@ public class DisposalRuleService {
     if (!isRuleScheduleValid(disposalRule, disposalSchedules)) {
       throw new DisposalRuleNotValidException("The disposal rule schedule is not valid");
     }
+
+    if (ConditionType.METADATA_FIELD.equals(disposalRule.getType()) && !isMetadataConditionValid(disposalRule)) {
+      throw new DisposalRuleNotValidException("The disposal rule condition is not valid: the condition key and value "
+        + "are mandatory and the condition key must be one of the configured text search fields");
+    }
+  }
+
+  /**
+   * Validates the conditions of a {@link ConditionType#METADATA_FIELD} rule. The rule must carry at least one
+   * condition, and every condition's key and value must be present with the key being one of the allowed condition
+   * fields. The whitelist lives in core ({@link DisposalRuleConditionFields#allowedMetadataConditionFields()}) so the
+   * API and the apply job enforce exactly the same set of fields. This prevents incomplete rules (which would fail the
+   * apply job with a null value) and stops arbitrary, non-whitelisted Solr field names from reaching the query the
+   * apply job builds.
+   */
+  private boolean isMetadataConditionValid(DisposalRule rule) {
+    List<DisposalRuleCondition> conditions = rule.getMetadataConditions();
+    if (conditions.isEmpty()) {
+      return false;
+    }
+    Set<String> allowedFields = DisposalRuleConditionFields.allowedMetadataConditionFields();
+    for (DisposalRuleCondition condition : conditions) {
+      if (StringUtils.isBlank(condition.getKey()) || StringUtils.isBlank(condition.getValue())
+        || !allowedFields.contains(condition.getKey())) {
+        return false;
+      }
+    }
+    return true;
   }
 
   private boolean isConditionTypeValid(ConditionType type) {
-    if (StringUtils.isNotBlank(type.toString())) {
-      return ConditionType.IS_CHILD_OF.equals(type) || ConditionType.METADATA_FIELD.equals(type);
-    }
-    return false;
+    return ConditionType.IS_CHILD_OF.equals(type) || ConditionType.METADATA_FIELD.equals(type);
   }
 
   private boolean isRuleScheduleValid(DisposalRule rule, DisposalSchedules disposalSchedules) {
