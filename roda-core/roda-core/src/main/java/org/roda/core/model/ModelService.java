@@ -48,6 +48,7 @@ import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.rule.DisposalRules;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.DIP;
@@ -77,6 +78,7 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
+
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.ContentPayload;
@@ -90,6 +92,13 @@ import org.roda.core.storage.fs.FileStorageService;
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 public interface ModelService extends ModelObservable {
+  enum JobName {
+	  CREATE_AIP,
+	  DELETE_AIP,
+	  CREATE_REPRESENTATION,
+      DELETE_REPRESENTATION
+  }
+    
   StorageService getStorage();
 
   CloseableIterable<OptionalWithCause<AIP>> listAIPs()
@@ -1015,4 +1024,11 @@ public interface ModelService extends ModelObservable {
 
   Date retrievePreservationMetadataCreationDate(PreservationMetadata pm)
     throws RequestNotValidException, GenericException;
+
+  void updateOriginalMETS(IsRODAObject object1, IsRODAObject object2, ModelService.JobName jobName)
+    throws
+		AuthorizationDeniedException,
+		GenericException,
+		NotFoundException,
+		RequestNotValidException;
 }

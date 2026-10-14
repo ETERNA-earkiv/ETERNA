@@ -8,6 +8,8 @@
 package org.roda.core.plugins.base.originalmets;
 
 import jakarta.xml.bind.JAXBException;
+
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
@@ -24,6 +26,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.model.ModelService;
@@ -31,8 +34,12 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda_project.commons_ip.utils.IPException;
 import org.roda_project.commons_ip2.mets_v1_12.beans.AmdSecType;
 import org.roda_project.commons_ip2.mets_v1_12.beans.DivType;
+import org.roda_project.commons_ip2.mets_v1_12.beans.FileType;
+import org.roda_project.commons_ip2.mets_v1_12.beans.FileType.FLocat;
 import org.roda_project.commons_ip2.mets_v1_12.beans.MdSecType;
 import org.roda_project.commons_ip2.mets_v1_12.beans.Mets;
+import org.roda_project.commons_ip2.mets_v1_12.beans.MetsType.FileSec;
+import org.roda_project.commons_ip2.mets_v1_12.beans.MetsType.FileSec.FileGrp;
 import org.roda_project.commons_ip2.mets_v1_12.beans.StructMapType;
 import org.roda_project.commons_ip2.model.IPConstants;
 import org.roda_project.commons_ip2.model.MetsWrapper;
@@ -83,6 +90,9 @@ public class UpdateOriginalMETS {
     private static final String RELATEDPACKAGE = "RelatedPackage";
     private static final String ANCESTORS = "Parent";
     private static final String DESCENDENTS = "Children";
+    
+    private static final String REPRESENTATION = "Representation";
+    private static final String REPRESENTATIONS = "Representations";
 
     public static void update(
         PreservationMetadata pm,
@@ -111,7 +121,7 @@ public class UpdateOriginalMETS {
                     metsPath
                 );
 
-                handleStructurMap(modelService, pm.getAipId(), metsWrapper);
+                handleParentAIP(modelService, pm.getAipId(), metsWrapper);
 
                 java.io.File file = modelService
                     .getStorage()
@@ -157,30 +167,42 @@ public class UpdateOriginalMETS {
                 Path representationPath = Path.of(
                     IPConstants.REPRESENTATIONS_FOLDER
                 ).resolve(Path.of(pm.getRepresentationId()));
+
                 Path metsPath = OriginalMETSUtils.metsPath(
                     modelService,
                     aipPath,
                     representationPath
                 );
+
+                AIP aipTemp = modelService.retrieveAIP(pm.getAipId());
+                Optional<Representation> rep = aipTemp.getRepresentations().stream().filter(r -> r.getId().equals(pm.getRepresentationId())).findFirst();
+                if (rep.isPresent() && ! new File(metsPath.toString()).exists()) {
+                    CreateRepresentationMETS.create(rep.get(), modelService);
+                }
+
                 MetsWrapper metsWrapper = new MetsWrapper(
                     METSUtils.instantiateMETSFromFile(metsPath),
                     metsPath
                 );
 
-                Path subFolders = Path.of(
-                    pm
-                        .getFileDirectoryPath()
-                        .stream()
-                        .map(p -> p)
-                        .collect(Collectors.joining(java.io.File.separator))
-                );
+                Path subFolders = Path.of("");
+                if (pm.getFileDirectoryPath() != null) {
+	                subFolders = Path.of(
+	                    pm
+	                        .getFileDirectoryPath()
+	                        .stream()
+	                        .map(p -> p)
+	                        .collect(Collectors.joining(java.io.File.separator))
+	                );
+                }
 
                 String fileName = "";
                 if (pm.getType().name().equals("FILE")) {
                     fileName = pm.getId() + PREMIS_FILE_TYPE;
                 } else if (pm.getType().name().equals("EVENT")) {
+                	String pmFileId = pm.getFileId() != null ? "%3A" + pm.getFileId() : "";
                     fileName =
-                        pm.getId() + "%3A" + pm.getFileId() + PREMIS_FILE_TYPE;
+                        pm.getId() + pmFileId + PREMIS_FILE_TYPE;
                 } else {
                     return;
                 }
@@ -202,13 +224,7 @@ public class UpdateOriginalMETS {
                         java.io.File.separator +
                         IPConstants.PRESERVATION +
                         java.io.File.separator +
-                        pm
-                            .getFileDirectoryPath()
-                            .stream()
-                            .map(p -> p)
-                            .collect(
-                                Collectors.joining(java.io.File.separator)
-                            ) +
+                        subFolders +
                         java.io.File.separator +
                         file.getName();
 
@@ -246,7 +262,6 @@ public class UpdateOriginalMETS {
             | RequestNotValidException
             | SAXException e
         ) {
-            e.printStackTrace();
             LOG.error(
                 "Then update the original AIP {} METS file - Error: {}",
                 pm.getAipId(),
@@ -340,7 +355,6 @@ public class UpdateOriginalMETS {
             | RequestNotValidException
             | SAXException e
         ) {
-            e.printStackTrace();
             LOG.error(
                 "Then update the original AIP {} representation {} METS file - Error: {}",
                 aipId,
@@ -350,13 +364,22 @@ public class UpdateOriginalMETS {
         }
     }
 
-    // STRUCTUREMAP
-    private static void handleStructurMap(
+    // PARENT AIP
+    public static void handleParentAIP(
         ModelService modelService,
         String aipId,
         MetsWrapper metsWrapper
     )
-        throws AuthorizationDeniedException, GenericException, IOException, IPException, JAXBException, NotFoundException, RequestNotValidException, SAXException {
+        throws 
+        	AuthorizationDeniedException, 
+        	GenericException, 
+        	IOException, 
+        	IPException, 
+        	JAXBException, 
+        	NotFoundException, 
+        	RequestNotValidException, 
+        	SAXException 
+    {
         AIP aip = modelService.retrieveAIP(aipId);
         AIP parentAIP = null;
 
@@ -365,8 +388,8 @@ public class UpdateOriginalMETS {
                 modelService.retrieveAIP(aipId).getParentId()
             );
         }
-
-        StructMapType structMapType = getStructureMap(metsWrapper);
+        
+        StructMapType structMapType = getStructMapList(metsWrapper, RELATEDPACKAGE).getFirst();
         Optional<DivType> optionalAncestorDivType = structMapType
             .getDiv()
             .getDiv()
@@ -376,7 +399,7 @@ public class UpdateOriginalMETS {
 
         if (parentAIP != null) {
             final String pId = parentAIP.getId();
-
+            
             DivType ancestorDivType;
             if (!optionalAncestorDivType.isPresent()) {
                 ancestorDivType = createDivType(ANCESTORS);
@@ -405,7 +428,7 @@ public class UpdateOriginalMETS {
                 }
 
                 ancestorDivType.getMptr().clear();
-
+                
                 DivType.Mptr divTypeMptr = createMptrDivType(parentAIP.getId());
                 ancestorDivType.getMptr().add(divTypeMptr);
                 addDescendentToParent(modelService, aipId, parentAIP.getId());
@@ -413,7 +436,7 @@ public class UpdateOriginalMETS {
         } else {
             if (optionalAncestorDivType.isPresent()) {
                 DivType ancestorDivType = optionalAncestorDivType.get();
-
+                
                 Optional<DivType.Mptr> optionalDivTypeMptr = ancestorDivType
                     .getMptr()
                     .stream()
@@ -431,29 +454,31 @@ public class UpdateOriginalMETS {
         }
     }
 
-    private static StructMapType getStructureMap(MetsWrapper metsWrapper) {
-        List<StructMapType> structMapTypeList = metsWrapper
-            .getMets()
-            .getStructMap()
-            .stream()
-            .filter(s -> s.getLABEL().equals(RELATEDPACKAGE))
-            .toList();
+    private static List<StructMapType> getStructMapList(MetsWrapper metsWrapper, String label) {
+        List<StructMapType> structMapList = findStructMap(metsWrapper, label);
 
-        StructMapType structMapType;
-        if (!structMapTypeList.isEmpty()) {
-            structMapType = structMapTypeList.getFirst();
-        } else {
-            structMapType = createStructureMap();
-            metsWrapper.getMets().getStructMap().add(structMapType);
+        if (structMapList.isEmpty()) {
+        	StructMapType structMapType = createStructMap(label);
+        	metsWrapper.getMets().getStructMap().add(structMapType);
+        	structMapList = findStructMap(metsWrapper, label);
         }
 
-        return structMapType;
+        return structMapList;
+    }
+    
+    private static List<StructMapType> findStructMap(MetsWrapper metsWrapper, String label) {
+    	return metsWrapper
+                .getMets()
+                .getStructMap()
+                .stream()
+                .filter(s -> s.getLABEL().equals(label))
+                .toList();
     }
 
-    private static StructMapType createStructureMap() {
+    public static StructMapType createStructMap(String label) {
         StructMapType structMapType = new StructMapType();
         structMapType.setID("uuid-" + UUID.randomUUID().toString());
-        structMapType.setLABEL(RELATEDPACKAGE);
+        structMapType.setLABEL(label);
         DivType dt = new DivType();
         dt.setID("uuid-" + UUID.randomUUID().toString());
         structMapType.setDiv(dt);
@@ -465,7 +490,16 @@ public class UpdateOriginalMETS {
         String aipId,
         String parentAipId
     )
-        throws AuthorizationDeniedException, GenericException, IOException, IPException, JAXBException, NotFoundException, RequestNotValidException, SAXException {
+        throws 
+        	AuthorizationDeniedException, 
+        	GenericException, 
+        	IOException, 
+        	IPException, 
+        	JAXBException, 
+        	NotFoundException, 
+        	RequestNotValidException, 
+        	SAXException 
+    {
         StoragePath parentAipPath = ModelUtils.getAIPStoragePath(parentAipId);
         Path metsPath = OriginalMETSUtils.metsPath(modelService, parentAipPath);
         MetsWrapper metsWrapper = new MetsWrapper(
@@ -473,7 +507,7 @@ public class UpdateOriginalMETS {
             metsPath
         );
 
-        StructMapType structMapType = getStructureMap(metsWrapper);
+        StructMapType structMapType = getStructMapList(metsWrapper, RELATEDPACKAGE).getFirst();
 
         Optional<DivType> optionalDescendentsDivType = structMapType
             .getDiv()
@@ -487,6 +521,7 @@ public class UpdateOriginalMETS {
             structMapType.getDiv().getDiv().add(descendentsDivType);
             descendentsDivType.getMptr().add(createMptrDivType(aipId));
             METSUtils.marshallMETS(metsWrapper.getMets(), metsPath, true);
+            
         } else {
             Optional<DivType.Mptr> optionalDivTypeMptr =
                 optionalDescendentsDivType
@@ -517,7 +552,16 @@ public class UpdateOriginalMETS {
         String aipId,
         String parentAipId
     )
-        throws AuthorizationDeniedException, GenericException, IOException, IPException, JAXBException, NotFoundException, RequestNotValidException, SAXException {
+        throws 
+        	AuthorizationDeniedException, 
+        	GenericException, 
+        	IOException, 
+        	IPException, 
+        	JAXBException, 
+        	NotFoundException, 
+        	RequestNotValidException, 
+        	SAXException 
+    {
         StoragePath parentAipPath = ModelUtils.getAIPStoragePath(parentAipId);
         Path metsPath = OriginalMETSUtils.metsPath(modelService, parentAipPath);
         MetsWrapper metsWrapper = new MetsWrapper(
@@ -525,7 +569,7 @@ public class UpdateOriginalMETS {
             metsPath
         );
 
-        StructMapType structMapType = getStructureMap(metsWrapper);
+        StructMapType structMapType = getStructMapList(metsWrapper, RELATEDPACKAGE).getFirst();
         Optional<DivType> optionalDescendentsDivType = structMapType
             .getDiv()
             .getDiv()
@@ -557,7 +601,17 @@ public class UpdateOriginalMETS {
         String removedAipId,
         String parentAipId
     )
-        throws AuthorizationDeniedException, GenericException, IOException, IPException, JAXBException, NotFoundException, RequestNotValidException, SAXException {
+        throws 
+        	AuthorizationDeniedException, 
+        	GenericException, 
+        	IOException, 
+        	IPException, 
+        	JAXBException, 
+        	NotFoundException, 
+        	RequestNotValidException, 
+        	SAXException 
+    {
+    	
         boolean keepOriginalMets = RodaCoreFactory.getProperty(
             RodaConstants.CORE_PLUGINS_BASE_KEEP_ORIGINAL_METS,
             false
@@ -565,7 +619,7 @@ public class UpdateOriginalMETS {
         if (!keepOriginalMets) {
             return;
         }
-
+        
         removeDescendentFromParent(modelService, removedAipId, parentAipId);
     }
 
@@ -593,7 +647,12 @@ public class UpdateOriginalMETS {
         Path metsPath,
         boolean isRoot
     )
-        throws IOException, DatatypeConfigurationException, IPException, JAXBException {
+        throws 
+        	IOException, 
+        	DatatypeConfigurationException, 
+        	IPException, 
+        	JAXBException 
+    {
         MdSecType mdSecType = new MdSecType();
         mdSecType.setID("uuid-" + UUID.randomUUID().toString());
         mdSecType.setGROUPID("PREMIS");
@@ -627,13 +686,160 @@ public class UpdateOriginalMETS {
 
     // Check if AMDSEC element is available
     private static void checkAmdSec(MetsWrapper metsWrapper)
-        throws IOException, IPException, JAXBException {
+        throws 
+        	IOException,
+        	IPException, 
+        	JAXBException {
+    	
         try {
             metsWrapper.getMets().getAmdSec().getFirst();
         } catch (java.util.NoSuchElementException e) {
             AmdSecType amdSec = new AmdSecType();
             amdSec.setID("uuid-" + UUID.randomUUID().toString());
             metsWrapper.getMets().getAmdSec().add(amdSec);
+        }
+    }
+    
+    public static void addRepresentationToMETS(
+    	Representation representation, 
+    	ModelService modelService
+    ) 
+    	throws GenericException, 
+    		IOException, 
+    		DatatypeConfigurationException, 
+    		IPException, 
+    		JAXBException, 
+    		NotFoundException, 
+    		RequestNotValidException, 
+    		SAXException, 
+    		AuthorizationDeniedException 
+    {
+    	
+    	AIP aip = modelService.retrieveAIP(representation.getAipId());
+    	StoragePath aipPath = ModelUtils.getAIPStoragePath(representation.getAipId());
+    	Path metsPath = OriginalMETSUtils.metsPath(
+                modelService,
+                aipPath
+            );
+        MetsWrapper metsWrapper = new MetsWrapper(
+            METSUtils.instantiateMETSFromFile(metsPath),
+            metsPath
+        );
+    	
+    	StructMapType structMapType = createStructMap(REPRESENTATION);
+        
+        DivType.Mptr mptr = new DivType.Mptr();
+        mptr.setLOCTYPE("URL");
+        mptr.setOTHERLOCTYPE("UUID");
+        mptr.setType("simple");
+        mptr.setHref(REPRESENTATIONS.toLowerCase() + "/" + representation.getId() + "/" + IPConstants.METS_FILE);
+        mptr.setTitle("UUID-" + UUID.randomUUID());
+        
+        DivType dt = new DivType();
+        dt.setID("uuid-" + UUID.randomUUID().toString());
+        dt.setLABEL(REPRESENTATIONS + "/" + representation.getId());
+        dt.getMptr().add(mptr);
+        structMapType.setDiv(dt);
+        metsWrapper.getMets().getStructMap().add(structMapType);
+        
+        FileType.FLocat flocat = new FileType.FLocat();
+        flocat.setID("uuid-" + UUID.randomUUID().toString());
+        flocat.setType("simple");
+        flocat.setHref(REPRESENTATIONS.toLowerCase() + "/" + representation.getId() + "/" + IPConstants.METS_FILE);
+        flocat.setLOCTYPE("URL");
+        
+        java.io.File file = modelService
+                .getStorage()
+                .getDirectAccess(aipPath)
+                .getPath()
+                .resolve(Path.of(IPConstants.REPRESENTATIONS_FOLDER))
+                .resolve(Path.of(representation.getId()))
+                .resolve(IPConstants.METS_FILE)
+                .toFile();
+        FileType fileType = new FileType();
+        fileType.setID("uuid-" + UUID.randomUUID().toString());
+        fileType.setMIMETYPE("text/xml");
+        fileType.setCREATED(OriginalMETSUtils.currentDateAndTime());
+        fileType.setSIZE(FileUtils.sizeOf(file));
+        fileType.setCHECKSUM(
+                DigestUtils.md5Hex(
+                        java.nio.file.Files.readAllBytes(file.toPath())
+                    ).toUpperCase());
+        fileType.setCHECKSUMTYPE("MD5");
+        fileType.getFLocat().add(flocat);
+        
+        FileSec.FileGrp fileGroup = new FileSec.FileGrp();
+        fileGroup.setID("uuid-" + UUID.randomUUID().toString());
+        fileGroup.setUSE(REPRESENTATIONS + "/" + representation.getId());
+        fileGroup.getFile().add(fileType);
+        
+        if (metsWrapper.getMets().getFileSec() == null) {
+        	FileSec fileSec = new FileSec();
+            fileSec.setID("uuid-" + UUID.randomUUID().toString());
+            metsWrapper.getMets().setFileSec(fileSec);
+        }
+        
+        metsWrapper.getMets().getFileSec().getFileGrp().add(fileGroup);
+        
+        METSUtils.marshallMETS(metsWrapper.getMets(), metsPath, true);
+    }
+    
+    public static void handleMETSWhenRemovedRepresentation(
+    		ModelService modelService, 
+    		String aipId, 
+    		String representationId) 
+    	throws 
+        	AuthorizationDeniedException, 
+        	GenericException, 
+        	IOException, 
+        	IPException, 
+        	JAXBException, 
+        	NotFoundException, 
+        	RequestNotValidException, 
+        	SAXException {
+ 
+    	StoragePath aipPath = ModelUtils.getAIPStoragePath(aipId);
+        Path metsPath = OriginalMETSUtils.metsPath(modelService, aipPath);
+        MetsWrapper metsWrapper = new MetsWrapper(
+            METSUtils.instantiateMETSFromFile(metsPath),
+            metsPath
+        );
+        
+        boolean doJob = false;
+        
+        List<StructMapType> structMapTypeList = findStructMap(metsWrapper, REPRESENTATION);
+        Optional<StructMapType> st = structMapTypeList
+        	.stream()
+        	.filter(s -> s.getDiv().getLABEL().endsWith(representationId))
+        	.findFirst();
+        if (st.isPresent()) {
+        	metsWrapper.getMets().getStructMap().remove(st.get());
+        	doJob = true;
+        	
+        }
+        
+        FileSec fileSec = metsWrapper.getMets().getFileSec();
+        if (fileSec != null) {
+        	Optional<FileGrp> fG = fileSec.getFileGrp()
+        		.stream()
+        		.filter(fg -> fg.getUSE().equals(REPRESENTATIONS + "/" + representationId))
+        		.findFirst();
+        	
+        	if (fG.isPresent()) {
+        		metsWrapper.getMets().getFileSec().getFileGrp().remove(fG.get());
+        		
+        		// Also cleanup filesec if empty
+        		if (metsWrapper.getMets().getFileSec().getFileGrp().isEmpty()) {
+        			metsWrapper.getMets().setFileSec(null);
+        		}
+        		
+        		doJob = true;
+        	}
+        		
+        }
+        
+        if (doJob) {
+        	METSUtils.marshallMETS(metsWrapper.getMets(), metsPath, true);
         }
     }
 }
