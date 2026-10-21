@@ -305,8 +305,10 @@ public class BulkUpdateDescriptiveMetadataPlugin extends AbstractPlugin<AIP> {
       outcomeText.append(". ").append(details);
     }
 
-    model.createUpdateAIPEvent(aip.getId(), null, null, null, PreservationEventType.METADATA_MODIFICATION,
-      EVENT_DESCRIPTION, state, outcomeText.toString(), details, job.getUsername(), true, null);
+    if (!PluginState.SKIPPED.equals(state)) {
+      model.createUpdateAIPEvent(aip.getId(), null, null, null, PreservationEventType.METADATA_MODIFICATION,
+        EVENT_DESCRIPTION, state, outcomeText.toString(), details, job.getUsername(), true, null);
+    }
     report.addReport(reportItem);
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
   }
