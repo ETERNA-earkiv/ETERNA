@@ -80,7 +80,7 @@ public class Main extends Composite implements EntryPoint {
   @UiField(provided = true)
   ContentPanel contentPanel;
 
-  Composite footer;
+  Footer footer;
 
   /**
    * Create a new main
@@ -119,6 +119,7 @@ public class Main extends Composite implements EntryPoint {
     // Add main widget to root panel
     RootPanel.get().add(this);
     RootPanel.get().add(footer);
+    footer.showVersion();
     RootPanel.get().addStyleName("roda");
 
     // Initialize

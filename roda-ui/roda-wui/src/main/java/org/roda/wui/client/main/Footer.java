@@ -45,7 +45,14 @@ public class Footer extends Composite {
     initWidget(layout);
   }
 
-  private void showVersion() {
+  /**
+   * Called both when Footer.html has loaded and when shared properties are
+   * initialized, since either may finish first.
+   */
+  public void showVersion() {
+    if (!ConfigurationManager.isInitialized()) {
+      return;
+    }
     String version = ConfigurationManager.getString("ui", "version");
     if (version == null) {
       return;
