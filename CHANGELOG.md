@@ -1,6 +1,6 @@
 # ETERNA Changelog
 
-## v1.0.1 (unreleased)
+## v1.1.0 (unreleased)
 
 #### New features
 - Added a "Ladda ner valda filer" action that downloads selected files and folders as a zip of file content only, with paths relative to the representation's `data/`; the selection is validated before anything is streamed and again just before delivery, a selection that cannot be delivered is refused with an explanation instead of a technical error, large selections ask for confirmation, and the disclosed file UUIDs, count and total size are recorded in the audit log [#589](https://github.com/ETERNA-earkiv/ETERNA/issues/589)
@@ -14,6 +14,7 @@
 - Added descriptive metadata support for DILCISBoard CITS ERMS 2.x (v2.1.2) and 3.x (v3.0.2), with internal types `cits_erms_2` and `cits_erms_3`: XSD validation, ingest crosswalks indexing title, system identifier, status, open date (normalised to UTC) and parent aggregation into Solr fields shared by both versions (`title` and `erms_*`, so search works across them); for 3.x the crosswalk also maps the description level (an aggregation becomes `file` — `class` stays `class` — and a record becomes `item`) and the date range (`dateInitial`/`dateFinal`) from the opened/closed dates; HTML dissemination views, metadata editor templates, advanced-search fields and Swedish/English labels [#674](https://github.com/ETERNA-earkiv/ETERNA/pull/674)
 
 #### Improvements
+- The footer now shows the running version next to the product name (e.g. "ETERNA v1.1.0"), read from Spring Boot build info and exposed to the UI as the shared property `ui.version`
 - Pinned the `eterna-unoserver` image to an immutable version tag (`v3.7.0`) in the deploy compose files, and updated the build workflow to publish `v3.7.0` alongside `:latest`, so deployments are reproducible [#600](https://github.com/ETERNA-earkiv/ETERNA/issues/600)
 - The parent-node selector now shows a lazy-loading tree of logical units instead of a flat list when picking a target during ingest, move and disposal-rule editing; the filter field runs a search that lists matching units with their ancestor path (breadcrumb), only structural levels are selectable (`file`/`item` are hidden), and when moving, the moved node and its subtree are shown but greyed out so a package cannot be moved into its own hierarchy [#301](https://github.com/ETERNA-earkiv/ETERNA/issues/301)
 - Translated the remaining English email templates (`generic-template.vm`, `ingestion-template.vm`) to Swedish; also fixed an unclosed HTML tag in the mail templates and simplified the email footer to match the other translated templates [#633](https://github.com/ETERNA-earkiv/ETERNA/issues/633) [#634](https://github.com/ETERNA-earkiv/ETERNA/pull/634)
@@ -23,12 +24,9 @@
 #### Bug fixes
 - License button on built-in plugins (archive maintenance jobs) is now hidden when no license file exists, instead of opening an empty dialog [#366](https://github.com/ETERNA-earkiv/ETERNA/issues/366)
 - Fixed Swedish label "Start datum" → "Startdatum" in the internal actions (job) detail view [#542](https://github.com/ETERNA-earkiv/ETERNA/issues/542)
-- Catalog tree no longer shows AIPs at description level `item` or `file` [#604](https://github.com/ETERNA-earkiv/ETERNA/issues/604)
 - Fixed flickering horizontal scrollbar on data table list pages (e.g. ingest process); the footer no longer scrolls horizontally with the table [#605](https://github.com/ETERNA-earkiv/ETERNA/issues/605) [#609](https://github.com/ETERNA-earkiv/ETERNA/pull/609)
 - Empty-search results now show a single, consistent message with troubleshooting tips regardless of the search term (previously a wildcard search such as `blå*` showed a different, mistranslated message); corrected the Swedish text and fixed the misaligned reset-filters link [#378](https://github.com/ETERNA-earkiv/ETERNA/issues/378)
 - Fixed `ClassCastException` that broke list rendering when a column used a rendering hint (e.g. `DATE_FORMAT_SIMPLE`) on a multivalued field; each element is now formatted with the hint and shown as a comma-separated list [#607](https://github.com/ETERNA-earkiv/ETERNA/issues/607)
-- Catalog tree now resolves ancestors in a single batch, so records the user has access to are no longer shown as "Åtkomst saknas"; an ancestor the user cannot access is shown as plain "Åtkomst saknas" text in the breadcrumb [#643](https://github.com/ETERNA-earkiv/ETERNA/issues/643) [#645](https://github.com/ETERNA-earkiv/ETERNA/pull/645)
-- Fixed the web archive (WARC/WACZ) viewer failing to load: removed the `Cross-Origin-Embedder-Policy` headers added in v1.0.0, since COEP on the parent page blocked the ReplayWeb.page iframe served by its service worker (`Cross-Origin-Opener-Policy` is kept) [#646](https://github.com/ETERNA-earkiv/ETERNA/pull/646)
 - The mandatory ingest step "Metadatavalidering" (`DescriptiveMetadataValidationPlugin`) never validated descriptive metadata against the XSD: the ingest workflow only passed its on/off switch (`parameter.do_descriptive_metadata_validation`) while the plugin reads `parameter.validate_descriptive_metadata` (default false), so a SIP with schema-invalid metadata was accepted. The step now forces `parameter.validate_descriptive_metadata=true`; schema errors fail the package with the validator message in the report. **Upgrade note:** SIPs that were previously accepted with schema-invalid metadata are now rejected [#681](https://github.com/ETERNA-earkiv/ETERNA/pull/681)
 - Search export mapped some fields to non-existent Solr fields (`active` → `isActive`, `directRoles` → `rolesDirect` etc.), so those columns were exported empty [#680](https://github.com/ETERNA-earkiv/ETERNA/pull/680)
 - Updating or deleting a group now re-indexes its previous and current members, so `rolesAll` and `groups` in the member index follow the change; bulk re-indexing (`ReindexRodaMemberPlugin`, start-up) skips the per-member re-index [#680](https://github.com/ETERNA-earkiv/ETERNA/pull/680)
@@ -38,13 +36,20 @@
 - The statistics page boxes for number of authentications and successful vs failed logins always showed 0, since they filtered on the removed `org.roda.wui.api.controllers.UserLogin` component; they now count logins from `org.roda.wui.api.v2.controller.MembersController` [#679](https://github.com/ETERNA-earkiv/ETERNA/pull/679)
 
 #### Security updates
-- Fixed GHSA-9xv2-5v5q-p794, GHSA-gcx9-497g-6cp6, GHSA-h3x4-894j-xpx5 (critical): upgraded embedded Tomcat to 10.1.60
-- Fixed GHSA-3qp7-7mw8-wx86, GHSA-c4c3-7fpv-j4q5, GHSA-c653-97m9-rcg9, GHSA-fccg-mwvh-qqg4, GHSA-x4gw-5cx5-pgmh, GHSA-558v-64gr-wgg4: upgraded `netty` to 4.1.138.Final via `netty-bom` (also aligns `netty-resolver` and epoll modules, previously 4.1.127)
-- Fixed GHSA-9pwp-9qqc-pr26, GHSA-qp49-qgx5-5m26: upgraded `bcprov`/`bcpkix-jdk18on` to 1.86
-- Fixed GHSA-3pjw-73gf-8qr5, GHSA-5jmj-h7xm-6q6v, GHSA-hgj6-7826-r7m5, GHSA-j3rv-43j4-c7qm, GHSA-rmj7-2vxq-3g9f, GHSA-72hv-8253-57qq, GHSA-r7wm-3cxj-wff9: upgraded Jackson to 2.21.7 via `jackson-bom` (all Jackson modules aligned)
-- Fixed GHSA-r4gv-qr8j-p3pg: upgraded `handlebars` to 4.5.5
-- Fixed GHSA-j92g-9f8w-j867: upgraded PostgreSQL driver to 42.7.13
-- Fixed GHSA-hjcp-jmpx-g3qm: upgraded `httpclient5` to 5.6.4 (with `httpcore5` 5.4.3)
+- Fixed GHSA-9xv2-5v5q-p794, GHSA-gcx9-497g-6cp6, GHSA-h3x4-894j-xpx5 (critical): upgraded embedded Tomcat to 10.1.61
+- Fixed GHSA-3qp7-7mw8-wx86, GHSA-c4c3-7fpv-j4q5, GHSA-c653-97m9-rcg9, GHSA-fccg-mwvh-qqg4, GHSA-x4gw-5cx5-pgmh, GHSA-558v-64gr-wgg4: upgraded `netty` (codec, handler, transport, common, buffer) to 4.1.137.Final
+- Fixed GHSA-9pwp-9qqc-pr26, GHSA-qp49-qgx5-5m26: upgraded `bcprov`/`bcpkix-jdk18on` to 1.85
+- Fixed GHSA-r4gv-qr8j-p3pg: upgraded `handlebars` to 4.5.2
+- Fixed GHSA-j92g-9f8w-j867: upgraded PostgreSQL driver to 42.7.12
+- Fixed GHSA-hjcp-jmpx-g3qm: upgraded `httpclient5` to 5.6.3 (with `httpcore5` 5.4.3)
+- Fixed GHSA-2rmj-mq67-h97g, GHSA-4gc7-5j7h-4qph, GHSA-6r3c-xf4w-jxjm in the GWT code server (development only): upgraded `spring-web` to 6.2.18
+
+## v1.0.1 (2026-10-14)
+
+#### Bug fixes
+- Catalog tree no longer shows AIPs at description level `item` or `file` [#604](https://github.com/ETERNA-earkiv/ETERNA/issues/604)
+- Catalog tree now resolves ancestors in a single batch, so records the user has access to are no longer shown as "Åtkomst saknas"; an ancestor the user cannot access is shown as plain "Åtkomst saknas" text in the breadcrumb [#643](https://github.com/ETERNA-earkiv/ETERNA/issues/643) [#645](https://github.com/ETERNA-earkiv/ETERNA/pull/645)
+- Fixed the web archive (WARC/WACZ) viewer failing to load: removed the `Cross-Origin-Embedder-Policy` headers added in v1.0.0, since COEP on the parent page blocked the ReplayWeb.page iframe served by its service worker (`Cross-Origin-Opener-Policy` is kept) [#646](https://github.com/ETERNA-earkiv/ETERNA/pull/646)
 
 ## v1.0.0 (2026-06-15)
 
