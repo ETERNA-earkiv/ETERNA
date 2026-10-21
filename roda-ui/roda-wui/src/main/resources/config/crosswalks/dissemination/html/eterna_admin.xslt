@@ -16,6 +16,10 @@
 	<xsl:param name="i18n.sekretessgrund" select="'Legal basis (OSL)'"/>
 	<xsl:param name="i18n.puSection" select="'Personal data'"/>
 	<xsl:param name="i18n.personuppgifter" select="'Personal data assessment'"/>
+	<xsl:param name="i18n.personuppgiftsniva" select="'Personal data level'"/>
+	<xsl:param name="i18n.personuppgiftsniva.niva_1" select="'Level 1 - harmless'"/>
+	<xsl:param name="i18n.personuppgiftsniva.niva_2" select="'Level 2 - protected'"/>
+	<xsl:param name="i18n.personuppgiftsniva.niva_3" select="'Level 3 - sensitive'"/>
 	<xsl:param name="i18n.pulGrund" select="'Legal basis for processing'"/>
 	<xsl:param name="i18n.granskningSection" select="'Review'"/>
 	<xsl:param name="i18n.granskningsdatum" select="'Review date'"/>
@@ -41,6 +45,10 @@
 			<xsl:call-template name="fieldWithVocab">
 				<xsl:with-param name="label" select="$i18n.personuppgifter" />
 				<xsl:with-param name="value" select="normalize-space(//ea:eternaAdmin/ea:personuppgifter)" />
+			</xsl:call-template>
+			<xsl:call-template name="fieldWithVocab">
+				<xsl:with-param name="label" select="$i18n.personuppgiftsniva" />
+				<xsl:with-param name="value" select="normalize-space(//ea:eternaAdmin/ea:personuppgiftsniva)" />
 			</xsl:call-template>
 			<xsl:call-template name="field">
 				<xsl:with-param name="label" select="$i18n.pulGrund" />
@@ -94,6 +102,11 @@
 						<xsl:when test="$value = 'inga'">Inga personuppgifter</xsl:when>
 						<xsl:when test="$value = 'forekommer'">Personuppgifter förekommer</xsl:when>
 						<xsl:when test="$value = 'kansliga_forekommer'">Känsliga personuppgifter förekommer</xsl:when>
+						<!-- personuppgiftsniva: etiketter via i18n-parametrarna
+						     (ServerMessages*); standardvokabular som kan anpassas -->
+						<xsl:when test="$value = 'niva_1'"><xsl:value-of select="$i18n.personuppgiftsniva.niva_1" /></xsl:when>
+						<xsl:when test="$value = 'niva_2'"><xsl:value-of select="$i18n.personuppgiftsniva.niva_2" /></xsl:when>
+						<xsl:when test="$value = 'niva_3'"><xsl:value-of select="$i18n.personuppgiftsniva.niva_3" /></xsl:when>
 						<xsl:otherwise>
 							<xsl:value-of select="$value" />
 						</xsl:otherwise>

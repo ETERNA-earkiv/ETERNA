@@ -7,6 +7,10 @@
 
   OBS: vokabularerna for sekretess/personuppgifter ar FORSLAG och
   faststalls med bestallaren innan skarp drift (oppen beslutspunkt).
+  Personuppgiftsniva har medvetet ingen enumeration i
+  schemat: nivaerna foljer organisationens riktlinje och vokabularen
+  (standard niva_1/niva_2/niva_3) definieras i konfigurationen
+  (eterna_admin.xml.hbs, roda-wui.properties, i18n), inte har.
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns="https://eterna.whitered.se/xml/eterna_admin/1"
@@ -32,6 +36,12 @@
                 <xs:element name="personuppgifter" type="personuppgifterType">
                     <xs:annotation>
                         <xs:documentation xml:lang="sv">Personuppgiftsbedomning enligt kontrollerad vokabular</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="personuppgiftsniva" type="xs:string" minOccurs="0">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="sv">Niva pa personuppgifter enligt organisationens riktlinje; vokabular i konfigurationen</xs:documentation>
+                        <xs:documentation xml:lang="en">Personal data level according to the organisation's guideline; vocabulary defined in configuration</xs:documentation>
                     </xs:annotation>
                 </xs:element>
                 <xs:element name="pulGrund" type="xs:string" minOccurs="0">

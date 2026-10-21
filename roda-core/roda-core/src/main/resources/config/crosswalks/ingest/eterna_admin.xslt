@@ -29,6 +29,11 @@
 					<xsl:value-of select="normalize-space(//ea:eternaAdmin/ea:personuppgifter)" />
 				</field>
 			</xsl:if>
+			<xsl:if test="normalize-space(//ea:eternaAdmin/ea:personuppgiftsniva) != ''">
+				<field name="personuppgiftsniva_s">
+					<xsl:value-of select="normalize-space(//ea:eternaAdmin/ea:personuppgiftsniva)" />
+				</field>
+			</xsl:if>
 			<xsl:if test="normalize-space(//ea:eternaAdmin/ea:pulGrund) != ''">
 				<field name="pul_grund_txt">
 					<xsl:value-of select="normalize-space(//ea:eternaAdmin/ea:pulGrund)" />
