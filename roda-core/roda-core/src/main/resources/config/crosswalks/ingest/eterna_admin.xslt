@@ -8,7 +8,8 @@
 <xsl:stylesheet version="2.0"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns:ea="https://eterna.whitered.se/xml/eterna_admin/1"
-	exclude-result-prefixes="ea">
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	exclude-result-prefixes="ea xs">
 	<xsl:output method="xml" indent="yes" encoding="UTF-8"
 		omit-xml-declaration="yes" />
 
@@ -39,9 +40,10 @@
 					<xsl:value-of select="normalize-space(//ea:eternaAdmin/ea:pulGrund)" />
 				</field>
 			</xsl:if>
-			<xsl:if test="normalize-space(//ea:eternaAdmin/ea:granskningsdatum) != ''">
+			<!-- xs:date kan ha tidszon (2024-01-01+02:00); kalenderdagen behålls -->
+			<xsl:if test="normalize-space(//ea:eternaAdmin/ea:granskningsdatum) castable as xs:date">
 				<field name="granskningsdatum_dt">
-					<xsl:value-of select="normalize-space(//ea:eternaAdmin/ea:granskningsdatum)" />
+					<xsl:value-of select="format-date(xs:date(normalize-space(//ea:eternaAdmin/ea:granskningsdatum)), '[Y0001]-[M01]-[D01]')" />
 					<xsl:text>T00:00:00Z</xsl:text>
 				</field>
 			</xsl:if>
