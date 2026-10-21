@@ -183,9 +183,9 @@ public class LagrumParserTest {
 
   /**
    * Säkerhetstest: långa sifferföljder får inte heller ge polynomiell
-   * backtracking (CodeQL java/polynomial-redos). Med giriga \d+ kunde
-   * följden delas godtyckligt mellan kapitel, paragraf och svans; före
-   * rättningen tog "0" × 2000 + " st x" över 70 s.
+   * backtracking (CodeQL java/polynomial-redos). Med giriga \d+ kunde följden
+   * delas godtyckligt mellan kapitel, paragraf och svans; före rättningen tog "0"
+   * × 2000 + " st x" över 70 s.
    */
   @Test(timeOut = 5000)
   public void testLongDigitRunsAreParsedQuickly() {

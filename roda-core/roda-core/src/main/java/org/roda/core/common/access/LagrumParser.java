@@ -87,9 +87,10 @@ public final class LagrumParser {
    * "21 kap. 1, 3 och 7 §§"; lag och kapitel ärvs från föregående del. Se
    * {@link #parseParagraphOnly} för när ett tal utan § får tolkas så.
    */
-  private static final Pattern PARAGRAPH_ONLY = Pattern.compile("^(?<par>\\d++)\\s*+(?<suffix>\\p{L})?\\s*+"
-    + "(?<tecken>§{1,2})?(?:\\s*+(?:\\d++|första|andra|tredje|fjärde|femte|sjätte)\\s*+"
-    + "(?:st|stycket|stycke|p|punkten|punkt|men|meningen)\\b\\.?)*\\s*+$",
+  private static final Pattern PARAGRAPH_ONLY = Pattern.compile(
+    "^(?<par>\\d++)\\s*+(?<suffix>\\p{L})?\\s*+"
+      + "(?<tecken>§{1,2})?(?:\\s*+(?:\\d++|första|andra|tredje|fjärde|femte|sjätte)\\s*+"
+      + "(?:st|stycket|stycke|p|punkten|punkt|men|meningen)\\b\\.?)*\\s*+$",
     Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.UNICODE_CHARACTER_CLASS);
 
   /** Lagbeteckning som i själva verket är ordet "kap." — avvisas. */
