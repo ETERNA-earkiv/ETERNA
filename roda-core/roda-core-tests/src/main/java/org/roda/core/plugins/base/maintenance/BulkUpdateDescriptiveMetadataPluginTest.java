@@ -16,7 +16,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
- * ETERNA 1.H (krav 1): massredigeringen är en användarinitierad
+ * Massredigeringen är en användarinitierad
  * arkivvårdsåtgärd. Jobben ska därför listas under Bevarande → Åtgärder
  * (ActionProcess filtrerar bort INTERNAL och INGEST) och pluginet ska kunna
  * väljas i "Nytt jobb" (CreateDefaultJob utesluter INTERNAL). Med typen

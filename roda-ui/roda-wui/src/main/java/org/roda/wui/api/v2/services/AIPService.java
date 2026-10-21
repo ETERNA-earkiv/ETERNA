@@ -371,7 +371,7 @@ public class AIPService {
   }
 
   /**
-   * ETERNA 1.H (krav 1): startar massredigeringsjobbet för valda AIP:ar.
+   * Startar massredigeringsjobbet för valda AIP:ar.
    * Behörighet och parametervalidering sker i pluginet; xpath resolvas
    * server-side ur formulärmallen.
    */
@@ -553,7 +553,7 @@ public class AIPService {
   }
 
   /**
-   * ETERNA 1.H (krav 1): fälten i formulärmallen för en konfigurerad
+   * Fälten i formulärmallen för en konfigurerad
    * beskrivande metadatatyp, utan koppling till någon specifik AIP. Endast
    * fält som massredigeringspluginet kan uppdatera returneras: fält med
    * exakt en xpath som inte är dolda eller separatorer. Etiketter och

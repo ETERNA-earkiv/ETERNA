@@ -2851,7 +2851,7 @@ public interface ClientMessages extends Messages {
 
   String filesReasonDownloadSelectedFiles();
 
-  /* ETERNA 1.H (krav 1): massredigering av metadatafält */
+  /* Massredigering av metadatafält */
   String bulkEditMetadataButton();
 
   String bulkEditMetadataDialogTitle();

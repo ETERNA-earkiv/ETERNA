@@ -37,7 +37,7 @@ import com.google.gwt.user.client.ui.TextBox;
 import config.i18n.client.ClientMessages;
 
 /**
- * ETERNA 1.H (krav 1): dialog för massredigering av ett fält i beskrivande
+ * Dialog för massredigering av ett fält i beskrivande
  * metadata för de valda strukturenheterna. Fältlistan läses dynamiskt ur
  * formulärmallen för vald metadatatyp (samma sanningskälla som pluginets
  * xpath-vitlista), och värde-widgeten anpassar sig efter fältets typ:

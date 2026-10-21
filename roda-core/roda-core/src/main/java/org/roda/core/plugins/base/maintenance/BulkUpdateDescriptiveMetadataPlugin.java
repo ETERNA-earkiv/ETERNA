@@ -53,7 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * ETERNA 1.H (krav 1): massredigering av ett specifikt fält i beskrivande
+ * Massredigering av ett specifikt fält i beskrivande
  * metadata för ett obegränsat antal AIP:ar, baserat på urvalskriterier.
  *
  * Skrivstrategi: XPath-baserad in-place-uppdatering via

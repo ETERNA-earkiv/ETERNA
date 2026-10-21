@@ -809,7 +809,7 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
   }
 
   /**
-   * ETERNA 1.H (krav 1): öppnar massredigeringsdialogen. Dialogen läser
+   * Öppnar massredigeringsdialogen. Dialogen läser
    * fälten ur formulärmallen och startar jobbet själv.
    */
   private void bulkEditMetadata(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {

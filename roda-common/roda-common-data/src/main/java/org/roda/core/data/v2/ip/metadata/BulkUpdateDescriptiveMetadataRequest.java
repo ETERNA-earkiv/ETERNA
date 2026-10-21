@@ -13,7 +13,7 @@ import java.io.Serializable;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 
 /**
- * ETERNA 1.H (krav 1): begäran om massredigering av ett fält i beskrivande
+ * Begäran om massredigering av ett fält i beskrivande
  * metadata för ett urval av AIP:ar. Utförs som jobb med
  * BulkUpdateDescriptiveMetadataPlugin; fältets xpath resolvas alltid
  * server-side ur formulärmallen.

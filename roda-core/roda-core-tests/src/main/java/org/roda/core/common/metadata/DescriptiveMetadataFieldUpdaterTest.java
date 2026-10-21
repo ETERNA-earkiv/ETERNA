@@ -18,7 +18,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
- * ETERNA 1.H (krav 1): enhetstester för XPath-baserad in-place-uppdatering.
+ * Enhetstester för XPath-baserad in-place-uppdatering.
  * Rena tester utan RODA-miljö: EAD/DC/ERMS-liknande dokument, namespaces,
  * attribut, villkor, lägen och förbjudna xpath.
  */

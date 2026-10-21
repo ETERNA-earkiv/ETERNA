@@ -38,7 +38,7 @@ import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmValue;
 
 /**
- * ETERNA 1.H (krav 1): XPath-baserad in-place-uppdatering av ett enskilt fält
+ * XPath-baserad in-place-uppdatering av ett enskilt fält
  * i en beskrivande metadatafil.
  *
  * Uppdateringen sker direkt i dokumentträdet (Saxon s9api över DOM) — aldrig
@@ -56,7 +56,7 @@ public final class DescriptiveMetadataFieldUpdater {
   public enum UpdateMode {
     /** Skriv alltid (standard för massredigering). */
     OVERWRITE,
-    /** Komplettering (krav 6): skriv aldrig över ett icke-tomt värde. */
+    /** Komplettering: skriv aldrig över ett icke-tomt värde. */
     COMPLETE
   }
 

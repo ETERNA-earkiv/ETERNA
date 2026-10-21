@@ -4,6 +4,7 @@
 
 #### New features
 - Added a "Ladda ner valda filer" action that downloads selected files and folders as a zip of file content only, with paths relative to the representation's `data/`; the selection is validated before anything is streamed and again just before delivery, a selection that cannot be delivered is refused with an explanation instead of a technical error, large selections ask for confirmation, and the disclosed file UUIDs, count and total size are recorded in the audit log [#589](https://github.com/ETERNA-earkiv/ETERNA/issues/589)
+- Added bulk editing of a single descriptive metadata field for a selection of AIPs ("Massredigera metadata" in the catalogue, search results and AIP actions): pick metadata type, field (read from the form template) and new value, choose overwrite or complete mode (never overwrites a non-empty value) and an optional condition on the current value; runs as a preservation job (`BulkUpdateDescriptiveMetadataPlugin`, AIP_TO_AIP) that updates the field in place via the template XPath, validates the result against the XSD and creates a new metadata version, exposed as `POST /api/v2/aips/metadata/descriptive/bulk-update` (role `descriptive_metadata.update`) [#677](https://github.com/ETERNA-earkiv/ETERNA/pull/677)
 
 #### Improvements
 - Pinned the `eterna-unoserver` image to an immutable version tag (`v3.7.0`) in the deploy compose files, and updated the build workflow to publish `v3.7.0` alongside `:latest`, so deployments are reproducible [#600](https://github.com/ETERNA-earkiv/ETERNA/issues/600)
