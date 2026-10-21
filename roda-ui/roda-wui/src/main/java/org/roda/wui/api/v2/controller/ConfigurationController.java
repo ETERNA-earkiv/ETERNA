@@ -7,8 +7,10 @@
  */
 package org.roda.wui.api.v2.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
@@ -37,7 +39,9 @@ import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.server.ServerTools;
 import org.roda.wui.common.utils.RequestUtils;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -56,6 +60,9 @@ public class ConfigurationController implements ConfigurationRestService {
 
   @Autowired
   ConfigurationsService configurationsService;
+
+  @Autowired
+  ObjectProvider<BuildProperties> buildProperties;
 
   @Override
   public StringResponse retrieveCronValue(String localeString) {
@@ -132,7 +139,9 @@ public class ConfigurationController implements ConfigurationRestService {
     try {
       Locale locale = ServerTools.parseLocale(localeString);
       SharedProperties sharedProperties = new SharedProperties();
-      sharedProperties.setProperties(RodaCoreFactory.getRodaSharedProperties(locale));
+      Map<String, List<String>> properties = new HashMap<>(RodaCoreFactory.getRodaSharedProperties(locale));
+      buildProperties.ifAvailable(build -> properties.put("ui.version", List.of(build.getVersion())));
+      sharedProperties.setProperties(properties);
       return sharedProperties;
     } finally {
       controllerAssistant.registerAction(requestContext, LogEntryState.SUCCESS);
