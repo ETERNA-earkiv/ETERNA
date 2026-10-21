@@ -1825,6 +1825,115 @@ public interface ClientMessages extends Messages {
 
   String groupPermissions();
 
+  // Access rules
+  String accessRulesTitle();
+
+  String accessRulesStatus();
+
+  String accessRulesStatusActive();
+
+  String accessRulesStatusDisabled();
+
+  String accessRulesVersion();
+
+  String accessRulesLastApplied();
+
+  String accessRulesNeverApplied();
+
+  String accessRulesShowJob();
+
+  String accessRulesLastChanged();
+
+  String accessRulesNoRules();
+
+  String accessRulesLoadError();
+
+  String accessRulesAddRule();
+
+  String accessRulesSelectGroup();
+
+  String accessRulesApply();
+
+  String accessRulesDryRun();
+
+  String accessRulesApplyConfirmTitle();
+
+  String accessRulesApplyConfirmMessage();
+
+  String accessRulesDryRunConfirmTitle();
+
+  String accessRulesDryRunConfirmMessage();
+
+  String accessRulesJobStartedTitle();
+
+  String accessRulesJobStartedMessage();
+
+  String accessRuleGroup();
+
+  String accessRuleEnabled();
+
+  String accessRuleEnabledYes();
+
+  String accessRuleEnabledNo();
+
+  String accessRuleSekretess();
+
+  String accessRuleLagrum();
+
+  String accessRulePersonuppgifter();
+
+  String accessRulePersonuppgiftsniva();
+
+  String accessRuleNote();
+
+  String accessRuleAll();
+
+  String accessRuleNone();
+
+  String accessRuleRemoveConfirmTitle();
+
+  String accessRuleRemoveConfirmMessage(String group);
+
+  String accessRuleRemoved(String group);
+
+  String editAccessRuleTitle();
+
+  String accessRuleLagrumHelp();
+
+  String accessRuleLagrumAdd();
+
+  String accessRuleLagrumRemove();
+
+  String accessRuleLagrumNormalize();
+
+  String accessRuleLagrumNormalized();
+
+  String accessRuleLagrumWarnings();
+
+  String accessRuleApplyAfterSave();
+
+  String accessRuleSavedTitle();
+
+  String accessRuleSavedMessage();
+
+  String accessRuleSavedAndApplyMessage();
+
+  String showGroupNoAccessRule();
+
+  String accessRuleRestrictedGroups();
+
+  String accessRuleRestrictedGroupsEmpty();
+
+  String accessRuleEnabledHelp();
+
+  String accessRuleValuesHelp();
+
+  String accessRulePersonuppgiftsnivaNoVocabulary();
+
+  String accessRuleLagrumUseNormalized();
+
+  String descriptionToggleTitle();
+
   // Preferences
   String preferencesUserDataTitle();
 

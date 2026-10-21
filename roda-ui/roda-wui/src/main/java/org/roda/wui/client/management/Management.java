@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.management.accessrules.AccessRules;
 import org.roda.wui.client.management.distributed.DistributedInstancesManagement;
 import org.roda.wui.client.management.distributed.LocalInstanceManagement;
 import org.roda.wui.client.process.ActionProcess;
@@ -44,8 +45,8 @@ public class Management {
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
       UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER, UserLog.RESOLVER,
-        NotificationRegister.RESOLVER, ActionProcess.RESOLVER, InternalProcess.RESOLVER, Statistics.RESOLVER}, false,
-        callback);
+        NotificationRegister.RESOLVER, ActionProcess.RESOLVER, InternalProcess.RESOLVER, Statistics.RESOLVER,
+        AccessRules.RESOLVER}, false, callback);
     }
 
     @Override
@@ -102,6 +103,8 @@ public class Management {
     } else {
       if (historyTokens.get(0).equals(MemberManagement.RESOLVER.getHistoryToken())) {
         MemberManagement.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+      } else if (historyTokens.get(0).equals(AccessRules.RESOLVER.getHistoryToken())) {
+        AccessRules.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(UserLog.RESOLVER.getHistoryToken())) {
         UserLog.getInstance().resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(NotificationRegister.RESOLVER.getHistoryToken())) {

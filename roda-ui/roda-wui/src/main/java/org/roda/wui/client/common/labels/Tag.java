@@ -71,7 +71,7 @@ public class Tag extends Composite {
   public static Tag fromText(String text) {
     Tag tag = new Tag();
     tag.label.setText(text);
-    tag.addStyleName(TagStyle.toStyleName(TagStyle.DEFAULT));
+    tag.addTagStyle(TagStyle.DEFAULT);
     return tag;
   }
 
@@ -79,7 +79,7 @@ public class Tag extends Composite {
     Tag tag;
     tag = new Tag();
     tag.label.setText(text);
-    tag.addStyleName(TagStyle.toStyleName(style));
+    tag.addTagStyle(style);
     return tag;
   }
 
@@ -88,9 +88,21 @@ public class Tag extends Composite {
     tag = new Tag();
     tag.label.setText(text);
     for (TagStyle s : style) {
-      tag.addStyleName(TagStyle.toStyleName(s));
+      tag.addTagStyle(s);
     }
     return tag;
+  }
+
+  /**
+   * Lägger till stilklassen för en TagStyle. DEFAULT (och okända värden) saknar
+   * klass; GWT tillåter inte tomma stilnamn (IllegalArgumentException "Style
+   * names cannot be empty"), så tomma namn hoppas över.
+   */
+  private void addTagStyle(TagStyle style) {
+    String styleName = TagStyle.toStyleName(style);
+    if (styleName != null && !styleName.isEmpty()) {
+      addStyleName(styleName);
+    }
   }
 
   public void addClickHandler(ClickHandler clickHandler) {

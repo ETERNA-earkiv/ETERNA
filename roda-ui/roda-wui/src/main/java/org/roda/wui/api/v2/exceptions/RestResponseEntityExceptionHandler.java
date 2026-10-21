@@ -22,6 +22,7 @@ import org.roda.core.data.exceptions.JobStateNotPendingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.NotImplementedException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.VersionConflictException;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
 import org.slf4j.LoggerFactory;
@@ -70,6 +71,11 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
       httpStatus = HttpStatus.CONFLICT;
     } else if (ex.getCause() instanceof IsStillUpdatingException) {
       message = "Resource still updating";
+      details = ex.getCause().getMessage();
+      httpStatus = HttpStatus.CONFLICT;
+    } else if (ex.getCause() instanceof VersionConflictException) {
+      // ETERNA: optimistisk låsning (t.ex. åtkomstreglernas version)
+      message = "Version conflict";
       details = ex.getCause().getMessage();
       httpStatus = HttpStatus.CONFLICT;
     } else if (ex.getCause() instanceof IllegalOperationException) {

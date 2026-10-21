@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.MissingResourceException;
 import java.util.Set;
 
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.NoAsyncCallback;
@@ -19,7 +21,10 @@ import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.RODAMemberActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
+import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.common.utils.SidebarUtils;
+import org.roda.wui.client.management.accessrules.AccessRulesFormat;
+import org.roda.wui.client.management.accessrules.EditAccessRule;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.ConfigurationManager;
@@ -27,9 +32,11 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
@@ -97,6 +104,8 @@ public class ShowGroup extends Composite {
   @UiField
   FlowPanel userList, permissionList;
   @UiField
+  FlowPanel accessRuleField, accessRuleList;
+  @UiField
   SimplePanel actionsSidebar;
 
   @UiField
@@ -125,6 +134,9 @@ public class ShowGroup extends Composite {
 
     // Permissions
     buildPermissionList();
+
+    // Access rules
+    buildAccessRuleSummary();
 
     // Sidebar
     RODAMemberActions rodaMemberActions = RODAMemberActions.get();
@@ -169,6 +181,41 @@ public class ShowGroup extends Composite {
         permissionList.add(permissionsPanel);
       }
     });
+  }
+
+  /**
+   * Gruppens åtkomstregel (sekretess/personuppgifter) eller "Ingen regel".
+   * Avsnittet döljs för användare utan access_rules.read.
+   */
+  private void buildAccessRuleSummary() {
+    if (!PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_RETRIEVE_ACCESS_RULE)) {
+      accessRuleField.setVisible(false);
+      return;
+    }
+
+    final boolean canManage = PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_UPDATE_ACCESS_RULE);
+    Services services = new Services("Retrieve access rule", "get");
+    services.accessRulesResource(s -> s.retrieveVocabulary(LocaleInfo.getCurrentLocale().getLocaleName()))
+      .whenComplete((vocabulary, vocabularyError) -> {
+        if (vocabularyError != null) {
+          accessRuleList.add(new Label(messages.accessRulesLoadError()));
+          return;
+        }
+        services.accessRulesResource(s -> s.retrieveAccessRule(group.getId())).whenComplete((rule, ruleError) -> {
+          if (rule != null) {
+            accessRuleList.add(AccessRulesFormat.summary(rule, vocabulary));
+          } else if (ruleError instanceof NotFoundException) {
+            accessRuleList.add(new Label(messages.showGroupNoAccessRule()));
+          } else {
+            accessRuleList.add(new Label(messages.accessRulesLoadError()));
+            return;
+          }
+          if (canManage) {
+            accessRuleList.add(new Anchor(messages.editButton(),
+              HistoryUtils.createHistoryHashLink(EditAccessRule.RESOLVER, group.getId())));
+          }
+        });
+      });
   }
 
   private FlowPanel createListItem(String item) {

@@ -278,6 +278,13 @@ public class AccessRuleRegistryTest {
     // cachen är en egen kopia: ändringar i anroparens objekt syns inte
     stale.setEnabled(false);
     Assert.assertTrue(registry.get().isEnabled());
+
+    // en inskickad version högre än filens får inte räknaren att hoppa: alltid filens + 1
+    AccessRuleSet ahead = sampleSet();
+    ahead.setVersion(999999);
+    registry.save(ahead, "anna");
+    Assert.assertEquals(ahead.getVersion(), 4);
+    Assert.assertEquals(registry.get().getVersion(), 4);
   }
 
   @Test
@@ -454,6 +461,20 @@ public class AccessRuleRegistryTest {
   }
 
   @Test
+  public void testValidateRejectsOverlongLagrumPattern() {
+    AccessRuleSet set = sampleSet();
+    // tolkbart i sig (svansen ignoreras) men längre än gränsen
+    String overlong = "OSL 21:7 " + "1 st. ".repeat(40);
+    Assert.assertTrue(overlong.length() > AccessRuleRegistry.MAX_PATTERN_LENGTH);
+    set.findRule("socialtjanst").setLagrum(List.of("OSL 21:7", overlong));
+
+    List<String> problems = AccessRuleRegistry.validate(set);
+    Assert.assertEquals(problems.size(), 1, problems.toString());
+    Assert.assertTrue(problems.get(0).contains(".lagrum") && problems.get(0).contains("längre än"),
+      problems.toString());
+  }
+
+  @Test
   public void testValidatePolicyValuesAreCaseInsensitive() {
     AccessRuleSet set = sampleSet();
     set.getDefaults().setEjBedomd("OPEN");
@@ -574,9 +595,9 @@ public class AccessRuleRegistryTest {
     Assert.assertEquals(onDisk.getDefaults().getEjBedomd(), "closed");
     Assert.assertNotNull(onDisk.findRule("socialtjanst"));
     Assert.assertEquals(onDisk.findRule("socialtjanst").getSekretess(), List.of("ingen_sekretess"));
-    // sampleSet har version 3 ⇒ max(0, 3) + 1
-    Assert.assertEquals(onDisk.getVersion(), 4);
-    Assert.assertEquals(set.getVersion(), 4);
+    // ingen fil fanns (lagrad version 0) ⇒ 1; att sampleSet anger version 3 spelar ingen roll
+    Assert.assertEquals(onDisk.getVersion(), 1);
+    Assert.assertEquals(set.getVersion(), 1);
     Assert.assertEquals(onDisk.getUpdatedBy(), "anna");
   }
 

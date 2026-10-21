@@ -61,7 +61,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  * (config/access-rules.json i roda-core, tom regellista och enabled=false);
  * saknas även den används en tom, avstängd regeluppsättning.</li>
  * <li>{@link #save(AccessRuleSet, String)} normaliserar och validerar en
- * kopia, stämplar updatedBy/updatedOn, räknar upp version, kopierar
+ * kopia, stämplar updatedBy/updatedOn, sätter version = lagrad version + 1
+ * (den inskickade versionen ignoreras; konfliktkontrollen görs av
+ * anroparen, se AccessRulesService), kopierar
  * föregående fil till {@code <dir>/access-rules.history/<yyyyMMddHHmmss>-<user>.json}
  * och skriver atomiskt (tmp + move). Misslyckad validering lämnar cache och
  * fil orörda.</li>
@@ -87,6 +89,12 @@ public class AccessRuleRegistry {
   static final String[] CONFIG_FILE_KEY = {"core", "access_rules", "file"};
   /** Tillåtna personuppgiftsnivåer (flervärdig nyckel i roda-core.properties). */
   static final String CONFIG_NIVA_VALUES_KEY = "core.access_rules.personuppgiftsniva.values[]";
+  /**
+   * Längsta tillåtna lagrumsmönster (tecken). Ett giltigt mönster är några
+   * tiotal tecken; gränsen hindrar att en lång text skickas genom
+   * {@link LagrumPattern#parse} (regex) från REST-API:et.
+   */
+  public static final int MAX_PATTERN_LENGTH = 200;
 
   private static final DateTimeFormatter HISTORY_STAMP = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
     .withZone(ZoneOffset.UTC);
@@ -285,8 +293,9 @@ public class AccessRuleRegistry {
 
   /**
    * Sparar en ny version av reglerna. En normaliserad kopia valideras och
-   * skrivs; på det inskickade objektet sätts sedan version = max(sparad
-   * version, angiven version) + 1 samt updatedBy/updatedOn (ISO-8601 UTC).
+   * skrivs; på det inskickade objektet sätts sedan version = sparad version
+   * + 1 (den inskickade versionen ignoreras så att räknaren inte kan hoppa)
+   * samt updatedBy/updatedOn (ISO-8601 UTC).
    * Föregående fil kopieras till historikkatalogen och den nya skrivs
    * atomiskt. Cachen uppdateras först när filen skrivits.
    *
@@ -307,7 +316,7 @@ public class AccessRuleRegistry {
     }
 
     AccessRuleSet current = current();
-    copy.setVersion(Math.max(current.getVersion(), copy.getVersion()) + 1);
+    copy.setVersion(current.getVersion() + 1);
     copy.setUpdatedBy(user);
     copy.setUpdatedOn(nowIso());
     String json = toJson(copy);
@@ -366,8 +375,9 @@ public class AccessRuleRegistry {
    * gruppnamn (ej tomma, inga blanksteg, inga dubbletter, finns i katalogen
    * om en sådan ges), tomma listvärden, vokabulär för sekretess och
    * personuppgifter enligt eterna_admin.xsd (plus "*"), personuppgiftsnivå
-   * mot given vokabulär (plus "*") samt att alla lagrumsmönster går att
-   * tolka. Värden jämförs trimmade och i gemener. Tom lista = giltig.
+   * mot given vokabulär (plus "*") samt att alla lagrumsmönster är högst
+   * {@link #MAX_PATTERN_LENGTH} tecken och går att tolka. Värden jämförs
+   * trimmade och i gemener. Tom lista = giltig.
    *
    * @param set
    *          regeluppsättningen
@@ -433,6 +443,10 @@ public class AccessRuleRegistry {
       for (String pattern : rule.getLagrum()) {
         if (pattern == null || pattern.isBlank()) {
           continue; // redan rapporterat
+        }
+        if (pattern.length() > MAX_PATTERN_LENGTH) {
+          problems.add(label + ".lagrum: mönstret är längre än " + MAX_PATTERN_LENGTH + " tecken");
+          continue;
         }
         try {
           LagrumPattern.parse(pattern, defaults.getDefaultAct());

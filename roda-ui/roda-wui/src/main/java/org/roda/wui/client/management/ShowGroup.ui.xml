@@ -46,6 +46,14 @@
 						<g:FlowPanel styleName="value" ui:field="permissionList" />
 					</g:FlowPanel>
 
+					<!--Access rules-->
+					<g:FlowPanel styleName="field" ui:field="accessRuleField">
+						<g:Label styleName="label" >
+							<ui:text from='{messages.accessRulesTitle}' />
+						</g:Label>
+						<g:FlowPanel styleName="value" ui:field="accessRuleList" />
+					</g:FlowPanel>
+
 				</g:FlowPanel>
 			</g:FlowPanel>
 

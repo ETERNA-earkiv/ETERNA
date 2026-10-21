@@ -55,8 +55,17 @@ public final class LagrumParser {
   /** Lag som används när varken texten eller anropet anger någon. */
   public static final String DEFAULT_ACT = "OSL";
 
-  /** Delare mellan flera lagrum i samma text. */
-  private static final Pattern SEPARATOR = Pattern.compile("\\s*(?:[,;/]|\\boch\\b|\\bsamt\\b)\\s*",
+  /** Blankstegsföljder (även unicode) som kollapsas till ett mellanslag före tolkningen. */
+  private static final Pattern WHITESPACE = Pattern.compile("\\s+", Pattern.UNICODE_CHARACTER_CLASS);
+
+  /**
+   * Delare mellan flera lagrum i samma text. Alla mönster nedan använder
+   * possessiva kvantifierare ({@code \\s*+}) och texten får sina
+   * blankstegsföljder kollapsade innan den tolkas, så att en text med
+   * tusentals blanksteg inte kan få regexmotorn att backtracka polynomiellt
+   * (CPU-DoS via REST-API:ets normalisering och sparning).
+   */
+  private static final Pattern SEPARATOR = Pattern.compile("\\s*+(?:[,;/]|\\boch\\b|\\bsamt\\b)\\s*+",
     Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.UNICODE_CHARACTER_CLASS);
 
   /**
@@ -65,22 +74,22 @@ public final class LagrumParser {
    * ignorerad svans (stycke/punkt/mening).
    */
   private static final Pattern SEGMENT = Pattern.compile("^" // ----
-    + "(?:(?<lag>\\p{L}[\\p{L}\\-]*)(?:\\s*\\(\\d{4}:\\d+\\))?\\s+)?" // lag + ev. (2009:400)
+    + "(?:(?<lag>\\p{L}[\\p{L}\\-]*+)(?:\\s*+\\(\\d{4}:\\d+\\))?\\s++)?" // lag + ev. (2009:400)
     + "(?<kap>\\d+)" // kapitel
-    + "(?:\\s*(?<kapord>kap(?:itlet|itel)?\\.?)|(?<kolon>:))?" // "kap." eller ":"
-    + "(?:\\s*(?<par>\\d+)\\s*(?<suffix>\\p{L})?\\s*§{0,2})?" // paragraf, suffix, §
-    + "(?<svans>(?:\\s*(?:\\d+|första|andra|tredje|fjärde|femte|sjätte)\\s*" // 1 st., 2 p.
+    + "(?:\\s*+(?<kapord>kap(?:itlet|itel)?\\.?)|(?<kolon>:))?" // "kap." eller ":"
+    + "(?:\\s*+(?<par>\\d+)\\s*+(?<suffix>\\p{L})?\\s*+§{0,2})?" // paragraf, suffix, §
+    + "(?<svans>(?:\\s*+(?:\\d+|första|andra|tredje|fjärde|femte|sjätte)\\s*+" // 1 st., 2 p.
     + "(?:st|stycket|stycke|p|punkten|punkt|men|meningen)\\b\\.?)*)" // ----
-    + "\\s*$", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.UNICODE_CHARACTER_CLASS);
+    + "\\s*+$", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.UNICODE_CHARACTER_CLASS);
 
   /**
    * Enbart paragraf ("8 §", "8 a §§", "3") — i uppräkningar som
    * "21 kap. 1, 3 och 7 §§"; lag och kapitel ärvs från föregående del. Se
    * {@link #parseParagraphOnly} för när ett tal utan § får tolkas så.
    */
-  private static final Pattern PARAGRAPH_ONLY = Pattern.compile("^(?<par>\\d+)\\s*(?<suffix>\\p{L})?\\s*"
-    + "(?<tecken>§{1,2})?(?:\\s*(?:\\d+|första|andra|tredje|fjärde|femte|sjätte)\\s*"
-    + "(?:st|stycket|stycke|p|punkten|punkt|men|meningen)\\b\\.?)*\\s*$",
+  private static final Pattern PARAGRAPH_ONLY = Pattern.compile("^(?<par>\\d+)\\s*+(?<suffix>\\p{L})?\\s*+"
+    + "(?<tecken>§{1,2})?(?:\\s*+(?:\\d+|första|andra|tredje|fjärde|femte|sjätte)\\s*+"
+    + "(?:st|stycket|stycke|p|punkten|punkt|men|meningen)\\b\\.?)*\\s*+$",
     Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.UNICODE_CHARACTER_CLASS);
 
   /** Lagbeteckning som i själva verket är ordet "kap." — avvisas. */
@@ -142,7 +151,10 @@ public final class LagrumParser {
     }
     Lagrum previous = null;
 
-    for (String rawSegment : SEPARATOR.split(text.trim())) {
+    // blankstegsföljder kollapsas: likvärdigt för tolkningen och tar bort
+    // det enda sättet att få separator- och delmönstren att backtracka
+    String collapsed = WHITESPACE.matcher(text).replaceAll(" ").strip();
+    for (String rawSegment : SEPARATOR.split(collapsed)) {
       String segment = rawSegment.trim();
       if (segment.isEmpty()) {
         continue;

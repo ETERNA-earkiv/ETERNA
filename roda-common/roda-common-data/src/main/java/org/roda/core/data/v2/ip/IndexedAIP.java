@@ -102,6 +102,9 @@ public class IndexedAIP
 
   private String disposalConfirmationId = null;
 
+  // Grupper vars läsbehörighet spärrats av åtkomstreglerna
+  private List<String> accessRuleRestrictedGroups = new ArrayList<>();
+
   /**
    * Constructs an empty (<strong>invalid</strong>) {@link IndexedAIP}.
    */
@@ -471,6 +474,16 @@ public class IndexedAIP
     return this;
   }
 
+  public List<String> getAccessRuleRestrictedGroups() {
+    return accessRuleRestrictedGroups;
+  }
+
+  public IndexedAIP setAccessRuleRestrictedGroups(List<String> accessRuleRestrictedGroups) {
+    this.accessRuleRestrictedGroups = accessRuleRestrictedGroups != null ? accessRuleRestrictedGroups
+      : new ArrayList<>();
+    return this;
+  }
+
   public Date getDestroyedOn() {
     return destroyedOn;
   }
@@ -650,6 +663,9 @@ public class IndexedAIP
     if (scheduleAssociationType != null ? !scheduleAssociationType.equals(that.scheduleAssociationType)
       : that.scheduleAssociationType != null)
       return false;
+    if (accessRuleRestrictedGroups != null ? !accessRuleRestrictedGroups.equals(that.accessRuleRestrictedGroups)
+      : that.accessRuleRestrictedGroups != null)
+      return false;
     return destroyedBy != null ? destroyedBy.equals(that.destroyedBy) : that.destroyedBy == null;
 
   }
@@ -684,6 +700,7 @@ public class IndexedAIP
     result = 31 * result + (destroyedOn != null ? destroyedOn.hashCode() : 0);
     result = 31 * result + (destroyedBy != null ? destroyedBy.hashCode() : 0);
     result = 31 * result + (scheduleAssociationType != null ? scheduleAssociationType.hashCode() : 0);
+    result = 31 * result + (accessRuleRestrictedGroups != null ? accessRuleRestrictedGroups.hashCode() : 0);
     return result;
   }
 
@@ -704,6 +721,7 @@ public class IndexedAIP
       + retentionPeriodStartDate + ", disposalHoldsId=" + disposalHoldsId + ", destroyedOn=" + destroyedOn
       + ", destroyedBy='" + destroyedBy + '\'' + ", disposalAction='" + disposalAction + '\'' + ", overdueDate="
       + overdueDate + ", disposalHoldStatus=" + onHold + ", disposalConfirmationId='" + disposalConfirmationId + '\''
+      + ", accessRuleRestrictedGroups=" + accessRuleRestrictedGroups
       + ", scheduleAssociationType=" + scheduleAssociationType + '}';
   }
 

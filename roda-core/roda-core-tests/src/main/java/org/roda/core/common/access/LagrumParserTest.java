@@ -150,6 +150,37 @@ public class LagrumParserTest {
     Assert.assertEquals(chapter, new Lagrum("osl", 21));
   }
 
+  /**
+   * Säkerhetstest: långa blankstegsföljder får inte ge polynomiell
+   * backtracking (CPU-DoS via POST /api/v2/access-rules/normalize och PUT
+   * /api/v2/access-rules). Före rättningen tog "1" + 4000 blanksteg + "1" +
+   * 4000 blanksteg + "stx" över 170 s; nu ska hela testet gå på bråkdelen
+   * av en sekund.
+   */
+  @Test(timeOut = 5000)
+  public void testLongWhitespaceRunsAreParsedQuickly() {
+    String spaces = " ".repeat(4000);
+
+    ParseResult unparsable = LagrumParser.parse("1" + spaces + "1" + spaces + "stx", OSL);
+    Assert.assertTrue(unparsable.getLagrum().isEmpty(), unparsable.toString());
+    Assert.assertEquals(unparsable.getWarnings().size(), 1, unparsable.toString());
+
+    ParseResult separated = LagrumParser.parse("OSL 21:7" + " ".repeat(8000) + "och" + spaces + "26:1", OSL);
+    Assert.assertEquals(separated.getLagrum().stream().map(Lagrum::toString).toList(),
+      List.of("OSL 21:7", "OSL 26:1"), separated.toString());
+    Assert.assertFalse(separated.hasWarnings(), separated.toString());
+
+    ParseResult spaced = LagrumParser.parse("OSL" + spaces + "21" + spaces + "kap." + spaces + "7" + spaces + "§",
+      OSL);
+    Assert.assertEquals(spaced.getLagrum().stream().map(Lagrum::toString).toList(), List.of("OSL 21:7"),
+      spaced.toString());
+
+    // även andra unicode-blanksteg (NBSP) kollapsas
+    ParseResult nbsp = LagrumParser.parse("OSL\u00a021\u00a0kap.\u00a07\u00a0§", OSL);
+    Assert.assertEquals(nbsp.getLagrum().stream().map(Lagrum::toString).toList(), List.of("OSL 21:7"),
+      nbsp.toString());
+  }
+
   @Test
   public void testResultListsAreUnmodifiable() {
     ParseResult result = LagrumParser.parse("OSL 21:7", OSL);
