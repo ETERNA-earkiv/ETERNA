@@ -55,7 +55,6 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
     steps.add(new IngestStep(DescriptiveMetadataValidationPlugin.class.getName(),
       RodaConstants.PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION, true, true, true, true,
       metadataValidationStepParameters));
-      RodaConstants.PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION, true, true, true, true));
     // 3b) Valbar validering mot leveransspecifikation
     steps.add(new IngestStep(DeliverySpecValidationPlugin.class.getName(),
       RodaConstants.PLUGIN_PARAMS_DO_DELIVERY_SPEC_VALIDATION, true, false, true, true));
