@@ -28,6 +28,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import net.sf.saxon.s9api.Processor;
@@ -219,6 +220,18 @@ public final class DescriptiveMetadataFieldUpdater {
 
     if (target == null) {
       return new Result(Status.SKIPPED_NODE_MISSING, null, null);
+    }
+
+    // setTextContent på ett element med elementbarn tar bort barnen, vilket
+    // inte är förlustfritt; sådana fält kan inte massredigeras
+    if (target instanceof Element) {
+      NodeList children = target.getChildNodes();
+      for (int i = 0; i < children.getLength(); i++) {
+        if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
+          throw new GenericException("The element selected by xpath '" + writableXpath
+            + "' contains child elements and cannot be updated without losing content");
+        }
+      }
     }
 
     String oldValue = target instanceof Attr ? ((Attr) target).getValue() : target.getTextContent();

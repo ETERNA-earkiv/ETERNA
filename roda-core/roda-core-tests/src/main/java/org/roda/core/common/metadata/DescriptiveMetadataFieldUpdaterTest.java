@@ -132,6 +132,25 @@ public class DescriptiveMetadataFieldUpdaterTest {
     Assert.assertNull(result.getNewXml());
   }
 
+  // --- element med elementbarn skrivs aldrig över (barnen skulle försvinna) ---
+
+  private static final String EAD_MIXED_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+    + "<ead xmlns=\"urn:isbn:1-931666-22-9\"><archdesc level=\"fonds\"><did>"
+    + "<unittitle>Protokoll <emph render=\"italic\">kommunfullmäktige</emph></unittitle></did></archdesc></ead>";
+
+  @Test(expectedExceptions = GenericException.class)
+  public void testElementWithElementChildrenIsRejected() throws GenericException {
+    DescriptiveMetadataFieldUpdater.update(EAD_MIXED_XML, "//*:did/*:unittitle[1]", "Ny titel", UpdateMode.OVERWRITE,
+      null);
+  }
+
+  @Test(expectedExceptions = GenericException.class)
+  public void testElementWithElementChildrenIsRejectedBeforeConditions() throws GenericException {
+    // avvisas även när villkoret/läget annars hade gett SKIPPED
+    DescriptiveMetadataFieldUpdater.update(EAD_MIXED_XML, "//*:did/*:unittitle[1]", "Ny titel", UpdateMode.COMPLETE,
+      "annat värde");
+  }
+
   // --- förbjudna xpath ---
 
   @Test(expectedExceptions = GenericException.class)
