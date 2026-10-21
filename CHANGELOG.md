@@ -19,6 +19,9 @@
 - Fixed `ClassCastException` that broke list rendering when a column used a rendering hint (e.g. `DATE_FORMAT_SIMPLE`) on a multivalued field; each element is now formatted with the hint and shown as a comma-separated list [#607](https://github.com/ETERNA-earkiv/ETERNA/issues/607)
 - Catalog tree now resolves ancestors in a single batch, so records the user has access to are no longer shown as "Åtkomst saknas"; an ancestor the user cannot access is shown as plain "Åtkomst saknas" text in the breadcrumb [#643](https://github.com/ETERNA-earkiv/ETERNA/issues/643) [#645](https://github.com/ETERNA-earkiv/ETERNA/pull/645)
 - Fixed the web archive (WARC/WACZ) viewer failing to load: removed the `Cross-Origin-Embedder-Policy` headers added in v1.0.0, since COEP on the parent page blocked the ReplayWeb.page iframe served by its service worker (`Cross-Origin-Opener-Policy` is kept) [#646](https://github.com/ETERNA-earkiv/ETERNA/pull/646)
+- Fixed the ingest notification email: the failure details box had a fixed `max-height` without overflow, so long reports overlapped the acknowledgement section below it; the report is now shown as one entry per item with level, file and message, with ERROR and WARN highlighted, and the box grows with its content [#679](https://github.com/ETERNA-earkiv/ETERNA/pull/679)
+- Added a Swedish acknowledgement page (`Acknowledge_sv_SE.html`), shown when a notification is acknowledged from the email link [#679](https://github.com/ETERNA-earkiv/ETERNA/pull/679)
+- The statistics page boxes for number of authentications and successful vs failed logins always showed 0, since they filtered on the removed `org.roda.wui.api.controllers.UserLogin` component; they now count logins from `org.roda.wui.api.v2.controller.MembersController` [#679](https://github.com/ETERNA-earkiv/ETERNA/pull/679)
 
 #### Security updates
 - Fixed GHSA-9xv2-5v5q-p794, GHSA-gcx9-497g-6cp6, GHSA-h3x4-894j-xpx5 (critical): upgraded embedded Tomcat to 10.1.60

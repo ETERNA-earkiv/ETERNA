@@ -1,32 +1,36 @@
 <html>
 	<head>
 		<style>
-			.code {
-			    padding: .2rem .5rem;
-			    margin: 0 .2rem;
-			    font-size: 90%;
-			    white-space: nowrap;
-			    background: #F1F1F1;
-			    border: 1px solid #E1E1E1;
-			    border-radius: 4px;
-			}
+			body { font-family: Arial, Helvetica, sans-serif; color: #222; }
+			h2 { font-size: 1.1em; margin: 1.2em 0 .4em 0; }
 
+			/* Felinformation: rapporten levereras som nästlade div-element
+			   (.report > .entry_attr / .entries > .entry > .entry_attr .label/.value) */
 			.pre > .code {
 			    display: block;
-			    padding: 1rem 1.5rem;
-			    white-space: pre-wrap;
-
-			    /* Word break in FF */
+			    padding: .8rem 1rem;
+			    background: #F7F7F7;
+			    border: 1px solid #E1E1E1;
+			    border-radius: 4px;
+			    font-size: 90%;
+			    white-space: normal;
 			    overflow-wrap: break-word;
-			    word-wrap: break-word;
-			    -ms-word-break: break-all;
-			    word-break: break-all;
 			    word-break: break-word;
 			}
-
-			.pre .code {
-			    max-height: 15em;
-			}
+			.report > .entry_attr { margin-bottom: .6em; }
+			.report > .entry_attr .label { display: inline; font-weight: bold; }
+			.report > .entry_attr .label:after { content: ": "; }
+			.report > .entry_attr .value { display: inline; }
+			.entries .entry { display: block; margin: .3em 0; padding: .3em .6em; border-left: 4px solid #BBBBBB; background: #FFFFFF; }
+			.entries .entry .entry_attr { display: inline; }
+			.entries .entry .entry_attr .label { display: none; }
+			.entries .entry .entry_attr .value { display: inline; }
+			.entries .entry .entry_attr.level .value { font-weight: bold; margin-right: .6em; }
+			.entries .entry .entry_attr.related .value { font-family: Consolas, monospace; margin-right: .6em; }
+			.entries .entry .entry_attr.description { display: block; color: #555555; font-size: 90%; margin-top: .2em; }
+			.entries .entry.level_info { color: #555555; }
+			.entries .entry.level_warn, .entries .entry.level_warning { border-left-color: #E0A800; background: #FFF6DD; }
+			.entries .entry.level_error { border-left-color: #C0392B; background: #FBE9EB; color: #222; }
 		</style>
 	</head>
 	<body>
