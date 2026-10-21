@@ -4407,20 +4407,25 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
 
   @Override
   public void commit() throws RODATransactionException {
-    for (TransactionalModelOperationLog modelOperation : transactionLogService
-      .getModelOperations(transaction.getId())) {
-      LiteRODAObject liteRODAObject = new LiteRODAObject(modelOperation.getLiteObject());
-      OptionalWithCause<Class<IsRODAObject>> isRODAObjectClassOptionalWithCause = LiteRODAObjectFactory
-        .getClass(liteRODAObject);
+    try {
+      for (TransactionalModelOperationLog modelOperation : transactionLogService
+        .getModelOperations(transaction.getId())) {
+        LiteRODAObject liteRODAObject = new LiteRODAObject(modelOperation.getLiteObject());
+        OptionalWithCause<Class<IsRODAObject>> isRODAObjectClassOptionalWithCause = LiteRODAObjectFactory
+          .getClass(liteRODAObject);
 
-      if (isRODAObjectClassOptionalWithCause.isPresent()) {
-        Class<IsRODAObject> isRODAObjectClass = isRODAObjectClassOptionalWithCause.get();
-        if (operationRegistry.isLockableClass(isRODAObjectClass)) {
-          PluginHelper.releaseObjectLock(modelOperation.getLiteObject(), transaction.getRequestId().toString());
+        if (isRODAObjectClassOptionalWithCause.isPresent()) {
+          Class<IsRODAObject> isRODAObjectClass = isRODAObjectClassOptionalWithCause.get();
+          if (operationRegistry.isLockableClass(isRODAObjectClass)) {
+            PluginHelper.releaseObjectLock(modelOperation.getLiteObject(), transaction.getRequestId().toString());
+          }
         }
       }
+    } finally {
+      // lagringen är redan committad: åtgärderna ska köras även om ett lås
+      // inte kunde frisläppas
+      runAfterCommitActions();
     }
-    runAfterCommitActions();
   }
 
   @Override

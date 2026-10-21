@@ -267,9 +267,14 @@ public class PermissionOverview extends Composite {
       cached(this::createUsersTab));
     tabs.createAndAddTab(SafeHtmlUtils.fromString(messages.permissionOverviewTabNodes()),
       cached(this::createNodesTab));
-    tabs.createAndAddTab(SafeHtmlUtils.fromString(messages.permissionOverviewTabRules()),
-      cached(this::createRulesTab));
-    tabs.selectTabAt(tabToSelect);
+    // regelinnehållet kräver access_rules.read (servern skickar annars inga regler)
+    boolean mayReadRules = UserLogin.getInstance().getCachedUser().map(user -> user.hasRole("access_rules.read"))
+      .orElse(false);
+    if (mayReadRules) {
+      tabs.createAndAddTab(SafeHtmlUtils.fromString(messages.permissionOverviewTabRules()),
+        cached(this::createRulesTab));
+    }
+    tabs.selectTabAt(mayReadRules ? tabToSelect : Math.min(tabToSelect, 2));
     tabsContainer.add(tabs);
   }
 

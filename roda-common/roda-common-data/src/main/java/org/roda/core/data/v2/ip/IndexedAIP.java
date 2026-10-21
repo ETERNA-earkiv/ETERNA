@@ -128,6 +128,7 @@ public class IndexedAIP
       other.getRetentionPeriodDetails(), other.getRetentionPeriodState(), other.getDisposalHoldsId(),
       other.getTransitiveDisposalHoldsId(), other.getDestroyedOn(), other.getDestroyedBy(),
       other.getDisposalConfirmationId(), other.getScheduleAssociationType());
+    setAccessRuleRestrictedGroups(new ArrayList<>(other.getAccessRuleRestrictedGroups()));
   }
 
   /**

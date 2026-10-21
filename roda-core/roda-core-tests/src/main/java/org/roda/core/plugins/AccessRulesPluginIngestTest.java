@@ -21,6 +21,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
 import org.roda.core.common.access.AccessRuleRegistry;
 import org.roda.core.common.access.AccessRulesApplier;
+import org.roda.core.common.access.AccessRulesConfig;
 import org.roda.core.common.access.AccessRulesModelObserver;
 import org.roda.core.common.access.EternaAdminParser;
 import org.roda.core.data.common.RodaConstants;
@@ -126,6 +127,10 @@ public class AccessRulesPluginIngestTest {
 
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
+
+    // huvudbrytaren är avstängd i standardkonfigurationen; regelfilens egen
+    // enabled-flagga räcker inte
+    RodaCoreFactory.getRodaConfiguration().setProperty(AccessRulesConfig.PREFIX + ".enabled", true);
 
     // regelregistret är en lat singleton; se till att det pekar på detta
     // tests konfigurationskatalog (och inte en tidigare testklass' RODA_HOME)

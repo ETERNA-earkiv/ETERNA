@@ -227,8 +227,8 @@ public class PermissionOverviewBuilderTest {
   private static final class Fixture {
     final ModelStub model = new ModelStub();
     final NodeStub nodes = new NodeStub();
-    final User requester = user("admin", "Administratör", "admin@example.org", true, set("administrators"),
-      set(), set());
+    final User requester = user("admin", "Administratör", "admin@example.org", true, set("administrators"), set(),
+      set("member.read", "access_rules.read"));
 
     Fixture() {
       // grupper i omvänd ordning för att testa sorteringen
@@ -440,6 +440,20 @@ public class PermissionOverviewBuilderTest {
     // reglerna sorterade på grupp
     Assert.assertEquals(names(overview.getRules(), r -> ((AccessRule) r).getGroup()), Arrays.asList(HANDL, SOC));
     Assert.assertEquals(overview.getRules().get(0).getLagrum(), Collections.singletonList("OSL 26:1"));
+  }
+
+  @Test
+  public void testRuleContentRequiresAccessRulesRead() {
+    Fixture fx = new Fixture();
+    User memberReader = user("bertil", "Bertil", "bertil@example.org", true, set(SOC), set(), set("member.read"));
+    PermissionOverview overview = PermissionOverviewBuilder.build(fx.model.proxy(), fx.nodes, memberReader, LEVELS,
+      rules(true), ROLE_TITLES, PermissionOverviewBuilder.groupRolesByPrefix(ROLES));
+
+    Assert.assertTrue(overview.getRules().isEmpty(), "regelinnehåll kräver access_rules.read");
+    Assert.assertTrue(overview.isRulesEnabled());
+    // spärrade grupper är behörighetsläge, inte regelinnehåll, och visas
+    // fortfarande
+    Assert.assertEquals(node(overview, "s1").getRestrictedGroups(), Collections.singletonList(HANDL));
   }
 
   @Test

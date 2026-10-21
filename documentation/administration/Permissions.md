@@ -121,7 +121,8 @@ The **status row** shows *Status* (Active/Disabled – both `core.access_rules.e
 2. **Active** – whether the rule is evaluated (a disabled rule restricts the group completely).
 3. **Allowed confidentiality assessments** – *All (\*)*, *Not assessed*, *No confidentiality*, *Contains confidential information*, *Entirely confidential*. Ticking *All* locks the others. Nothing ticked = nothing allowed.
 4. **Allowed legal references** – one per line; *Add legal reference*, *Remove*, *Normalize* (shows *Normalized form* and *Warnings*; *Use normalized form* replaces the rows). A row yielding more than one reference is rejected on save.
-5. **Allowed personal data assessments** and 6. **Allowed personal data levels** – check boxes from the vocabulary (levels locked to *All* when no vocabulary is configured).
+5. **Allowed personal data assessments** – check boxes from the vocabulary.
+6. **Allowed personal data levels** – check boxes from the vocabulary (locked to *All* when no vocabulary is configured).
 7. **Note** – free text.
 8. **Apply the rules to the repository right after saving** – tick to start the apply job; click **Save**. The server validates (vocabulary, patterns, group exists in the directory) and answers 400 with a problem list if invalid.
 9. **Remove** asks for confirmation; the group is then no longer managed.

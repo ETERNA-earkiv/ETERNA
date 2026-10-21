@@ -106,6 +106,8 @@ public final class PermissionOverviewBuilder {
   public static final String CONFIG_ROLES_KEY = "ui.role";
   /** Huvudbrytaren för åtkomstreglerna (roda-core.properties). */
   public static final String CONFIG_RULES_ENABLED_KEY = "core.access_rules.enabled";
+  /** Roll som krävs för att se regelinnehållet i översikten. */
+  public static final String ROLE_ACCESS_RULES_READ = "access_rules.read";
   /** Områdesnyckel för rättigheter utan konfigurerat område. */
   public static final String OTHER_AREA = "other";
   /** Nivåer som tas med när ui.permissionOverview.levels saknas. */
@@ -209,7 +211,10 @@ public final class PermissionOverviewBuilder {
     overview.setUsers(buildUsers(model, m, warnings));
     overview.setRoleAreas(buildRoleAreas(roleTitles, rolesByTitle, overview.getGroups(), overview.getUsers()));
     overview.setNodes(buildNodes(model, nodes, requester, effectiveLevels, rules, m, warnings));
-    overview.setRules(sortedRules(rules));
+    // regelinnehållet (villkor, lagrum) kräver access_rules.read; att reglerna
+    // är på och vilka grupper som spärrats är behörighetsläge och visas ändå
+    boolean mayReadRules = requester != null && requester.hasRole(ROLE_ACCESS_RULES_READ);
+    overview.setRules(mayReadRules ? sortedRules(rules) : new ArrayList<>());
     overview.setRulesEnabled(rules != null && rules.isEnabled());
     overview.setWarnings(warnings);
     return overview;
