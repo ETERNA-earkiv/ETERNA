@@ -1,0 +1,19 @@
+{
+  "name": "eterna-regression",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:unit": "playwright test --project=unit",
+    "test:smoke": "playwright test --project=smoke",
+    "test:core": "playwright test --project=core",
+    "regression": "./scripts/regression.sh",
+    "report": "playwright show-report",
+    "typecheck": "tsc"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/node": "24.19.2",
+    "fflate": "0.8.2",
+    "typescript": "5.9.3"
+  }
+}
