@@ -2850,4 +2850,31 @@ public interface ClientMessages extends Messages {
   String browseAIPReasonViewAIP();
 
   String filesReasonDownloadSelectedFiles();
+
+  /* Massredigering av metadatafält */
+  String bulkEditMetadataButton();
+
+  String bulkEditMetadataDialogTitle();
+
+  String bulkEditMetadataSelectedCount(long count);
+
+  String bulkEditMetadataTypeLabel();
+
+  String bulkEditMetadataFieldLabel();
+
+  String bulkEditMetadataNewValueLabel();
+
+  String bulkEditMetadataModeLabel();
+
+  String bulkEditMetadataModeOverwrite();
+
+  String bulkEditMetadataModeComplete();
+
+  String bulkEditMetadataExpectedValueLabel();
+
+  String bulkEditMetadataNoFields();
+
+  String bulkEditMetadataStartButton();
+
+  String bulkEditMetadataMissingValue();
 }
