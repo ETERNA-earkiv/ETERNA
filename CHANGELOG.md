@@ -4,6 +4,7 @@
 
 #### New features
 - Added a "Ladda ner valda filer" action that downloads selected files and folders as a zip of file content only, with paths relative to the representation's `data/`; the selection is validated before anything is streamed and again just before delivery, a selection that cannot be delivered is refused with an explanation instead of a technical error, large selections ask for confirmation, and the disclosed file UUIDs, count and total size are recorded in the audit log [#589](https://github.com/ETERNA-earkiv/ETERNA/issues/589)
+- Added delivery specifications: a registry in `roda-core.properties` (`core.deliveryspec.*`) that binds a specification id to a metadata type and version, and an optional ingest step "Validering mot leveransspecifikation" (`DeliverySpecValidationPlugin`, off by default) that fails a package when required metadata of that type is missing or does not validate against its XSD (a missing XSD is reported as a configuration error), with line numbers in the job report and a PREMIS validation event; CITS ERMS 2.x and 3.x are registered out of the box and further specifications can be added in `RODA_HOME/config` without code changes [#678](https://github.com/ETERNA-earkiv/ETERNA/pull/678)
 
 #### Improvements
 - Pinned the `eterna-unoserver` image to an immutable version tag (`v3.7.0`) in the deploy compose files, and updated the build workflow to publish `v3.7.0` alongside `:latest`, so deployments are reproducible [#600](https://github.com/ETERNA-earkiv/ETERNA/issues/600)
