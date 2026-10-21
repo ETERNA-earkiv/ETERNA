@@ -4440,4 +4440,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       }
     }
   }
+
+  @Override
+  public void updateOriginalMETS(IsRODAObject object1, IsRODAObject object2, ModelService.JobName jobName)
+    throws
+		AuthorizationDeniedException,
+		GenericException,
+		NotFoundException,
+		RequestNotValidException
+  {
+	  
+  }
 }

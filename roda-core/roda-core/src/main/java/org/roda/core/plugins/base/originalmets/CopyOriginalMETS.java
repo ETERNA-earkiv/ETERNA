@@ -82,8 +82,6 @@ public class CopyOriginalMETS {
                 .getMetsHdr()
                 .setLASTMODDATE(OriginalMETSUtils.currentDateAndTime());
 
-            metsWrapper.getMets().getMetsHdr().setRECORDSTATUS("Complete");
-
             metsWrapper.getMets().setPROFILE(PROFILE);
 
             METSUtils.marshallMETS(mets, metsPath, true);
@@ -125,10 +123,10 @@ public class CopyOriginalMETS {
                             .setLASTMODDATE(
                                 OriginalMETSUtils.currentDateAndTime()
                             );
-                        repMetsWrapper
-                            .getMets()
-                            .getMetsHdr()
-                            .setRECORDSTATUS("Complete");
+//                        repMetsWrapper
+//                            .getMets()
+//                            .getMetsHdr()
+//                            .setRECORDSTATUS("Complete");
 
                         repMetsWrapper.getMets().setPROFILE(PROFILE);
 

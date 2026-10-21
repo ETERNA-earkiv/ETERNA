@@ -7,6 +7,8 @@
  */
 package org.roda.core.model;
 
+import jakarta.xml.bind.JAXBException;
+
 import static org.roda.core.common.DownloadUtils.ZIP_FILE_NAME_EXTENSION;
 import static org.roda.core.common.DownloadUtils.ZIP_MEDIA_TYPE;
 import static org.roda.core.common.DownloadUtils.ZIP_PATH_DELIMITER;
@@ -152,6 +154,9 @@ import org.roda.core.model.utils.ResourceListUtils;
 import org.roda.core.model.utils.ResourceParseUtils;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.base.ingest.PermissionUtils;
+import org.roda.core.plugins.base.originalmets.CreateLogicalMETS;
+import org.roda.core.plugins.base.originalmets.CreateRepresentationMETS;
+import org.roda.core.plugins.base.originalmets.UpdateOriginalMETS;
 import org.roda.core.protocols.Protocol;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
@@ -176,8 +181,11 @@ import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.HTTPUtility;
 import org.roda.core.util.IdUtils;
 import org.roda.core.util.RESTClientUtility;
+import org.roda_project.commons_ip.utils.IPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.xml.sax.SAXException;
 
 /**
  * Class that "relates" Model & Storage
@@ -374,7 +382,6 @@ public class DefaultModelService implements ModelService {
     } else {
       throw new ValidationException(validationReport);
     }
-
     return aip;
   }
 
@@ -418,7 +425,6 @@ public class DefaultModelService implements ModelService {
     if (notify) {
       notifyAipCreated(aip).failOnError();
     }
-
     return aip;
   }
 
@@ -669,7 +675,26 @@ public class DefaultModelService implements ModelService {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     StoragePath aipPath = ModelUtils.getAIPStoragePath(aipId);
+    
+    AIP aip = this.retrieveAIP(aipId);
+    AIP aip2 = null;
+    AIP parentAip = null;
+    if (aip.getParentId() != null) {
+		aip2 = new AIP();
+		aip2.setId(aipId);
+		parentAip = new AIP();
+		parentAip.setId(aip.getParentId());
+    }
+    
     storage.deleteResource(aipPath);
+    aip = null;
+    
+    if (parentAip != null) {
+    	updateOriginalMETS(aip2, parentAip, ModelService.JobName.DELETE_AIP);
+    	aip2 = null;
+        parentAip = null;
+    }
+    
     notifyAipDeleted(aipId).failOnError();
   }
 
@@ -1292,7 +1317,14 @@ public class DefaultModelService implements ModelService {
     for (Iterator<Representation> it = aip.getRepresentations().iterator(); it.hasNext();) {
       Representation representation = it.next();
       if (representation.getId().equals(representationId)) {
+    	Representation representation2 = new Representation();
+    	representation2.setId(representationId);
+    	
         it.remove();
+ 
+        updateOriginalMETS(aip, representation2, ModelService.JobName.DELETE_REPRESENTATION);
+        representation2 = null;
+        
         break;
       }
     }
@@ -5860,5 +5892,67 @@ public class DefaultModelService implements ModelService {
     throws RequestNotValidException, GenericException {
     StoragePath storagePath = DefaultStoragePath.parse(ModelUtils.getStoragePath(lite), pathPartials);
     return getStorage().exists(storagePath);
+  }
+  
+  @Override
+  public void updateOriginalMETS(IsRODAObject object1, IsRODAObject object2, ModelService.JobName jobName)
+    throws 
+    	AuthorizationDeniedException, 
+    	GenericException,
+    	NotFoundException,
+    	RequestNotValidException {
+  
+	  if (jobName == ModelService.JobName.CREATE_AIP) {
+		  if (object1 instanceof AIP) {
+			  LOGGER.debug("updateOriginalMETS -> CreateLogicalMETS.create (manually created) (" + object1.getId()+ ")");
+			  CreateLogicalMETS.create((AIP) object1, this);
+		  }
+		
+	  } else if (jobName == ModelService.JobName.DELETE_AIP) { 
+		  updateOriginalMETSAipDeleted(object1.getId(), object2.getId());
+		  
+	  } else if (jobName == ModelService.JobName.CREATE_REPRESENTATION) {
+		  if (object1 instanceof Representation) {
+			  LOGGER.debug("updateOriginalMETS -> CreateRepresentationMETS.create (manually created) (" + object1.getId() + ")");
+			  CreateRepresentationMETS.create((Representation) object1, this);
+		  }
+		  
+	  } else if (jobName == ModelService.JobName.DELETE_REPRESENTATION) {
+		  updateOriginalMETSRepresentationDeleted(object1.getId(), object2.getId());
+	  }
+  }
+  
+  private void updateOriginalMETSAipDeleted(String aipId, String parentAipId)
+    throws 
+	    AuthorizationDeniedException, 
+	    GenericException,
+	    NotFoundException,
+	    RequestNotValidException {
+	  
+	LOGGER.debug("updateOriginalMETSAipDeleted -> UpdateOriginalMETS.handleParentWhenRemovedAIP (aipId {} and parentAipId {})", aipId, parentAipId);
+	
+	try {
+		UpdateOriginalMETS.handleParentWhenRemovedAIP(this, aipId, parentAipId);
+	
+	} catch (IOException | IPException | JAXBException | SAXException e) {
+		throw new GenericException(e.getMessage(), e.getCause());	
+	}	  
+  }
+  
+  private void updateOriginalMETSRepresentationDeleted(String aipId, String representationId)
+    throws 
+	    AuthorizationDeniedException, 
+	    GenericException,
+	    NotFoundException,
+	    RequestNotValidException {
+	  
+	LOGGER.debug("updateOriginalMETSRepresentationDeleted -> UpdateOriginalMETS.handleMETSWhenRemovedRepresentation (aipId {} and representationId {})", aipId, representationId);
+	
+	try {
+		UpdateOriginalMETS.handleMETSWhenRemovedRepresentation(this, aipId, representationId);
+	
+	} catch (IOException | IPException | JAXBException | SAXException  e) {
+		throw new GenericException(e.getMessage(), e.getCause());	
+	}	  
   }
 }

@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.base.originalmets;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -45,6 +46,7 @@ import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda_project.commons_ip2.validator.utils.CHECKSUMTYPE;
 import org.roda_project.commons_ip2.mets_v1_12.beans.Mets;
 import org.roda_project.commons_ip2.mets_v1_12.beans.StructMapType;
+import org.roda_project.commons_ip.utils.IPException;
 import org.roda_project.commons_ip2.mets_v1_12.beans.AmdSecType;
 import org.roda_project.commons_ip2.mets_v1_12.beans.DivType;
 import org.roda_project.commons_ip2.mets_v1_12.beans.MdSecType;
@@ -60,29 +62,43 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.jsonwebtoken.lang.Arrays;
+import jakarta.xml.bind.JAXBException;
+import org.xml.sax.SAXException;
 
 /**
  * Creates the METS file in the logical AIP
- * 
+ *
  * @author Paul Hedberg <paul.hedberg@skane.se>
  */
 public class CreateLogicalMETS {
 	private static final Logger LOG = LoggerFactory.getLogger(CreateLogicalMETS.class);
-	
+
 	private static final String PROFILE = "https://earkaip.dilcis.eu/profile/E-ARK-AIP-v2-2-0.xml";
-	
+
 	public static void create(AIP aip, ModelService modelService) {
-		
+
 		boolean keepOriginalMets = RodaCoreFactory.getProperty(RodaConstants.CORE_PLUGINS_BASE_KEEP_ORIGINAL_METS, false);
 		if (!keepOriginalMets) {
 			return;
 		}
-		
+
 		String softwareVersion = RodaCoreFactory.getProperty("core.plugins.base.keep_original_mets.software_version", "NOT DEFINED");
 
 		try {
 			StoragePath aipPath = ModelUtils.getAIPStoragePath(aip.getId());
+			StoragePath metsPath = DefaultStoragePath.parse(aipPath, IPConstants.METS_FILE);
 			
+			// Check if METS already exists
+			java.io.File file = modelService
+                    .getStorage()
+                    .getDirectAccess(aipPath)
+                    .getPath()
+                    .resolve(Path.of(IPConstants.METS_FILE))
+                    .toFile();
+			if (file.exists()) {
+				return;
+			}
+
 			ObjectFactory of = new ObjectFactory();
 			Mets mets = of.createMets();
 			mets.setOBJID(aip.getId());
@@ -90,64 +106,73 @@ public class CreateLogicalMETS {
 			mets.setPROFILE(PROFILE);
 			mets.setTYPE("MIXED");
 			mets.setOTHERTYPE("OTHERTYPE");
-			
+
 			MetsType.MetsHdr metsHeader = new MetsType.MetsHdr();
 			metsHeader.setCREATEDATE(OriginalMETSUtils.currentDateAndTime());
 			metsHeader.setLASTMODDATE(OriginalMETSUtils.currentDateAndTime());
-			
+
 			Agent agent = new Agent();
 			agent.setID("uuid-" + UUID.randomUUID().toString());
 			agent.setROLE("CREATOR");
 			agent.setTYPE("OTHER");
 			agent.setOTHERTYPE("SOFTWARE");
-			agent.setName("RODA");	
+			agent.setName("RODA");
 			Note note = new Note();
 			note.setNOTETYPE("SOFTWARE VERSION");
 			note.setValue(softwareVersion);
-			agent.getNote().add(note);	
+			agent.getNote().add(note);
 			metsHeader.getAgent().add(agent);
-			
+
 			metsHeader.setOAISPACKAGETYPE("AIP");
 			mets.setMetsHdr(metsHeader);
-			
+
 			AmdSecType amdSec = new AmdSecType();
 			amdSec.setID("uuid-" + UUID.randomUUID().toString());
 			mets.getAmdSec().add(amdSec);
 			
-			StructMapType structMapType = new StructMapType();
-	    	structMapType.setID("uuid-" + UUID.randomUUID().toString());
-	    	structMapType.setLABEL("RelatedPackage");
-	    	DivType dt = new DivType();
-	    	dt.setID("uuid-" + UUID.randomUUID().toString());
-	    	structMapType.setDiv(dt);
-	    	mets.getStructMap().add(structMapType);
-			
-			if (aip.getParentId() != null) {
-				DivType dt2 = new DivType();
-	    		dt2.setID("uuid-" + UUID.randomUUID().toString());
-	    		dt2.setLABEL("Parent");
-	    		DivType.Mptr mptr = new DivType.Mptr();
-	    		mptr.setLOCTYPE("OTHER");
-	    		mptr.setOTHERLOCTYPE("UUID");
-	    		mptr.setType("simple");
-	    		mptr.setHref(aip.getParentId());
-	    		mptr.setTitle("UUID-" + aip.getParentId());
-	    		dt2.getMptr().add(mptr);
-	    		structMapType.getDiv().getDiv().add(dt2);
-			}
-			
-			StoragePath path = DefaultStoragePath.parse(aipPath, IPConstants.METS_FILE);	
-			modelService.getStorage().createBinary(path, new StringContentPayload(XMLUtils.getXMLFromObject(mets)), false);
-			Path metsPath = modelService.getStorage().getDirectAccess(aipPath).getPath().resolve(Path.of(IPConstants.METS_FILE));
-			
+	    	mets.getStructMap().add(UpdateOriginalMETS.createStructMap("RelatedPackage"));
+	    	
+			modelService.getStorage().createBinary(metsPath, new StringContentPayload(XMLUtils.getXMLFromObject(mets)), false);
+			handleParentAIP(aip, aipPath, modelService);
+
 		} catch (AlreadyExistsException
         		| AuthorizationDeniedException
-        		| DatatypeConfigurationException 
+        		| DatatypeConfigurationException
         		| GenericException
+        		| IOException
+            	| IPException
+            	| JAXBException
         		| NotFoundException
-        		| RequestNotValidException e) {
-			
+        		| RequestNotValidException 
+        		| SAXException e) {
+
 	    	LOG.error("Then create the logical METS file {} - Error: {}", aip.getId(), e);
 		}
+	}
+	
+	private static void handleParentAIP(AIP aip, StoragePath aipPath, ModelService modelService) 
+			throws 
+        	AuthorizationDeniedException, 
+        	GenericException, 
+        	IOException, 
+        	IPException, 
+        	JAXBException, 
+        	NotFoundException, 
+        	RequestNotValidException, 
+        	SAXException 
+	{		
+		if (aip.getParentId() != null) {
+			Path metsPath = OriginalMETSUtils.metsPath(
+                modelService,
+                aipPath
+            );
+            MetsWrapper metsWrapper = new MetsWrapper(
+                METSUtils.instantiateMETSFromFile(metsPath),
+                metsPath
+            );
+                    
+			UpdateOriginalMETS.handleParentAIP(modelService, aip.getId(), metsWrapper);
+			METSUtils.marshallMETS(metsWrapper.getMets(), metsPath, false);
+		}		
 	}
 }
