@@ -2959,4 +2959,75 @@ public interface ClientMessages extends Messages {
   String browseAIPReasonViewAIP();
 
   String filesReasonDownloadSelectedFiles();
+
+  /* Behörighetsöversikt */
+  String permissionOverviewTitle();
+
+  String permissionOverviewTabRoles();
+
+  String permissionOverviewTabUsers();
+
+  String permissionOverviewTabNodes();
+
+  String permissionOverviewTabRules();
+
+  String permissionOverviewDownloadHtml();
+
+  String permissionOverviewDownloadCsv();
+
+  String permissionOverviewFilterPlaceholder();
+
+  String permissionOverviewColArea();
+
+  String permissionOverviewColRole();
+
+  String permissionOverviewColUser();
+
+  String permissionOverviewColName();
+
+  String permissionOverviewColEmail();
+
+  String permissionOverviewColActive();
+
+  String permissionOverviewColGroups();
+
+  String permissionOverviewColDirectRoles();
+
+  String permissionOverviewColAllRoles();
+
+  String permissionOverviewNoRoles();
+
+  String permissionOverviewNoUsers();
+
+  String permissionOverviewLoadError();
+
+  String permissionOverviewRetry();
+
+  String permissionOverviewRulesDisabled();
+
+  String permissionOverviewRulesEmpty();
+
+  String permissionOverviewRuleGroup();
+
+  String permissionOverviewRuleEnabled();
+
+  String permissionOverviewRuleSekretess();
+
+  String permissionOverviewRuleLagrum();
+
+  String permissionOverviewRulePersonuppgifter();
+
+  String permissionOverviewRuleNiva();
+
+  String permissionOverviewRuleNote();
+
+  String permissionOverviewGeneratedAt(String generatedAt, String generatedBy);
+
+  String permissionOverviewWarnings();
+
+  String permissionOverviewAdminGroup();
+
+  String permissionOverviewYes();
+
+  String permissionOverviewNo();
 }

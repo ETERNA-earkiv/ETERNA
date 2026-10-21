@@ -44,9 +44,9 @@ public class Management {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER, UserLog.RESOLVER,
-        NotificationRegister.RESOLVER, ActionProcess.RESOLVER, InternalProcess.RESOLVER, Statistics.RESOLVER,
-        AccessRules.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER,
+        PermissionOverview.RESOLVER, UserLog.RESOLVER, NotificationRegister.RESOLVER, ActionProcess.RESOLVER,
+        InternalProcess.RESOLVER, Statistics.RESOLVER, AccessRules.RESOLVER}, false, callback);
     }
 
     @Override
@@ -105,6 +105,8 @@ public class Management {
         MemberManagement.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(AccessRules.RESOLVER.getHistoryToken())) {
         AccessRules.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+      } else if (historyTokens.get(0).equals(PermissionOverview.RESOLVER.getHistoryToken())) {
+        PermissionOverview.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(UserLog.RESOLVER.getHistoryToken())) {
         UserLog.getInstance().resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(NotificationRegister.RESOLVER.getHistoryToken())) {

@@ -10,6 +10,7 @@ Tekniska referenser och detaljerad information om systemet.
 
 - **[Överblick](reference/Overview_sv_SE.md)** - En introduktion till ETERNA och dess kärnfunktioner
 - **[Beskrivande Metadata Typer](reference/Descriptive_Metadata_Types_sv_SE.md)** - Olika typer av metadata som stöds
+- **[Administrativ metadata eterna_admin](administration/Permissions_sv_SE.md)** - Fälten sekretess, sekretessgrund, personuppgifter och personuppgiftsniva med vokabulär, och hur de styr åtkomstreglerna
 - **[Metadata Format](reference/Metadata_Formats_sv_SE.md)** - Format som stöds för metadata
 - **[Representation Information](reference/Representation_Information_sv_SE.md)** - Information om digital representation
 - **[Statistik](reference/Statistics_sv_SE.md)** - Statistik och rapportering i systemet
@@ -28,6 +29,7 @@ Steg-för-steg guider för att använda ETERNA effektivt.
 - **[Webbarkivvisaren](usage/WebArchiveViewer_sv_SE.md)** - Spela upp arkiverade webbsidor (WARC och WACZ)
 - **[XML-visning med XSLT-stilmallar](usage/XsltViewer_sv_SE.md)** - Rendera XML-filer med XSLT och applicera egna stilmallar
 - **[Vanliga Frågor](usage/FAQ_sv_SE.md)** - Svar på ofta ställda frågor
+- **[Varför syns inte en handling? (åtkomstregler)](administration/Permissions_sv_SE.md)** - Vanliga orsaker: saknad läsbehörighet, bedömning "ej bedömd", lagrum som inte täcks av gruppens regel, regler som ännu inte tillämpats på befintligt bestånd – och omvänt varför obedömd struktur syns (`missingMetadata = inherit`)
 - **[README](usage/README.md)** - Övergripande information om ETERNA
 - **[Felsökning](usage/Troubleshooting_sv_SE.md)** - Felsökning
 - **[Konfigurera fält för export av sökresultat](administration/Export_Configuration_sv_SE.md)** - Konfigurera fält för export av sökresultat
@@ -40,7 +42,9 @@ Guider för systemadministratörer och ansvariga för arkivet.
 - **[Central Autentiseringstjänst](administration/Central_Authentication_Service_sv_SE.md)** - Hantera användarautentisering
 - **[Gallringsspolicyer](administration/Disposal_Policies_sv_SE.md)** - Policyer för datahantering
 - **[Gallring](administration/Disposal_sv_SE.md)** - Processer för datahantering
-- **[Behörigheter](administration/Permissions_sv_SE.md)** - Hantering av användarbehörigheter
+- **[Behörigheter](administration/Permissions_sv_SE.md)** - Rättigheter och grupper, objektbehörigheter per strukturenhet, åtkomstregler för sekretess och personuppgifter, behörighetsöversikt och rapport, systemadministratörskonton, konfiguration (`core.access_rules.*`, `access-rules.json`) och felsökning
+- **[Åtkomstregler (sekretess och personuppgifter)](administration/Permissions_sv_SE.md)** - Så spärras läsbehörighet utifrån sekretessbedömning, lagrum (kapitel och paragraf), personuppgiftsbedömning och personuppgiftsnivå i `eterna_admin`; administrationssidan Åtkomstregler steg för steg, torrkörning och tillämpningsjobb; policyval för ej bedömt och obedömd struktur (`ejBedomd`, `missingMetadata`)
+- **[Behörighetsöversikt och rapport](administration/Permissions_sv_SE.md)** - Översikt över rättigheter per grupp, användare med effektiva rättigheter, strukturenheternas behörigheter och aktiva åtkomstregler; utskrivbar HTML-rapport och CSV
 - **[Riskbedömning](administration/Risk_Assessment_sv_SE.md)** - Utvärdering av arkiveringsrisker
 - **[Datum- och tidvisning](administration/Date_Time_Configuration_sv_SE.md)** - Konfigurera hur datum och tider visas i systemet
 <!-- - **[Original-METS](administration/original-mets_sv_SE.md)** - Hanterar METS filer -->

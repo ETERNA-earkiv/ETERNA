@@ -1077,6 +1077,15 @@ public final class RodaConstants {
   public static final String INDEX_PERMISSION_GROUPS_PREFIX = "permission_groups_";
 
   /*
+   * Behörighetsöversikt. Delas av
+   * PermissionOverviewBuilder (roda-core) och PermissionOverview (roda-wui) så
+   * att klienten följer serverns standardnivåer.
+   */
+  public static final String UI_PERMISSION_OVERVIEW_LEVELS = "ui.permissionOverview.levels";
+  public static final List<String> PERMISSION_OVERVIEW_DEFAULT_LEVELS = Collections
+    .unmodifiableList(Arrays.asList("fonds", "class", "series"));
+
+  /*
    * Index common fields
    */
   public static final String INDEX_UUID = "uuid";

@@ -30,6 +30,7 @@ import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.management.Management;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.management.NotificationRegister;
+import org.roda.wui.client.management.PermissionOverview;
 import org.roda.wui.client.management.Statistics;
 import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.management.accessrules.AccessRules;
@@ -105,6 +106,7 @@ public class Header extends Composite {
   private MenuItem administrationInternalActions;
   private MenuItem administrationUser;
   private MenuItem administrationAccessRules;
+  private MenuItem administrationPermissionOverview;
   private MenuItem administrationLog;
   private MenuItem administrationNotifications;
   private MenuItem administrationStatistics;
@@ -212,6 +214,10 @@ public class Header extends Composite {
     administrationAccessRules = administrationMenu.addItem(messages.title("administration_access_rules"),
       createCommand(AccessRules.RESOLVER.getHistoryPath()));
     administrationAccessRules.addStyleName("administration_access_rules_item");
+    administrationPermissionOverview = administrationMenu.addItem(
+      messages.title("administration_permission_overview"),
+      createCommand(PermissionOverview.RESOLVER.getHistoryPath()));
+    administrationPermissionOverview.addStyleName("administration_permission_overview_item");
 
     disposalMenu = new AcessibleMenuBar(true);
     disposalMenu.addStyleName("bannerHeaderColors");
@@ -306,6 +312,7 @@ public class Header extends Composite {
       updateResolverSubItemVisibility(InternalProcess.RESOLVER, administrationInternalActions);
       updateResolverSubItemVisibility(MemberManagement.RESOLVER, administrationUser);
       updateResolverSubItemVisibility(AccessRules.RESOLVER, administrationAccessRules);
+      updateResolverSubItemVisibility(PermissionOverview.RESOLVER, administrationPermissionOverview);
       updateResolverSubItemVisibility(UserLog.RESOLVER, administrationLog);
       updateResolverSubItemVisibility(NotificationRegister.RESOLVER, administrationNotifications);
       updateResolverSubItemVisibility(Statistics.RESOLVER, administrationStatistics);
