@@ -233,7 +233,8 @@ public class NavigationToolbarLegacy<T extends IsIndexed> extends Composite impl
       searchPopup.addStyleName("ActionableStyleMenu");
       searchPopupClickHandler = searchButton
         .addClickHandler(event -> searchPopup.showRelativeTo(searchButton, CalloutPopup.CalloutPosition.TOP_RIGHT));
-      searchButton.setVisible(true);
+      // utan sökrollen nekas alla sökåtgärder och popupen skulle bli tom
+      searchButton.setVisible(SearchAipActions.userHasSearchRole());
     }
   }
 
