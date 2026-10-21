@@ -74,11 +74,11 @@ public final class LagrumParser {
    * ignorerad svans (stycke/punkt/mening).
    */
   private static final Pattern SEGMENT = Pattern.compile("^" // ----
-    + "(?:(?<lag>\\p{L}[\\p{L}\\-]*+)(?:\\s*+\\(\\d{4}:\\d+\\))?\\s++)?" // lag + ev. (2009:400)
-    + "(?<kap>\\d+)" // kapitel
+    + "(?:(?<lag>\\p{L}[\\p{L}\\-]*+)(?:\\s*+\\(\\d{4}:\\d++\\))?\\s++)?" // lag + ev. (2009:400)
+    + "(?<kap>\\d++)" // kapitel
     + "(?:\\s*+(?<kapord>kap(?:itlet|itel)?\\.?)|(?<kolon>:))?" // "kap." eller ":"
-    + "(?:\\s*+(?<par>\\d+)\\s*+(?<suffix>\\p{L})?\\s*+§{0,2})?" // paragraf, suffix, §
-    + "(?<svans>(?:\\s*+(?:\\d+|första|andra|tredje|fjärde|femte|sjätte)\\s*+" // 1 st., 2 p.
+    + "(?:\\s*+(?<par>\\d++)\\s*+(?<suffix>\\p{L})?\\s*+§{0,2})?" // paragraf, suffix, §
+    + "(?<svans>(?:\\s*+(?:\\d++|första|andra|tredje|fjärde|femte|sjätte)\\s*+" // 1 st., 2 p.
     + "(?:st|stycket|stycke|p|punkten|punkt|men|meningen)\\b\\.?)*)" // ----
     + "\\s*+$", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.UNICODE_CHARACTER_CLASS);
 
@@ -87,8 +87,8 @@ public final class LagrumParser {
    * "21 kap. 1, 3 och 7 §§"; lag och kapitel ärvs från föregående del. Se
    * {@link #parseParagraphOnly} för när ett tal utan § får tolkas så.
    */
-  private static final Pattern PARAGRAPH_ONLY = Pattern.compile("^(?<par>\\d+)\\s*+(?<suffix>\\p{L})?\\s*+"
-    + "(?<tecken>§{1,2})?(?:\\s*+(?:\\d+|första|andra|tredje|fjärde|femte|sjätte)\\s*+"
+  private static final Pattern PARAGRAPH_ONLY = Pattern.compile("^(?<par>\\d++)\\s*+(?<suffix>\\p{L})?\\s*+"
+    + "(?<tecken>§{1,2})?(?:\\s*+(?:\\d++|första|andra|tredje|fjärde|femte|sjätte)\\s*+"
     + "(?:st|stycket|stycke|p|punkten|punkt|men|meningen)\\b\\.?)*\\s*+$",
     Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.UNICODE_CHARACTER_CLASS);
 

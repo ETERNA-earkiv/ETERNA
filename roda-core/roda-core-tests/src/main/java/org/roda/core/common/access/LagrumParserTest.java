@@ -181,6 +181,26 @@ public class LagrumParserTest {
       nbsp.toString());
   }
 
+  /**
+   * Säkerhetstest: långa sifferföljder får inte heller ge polynomiell
+   * backtracking (CodeQL java/polynomial-redos). Med giriga \d+ kunde
+   * följden delas godtyckligt mellan kapitel, paragraf och svans; före
+   * rättningen tog "0" × 2000 + " st x" över 70 s.
+   */
+  @Test(timeOut = 5000)
+  public void testLongDigitRunsAreParsedQuickly() {
+    String zeros = "0".repeat(2000);
+
+    ParseResult unparsable = LagrumParser.parse(zeros + " st x", OSL);
+    Assert.assertTrue(unparsable.getLagrum().isEmpty(), unparsable.toString());
+    Assert.assertEquals(unparsable.getWarnings().size(), 1, unparsable.toString());
+
+    ParseResult paragraphOnly = LagrumParser.parse("OSL 21 kap. 7 §, " + zeros + " st x", OSL);
+    Assert.assertEquals(paragraphOnly.getLagrum().stream().map(Lagrum::toString).toList(), List.of("OSL 21:7"),
+      paragraphOnly.toString());
+    Assert.assertEquals(paragraphOnly.getWarnings().size(), 1, paragraphOnly.toString());
+  }
+
   @Test
   public void testResultListsAreUnmodifiable() {
     ParseResult result = LagrumParser.parse("OSL 21:7", OSL);
