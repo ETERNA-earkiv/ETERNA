@@ -27,6 +27,7 @@ import org.roda.core.plugins.base.antivirus.AntivirusPlugin;
 import org.roda.core.plugins.base.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.base.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.base.disposal.rules.ApplyDisposalRulesPlugin;
+import org.roda.core.plugins.base.ingest.AccessRulesPlugin;
 import org.roda.core.plugins.base.ingest.AutoAcceptSIPPlugin;
 import org.roda.core.plugins.base.ingest.EARKSIP2ToAIPPlugin;
 import org.roda.core.plugins.base.ingest.VerifyUserAuthorizationPlugin;
@@ -71,6 +72,14 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
     // 9) verify producer authorization
     steps.add(new IngestStep(VerifyUserAuthorizationPlugin.class.getName(),
       RodaConstants.PLUGIN_PARAMS_DO_PRODUCER_AUTHORIZATION_CHECK, true, true, true, true));
+    // 9b) Obligatorisk tillämpning av åtkomstregler på
+    // behörigheterna (en SIP med sekretess i eterna_admin får annars READ för
+    // nekade grupper tills ett jobb körs); torrkörning tvingas av så att
+    // parametern inte kan smugglas in via inleveransjobbets parametrar
+    Map<String, String> accessRulesStepParameters = new HashMap<>();
+    accessRulesStepParameters.put(RodaConstants.PLUGIN_PARAMS_ACCESS_RULES_DRY_RUN, "false");
+    steps.add(new IngestStep(AccessRulesPlugin.class.getName(), RodaConstants.PLUGIN_PARAMS_DO_APPLY_ACCESS_RULES,
+      true, true, true, false, accessRulesStepParameters));
     // 10) apply a disposal schedule via disposal rules
     steps.add(new IngestStep(ApplyDisposalRulesPlugin.class.getName(),
       RodaConstants.PLUGIN_PARAMS_DO_APPLY_DISPOSAL_RULES, true, false, true, false));
@@ -124,6 +133,7 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
     }
 
     pluginParametersList.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_PRODUCER_AUTHORIZATION_CHECK));
+    pluginParametersList.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_APPLY_ACCESS_RULES));
     pluginParametersList.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_APPLY_DISPOSAL_RULES));
     pluginParametersList.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT));
     pluginParametersList.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION));
@@ -192,6 +202,16 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
             VerifyUserAuthorizationPlugin.getStaticName(), PluginParameterType.BOOLEAN)
           .withDefaultValue("true").isReadOnly(true)
           .withDescription(VerifyUserAuthorizationPlugin.getStaticDescription()).build());
+
+      // Obligatorisk tillämpning av åtkomstregler
+      // (skrivskyddad som producentbehörighetskontrollen; avstängning sker
+      // centralt med core.access_rules.enabled)
+      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_APPLY_ACCESS_RULES,
+        PluginParameter
+          .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_APPLY_ACCESS_RULES, AccessRulesPlugin.getStaticName(),
+            PluginParameterType.BOOLEAN)
+          .withDefaultValue("true").isReadOnly(true).withDescription(AccessRulesPlugin.getStaticDescription())
+          .build());
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_FILE_FORMAT_IDENTIFICATION,
         PluginParameter

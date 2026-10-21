@@ -111,6 +111,8 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   private final TransactionLog transaction;
   private final TransactionLogService transactionLogService;
   private final TransactionalModelOperationRegistry operationRegistry;
+  /** ETERNA: åtgärder som körs efter commit (se {@link #addAfterCommitAction}); förkastas vid rollback. */
+  private final List<Runnable> afterCommitActions = new ArrayList<>();
 
   public DefaultTransactionalModelService(ModelService mainModelService, ModelService stagingModelService,
     TransactionLog transaction, TransactionLogService transactionLogService) {
@@ -4413,10 +4415,45 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
         }
       }
     }
+    runAfterCommitActions();
+  }
+
+  @Override
+  public void addAfterCommitAction(Runnable action) {
+    if (action != null) {
+      synchronized (afterCommitActions) {
+        afterCommitActions.add(action);
+      }
+    }
+  }
+
+  /**
+   * ETERNA: kör de registrerade efter-commit-åtgärderna (lagringen är redan
+   * committad när modellens commit anropas, se RODATransactionManager). Ett
+   * fel i en åtgärd loggas och stoppar varken övriga åtgärder eller
+   * transaktionen.
+   */
+  private void runAfterCommitActions() {
+    List<Runnable> actions;
+    synchronized (afterCommitActions) {
+      actions = new ArrayList<>(afterCommitActions);
+      afterCommitActions.clear();
+    }
+    for (Runnable action : actions) {
+      try {
+        action.run();
+      } catch (RuntimeException e) {
+        LOGGER.error("[transactionId:{}] Efter-commit-åtgärd misslyckades: {}", transaction.getId(), e.getMessage(),
+          e);
+      }
+    }
   }
 
   @Override
   public void rollback() throws RODATransactionException {
+    synchronized (afterCommitActions) {
+      afterCommitActions.clear();
+    }
     for (TransactionalModelOperationLog modelOperation : transactionLogService
       .getModelOperations(transaction.getId())) {
       transactionLogService.updateModelOperationState(modelOperation.getId(), OperationState.ROLLING_BACK);

@@ -1417,6 +1417,14 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_REPRESENTATION_TYPE = "parameter.representation_type";
   public static final String PLUGIN_PARAMS_OUTCOMEOBJECTID_TO_SOURCEOBJECTID_MAP = "parameter.outcomeobjectid_to_sourceobjectid_map";
   public static final String PLUGIN_PARAMS_NEW_TYPE = "parameter.new_type";
+  // Parametrar för tillämpning av åtkomstregler
+  public static final String PLUGIN_PARAMS_DO_APPLY_ACCESS_RULES = "parameter.do_apply_access_rules";
+  public static final String PLUGIN_PARAMS_ACCESS_RULES_DRY_RUN = "parameter.access_rules.dry_run";
+  public static final String PLUGIN_PARAMS_ACCESS_RULES_CREATE_EVENTS = "parameter.access_rules.create_events";
+  /** "true" ⇒ regeltillstånd (rulesVersion/factsSource) stämplas även när behörigheterna är oförändrade. */
+  public static final String PLUGIN_PARAMS_ACCESS_RULES_WRITE_STATE = "parameter.access_rules.write_state";
+  /** Användare vars metadataändring/flytt utlöste ett automatiskt startat åtkomstregeljobb. */
+  public static final String PLUGIN_PARAMS_ACCESS_RULES_TRIGGERED_BY = "parameter.access_rules.triggered_by";
   public static final String PLUGIN_PARAMS_NEW_STATUS = "parameter.new_status";
   public static final String PLUGIN_PARAMS_ACCEPT = "parameter.accept";
   public static final String PLUGIN_PARAMS_REJECT_REASON = "parameter.reject_reason";
