@@ -31,6 +31,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -178,7 +179,23 @@ public class BulkUpdateDescriptiveMetadataPlugin extends AbstractPlugin<AIP> {
   @Override
   public boolean areParameterValuesValid() {
     return metadataTypeWithVersion != null && !metadataTypeWithVersion.isBlank() && fieldName != null
-      && !fieldName.isBlank() && newValue != null;
+      && !fieldName.isBlank() && newValue != null && !newValue.isBlank();
+  }
+
+  /**
+   * Gallrade AIP:er, AIP:er under bedömning eller bearbetning och AIP:er som
+   * ingår i en gallringsbekräftelse får inte massredigeras.
+   *
+   * @return orsaken till att AIP:n inte får redigeras, eller null om den får det
+   */
+  static String notEditableReason(AIP aip) {
+    if (aip.getState() != AIPState.ACTIVE) {
+      return "AIP:n har tillståndet " + aip.getState() + " och kan inte massredigeras";
+    }
+    if (aip.getDisposalConfirmationId() != null && !aip.getDisposalConfirmationId().isBlank()) {
+      return "AIP:n ingår i gallringsbekräftelsen " + aip.getDisposalConfirmationId() + " och kan inte massredigeras";
+    }
+    return null;
   }
 
   @Override
@@ -230,8 +247,12 @@ public class BulkUpdateDescriptiveMetadataPlugin extends AbstractPlugin<AIP> {
     String oldValueForEvent = null;
 
     try {
-      DescriptiveMetadata metadata = findDescriptiveMetadata(aip, type, version);
-      if (metadata == null) {
+      String notEditableReason = notEditableReason(aip);
+      DescriptiveMetadata metadata = notEditableReason == null ? findDescriptiveMetadata(aip, type, version) : null;
+      if (notEditableReason != null) {
+        state = PluginState.SKIPPED;
+        details = notEditableReason;
+      } else if (metadata == null) {
         state = PluginState.SKIPPED;
         details = "Objektet saknar beskrivande metadata av typen '" + metadataTypeWithVersion + "'";
       } else {
