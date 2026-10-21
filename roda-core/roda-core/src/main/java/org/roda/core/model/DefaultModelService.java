@@ -5153,6 +5153,11 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
+  public ReturnWithExceptionsWrapper notifyGroupUpdated(Group group, boolean reindexMembers) {
+    return notifyObserversSafely(observer -> observer.groupUpdated(group, reindexMembers));
+  }
+
+  @Override
   public ReturnWithExceptionsWrapper notifyGroupDeleted(String groupID) {
     return notifyObserversSafely(observer -> observer.groupDeleted(groupID));
   }

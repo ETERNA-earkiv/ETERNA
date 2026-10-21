@@ -1473,7 +1473,8 @@ public class RodaCoreFactory {
     }
 
     for (Group group : getModelService().listGroups()) {
-      getModelService().notifyGroupUpdated(group).failOnError();
+      // all users were re-indexed above, so skip the per-member re-indexing
+      getModelService().notifyGroupUpdated(group, false).failOnError();
     }
   }
 
