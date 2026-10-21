@@ -130,7 +130,7 @@
             <div class="textfill">
 				<span class="statistic" data-source="index"
                       data-source-class="org.roda.core.data.v2.log.LogEntry"
-                      data-source-filters="actionComponent=org.roda.wui.api.controllers.UserLogin, actionMethod=login, state=SUCCESS"
+                      data-source-filters="actionComponent=org.roda.wui.api.v2.controller.MembersController, actionMethod=login, state=SUCCESS"
                       data-view="text" data-view-field="totalCount"></span>
             </div>
             <p class="description">Kumulativt antal lyckade användarinloggningar i systemet.</p>
@@ -140,7 +140,7 @@
             <h4>Lyckade vs misslyckade inloggningar</h4>
             <canvas id="logins-state" class="statistic" data-source="index"
                     data-source-class="org.roda.core.data.v2.log.LogEntry"
-                    data-source-filters="actionComponent=org.roda.wui.api.controllers.UserLogin, actionMethod=login"
+                    data-source-filters="actionComponent=org.roda.wui.api.v2.controller.MembersController, actionMethod=login"
                     data-source-facets="state" data-view="chart" data-view-field="facetResults"
                     data-view-type="pie"></canvas>
             <span class="statistic toolbarLink" data-ref="logins-state" data-view="download"

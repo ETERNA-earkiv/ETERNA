@@ -45,6 +45,11 @@ public class OnOffFilter implements Filter {
    */
   private static final String PARAM_CONFIG_PREFIX = "config-prefix";
   /**
+   * Has the WUI configuration (roda-wui.properties) been injected? Before that,
+   * RODA configuration exists but lacks the filter on/off settings.
+   */
+  private static volatile boolean wuiConfigurationLoaded = false;
+  /**
    * Inner filter to which all calls to this filter will be delegated.
    */
   private Filter innerFilter = null;
@@ -105,7 +110,15 @@ public class OnOffFilter implements Filter {
    *         <code>false</code> otherwise.
    */
   private boolean isConfigAvailable() {
-    return RodaCoreFactory.getRodaConfiguration() != null;
+    return wuiConfigurationLoaded && RodaCoreFactory.getRodaConfiguration() != null;
+  }
+
+  /**
+   * Mark that the WUI configuration has been injected, so that filters may read
+   * their on/off settings.
+   */
+  public static void setWuiConfigurationLoaded() {
+    wuiConfigurationLoaded = true;
   }
 
   /**

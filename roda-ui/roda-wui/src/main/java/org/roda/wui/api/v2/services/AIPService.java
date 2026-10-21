@@ -58,6 +58,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.metadata.BulkUpdateDescriptiveMetadataRequest;
 import org.roda.core.data.v2.ip.metadata.ConfiguredDescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.ConfiguredDescriptiveMetadataList;
 import org.roda.core.data.v2.ip.metadata.CreateDescriptiveMetadataRequest;
@@ -80,6 +81,7 @@ import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.model.utils.UserUtility;
+import org.roda.core.plugins.base.maintenance.BulkUpdateDescriptiveMetadataPlugin;
 import org.roda.core.plugins.base.maintenance.ChangeTypePlugin;
 import org.roda.core.plugins.base.maintenance.DeleteRODAObjectPlugin;
 import org.roda.core.plugins.base.maintenance.MovePlugin;
@@ -368,6 +370,28 @@ public class AIPService {
       pluginParameters, "Could not change AIP type");
   }
 
+  /**
+   * Startar massredigeringsjobbet för valda AIP:ar.
+   * Behörighet och parametervalidering sker i pluginet; xpath resolvas
+   * server-side ur formulärmallen.
+   */
+  public Job bulkUpdateDescriptiveMetadata(User user, SelectedItems<IndexedAIP> selected,
+    BulkUpdateDescriptiveMetadataRequest request)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BULK_METADATA_TYPE, request.getMetadataType());
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BULK_FIELD_NAME, request.getFieldName());
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BULK_NEW_VALUE, request.getNewValue());
+    if (StringUtils.isNotBlank(request.getMode())) {
+      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BULK_MODE, request.getMode());
+    }
+    if (StringUtils.isNotBlank(request.getExpectedValue())) {
+      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BULK_EXPECTED_VALUE, request.getExpectedValue());
+    }
+    return CommonServicesUtils.createAndExecuteInternalJob("Massredigering av metadatafält", selected,
+      BulkUpdateDescriptiveMetadataPlugin.class, user, pluginParameters, "Could not execute bulk update job");
+  }
+
   public Job appraisal(User user, SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     Map<String, String> pluginParameters = new HashMap<>();
@@ -526,6 +550,41 @@ public class AIPService {
     }
 
     return supportedMetadata;
+  }
+
+  /**
+   * Fälten i formulärmallen för en konfigurerad
+   * beskrivande metadatatyp, utan koppling till någon specifik AIP. Endast
+   * fält som massredigeringspluginet kan uppdatera returneras: fält med
+   * exakt en xpath som inte är dolda eller separatorer. Etiketter och
+   * vokabulärer resolvas för angivet språk (samma mekanism som
+   * metadataredigeraren).
+   */
+  public SupportedMetadataValue retrieveConfiguredMetadataFields(String metadataId, Locale locale)
+    throws NotFoundException, GenericException {
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+    try (
+      InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(RodaConstants.METADATA_TEMPLATE_FOLDER
+        + "/" + metadataId + RodaConstants.METADATA_TEMPLATE_EXTENSION)) {
+      if (templateStream == null) {
+        throw new NotFoundException("Form template not found for metadata type: " + metadataId);
+      }
+      String template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
+      Set<MetadataValue> result = new TreeSet<>();
+      for (MetadataValue mv : ServerTools.transform(template)) {
+        String xpath = mv.get("xpath");
+        if (StringUtils.isBlank(xpath) || xpath.contains("##%##") || "true".equals(mv.get("hidden"))
+          || "separator".equals(mv.get("type"))) {
+          continue;
+        }
+        CommonServicesUtils.getMetadataValueLabels(mv, locale, messages);
+        CommonServicesUtils.getMetadataValueI18nPrefix(mv, locale, messages);
+        result.add(mv);
+      }
+      return new SupportedMetadataValue(result);
+    } catch (IOException e) {
+      throw new GenericException("Error reading form template for metadata type: " + metadataId, e);
+    }
   }
 
   public SupportedMetadataValue retrieveSupportedMetadata(RequestContext context, IndexedAIP aip,
