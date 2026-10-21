@@ -69,7 +69,8 @@
 {{~field name="disposalDescription"      order="179"  hidden="false"  type="text-area"  labeli18n="crosswalks.dissemination.html.cits_erms_3.disposalDescription"          label='{"en": "Disposal description", "sv": "Gallringsbeskrivning"}' xpath="(//*:aggregation)[1]/*:disposal/*:disposalDescription/string()"~}}
 {{~field name="disposable"               order="180"  hidden="false"  type="list"       labeli18n="crosswalks.dissemination.html.cits_erms_3.disposable"                   label='{"en": "Disposable", "sv": "Får gallras"}' options='["true","false"]' optionsLabels='{"true": {"en":"Yes", "sv":"Ja"}, "false": {"en":"No", "sv":"Nej"}}' xpath="(//*:aggregation)[1]/*:disposal/@disposable/string()"~}}
 {{~field name="disposalDate"             order="181"  hidden="false"  type="date"       labeli18n="crosswalks.dissemination.html.cits_erms_3.disposalDate"                 label='{"en": "Disposal date", "sv": "Gallringsdatum"}' xpath="substring((//*:aggregation)[1]/*:disposal/*:dates/*:disposalDate[1]/string(), 1, 10)"~}}
-{{~field name="disposalDateType"         order="182"  hidden="false"  type="list"       labeli18n="crosswalks.dissemination.html.cits_erms_3.disposalDateType"             label='{"en": "Disposal date type", "sv": "Typ av gallringsdatum"}' options='["action_due","applied","confirmation_due","disposal_date","lifted","overdue_alert","retention_period_start","retention_period_end","other_date"]' xpath="(//*:aggregation)[1]/*:disposal/*:dates/*:disposalDate[1]/@dateType/string()"~}}
+{{~field name="disposalTime"             order="182"  hidden="false"  type="text"       labeli18n="crosswalks.dissemination.html.cits_erms_3.disposalTime"                 label='{"en": "Disposal time (hh:mm:ss, optional time zone)", "sv": "Gallringstid (hh:mm:ss, valfri tidszon)"}' xpath="substring-after((//*:aggregation)[1]/*:disposal/*:dates/*:disposalDate[1]/string(), 'T')"~}}
+{{~field name="disposalDateType"         order="183"  hidden="false"  type="list"       labeli18n="crosswalks.dissemination.html.cits_erms_3.disposalDateType"             label='{"en": "Disposal date type", "sv": "Typ av gallringsdatum"}' options='["action_due","applied","confirmation_due","disposal_date","lifted","overdue_alert","retention_period_start","retention_period_end","other_date"]' xpath="(//*:aggregation)[1]/*:disposal/*:dates/*:disposalDate[1]/@dateType/string()"~}}
 
 {{! ===== PLATSINFORMATION ===== }}
 {{~field name="physicalSection"          order="185"  hidden="false"  type="separator"  labeli18n="crosswalks.dissemination.html.cits_erms_3.physicalSection"              label='{"en": "Physical information", "sv": "Platsinformation"}'~}}
@@ -162,7 +163,7 @@
         {{~#if disposalPeriod~}}<disposalPeriod>{{disposalPeriod}}</disposalPeriod>{{~/if~}}
         {{~#if disposalMandate~}}<disposalMandate>{{disposalMandate}}</disposalMandate>{{~/if~}}
         {{~#if disposalDescription~}}<disposalDescription>{{disposalDescription}}</disposalDescription>{{~/if~}}
-        {{~#if disposalDate~}}<dates><disposalDate dateType="{{#if disposalDateType}}{{disposalDateType}}{{else}}other_date{{/if}}">{{disposalDate}}T00:00:00</disposalDate></dates>{{~/if~}}
+        {{~#if disposalDate~}}<dates><disposalDate dateType="{{#if disposalDateType}}{{disposalDateType}}{{else}}other_date{{/if}}">{{disposalDate}}T{{#if disposalTime}}{{disposalTime}}{{else}}00:00:00{{/if}}</disposalDate></dates>{{~/if~}}
       </disposal>
       {{~/ifCond~}}
       {{~#ifCond "||" agent1Name agent2Name~}}
