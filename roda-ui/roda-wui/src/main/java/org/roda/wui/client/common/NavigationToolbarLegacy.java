@@ -401,7 +401,7 @@ public class NavigationToolbarLegacy<T extends IsIndexed> extends Composite impl
 
     @Override
     public CanActResult userCanAct(Action<IndexedAIP> action, IndexedAIP object) {
-      // ETERNA 1.H (krav 2): båda genvägarna öppnar globalsökningen och gate:as
+      // Båda genvägarna öppnar globalsökningen och gate:as
       // därför av samma roll som sökmenyn (ui.menu.search.role)
       return new CanActResult(userHasSearchRole(), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
     }

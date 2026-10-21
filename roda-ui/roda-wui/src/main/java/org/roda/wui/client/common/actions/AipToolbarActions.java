@@ -172,7 +172,7 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
       return new CanActResult(hasPermissions(action, permissions), CanActResult.Reason.USER,
         messages.reasonUserLacksPermission());
     } else if (SEARCH_WITHIN_ACTIONS.contains(action) && !userHasSearchRole()) {
-      // ETERNA 1.H (krav 2): sökgenvägarna öppnar globalsökningen och gate:as
+      // Sökgenvägarna öppnar globalsökningen och gate:as
       // därför av samma roll som sökmenyn (ui.menu.search.role)
       return new CanActResult(false, CanActResult.Reason.USER, messages.reasonUserLacksPermission());
     } else if ((AIPAction.REMOVE.equals(action) || AIPAction.NEW_CHILD_AIP_BELOW.equals(action)
