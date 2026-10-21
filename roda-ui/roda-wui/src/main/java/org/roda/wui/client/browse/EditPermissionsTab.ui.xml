@@ -24,6 +24,11 @@
                         <ui:text from='{messages.permissionAssignedUsersEmpty}'/>
                     </g:Label>
                     <g:FlowPanel ui:field="userPermissionsPanel" addStyleNames="permission-box-padding"/>
+                    <labels:Header ui:field="accessRuleRestrictedTitle"/>
+                    <g:Label styleName="info-empty" ui:field="accessRuleRestrictedEmpty">
+                        <ui:text from='{messages.accessRuleRestrictedGroupsEmpty}'/>
+                    </g:Label>
+                    <g:FlowPanel ui:field="accessRuleRestrictedPanel" addStyleNames="plugin-category-padding"/>
                 </g:FlowPanel>
             </g:FlowPanel>
         </g:FlowPanel>

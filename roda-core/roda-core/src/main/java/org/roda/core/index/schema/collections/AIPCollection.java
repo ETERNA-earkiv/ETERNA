@@ -127,6 +127,9 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     fields.add(new Field(RodaConstants.AIP_DESTROYED_ON, Field.TYPE_DATE));
     fields.add(new Field(RodaConstants.AIP_DESTROYED_BY, Field.TYPE_STRING));
 
+    // Grupper spärrade av åtkomstreglerna
+    fields.add(new Field(RodaConstants.AIP_ACCESS_RULE_RESTRICTED_GROUPS, Field.TYPE_STRING).setMultiValued(true));
+
     fields.add(SolrCollection.getSortFieldOf(RodaConstants.AIP_TITLE));
 
     return fields;
@@ -185,6 +188,11 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     doc.addField(RodaConstants.INGEST_SIP_IDS, aip.getIngestSIPIds());
     doc.addField(RodaConstants.INGEST_JOB_ID, aip.getIngestJobId());
     doc.addField(RodaConstants.INGEST_UPDATE_JOB_IDS, aip.getIngestUpdateJobIds());
+
+    if (aip.getAccessRuleState() != null && !aip.getAccessRuleState().getRestrictedGroups().isEmpty()) {
+      doc.addField(RodaConstants.AIP_ACCESS_RULE_RESTRICTED_GROUPS,
+        new ArrayList<>(aip.getAccessRuleState().getRestrictedGroups()));
+    }
 
     List<String> descriptiveMetadataIds = aip.getDescriptiveMetadata().stream().map(DescriptiveMetadata::getId)
       .toList();
@@ -322,6 +330,8 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     final List<String> disposalHoldsId = SolrUtils.objectToListString(doc.get(RodaConstants.AIP_DISPOSAL_HOLDS_ID));
     final List<String> transitiveDisposalHoldsId = SolrUtils
       .objectToListString(doc.get(RodaConstants.AIP_TRANSITIVE_DISPOSAL_HOLDS_ID));
+    final List<String> accessRuleRestrictedGroups = SolrUtils
+      .objectToListString(doc.get(RodaConstants.AIP_ACCESS_RULE_RESTRICTED_GROUPS));
     final Date destroyedOn = SolrUtils.objectToDate(doc.get(RodaConstants.AIP_DESTROYED_ON));
     final String destroyedBy = SolrUtils.objectToString(doc.get(RodaConstants.AIP_DESTROYED_BY), "");
     final DisposalActionCode disposalAction = SolrUtils.objectToEnum(doc.get(RodaConstants.AIP_DISPOSAL_ACTION),
@@ -380,6 +390,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     ret.setOnHold(disposalHoldStatus);
     ret.setDisposalConfirmationId(disposalConfirmationId);
     ret.setScheduleAssociationType(aipDisposalScheduleAssociationType);
+    ret.setAccessRuleRestrictedGroups(accessRuleRestrictedGroups);
 
     return ret;
   }

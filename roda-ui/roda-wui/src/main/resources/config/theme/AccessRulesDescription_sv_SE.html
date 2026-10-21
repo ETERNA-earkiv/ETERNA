@@ -1,0 +1,16 @@
+<p>Åtkomstregler kopplar en grupps läsbehörighet till de sekretess- och personuppgiftsbedömningar som finns i
+    arkivobjektens administrativa metadata (eterna_admin): sekretessbedömning, lagrum, personuppgiftsbedömning och
+    personuppgiftsnivå. En regel per grupp anger vilka bedömningar gruppen får läsa. Ett arkivobjekt vars bedömningar
+    inte tillåts av regeln spärras för gruppen.</p>
+<p>Reglerna kan bara spärra åtkomst, aldrig ge den. Gruppen måste fortfarande ha fått läsbehörighet på arkivobjektet
+    (direkt eller genom arv) för att se det; regeln kan bara ta bort den behörigheten. Grupper som saknar regel
+    påverkas inte alls.</p>
+<p>Ändringar i reglerna slår igenom direkt för nya bedömningar, det vill säga för arkivobjekt som levereras in eller
+    vars administrativa metadata redigeras efter ändringen. Befintliga arkivobjekt uppdateras när reglerna tillämpas på
+    arkivet med åtgärden "Tillämpa reglerna nu". "Torrkörning" utvärderar alla arkivobjekt och rapporterar vad som skulle
+    ändras utan att skriva något. Statusraden visar när reglerna senast tillämpades.</p>
+<p>En regel tillåter bara det den listar: alla villkor måste uppfyllas och en tom lista tillåter inget, så markera
+    "Alla (*)" för varje bedömning som inte ska begränsa åtkomsten. En avstängd regel pausar inte regeln: gruppen är
+    fortfarande hanterad och spärras från alla arkivobjekt. Ta i stället bort regeln om gruppen inte längre ska
+    hanteras. Rollen "Hantera åtkomstregler" är arkivövergripande: tillämpningen spärrar de hanterade grupperna på
+    alla arkivobjekt användaren får läsa, oavsett vem som annars får administrera arkivobjektets behörigheter.</p>

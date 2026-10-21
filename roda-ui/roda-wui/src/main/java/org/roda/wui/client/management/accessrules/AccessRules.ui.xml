@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:common="urn:import:org.roda.wui.client.common">
+
+	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
+
+	<ui:style>
+		.section {
+			margin-top: 20px;
+		}
+	</ui:style>
+
+	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
+		<g:FlowPanel addStyleNames="row full_width skip_padding">
+			<g:FlowPanel ui:field="contentFlowPanel" addStyleNames="col_10 content">
+				<common:TitlePanel text="{messages.accessRulesTitle}" iconClass="AccessRules" ui:field="title" />
+				<g:FlowPanel addStyleNames="page-description" ui:field="accessRulesDescription" />
+				<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
+					<g:FlowPanel ui:field="statusPanel" />
+				</g:FlowPanel>
+				<g:FlowPanel ui:field="rulesPanel" addStyleNames="{style.section}" />
+			</g:FlowPanel>
+
+			<g:FlowPanel addStyleNames="col_2 last sidebar" ui:field="sidebarFlowPanel">
+				<g:FlowPanel addStyleNames="sticky-flow">
+					<g:FlowPanel addStyleNames="sticky-padding">
+						<g:Label addStyleNames="h4">
+							<ui:text from='{messages.actions}' />
+						</g:Label>
+						<g:Button addStyleNames="btn btn-block btn-plus" ui:field="buttonAddRule">
+							<ui:text from='{messages.accessRulesAddRule}' />
+						</g:Button>
+						<g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonApply">
+							<ui:text from='{messages.accessRulesApply}' />
+						</g:Button>
+						<g:Button addStyleNames="btn btn-block btn-default btn-play" ui:field="buttonDryRun">
+							<ui:text from='{messages.accessRulesDryRun}' />
+						</g:Button>
+					</g:FlowPanel>
+				</g:FlowPanel>
+			</g:FlowPanel>
+		</g:FlowPanel>
+	</g:FlowPanel>
+</ui:UiBinder>

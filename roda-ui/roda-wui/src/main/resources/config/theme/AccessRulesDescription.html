@@ -1,0 +1,16 @@
+<p>Access rules connect the read access of a group to the confidentiality and personal data assessments recorded in
+    the administrative metadata (eterna_admin) of each record: confidentiality assessment, legal references (lagrum),
+    personal data assessment and personal data level. One rule per group states which assessments the group may read.
+    A record whose assessments are not allowed by the rule is restricted for that group.</p>
+<p>The rules only restrict access, they never grant it. A group still needs to be given read permission on the record
+    (directly or by inheritance) in order to see it; the rule can only take that permission away. Groups without a rule
+    are not affected at all.</p>
+<p>Changes to the rules take effect immediately for new assessments, i.e. for records that are ingested or whose
+    administrative metadata is edited after the change. Records that already exist are updated when the rules are
+    applied to the repository with the action "Apply rules now". "Dry run" evaluates all records and reports what would
+    change without writing anything. The status row shows when the rules were last applied.</p>
+<p>A rule allows only what it lists: all conditions must be met and an empty list allows nothing, so select "All (*)"
+    for every assessment that should not restrict access. A disabled rule does not pause the rule: the group stays
+    managed and is restricted from all records. Remove the rule instead if the group should no longer be managed.
+    The role "Manage access rules" is repository-wide: applying the rules restricts the managed groups on every
+    record the user can read, regardless of who may otherwise administer the permissions of that record.</p>

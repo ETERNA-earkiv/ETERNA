@@ -15,6 +15,7 @@ import java.util.Objects;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
+import org.roda.core.data.v2.accessrules.AccessRuleState;
 import org.roda.core.data.v2.disposal.metadata.DisposalAIPMetadata;
 import org.roda.core.data.v2.disposal.metadata.DisposalHoldAIPMetadata;
 import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldAIPMetadata;
@@ -60,6 +61,9 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
   private String updatedBy = null;
 
   private DisposalAIPMetadata disposal;
+
+  // Tillstånd som behörighetsreglerna lämnar efter sig
+  private AccessRuleState accessRuleState;
 
   public AIP() {
     super();
@@ -343,6 +347,18 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
     this.disposal = disposal;
   }
 
+  /**
+   * Tillstånd från behörighetsreglerna, eller
+   * <code>null</code> om reglerna aldrig tillämpats på denna AIP.
+   */
+  public AccessRuleState getAccessRuleState() {
+    return accessRuleState;
+  }
+
+  public void setAccessRuleState(AccessRuleState accessRuleState) {
+    this.accessRuleState = accessRuleState;
+  }
+
   @JsonIgnore
   public DisposalHoldAIPMetadata findHold(String disposalHoldId) {
     if (disposal != null) {
@@ -462,7 +478,9 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
       return false;
     if (!Objects.equals(ghost, aip.ghost))
       return false;
-    return Objects.equals(disposal, aip.disposal);
+    if (!Objects.equals(disposal, aip.disposal))
+      return false;
+    return Objects.equals(accessRuleState, aip.accessRuleState);
 
   }
 
@@ -480,6 +498,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
     result = 31 * result + (ingestJobId != null ? ingestJobId.hashCode() : 0);
     result = 31 * result + (ghost != null ? ghost.hashCode() : 0);
     result = 31 * result + (disposal != null ? disposal.hashCode() : 0);
+    result = 31 * result + (accessRuleState != null ? accessRuleState.hashCode() : 0);
     return result;
   }
 
@@ -491,6 +510,6 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
       + ", ingestSIPIds=" + ingestSIPIds + ", ingestJobId='" + ingestJobId + '\'' + ", ingestUpdateJobIds="
       + ingestUpdateJobIds + ", ghost=" + ghost + ", format=" + format + ", relationships=" + relationships
       + ", createdOn=" + createdOn + ", createdBy='" + createdBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='"
-      + updatedBy + '\'' + ", disposal='" + disposal + '}';
+      + updatedBy + '\'' + ", disposal='" + disposal + ", accessRuleState=" + accessRuleState + '}';
   }
 }

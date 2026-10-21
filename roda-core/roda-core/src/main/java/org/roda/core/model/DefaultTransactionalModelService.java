@@ -111,6 +111,8 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   private final TransactionLog transaction;
   private final TransactionLogService transactionLogService;
   private final TransactionalModelOperationRegistry operationRegistry;
+  /** ETERNA: åtgärder som körs efter commit (se {@link #addAfterCommitAction}); förkastas vid rollback. */
+  private final List<Runnable> afterCommitActions = new ArrayList<>();
 
   public DefaultTransactionalModelService(ModelService mainModelService, ModelService stagingModelService,
     TransactionLog transaction, TransactionLogService transactionLogService) {
@@ -4405,23 +4407,63 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
 
   @Override
   public void commit() throws RODATransactionException {
-    for (TransactionalModelOperationLog modelOperation : transactionLogService
-      .getModelOperations(transaction.getId())) {
-      LiteRODAObject liteRODAObject = new LiteRODAObject(modelOperation.getLiteObject());
-      OptionalWithCause<Class<IsRODAObject>> isRODAObjectClassOptionalWithCause = LiteRODAObjectFactory
-        .getClass(liteRODAObject);
+    try {
+      for (TransactionalModelOperationLog modelOperation : transactionLogService
+        .getModelOperations(transaction.getId())) {
+        LiteRODAObject liteRODAObject = new LiteRODAObject(modelOperation.getLiteObject());
+        OptionalWithCause<Class<IsRODAObject>> isRODAObjectClassOptionalWithCause = LiteRODAObjectFactory
+          .getClass(liteRODAObject);
 
-      if (isRODAObjectClassOptionalWithCause.isPresent()) {
-        Class<IsRODAObject> isRODAObjectClass = isRODAObjectClassOptionalWithCause.get();
-        if (operationRegistry.isLockableClass(isRODAObjectClass)) {
-          PluginHelper.releaseObjectLock(modelOperation.getLiteObject(), transaction.getRequestId().toString());
+        if (isRODAObjectClassOptionalWithCause.isPresent()) {
+          Class<IsRODAObject> isRODAObjectClass = isRODAObjectClassOptionalWithCause.get();
+          if (operationRegistry.isLockableClass(isRODAObjectClass)) {
+            PluginHelper.releaseObjectLock(modelOperation.getLiteObject(), transaction.getRequestId().toString());
+          }
         }
+      }
+    } finally {
+      // lagringen är redan committad: åtgärderna ska köras även om ett lås
+      // inte kunde frisläppas
+      runAfterCommitActions();
+    }
+  }
+
+  @Override
+  public void addAfterCommitAction(Runnable action) {
+    if (action != null) {
+      synchronized (afterCommitActions) {
+        afterCommitActions.add(action);
+      }
+    }
+  }
+
+  /**
+   * ETERNA: kör de registrerade efter-commit-åtgärderna (lagringen är redan
+   * committad när modellens commit anropas, se RODATransactionManager). Ett
+   * fel i en åtgärd loggas och stoppar varken övriga åtgärder eller
+   * transaktionen.
+   */
+  private void runAfterCommitActions() {
+    List<Runnable> actions;
+    synchronized (afterCommitActions) {
+      actions = new ArrayList<>(afterCommitActions);
+      afterCommitActions.clear();
+    }
+    for (Runnable action : actions) {
+      try {
+        action.run();
+      } catch (RuntimeException e) {
+        LOGGER.error("[transactionId:{}] Efter-commit-åtgärd misslyckades: {}", transaction.getId(), e.getMessage(),
+          e);
       }
     }
   }
 
   @Override
   public void rollback() throws RODATransactionException {
+    synchronized (afterCommitActions) {
+      afterCommitActions.clear();
+    }
     for (TransactionalModelOperationLog modelOperation : transactionLogService
       .getModelOperations(transaction.getId())) {
       transactionLogService.updateModelOperationState(modelOperation.getId(), OperationState.ROLLING_BACK);

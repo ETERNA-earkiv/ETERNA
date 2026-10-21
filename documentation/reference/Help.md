@@ -40,7 +40,9 @@ Guides for system administrators and archive managers.
 - **[Central Authentication Service](administration/Central_Authentication_Service.md)** - Manage user authentication
 - **[Disposal Policies](administration/Disposal_Policies.md)** - Policies for data management
 - **[Disposal](administration/Disposal.md)** - Processes for data management
-- **[Permissions](administration/Permissions.md)** - Managing user permissions
+- **[Permissions](administration/Permissions.md)** - Roles and groups, object permissions per structural unit, access rules for confidentiality and personal data, permission overview and report, administrator accounts, configuration (`core.access_rules.*`, `access-rules.json`) and troubleshooting
+- **[Access rules (confidentiality and personal data)](administration/Permissions.md)** - How read permission is restricted by confidentiality assessment, legal reference (chapter and section), personal-data assessment and level in `eterna_admin`; the Access rules page step by step, dry run and apply job
+- **[Permission overview and report](administration/Permissions.md)** - Overview of roles per group, users with effective roles, structural-unit permissions and active access rules; printable HTML report and CSV
 - **[Risk Assessment](administration/Risk_Assessment.md)** - Evaluation of archiving risks
 <!-- - **[Original-METS](administration/original-mets.md)** - Handles METS files -->
 

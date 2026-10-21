@@ -24,6 +24,8 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ReturnWithExceptionsWrapper;
+import org.roda.core.common.access.AccessRulesConfig;
+import org.roda.core.common.access.AccessRulesModelObserver;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.NodeType;
@@ -105,8 +107,34 @@ public class IndexService {
 
     observer = new IndexModelObserver(this.getSolrClient(), this.model);
     model.addModelObserver(observer);
+    registerAccessRulesObserver(rodaConfiguration);
 
     configIterableIndexResult(metricRegistry, rodaConfiguration);
+  }
+
+  /**
+   * Registrerar observern som tillämpar
+   * behörighetsreglerna när eterna_admin-metadata eller behörigheter ändras,
+   * om core.access_rules.observer.enabled (standard true). Registreras på
+   * samma modell som indexobservern – alltså även per transaktion
+   * (TransactionContextFactory skapar en IndexService per transaktion).
+   * Brytaren läses ur den medskickade konfigurationen så att registreringen
+   * inte beror på RodaCoreFactorys statiska tillstånd; fel loggas och stoppar
+   * aldrig uppstarten (reglerna kan då fortfarande köras via jobb).
+   */
+  private void registerAccessRulesObserver(Configuration rodaConfiguration) {
+    try {
+      boolean enabled = rodaConfiguration == null
+        || rodaConfiguration.getBoolean(AccessRulesConfig.OBSERVER_ENABLED_PROPERTY, true);
+      if (enabled) {
+        model.addModelObserver(new AccessRulesModelObserver(model, this));
+      } else {
+        LOGGER.info("Observern för åtkomstregler är avstängd ({}=false) – reglerna tillämpas bara via jobb",
+          AccessRulesConfig.OBSERVER_ENABLED_PROPERTY);
+      }
+    } catch (RuntimeException e) {
+      LOGGER.error("Kunde inte registrera observern för åtkomstregler – reglerna tillämpas bara via jobb", e);
+    }
   }
 
   private void configIterableIndexResult(MetricRegistry metricRegistry, Configuration rodaConfiguration) {

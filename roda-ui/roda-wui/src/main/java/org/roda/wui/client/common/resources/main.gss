@@ -9779,3 +9779,115 @@ wui-disposal-hold-data .form-textbox {
     font-size: 0.85em;
     margin-bottom: 0.5em;
 }
+
+/******************************
+  Behörighetsöversikt
+ ******************************/
+
+.permissionOverviewToolbar {
+    margin: 1rem 0;
+}
+
+.permissionOverviewGenerated {
+    font-size: 1.3rem;
+    color: COLOR_GREY_MEDIUM;
+    margin-bottom: 1rem;
+}
+
+/* Behållare för spinnern medan underlaget hämtas (.spinner i theme/spinner.css är absolut positionerad) */
+.permissionOverviewLoading {
+    position: relative;
+    min-height: 10rem;
+    margin: 1rem 0;
+}
+
+.permissionOverviewWarnings {
+    border-left: 5px solid COLOR_LABEL_WARNING;
+    background-color: COLOR_YELLOW_LIGHT;
+    padding: 0.5rem 1rem;
+    margin: 1rem 0;
+}
+
+.permissionOverviewWarnings p {
+    margin-bottom: 0.5rem;
+}
+
+.permissionOverviewWarnings ul {
+    margin: 0 0 0 1.5rem;
+}
+
+.permissionOverviewFilter {
+    margin-bottom: 1rem;
+    max-width: 40rem;
+}
+
+/* Text som bara skärmläsare får (Ja/Nej i matrisen) */
+.permissionOverviewSrOnly {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+}
+
+.permissionOverviewMatrixCell {
+    text-align: center;
+}
+
+.permissionOverviewCheck {
+    color: COLOR_LABEL_SUCCESS;
+}
+
+.permissionOverviewAdminColumn {
+    background-color: COLOR_GREY_VERYLIGHT;
+}
+
+/* Matrisen "Rättigheter per grupp": första kolumnen (rättighet + beskrivning) ligger fast
+   när gruppkolumnerna scrollas i sidled, så att raden behåller sin kontext */
+.permissionOverviewMatrix .my-asyncdatagrid-display th:first-child,
+.permissionOverviewMatrix .my-asyncdatagrid-display td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: white;
+}
+
+/* Samma radfärger som cellTableHoveredRow/cellTableSelectedRow i MyCellTable.css */
+.permissionOverviewMatrix .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableHoveredRow td:first-child {
+    background: #eeeeee;
+}
+
+.permissionOverviewMatrix .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableSelectedRow td:first-child {
+    background: #5bbeff;
+}
+
+.permissionOverviewRoleCell {
+    max-width: 28em;
+}
+
+.permissionOverviewRoleName {
+    display: block;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.permissionOverviewRoleDescription {
+    display: block;
+    color: COLOR_GREY_MEDIUM;
+    white-space: normal;
+}
+
+/* Utfällbar lista (details/summary) över en användares rättigheter */
+.permissionOverviewRoleListToggle {
+    cursor: pointer;
+}
+
+.permissionOverviewRoleListItems {
+    max-width: 40em;
+    white-space: normal;
+    padding-top: 0.3rem;
+}

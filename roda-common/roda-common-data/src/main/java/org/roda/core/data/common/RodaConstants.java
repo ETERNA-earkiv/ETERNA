@@ -838,6 +838,11 @@ public final class RodaConstants {
   public static final String CONTROLLER_FILE_COUNT_PARAM = "fileCount";
   public static final String CONTROLLER_TOTAL_SIZE_PARAM = "totalSize";
   public static final String CONTROLLER_DOWNLOAD_TOKEN_PARAM = "downloadToken";
+  // Loggparametrar för åtkomstreglernas REST-API
+  public static final String CONTROLLER_ACCESS_RULE_PARAM = "accessRule";
+  public static final String CONTROLLER_ACCESS_RULE_SET_PARAM = "accessRuleSet";
+  public static final String CONTROLLER_APPLY_PARAM = "apply";
+  public static final String CONTROLLER_DRY_RUN_PARAM = "dryRun";
 
   /*
    * Core (storage, index, orchestrator, etc.)
@@ -1072,6 +1077,15 @@ public final class RodaConstants {
   public static final String INDEX_PERMISSION_GROUPS_PREFIX = "permission_groups_";
 
   /*
+   * Behörighetsöversikt. Delas av
+   * PermissionOverviewBuilder (roda-core) och PermissionOverview (roda-wui) så
+   * att klienten följer serverns standardnivåer.
+   */
+  public static final String UI_PERMISSION_OVERVIEW_LEVELS = "ui.permissionOverview.levels";
+  public static final List<String> PERMISSION_OVERVIEW_DEFAULT_LEVELS = Collections
+    .unmodifiableList(Arrays.asList("fonds", "class", "series"));
+
+  /*
    * Index common fields
    */
   public static final String INDEX_UUID = "uuid";
@@ -1148,6 +1162,8 @@ public final class RodaConstants {
   public static final String AIP_DISPOSAL_RETENTION_PERIOD_CALCULATION = "retentionPeriodCalculation";
   public static final String DISPOSAL_RETENTION_PERIOD_ERROR_MISSING_START_DATE = "MISSING_START_DATE";
   public static final String DISPOSAL_RETENTION_PERIOD_ERROR_INVALID_START_DATE_TYPE = "INVALID_START_DATE_TYPE";
+  // Grupper vars läsbehörighet spärrats av åtkomstreglerna
+  public static final String AIP_ACCESS_RULE_RESTRICTED_GROUPS = "accessRuleRestrictedGroups";
 
   // AIP types
   public static final String AIP_TYPE_MIXED = "MIXED";
@@ -1417,6 +1433,14 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_REPRESENTATION_TYPE = "parameter.representation_type";
   public static final String PLUGIN_PARAMS_OUTCOMEOBJECTID_TO_SOURCEOBJECTID_MAP = "parameter.outcomeobjectid_to_sourceobjectid_map";
   public static final String PLUGIN_PARAMS_NEW_TYPE = "parameter.new_type";
+  // Parametrar för tillämpning av åtkomstregler
+  public static final String PLUGIN_PARAMS_DO_APPLY_ACCESS_RULES = "parameter.do_apply_access_rules";
+  public static final String PLUGIN_PARAMS_ACCESS_RULES_DRY_RUN = "parameter.access_rules.dry_run";
+  public static final String PLUGIN_PARAMS_ACCESS_RULES_CREATE_EVENTS = "parameter.access_rules.create_events";
+  /** "true" ⇒ regeltillstånd (rulesVersion/factsSource) stämplas även när behörigheterna är oförändrade. */
+  public static final String PLUGIN_PARAMS_ACCESS_RULES_WRITE_STATE = "parameter.access_rules.write_state";
+  /** Användare vars metadataändring/flytt utlöste ett automatiskt startat åtkomstregeljobb. */
+  public static final String PLUGIN_PARAMS_ACCESS_RULES_TRIGGERED_BY = "parameter.access_rules.triggered_by";
   // Parametrar för leveransspecifikationsvalidering
   public static final String PLUGIN_PARAMS_DO_DELIVERY_SPEC_VALIDATION = "parameter.do_delivery_spec_validation";
   public static final String PLUGIN_PARAMS_DELIVERY_SPEC_ID = "parameter.delivery_spec.id";
@@ -2110,6 +2134,8 @@ public final class RodaConstants {
       AIP_PERMISSIONS_FIELDS_TO_RETURN.add(RodaConstants.INDEX_PERMISSION_USERS_PREFIX + type);
       AIP_PERMISSIONS_FIELDS_TO_RETURN.add(RodaConstants.INDEX_PERMISSION_GROUPS_PREFIX + type);
     }
+
+    AIP_PERMISSIONS_FIELDS_TO_RETURN.add(RodaConstants.AIP_ACCESS_RULE_RESTRICTED_GROUPS);
   }
 
   public static final List<String> REPRESENTATION_FIELDS_TO_RETURN = Arrays.asList(RodaConstants.INDEX_UUID,
@@ -2208,6 +2234,13 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_DELETE_USER = "org.roda.wui.api.v2.controller.MembersController.deleteUser";
 
   public static final String PERMISSION_METHOD_CREATE_ACCESS_KEY = "org.roda.wui.api.v2.controller.MembersController.createAccessKey";
+
+  // Åtkomstregler
+  public static final String PERMISSION_METHOD_LIST_ACCESS_RULES = "org.roda.wui.api.v2.controller.AccessRulesController.listAccessRules";
+  public static final String PERMISSION_METHOD_RETRIEVE_ACCESS_RULE = "org.roda.wui.api.v2.controller.AccessRulesController.retrieveAccessRule";
+  public static final String PERMISSION_METHOD_UPDATE_ACCESS_RULE = "org.roda.wui.api.v2.controller.AccessRulesController.updateAccessRule";
+  public static final String PERMISSION_METHOD_DELETE_ACCESS_RULE = "org.roda.wui.api.v2.controller.AccessRulesController.deleteAccessRule";
+  public static final String PERMISSION_METHOD_APPLY_ACCESS_RULES = "org.roda.wui.api.v2.controller.AccessRulesController.applyAccessRules";
 
   public static final String PERMISSION_METHOD_CREATE_DISPOSAL_RULE = "org.roda.wui.api.v2.controller.DisposalRuleController.createDisposalRule";
   public static final String PERMISSION_METHOD_UPDATE_DISPOSAL_RULE = "org.roda.wui.api.v2.controller.DisposalRuleController.updateDisposalRule";

@@ -103,6 +103,10 @@ public class Services implements DirectRestService {
       return GWT.create(ClientLoggerRestService.class);
     } else if (RedactionRestService.class.equals(serviceClass)) {
       return GWT.create(RedactionRestService.class);
+    } else if (AccessRulesRestService.class.equals(serviceClass)) {
+      return GWT.create(AccessRulesRestService.class);
+    } else if (PermissionOverviewRestService.class.equals(serviceClass)) {
+      return GWT.create(PermissionOverviewRestService.class);
     } else {
       String error = serviceClass.getName() + " not supported";
       Toast.showError(error);
@@ -299,5 +303,15 @@ public class Services implements DirectRestService {
 
   public <T> CompletableFuture<T> redactionResource(CheckedFunction<RedactionRestService, T> method) {
     return future(RedactionRestService.class, method);
+  }
+
+  /** Åtkomstreglernas REST-API. */
+  public <T> CompletableFuture<T> accessRulesResource(CheckedFunction<AccessRulesRestService, T> method) {
+    return future(AccessRulesRestService.class, method);
+  }
+
+  public <T> CompletableFuture<T> permissionOverviewResource(
+    CheckedFunction<PermissionOverviewRestService, T> method) {
+    return future(PermissionOverviewRestService.class, method);
   }
 }

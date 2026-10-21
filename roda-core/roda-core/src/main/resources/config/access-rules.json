@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "enabled": false,
+  "defaults": {
+    "ejBedomd": "closed",
+    "missingMetadata": "inherit",
+    "missingLagrum": "closed",
+    "multipleLagrum": "all",
+    "defaultAct": "OSL"
+  },
+  "rules": [],
+  "_example": {
+    "_about": "Mall för en post i rules[]. Objektet _example ignoreras vid inläsning och tas bort vid första sparning. Alla villkor i en regel måste vara uppfyllda för att gruppen ska få READ; '*' i en lista tillåter alla värden. Vokabulär enligt eterna_admin.xsd: sekretess = ej_bedomd | ingen_sekretess | sekretess_forekommer | helt_sekretessbelagd; personuppgifter = ej_bedomd | inga | forekommer | kansliga_forekommer; personuppgiftsniva enligt core.access_rules.personuppgiftsniva.values[] (niva_1, niva_2, niva_3). Lagrum anges som 'OSL 21' (helt kapitel) eller 'OSL 21:7' / 'OSL 21 kap. 7 §' (paragraf). En regel med enabled=false gör gruppen hanterad men tillåter aldrig något. Filen valideras vid inläsning; okända värden gör hela filen ogiltig. Policyval i defaults: ejBedomd (closed/open), missingMetadata (inherit = ärv närmaste förfaders bedömning, obedömd struktur utan bedömd förfader lämnas öppen; inherit-closed = som inherit men obedömd struktur behandlas som ej bedömd, dvs. stängd; open/closed = ingen arvslogik), missingLagrum (closed/open), multipleLagrum (all/any) och defaultAct.",
+    "rule": {
+      "group": "socialtjanst",
+      "enabled": true,
+      "sekretess": ["ingen_sekretess", "sekretess_forekommer"],
+      "lagrum": ["OSL 26:1", "OSL 21"],
+      "personuppgifter": ["inga", "forekommer", "kansliga_forekommer"],
+      "personuppgiftsniva": ["niva_1", "niva_2"],
+      "note": ""
+    }
+  }
+}

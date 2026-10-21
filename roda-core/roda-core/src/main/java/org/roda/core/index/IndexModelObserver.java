@@ -1391,9 +1391,13 @@ public class IndexModelObserver implements ModelObserver {
   public ReturnWithExceptions<Void, ModelObserver> aipPermissionsUpdated(AIP aip) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
-    // change AIP
-    SolrUtils.update(index, IndexedAIP.class, aip.getId(),
-      SolrUtils.getPermissionsAsPreCalculatedFields(aip.getPermissions()), (ModelObserver) this).addTo(ret);
+    // change AIP (även fältet för grupper som spärrats av
+    // åtkomstreglerna, som annars bara skrivs vid fullständig omindexering)
+    Map<String, Object> fields = new HashMap<>(SolrUtils.getPermissionsAsPreCalculatedFields(aip.getPermissions()));
+    fields.put(RodaConstants.AIP_ACCESS_RULE_RESTRICTED_GROUPS,
+      aip.getAccessRuleState() != null ? new ArrayList<>(aip.getAccessRuleState().getRestrictedGroups())
+        : new ArrayList<>());
+    SolrUtils.update(index, IndexedAIP.class, aip.getId(), fields, (ModelObserver) this).addTo(ret);
 
     if (ret.isEmpty()) {
       // change Representations, Files and Preservation events

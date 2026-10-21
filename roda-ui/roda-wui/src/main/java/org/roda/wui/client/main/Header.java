@@ -30,8 +30,10 @@ import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.management.Management;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.management.NotificationRegister;
+import org.roda.wui.client.management.PermissionOverview;
 import org.roda.wui.client.management.Statistics;
 import org.roda.wui.client.management.UserLog;
+import org.roda.wui.client.management.accessrules.AccessRules;
 import org.roda.wui.client.management.distributed.DistributedInstancesManagement;
 import org.roda.wui.client.management.distributed.LocalInstanceManagement;
 import org.roda.wui.client.planning.Planning;
@@ -103,6 +105,8 @@ public class Header extends Composite {
   private MenuItem administrationActions;
   private MenuItem administrationInternalActions;
   private MenuItem administrationUser;
+  private MenuItem administrationAccessRules;
+  private MenuItem administrationPermissionOverview;
   private MenuItem administrationLog;
   private MenuItem administrationNotifications;
   private MenuItem administrationStatistics;
@@ -207,6 +211,13 @@ public class Header extends Composite {
     administrationUser = administrationMenu.addItem(messages.title("administration_user"),
       createCommand(MemberManagement.RESOLVER.getHistoryPath()));
     administrationUser.addStyleName("administration_user_item");
+    administrationAccessRules = administrationMenu.addItem(messages.title("administration_access_rules"),
+      createCommand(AccessRules.RESOLVER.getHistoryPath()));
+    administrationAccessRules.addStyleName("administration_access_rules_item");
+    administrationPermissionOverview = administrationMenu.addItem(
+      messages.title("administration_permission_overview"),
+      createCommand(PermissionOverview.RESOLVER.getHistoryPath()));
+    administrationPermissionOverview.addStyleName("administration_permission_overview_item");
 
     disposalMenu = new AcessibleMenuBar(true);
     disposalMenu.addStyleName("bannerHeaderColors");
@@ -300,6 +311,8 @@ public class Header extends Composite {
       updateResolverSubItemVisibility(ActionProcess.RESOLVER, administrationActions);
       updateResolverSubItemVisibility(InternalProcess.RESOLVER, administrationInternalActions);
       updateResolverSubItemVisibility(MemberManagement.RESOLVER, administrationUser);
+      updateResolverSubItemVisibility(AccessRules.RESOLVER, administrationAccessRules);
+      updateResolverSubItemVisibility(PermissionOverview.RESOLVER, administrationPermissionOverview);
       updateResolverSubItemVisibility(UserLog.RESOLVER, administrationLog);
       updateResolverSubItemVisibility(NotificationRegister.RESOLVER, administrationNotifications);
       updateResolverSubItemVisibility(Statistics.RESOLVER, administrationStatistics);

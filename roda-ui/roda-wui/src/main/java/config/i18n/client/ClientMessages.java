@@ -1825,6 +1825,115 @@ public interface ClientMessages extends Messages {
 
   String groupPermissions();
 
+  // Access rules
+  String accessRulesTitle();
+
+  String accessRulesStatus();
+
+  String accessRulesStatusActive();
+
+  String accessRulesStatusDisabled();
+
+  String accessRulesVersion();
+
+  String accessRulesLastApplied();
+
+  String accessRulesNeverApplied();
+
+  String accessRulesShowJob();
+
+  String accessRulesLastChanged();
+
+  String accessRulesNoRules();
+
+  String accessRulesLoadError();
+
+  String accessRulesAddRule();
+
+  String accessRulesSelectGroup();
+
+  String accessRulesApply();
+
+  String accessRulesDryRun();
+
+  String accessRulesApplyConfirmTitle();
+
+  String accessRulesApplyConfirmMessage();
+
+  String accessRulesDryRunConfirmTitle();
+
+  String accessRulesDryRunConfirmMessage();
+
+  String accessRulesJobStartedTitle();
+
+  String accessRulesJobStartedMessage();
+
+  String accessRuleGroup();
+
+  String accessRuleEnabled();
+
+  String accessRuleEnabledYes();
+
+  String accessRuleEnabledNo();
+
+  String accessRuleSekretess();
+
+  String accessRuleLagrum();
+
+  String accessRulePersonuppgifter();
+
+  String accessRulePersonuppgiftsniva();
+
+  String accessRuleNote();
+
+  String accessRuleAll();
+
+  String accessRuleNone();
+
+  String accessRuleRemoveConfirmTitle();
+
+  String accessRuleRemoveConfirmMessage(String group);
+
+  String accessRuleRemoved(String group);
+
+  String editAccessRuleTitle();
+
+  String accessRuleLagrumHelp();
+
+  String accessRuleLagrumAdd();
+
+  String accessRuleLagrumRemove();
+
+  String accessRuleLagrumNormalize();
+
+  String accessRuleLagrumNormalized();
+
+  String accessRuleLagrumWarnings();
+
+  String accessRuleApplyAfterSave();
+
+  String accessRuleSavedTitle();
+
+  String accessRuleSavedMessage();
+
+  String accessRuleSavedAndApplyMessage();
+
+  String showGroupNoAccessRule();
+
+  String accessRuleRestrictedGroups();
+
+  String accessRuleRestrictedGroupsEmpty();
+
+  String accessRuleEnabledHelp();
+
+  String accessRuleValuesHelp();
+
+  String accessRulePersonuppgiftsnivaNoVocabulary();
+
+  String accessRuleLagrumUseNormalized();
+
+  String descriptionToggleTitle();
+
   // Preferences
   String preferencesUserDataTitle();
 
@@ -2850,6 +2959,77 @@ public interface ClientMessages extends Messages {
   String browseAIPReasonViewAIP();
 
   String filesReasonDownloadSelectedFiles();
+
+  /* Behörighetsöversikt */
+  String permissionOverviewTitle();
+
+  String permissionOverviewTabRoles();
+
+  String permissionOverviewTabUsers();
+
+  String permissionOverviewTabNodes();
+
+  String permissionOverviewTabRules();
+
+  String permissionOverviewDownloadHtml();
+
+  String permissionOverviewDownloadCsv();
+
+  String permissionOverviewFilterPlaceholder();
+
+  String permissionOverviewColArea();
+
+  String permissionOverviewColRole();
+
+  String permissionOverviewColUser();
+
+  String permissionOverviewColName();
+
+  String permissionOverviewColEmail();
+
+  String permissionOverviewColActive();
+
+  String permissionOverviewColGroups();
+
+  String permissionOverviewColDirectRoles();
+
+  String permissionOverviewColAllRoles();
+
+  String permissionOverviewNoRoles();
+
+  String permissionOverviewNoUsers();
+
+  String permissionOverviewLoadError();
+
+  String permissionOverviewRetry();
+
+  String permissionOverviewRulesDisabled();
+
+  String permissionOverviewRulesEmpty();
+
+  String permissionOverviewRuleGroup();
+
+  String permissionOverviewRuleEnabled();
+
+  String permissionOverviewRuleSekretess();
+
+  String permissionOverviewRuleLagrum();
+
+  String permissionOverviewRulePersonuppgifter();
+
+  String permissionOverviewRuleNiva();
+
+  String permissionOverviewRuleNote();
+
+  String permissionOverviewGeneratedAt(String generatedAt, String generatedBy);
+
+  String permissionOverviewWarnings();
+
+  String permissionOverviewAdminGroup();
+
+  String permissionOverviewYes();
+
+  String permissionOverviewNo();
 
   /* Massredigering av metadatafält */
   String bulkEditMetadataButton();

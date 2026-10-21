@@ -19,6 +19,7 @@ import java.util.Set;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.HasPermissions;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.user.RODAMember;
@@ -64,6 +65,12 @@ public class EditPermissionsTab extends Composite {
   @UiField
   FlowPanel groupPermissionsPanel;
   @UiField
+  Header accessRuleRestrictedTitle;
+  @UiField
+  Label accessRuleRestrictedEmpty;
+  @UiField
+  FlowPanel accessRuleRestrictedPanel;
+  @UiField
   ActionsToolbar actionsToolbar;
 
   private List<HasPermissions> objects = new ArrayList<>();
@@ -89,6 +96,7 @@ public class EditPermissionsTab extends Composite {
     actionsToolbar.setTagsVisible(false);
     actionsToolbar.setLabelVisible(false);
     createPermissionPanel();
+    createAccessRuleRestrictedPanel(object);
   }
 
   public EditPermissionsTab(String objectClass, SelectedItems<? extends HasPermissions> selectedItems,
@@ -107,6 +115,29 @@ public class EditPermissionsTab extends Composite {
     userPermissionsTitle.setLevel(4);
     groupPermissionsTitle.setHeaderText(messages.permissionAssignedGroups());
     groupPermissionsTitle.setLevel(4);
+    accessRuleRestrictedTitle.setHeaderText(messages.accessRuleRestrictedGroups());
+    accessRuleRestrictedTitle.setLevel(4);
+    // only shown for a single AIP, see createAccessRuleRestrictedPanel
+    accessRuleRestrictedTitle.setVisible(false);
+    accessRuleRestrictedEmpty.setVisible(false);
+    accessRuleRestrictedPanel.setVisible(false);
+  }
+
+  /**
+   * Grupper vars läsbehörighet på arkivobjektet har
+   * spärrats av åtkomstreglerna (indexfältet accessRuleRestrictedGroups).
+   */
+  private void createAccessRuleRestrictedPanel(HasPermissions object) {
+    if (!(object instanceof IndexedAIP)) {
+      return;
+    }
+    List<String> restrictedGroups = ((IndexedAIP) object).getAccessRuleRestrictedGroups();
+    accessRuleRestrictedTitle.setVisible(true);
+    accessRuleRestrictedEmpty.setVisible(restrictedGroups.isEmpty());
+    accessRuleRestrictedPanel.setVisible(!restrictedGroups.isEmpty());
+    for (String group : restrictedGroups) {
+      accessRuleRestrictedPanel.add(Tag.fromText(group, List.of(Tag.TagStyle.DANGER_LIGHT, Tag.TagStyle.MONO)));
+    }
   }
 
   private void createPermissionPanelList() {

@@ -20,6 +20,7 @@ import java.util.Objects;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.access.AccessRulesModelObserver;
 import org.roda.core.common.metadata.DescriptiveMetadataFieldUpdater;
 import org.roda.core.common.metadata.DescriptiveMetadataFieldUpdater.Result;
 import org.roda.core.common.metadata.DescriptiveMetadataFieldUpdater.UpdateMode;
@@ -232,9 +233,16 @@ public class BulkUpdateDescriptiveMetadataPlugin extends AbstractPlugin<AIP> {
         metadataTypeWithVersion.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
     }
 
-    for (AIP aip : aips) {
-      processAIP(model, report, jobPluginInfo, job, aip, type, version, xpath);
-    }
+    // Varje metadatauppdatering notifierar observern för åtkomstreglerna, som
+    // annars skulle starta ett efterkommande-jobb per AIP; samla dem till ett
+    // jobb per batch
+    final String resolvedType = type;
+    final String resolvedVersion = version;
+    AccessRulesModelObserver.deferDescendantsJobs(() -> {
+      for (AIP aip : aips) {
+        processAIP(model, report, jobPluginInfo, job, aip, resolvedType, resolvedVersion, xpath);
+      }
+    });
   }
 
   private void processAIP(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job, AIP aip,

@@ -1,4 +1,4 @@
-{{! Administrativ metadata. Mallen äger filens fullständiga struktur — skapande/omrendering är förlustfri per definition. Vokabulärerna kan anpassas per installation. }}
+{{! Administrativ metadata. Mallen äger filens fullständiga struktur — skapande/omrendering är förlustfri per definition. Vokabulärerna kan anpassas per installation. personuppgiftsniva skrivs alltid (även tomt) så att massredigeringen (XPath in-place) kan sätta nivån på objekt där den ännu inte är bedömd. }}
 
 {{~field name="sekretessSection"  order="10" hidden="false" type="separator" labeli18n="crosswalks.dissemination.html.eterna_admin.sekretessSection" label='{"en": "Confidentiality", "sv": "Sekretess"}'~}}
 {{~field name="sekretess"         order="20" hidden="false" type="list"      labeli18n="crosswalks.dissemination.html.eterna_admin.sekretess"        label='{"en": "Confidentiality assessment", "sv": "Sekretessbedömning"}' mandatory="true" value="ej_bedomd" options='["ej_bedomd","ingen_sekretess","sekretess_forekommer","helt_sekretessbelagd"]' optionsLabels='{"ej_bedomd": {"en":"Not assessed", "sv":"Ej bedömd"}, "ingen_sekretess": {"en":"No confidentiality", "sv":"Ingen sekretess"}, "sekretess_forekommer": {"en":"Contains confidential information", "sv":"Sekretess förekommer"}, "helt_sekretessbelagd": {"en":"Entirely confidential", "sv":"Helt sekretessbelagd"}}' optionsLabelI18nKeyPrefix="crosswalks.dissemination.html.eterna_admin.sekretess" xpath="//*:eternaAdmin/*:sekretess/string()"~}}
@@ -6,6 +6,7 @@
 
 {{~field name="puSection"         order="40" hidden="false" type="separator" labeli18n="crosswalks.dissemination.html.eterna_admin.puSection"         label='{"en": "Personal data", "sv": "Personuppgifter"}'~}}
 {{~field name="personuppgifter"   order="50" hidden="false" type="list"      labeli18n="crosswalks.dissemination.html.eterna_admin.personuppgifter"   label='{"en": "Personal data assessment", "sv": "Personuppgiftsbedömning"}' mandatory="true" value="ej_bedomd" options='["ej_bedomd","inga","forekommer","kansliga_forekommer"]' optionsLabels='{"ej_bedomd": {"en":"Not assessed", "sv":"Ej bedömd"}, "inga": {"en":"No personal data", "sv":"Inga personuppgifter"}, "forekommer": {"en":"Contains personal data", "sv":"Personuppgifter förekommer"}, "kansliga_forekommer": {"en":"Contains sensitive personal data", "sv":"Känsliga personuppgifter förekommer"}}' optionsLabelI18nKeyPrefix="crosswalks.dissemination.html.eterna_admin.personuppgifter" xpath="//*:eternaAdmin/*:personuppgifter/string()"~}}
+{{~field name="personuppgiftsniva" order="55" hidden="false" type="list"      labeli18n="crosswalks.dissemination.html.eterna_admin.personuppgiftsniva" label='{"en": "Personal data level", "sv": "Personuppgiftsnivå"}' options='["niva_1","niva_2","niva_3"]' optionsLabels='{"niva_1": {"en":"Level 1 - harmless", "sv":"Nivå 1 – harmlösa"}, "niva_2": {"en":"Level 2 - protected", "sv":"Nivå 2 – skyddsvärda"}, "niva_3": {"en":"Level 3 - sensitive", "sv":"Nivå 3 – känsliga"}}' optionsLabelI18nKeyPrefix="crosswalks.dissemination.html.eterna_admin.personuppgiftsniva" xpath="//*:eternaAdmin/*:personuppgiftsniva/string()"~}}
 {{~field name="pulGrund"          order="60" hidden="false" type="text"      labeli18n="crosswalks.dissemination.html.eterna_admin.pulGrund"          label='{"en": "Legal basis for processing", "sv": "Rättslig grund (GDPR)"}' xpath="//*:eternaAdmin/*:pulGrund/string()"~}}
 
 {{~field name="granskningSection" order="70" hidden="false" type="separator" labeli18n="crosswalks.dissemination.html.eterna_admin.granskningSection" label='{"en": "Review", "sv": "Granskning"}'~}}
@@ -18,6 +19,7 @@
     <sekretessgrund>{{sekretessgrund}}</sekretessgrund>
     {{~/if}}
     <personuppgifter>{{#if personuppgifter}}{{personuppgifter}}{{else}}ej_bedomd{{/if}}</personuppgifter>
+    <personuppgiftsniva>{{personuppgiftsniva}}</personuppgiftsniva>
     {{~#if pulGrund}}
     <pulGrund>{{pulGrund}}</pulGrund>
     {{~/if}}
