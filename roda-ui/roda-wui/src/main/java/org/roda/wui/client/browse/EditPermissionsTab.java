@@ -103,9 +103,9 @@ public class EditPermissionsTab extends Composite {
   }
 
   private void initLabels() {
-    userPermissionsTitle.setHeaderText(messages.permissionAssignedGroups());
+    userPermissionsTitle.setHeaderText(messages.permissionAssignedUsers());
     userPermissionsTitle.setLevel(4);
-    groupPermissionsTitle.setHeaderText(messages.permissionAssignedUsers());
+    groupPermissionsTitle.setHeaderText(messages.permissionAssignedGroups());
     groupPermissionsTitle.setLevel(4);
   }
 

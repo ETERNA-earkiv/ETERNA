@@ -9,6 +9,7 @@
 - Pinned the `eterna-unoserver` image to an immutable version tag (`v3.7.0`) in the deploy compose files, and updated the build workflow to publish `v3.7.0` alongside `:latest`, so deployments are reproducible [#600](https://github.com/ETERNA-earkiv/ETERNA/issues/600)
 - The parent-node selector now shows a lazy-loading tree of logical units instead of a flat list when picking a target during ingest, move and disposal-rule editing; the filter field runs a search that lists matching units with their ancestor path (breadcrumb), only structural levels are selectable (`file`/`item` are hidden), and when moving, the moved node and its subtree are shown but greyed out so a package cannot be moved into its own hierarchy [#301](https://github.com/ETERNA-earkiv/ETERNA/issues/301)
 - Translated the remaining English email templates (`generic-template.vm`, `ingestion-template.vm`) to Swedish; also fixed an unclosed HTML tag in the mail templates and simplified the email footer to match the other translated templates [#633](https://github.com/ETERNA-earkiv/ETERNA/issues/633) [#634](https://github.com/ETERNA-earkiv/ETERNA/pull/634)
+- Search export: new member fields `email`, `groups`, `users` and `allRoles`, and new AIP fields `readGroups`/`readUsers` (groups and users with read permission); `ui.export.aip.fields` and `ui.export.member.fields` in `roda-wui.properties` updated accordingly [#680](https://github.com/ETERNA-earkiv/ETERNA/pull/680)
 
 #### Bug fixes
 - License button on built-in plugins (archive maintenance jobs) is now hidden when no license file exists, instead of opening an empty dialog [#366](https://github.com/ETERNA-earkiv/ETERNA/issues/366)
@@ -19,6 +20,9 @@
 - Fixed `ClassCastException` that broke list rendering when a column used a rendering hint (e.g. `DATE_FORMAT_SIMPLE`) on a multivalued field; each element is now formatted with the hint and shown as a comma-separated list [#607](https://github.com/ETERNA-earkiv/ETERNA/issues/607)
 - Catalog tree now resolves ancestors in a single batch, so records the user has access to are no longer shown as "Åtkomst saknas"; an ancestor the user cannot access is shown as plain "Åtkomst saknas" text in the breadcrumb [#643](https://github.com/ETERNA-earkiv/ETERNA/issues/643) [#645](https://github.com/ETERNA-earkiv/ETERNA/pull/645)
 - Fixed the web archive (WARC/WACZ) viewer failing to load: removed the `Cross-Origin-Embedder-Policy` headers added in v1.0.0, since COEP on the parent page blocked the ReplayWeb.page iframe served by its service worker (`Cross-Origin-Opener-Policy` is kept) [#646](https://github.com/ETERNA-earkiv/ETERNA/pull/646)
+- Search export mapped some fields to non-existent Solr fields (`active` → `isActive`, `directRoles` → `rolesDirect` etc.), so those columns were exported empty [#680](https://github.com/ETERNA-earkiv/ETERNA/pull/680)
+- Updating or deleting a group now re-indexes its previous and current members, so `rolesAll` and `groups` in the member index follow the change; bulk re-indexing (`ReindexRodaMemberPlugin`, start-up) skips the per-member re-index [#680](https://github.com/ETERNA-earkiv/ETERNA/pull/680)
+- AIP permissions tab: the `ui:field` names and heading texts of the user and group panels were swapped; names, texts and positions now match (no visible change) [#680](https://github.com/ETERNA-earkiv/ETERNA/pull/680)
 
 #### Security updates
 - Fixed GHSA-9xv2-5v5q-p794, GHSA-gcx9-497g-6cp6, GHSA-h3x4-894j-xpx5 (critical): upgraded embedded Tomcat to 10.1.60

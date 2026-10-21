@@ -15,8 +15,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.StreamSupport;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -1133,14 +1135,94 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> groupUpdated(Group group) {
-    ReturnWithExceptions<Void, ModelObserver> ret = groupDeleted(group.getId());
+    return groupUpdated(group, true);
+  }
+
+  @Override
+  public ReturnWithExceptions<Void, ModelObserver> groupUpdated(Group group, boolean reindexMembers) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+
+    // Members to re-index: the ones the index knew about before this update
+    // (users removed from the group would otherwise keep the group's roles and
+    // name in 'rolesAll'/'groups') plus the current members from LDAP. Bulk
+    // re-indexing passes reindexMembers=false as it indexes every user anyway.
+    Set<String> members = new HashSet<>();
+    if (reindexMembers) {
+      members.addAll(findIndexedMembersOfGroup(group.getName(), ret));
+      if (group.getUsers() != null) {
+        members.addAll(group.getUsers());
+      }
+    }
+
+    deleteDocumentFromIndex(RODAMember.class, IdUtils.getGroupId(group.getId())).addTo(ret);
     groupCreated(group).addTo(ret);
+    reindexGroupMembers(members, group.getId(), ret);
+
     return ret;
   }
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> groupDeleted(String groupId) {
-    return deleteDocumentFromIndex(RODAMember.class, IdUtils.getGroupId(groupId));
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+
+    // The group is already gone from LDAP, so the index is the only place
+    // that still knows which users were members.
+    Set<String> members = findIndexedMembersOfGroup(groupId, ret);
+
+    deleteDocumentFromIndex(RODAMember.class, IdUtils.getGroupId(groupId)).addTo(ret);
+    reindexGroupMembers(members, groupId, ret);
+
+    return ret;
+  }
+
+  /**
+   * Looks up, in the members index, the names of the users that are currently
+   * indexed as members of the given group.
+   */
+  private Set<String> findIndexedMembersOfGroup(String groupName, ReturnWithExceptions<Void, ModelObserver> ret) {
+    Set<String> members = new HashSet<>();
+    if (StringUtils.isBlank(groupName)) {
+      return members;
+    }
+
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.MEMBERS_GROUPS, groupName));
+    List<String> memberFields = Arrays.asList(RodaConstants.MEMBERS_ID, RodaConstants.MEMBERS_NAME,
+      RodaConstants.MEMBERS_IS_USER);
+
+    try (IterableIndexResult<RODAMember> results = new IterableIndexResult<>(index, RODAMember.class, filter,
+      null, false, memberFields)) {
+      for (RODAMember member : results) {
+        if (member.isUser() && StringUtils.isNotBlank(member.getName())) {
+          members.add(member.getName());
+        }
+      }
+    } catch (IOException | RuntimeException e) {
+      LOGGER.error("Error looking up indexed members of group '{}'", groupName, e);
+      ret.add(e);
+    }
+
+    return members;
+  }
+
+  /**
+   * Re-indexes the given users so that their 'rolesAll' and 'groups' reflect
+   * the current state of the group (the user's roles are resolved from LDAP).
+   */
+  private void reindexGroupMembers(Set<String> usernames, String groupId,
+    ReturnWithExceptions<Void, ModelObserver> ret) {
+    for (String username : usernames) {
+      try {
+        User user = model.retrieveUser(username);
+        if (user == null || StringUtils.isBlank(user.getId())) {
+          LOGGER.warn("Skipping re-index of member '{}' of group '{}': user not found", username, groupId);
+          continue;
+        }
+        userUpdated(user).addTo(ret);
+      } catch (GenericException | RuntimeException e) {
+        LOGGER.error("Error re-indexing member '{}' after change of group '{}'", username, groupId, e);
+        ret.add(e);
+      }
+    }
   }
 
   @Override
