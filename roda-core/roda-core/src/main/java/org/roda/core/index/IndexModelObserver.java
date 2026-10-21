@@ -1197,7 +1197,8 @@ public class IndexModelObserver implements ModelObserver {
         }
       }
     } catch (IOException | RuntimeException e) {
-      LOGGER.error("Error looking up indexed members of group '{}'", groupName, e);
+      LOGGER.error("Error looking up indexed members of group '{}'; former members may keep stale roles/groups in "
+        + "the members index until the users and groups index is rebuilt (ReindexRodaMemberPlugin)", groupName, e);
       ret.add(e);
     }
 
