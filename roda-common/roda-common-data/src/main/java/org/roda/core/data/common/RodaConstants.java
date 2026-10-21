@@ -1417,6 +1417,9 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_REPRESENTATION_TYPE = "parameter.representation_type";
   public static final String PLUGIN_PARAMS_OUTCOMEOBJECTID_TO_SOURCEOBJECTID_MAP = "parameter.outcomeobjectid_to_sourceobjectid_map";
   public static final String PLUGIN_PARAMS_NEW_TYPE = "parameter.new_type";
+  // Parametrar för leveransspecifikationsvalidering
+  public static final String PLUGIN_PARAMS_DO_DELIVERY_SPEC_VALIDATION = "parameter.do_delivery_spec_validation";
+  public static final String PLUGIN_PARAMS_DELIVERY_SPEC_ID = "parameter.delivery_spec.id";
   // Parametrar för massredigering av beskrivande metadata
   public static final String PLUGIN_PARAMS_BULK_METADATA_TYPE = "parameter.bulk_update.metadata_type";
   public static final String PLUGIN_PARAMS_BULK_FIELD_NAME = "parameter.bulk_update.field_name";
