@@ -407,6 +407,22 @@ public class EditDescriptiveMetadata extends Composite {
     if (inXML) {
       updateMetadataOnServer(xmlText);
     } else {
+      // Fält märkta mandatory i mallen får inte lämnas
+      // tomma — validera formuläret innan förfrågan skickas. Redigerar
+      // användaren XML:en direkt gäller serverns XSD-validering i stället.
+      if (values != null && !values.isEmpty()) {
+        List<String> mandatoryErrors = FormUtilities.validate(values, formOrXML);
+        if (!mandatoryErrors.isEmpty()) {
+          StringBuilder errorString = new StringBuilder();
+          for (String error : mandatoryErrors) {
+            errorString.append("<span class='error'>").append(error).append("</span><br/>");
+          }
+          errors.setHTML(errorString.toString());
+          errors.setVisible(true);
+          return;
+        }
+        errors.setVisible(false);
+      }
 
       Services service = new Services("Update Descriptive metadata", "get");
 
