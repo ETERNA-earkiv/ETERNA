@@ -3030,4 +3030,31 @@ public interface ClientMessages extends Messages {
   String permissionOverviewYes();
 
   String permissionOverviewNo();
+
+  /* Massredigering av metadatafält */
+  String bulkEditMetadataButton();
+
+  String bulkEditMetadataDialogTitle();
+
+  String bulkEditMetadataSelectedCount(long count);
+
+  String bulkEditMetadataTypeLabel();
+
+  String bulkEditMetadataFieldLabel();
+
+  String bulkEditMetadataNewValueLabel();
+
+  String bulkEditMetadataModeLabel();
+
+  String bulkEditMetadataModeOverwrite();
+
+  String bulkEditMetadataModeComplete();
+
+  String bulkEditMetadataExpectedValueLabel();
+
+  String bulkEditMetadataNoFields();
+
+  String bulkEditMetadataStartButton();
+
+  String bulkEditMetadataMissingValue();
 }

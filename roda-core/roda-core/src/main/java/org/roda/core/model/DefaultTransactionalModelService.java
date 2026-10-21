@@ -4247,6 +4247,11 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   @Override
+  public ReturnWithExceptionsWrapper notifyGroupUpdated(Group group, boolean reindexMembers) {
+    return mainModelService.notifyGroupUpdated(group, reindexMembers);
+  }
+
+  @Override
   public ReturnWithExceptionsWrapper notifyGroupDeleted(String groupID) {
     return mainModelService.notifyGroupDeleted(groupID);
   }

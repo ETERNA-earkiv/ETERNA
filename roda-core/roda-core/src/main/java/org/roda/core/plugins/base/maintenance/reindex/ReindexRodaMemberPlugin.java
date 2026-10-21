@@ -137,7 +137,8 @@ public class ReindexRodaMemberPlugin extends AbstractPlugin<Void> {
 
       for (Group ldapGroup : groups) {
         LOGGER.debug("Group to be indexed: {}", ldapGroup);
-        RodaCoreFactory.getModelService().notifyGroupUpdated(ldapGroup).failOnError();
+        // all users were re-indexed above, so skip the per-member re-indexing
+        RodaCoreFactory.getModelService().notifyGroupUpdated(ldapGroup, false).failOnError();
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
       }
 

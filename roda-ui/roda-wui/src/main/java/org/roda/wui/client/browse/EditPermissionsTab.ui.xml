@@ -14,12 +14,12 @@
             <g:FlowPanel addStyleNames="row full_width">
                 <g:FlowPanel addStyleNames="content">
                     <g:FlowPanel addStyleNames="page-description" ui:field="editPermissionsDescription"/>
-                    <labels:Header ui:field="userPermissionsTitle"/>
+                    <labels:Header ui:field="groupPermissionsTitle"/>
                     <g:Label styleName="info-empty" ui:field="groupPermissionsEmpty">
                         <ui:text from='{messages.permissionAssignedGroupsEmpty}'/>
                     </g:Label>
                     <g:FlowPanel ui:field="groupPermissionsPanel" addStyleNames="plugin-category-padding"/>
-                    <labels:Header ui:field="groupPermissionsTitle"/>
+                    <labels:Header ui:field="userPermissionsTitle"/>
                     <g:Label styleName="info-empty" ui:field="userPermissionsEmpty">
                         <ui:text from='{messages.permissionAssignedUsersEmpty}'/>
                     </g:Label>

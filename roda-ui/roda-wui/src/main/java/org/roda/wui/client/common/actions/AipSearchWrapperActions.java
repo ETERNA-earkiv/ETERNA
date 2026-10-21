@@ -38,6 +38,7 @@ import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
+import org.roda.wui.client.common.dialogs.BulkEditMetadataDialog;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.DisposalDialogs;
 import org.roda.wui.client.common.dialogs.RepresentationDialogs;
@@ -83,11 +84,13 @@ public class AipSearchWrapperActions extends AbstractActionable<IndexedAIP> {
   private static final Set<AipSearchWrapperAction> POSSIBLE_ACTIONS_ON_SINGLE_AIP = new HashSet<>(
     Arrays.asList(AipSearchWrapperAction.MOVE_IN_HIERARCHY, AipSearchWrapperAction.UPDATE_PERMISSIONS,
       AipSearchWrapperAction.REMOVE, AipSearchWrapperAction.NEW_PROCESS, AipSearchWrapperAction.CHANGE_TYPE,
-      AipSearchWrapperAction.ASSOCIATE_DISPOSAL_SCHEDULE, AipSearchWrapperAction.ASSOCIATE_DISPOSAL_HOLD));
+      AipSearchWrapperAction.BULK_EDIT_METADATA, AipSearchWrapperAction.ASSOCIATE_DISPOSAL_SCHEDULE,
+      AipSearchWrapperAction.ASSOCIATE_DISPOSAL_HOLD));
   private static final Set<AipSearchWrapperAction> POSSIBLE_ACTIONS_ON_MULTIPLE_AIPS = new HashSet<>(
     Arrays.asList(AipSearchWrapperAction.MOVE_IN_HIERARCHY, AipSearchWrapperAction.UPDATE_PERMISSIONS,
       AipSearchWrapperAction.REMOVE, AipSearchWrapperAction.NEW_PROCESS, AipSearchWrapperAction.CHANGE_TYPE,
-      AipSearchWrapperAction.ASSOCIATE_DISPOSAL_SCHEDULE, AipSearchWrapperAction.ASSOCIATE_DISPOSAL_HOLD));
+      AipSearchWrapperAction.BULK_EDIT_METADATA, AipSearchWrapperAction.ASSOCIATE_DISPOSAL_SCHEDULE,
+      AipSearchWrapperAction.ASSOCIATE_DISPOSAL_HOLD));
   private static final Set<AipSearchWrapperAction> APPRAISAL_ACTIONS = new HashSet<>(
     Arrays.asList(AipSearchWrapperAction.APPRAISAL_ACCEPT, AipSearchWrapperAction.APPRAISAL_REJECT));
   private final String parentAipId;
@@ -231,6 +234,8 @@ public class AipSearchWrapperActions extends AbstractActionable<IndexedAIP> {
       appraisalReject(aip, callback);
     } else if (AipSearchWrapperAction.CHANGE_TYPE.equals(action)) {
       changeType(aip, callback);
+    } else if (AipSearchWrapperAction.BULK_EDIT_METADATA.equals(action)) {
+      bulkEditMetadata(aip, callback);
     } else if (AipSearchWrapperAction.ASSOCIATE_DISPOSAL_SCHEDULE.equals(action)) {
       associateDisposalSchedule(aip, callback);
     } else if (AipSearchWrapperAction.ASSOCIATE_DISPOSAL_HOLD.equals(action)) {
@@ -256,6 +261,8 @@ public class AipSearchWrapperActions extends AbstractActionable<IndexedAIP> {
       appraisalReject(aips, callback);
     } else if (AipSearchWrapperAction.CHANGE_TYPE.equals(action)) {
       changeType(aips, callback);
+    } else if (AipSearchWrapperAction.BULK_EDIT_METADATA.equals(action)) {
+      bulkEditMetadata(aips, callback);
     } else if (AipSearchWrapperAction.ASSOCIATE_DISPOSAL_SCHEDULE.equals(action)) {
       associateDisposalSchedule(aips, callback);
     } else if (AipSearchWrapperAction.ASSOCIATE_DISPOSAL_HOLD.equals(action)) {
@@ -649,6 +656,24 @@ public class AipSearchWrapperActions extends AbstractActionable<IndexedAIP> {
       });
   }
 
+  /**
+   * Öppnar massredigeringsdialogen för valda AIP:ar.
+   * Dialogen läser fälten ur formulärmallen och startar jobbet själv.
+   */
+  private void bulkEditMetadata(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
+    bulkEditMetadata(objectToSelectedItems(aip, IndexedAIP.class), callback);
+  }
+
+  private void bulkEditMetadata(final SelectedItems<IndexedAIP> aips, final AsyncCallback<ActionImpact> callback) {
+    ClientSelectedItemsUtils.size(IndexedAIP.class, aips, new ActionNoAsyncCallback<Long>(callback) {
+      @Override
+      public void onSuccess(final Long size) {
+        doActionCallbackNone();
+        new BulkEditMetadataDialog(aips, size).show();
+      }
+    });
+  }
+
   private void changeType(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
     changeType(objectToSelectedItems(aip, IndexedAIP.class), callback);
   }
@@ -1001,6 +1026,8 @@ public class AipSearchWrapperActions extends AbstractActionable<IndexedAIP> {
       "btn-plus-circle");
     managementGroup.addButton(messages.changeTypeButton(), AipSearchWrapperAction.CHANGE_TYPE, ActionImpact.UPDATED,
       BTN_EDIT);
+    managementGroup.addButton(messages.bulkEditMetadataButton(), AipSearchWrapperAction.BULK_EDIT_METADATA,
+      ActionImpact.UPDATED, BTN_EDIT);
     managementGroup.addButton(messages.moveArchivalPackage(), AipSearchWrapperAction.MOVE_IN_HIERARCHY,
       ActionImpact.UPDATED, BTN_EDIT);
     managementGroup.addButton(messages.archivalPackagePermissions(), AipSearchWrapperAction.UPDATE_PERMISSIONS,
@@ -1042,6 +1069,7 @@ public class AipSearchWrapperActions extends AbstractActionable<IndexedAIP> {
     APPRAISAL_ACCEPT(RodaConstants.PERMISSION_METHOD_APPRAISAL),
     APPRAISAL_REJECT(RodaConstants.PERMISSION_METHOD_APPRAISAL),
     CHANGE_TYPE(RodaConstants.PERMISSION_METHOD_CHANGE_AIP_TYPE),
+    BULK_EDIT_METADATA(RodaConstants.PERMISSION_METHOD_BULK_UPDATE_DESCRIPTIVE_METADATA),
     ASSOCIATE_DISPOSAL_SCHEDULE(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_SCHEDULE),
     ASSOCIATE_DISPOSAL_HOLD(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_HOLD);
 

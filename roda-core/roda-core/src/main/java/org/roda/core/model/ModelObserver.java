@@ -85,6 +85,14 @@ public interface ModelObserver {
 
   public ReturnWithExceptions<Void, ModelObserver> groupUpdated(Group group);
 
+  /**
+   * Same as {@link #groupUpdated(Group)}, but lets bulk re-indexing (which
+   * already re-indexes every user) skip the re-indexing of the group's members.
+   */
+  public default ReturnWithExceptions<Void, ModelObserver> groupUpdated(Group group, boolean reindexMembers) {
+    return groupUpdated(group);
+  }
+
   public ReturnWithExceptions<Void, ModelObserver> groupDeleted(String groupID);
 
   public ReturnWithExceptions<Void, ModelObserver> preservationMetadataCreated(
