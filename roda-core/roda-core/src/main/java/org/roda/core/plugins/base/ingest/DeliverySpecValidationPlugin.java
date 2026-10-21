@@ -126,7 +126,7 @@ public class DeliverySpecValidationPlugin extends AbstractPlugin<AIP> {
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-    specId = parameters.get(RodaConstants.PLUGIN_PARAMS_DELIVERY_SPEC_ID);
+    specId = getParameterValues().get(RodaConstants.PLUGIN_PARAMS_DELIVERY_SPEC_ID);
   }
 
   @Override
