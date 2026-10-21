@@ -390,6 +390,24 @@ public class CreateDescriptiveMetadata extends Composite {
     boolean hasOverridenTheForm = inXML && !xmlText.equals(metadataTextFromForm);
 
     if (!idText.isEmpty() && filename.endsWith(".xml")) {
+      // Fält märkta mandatory i mallen får inte lämnas
+      // tomma — validera formuläret innan förfrågan skickas. Redigerar
+      // användaren XML:en direkt gäller serverns XSD-validering i stället.
+      if (!inXML && values != null && !values.isEmpty()) {
+        List<String> mandatoryErrors = FormUtilities.validate(values, formOrXML);
+        if (!mandatoryErrors.isEmpty()) {
+          StringBuilder errorString = new StringBuilder();
+          for (String error : mandatoryErrors) {
+            errorString.append("<span class='error'>").append(error).append("</span><br/>");
+          }
+          errors.setHTML(errorString.toString());
+          errors.setVisible(true);
+          buttonApply.setEnabled(true);
+          return;
+        }
+        errors.setVisible(false);
+      }
+
       // we only send the values map if the user hasn't overriden the form by
       // modifying the XML directly
       CreateDescriptiveMetadataRequest body;
