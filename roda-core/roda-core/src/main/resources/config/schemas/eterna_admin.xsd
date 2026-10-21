@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Administrativt metadataschema
+  Version 1.0 - komplettering av arkivobjekt med sekretess- och
+  personuppgiftsbedomning. Egen fil per AIP; formularmallen
+  eterna_admin.xml.hbs ager filens fullstandiga struktur.
+
+  OBS: vokabularerna for sekretess/personuppgifter ar FORSLAG och
+  faststalls med bestallaren innan skarp drift (oppen beslutspunkt).
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns="https://eterna.whitered.se/xml/eterna_admin/1"
+    targetNamespace="https://eterna.whitered.se/xml/eterna_admin/1"
+    elementFormDefault="qualified">
+
+    <xs:element name="eternaAdmin">
+        <xs:annotation>
+            <xs:documentation xml:lang="sv">Administrativ metadata for komplettering enligt schema: sekretess- och personuppgiftsbedomning med sparbarhet</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="sekretess" type="sekretessType">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="sv">Sekretessbedomning enligt kontrollerad vokabular</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="sekretessgrund" type="xs:string" minOccurs="0">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="sv">Lagstod for sekretess, t.ex. "OSL 21 kap. 1 &#167;"</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="personuppgifter" type="personuppgifterType">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="sv">Personuppgiftsbedomning enligt kontrollerad vokabular</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="pulGrund" type="xs:string" minOccurs="0">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="sv">Rattslig grund for behandling av personuppgifter</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="granskningsdatum" type="xs:date" minOccurs="0">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="sv">Datum da bedomningen genomfordes eller senast omprovades</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="anteckning" type="xs:string" minOccurs="0">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="sv">Fri anteckning om bedomningen</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- FORSLAG: faststalls med bestallaren -->
+    <xs:simpleType name="sekretessType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="ej_bedomd"/>
+            <xs:enumeration value="ingen_sekretess"/>
+            <xs:enumeration value="sekretess_forekommer"/>
+            <xs:enumeration value="helt_sekretessbelagd"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- FORSLAG: faststalls med bestallaren -->
+    <xs:simpleType name="personuppgifterType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="ej_bedomd"/>
+            <xs:enumeration value="inga"/>
+            <xs:enumeration value="forekommer"/>
+            <xs:enumeration value="kansliga_forekommer"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+</xs:schema>

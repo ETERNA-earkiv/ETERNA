@@ -41,6 +41,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.metadata.BulkUpdateDescriptiveMetadataRequest;
 import org.roda.core.data.v2.ip.metadata.ConfiguredDescriptiveMetadataList;
 import org.roda.core.data.v2.ip.metadata.CreateDescriptiveMetadataRequest;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -723,6 +724,21 @@ public class AIPController implements AIPRestService, Exportable {
   }
 
   @Override
+  public SupportedMetadataValue retrieveConfiguredMetadataFields(String metadataType, String localeString) {
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<SupportedMetadataValue>() {
+      @Override
+      public SupportedMetadataValue process(RequestContext requestContext,
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException, IOException {
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_METADATA_ID_PARAM, metadataType);
+        Locale locale = ServerTools.parseLocale(localeString);
+
+        // delegate
+        return aipService.retrieveConfiguredMetadataFields(metadataType, locale);
+      }
+    });
+  }
+
+  @Override
   public SupportedMetadataValue retrieveAIPSupportedMetadata(String aipId, String metadataType, String localeString) {
     return requestHandler.processRequest(new RequestHandler.RequestProcessor<SupportedMetadataValue>() {
       @Override
@@ -936,6 +952,26 @@ public class AIPController implements AIPRestService, Exportable {
         }
 
         return new TypeOptionsInfo(isControlled, types);
+      }
+    });
+  }
+
+  @Override
+  public Job bulkUpdateDescriptiveMetadata(@RequestBody BulkUpdateDescriptiveMetadataRequest request) {
+    return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<Job>() {
+      @Override
+      public Job process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException, IOException {
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_SELECTED_PARAM, request.getItems(),
+          RodaConstants.CONTROLLER_METADATA_ID_PARAM, request.getMetadataType());
+
+        SelectedItems<IndexedAIP> indexedAIPSelectedItems = CommonServicesUtils.convertSelectedItems(request.getItems(),
+          IndexedAIP.class);
+
+        // check object permissions
+        controllerAssistant.checkObjectPermissions(requestContext.getUser(), indexedAIPSelectedItems);
+
+        return aipService.bulkUpdateDescriptiveMetadata(requestContext.getUser(), indexedAIPSelectedItems, request);
       }
     });
   }

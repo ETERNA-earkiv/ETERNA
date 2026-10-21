@@ -28,6 +28,7 @@ import org.roda.core.plugins.base.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.base.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.base.disposal.rules.ApplyDisposalRulesPlugin;
 import org.roda.core.plugins.base.ingest.AutoAcceptSIPPlugin;
+import org.roda.core.plugins.base.ingest.DeliverySpecValidationPlugin;
 import org.roda.core.plugins.base.ingest.EARKSIP2ToAIPPlugin;
 import org.roda.core.plugins.base.ingest.VerifyUserAuthorizationPlugin;
 import org.roda.core.plugins.base.ingest.v2.steps.AutoAcceptIngestStep;
@@ -54,6 +55,10 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
     steps.add(new IngestStep(DescriptiveMetadataValidationPlugin.class.getName(),
       RodaConstants.PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION, true, true, true, true,
       metadataValidationStepParameters));
+      RodaConstants.PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION, true, true, true, true));
+    // 3b) Valbar validering mot leveransspecifikation
+    steps.add(new IngestStep(DeliverySpecValidationPlugin.class.getName(),
+      RodaConstants.PLUGIN_PARAMS_DO_DELIVERY_SPEC_VALIDATION, true, false, true, true));
     // 4) create file fixity information
     steps.add(new IngestStep(PremisSkeletonPlugin.class.getName(), RodaConstants.PLUGIN_PARAMS_CREATE_PREMIS_SKELETON,
       true, true, true, true));
@@ -113,6 +118,8 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
     pluginParametersList.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID));
     pluginParametersList.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_VIRUS_CHECK));
     pluginParametersList.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION));
+    pluginParametersList.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_DELIVERY_SPEC_VALIDATION));
+    pluginParametersList.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DELIVERY_SPEC_ID));
     pluginParametersList.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_CREATE_PREMIS_SKELETON));
     pluginParametersList.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FILE_FORMAT_IDENTIFICATION));
 
@@ -174,6 +181,15 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
             DescriptiveMetadataValidationPlugin.getStaticName(), PluginParameterType.BOOLEAN)
           .withDefaultValue("true").isReadOnly(true)
           .withDescription(DescriptiveMetadataValidationPlugin.getStaticDescription()).build());
+
+      // Valbar validering mot leveransspecifikation
+      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_DELIVERY_SPEC_VALIDATION,
+        PluginParameter
+          .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_DELIVERY_SPEC_VALIDATION,
+            DeliverySpecValidationPlugin.getStaticName(), PluginParameterType.BOOLEAN)
+          .withDefaultValue(FALSE).withDescription(DeliverySpecValidationPlugin.getStaticDescription()).build());
+      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DELIVERY_SPEC_ID,
+        DeliverySpecValidationPlugin.buildSpecIdParameter());
 
       PluginManager pluginManager = RodaCoreFactory.getPluginManager();
       Plugin<?> plugin = pluginManager.getPlugin(DefaultIngestPlugin.PLUGIN_CLASS_VERAPDF);

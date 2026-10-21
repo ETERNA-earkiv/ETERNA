@@ -1,0 +1,30 @@
+{{! Administrativ metadata. Mallen äger filens fullständiga struktur — skapande/omrendering är förlustfri per definition. Vokabulärerna kan anpassas per installation. }}
+
+{{~field name="sekretessSection"  order="10" hidden="false" type="separator" labeli18n="crosswalks.dissemination.html.eterna_admin.sekretessSection" label='{"en": "Confidentiality", "sv": "Sekretess"}'~}}
+{{~field name="sekretess"         order="20" hidden="false" type="list"      labeli18n="crosswalks.dissemination.html.eterna_admin.sekretess"        label='{"en": "Confidentiality assessment", "sv": "Sekretessbedömning"}' mandatory="true" value="ej_bedomd" options='["ej_bedomd","ingen_sekretess","sekretess_forekommer","helt_sekretessbelagd"]' optionsLabels='{"ej_bedomd": {"en":"Not assessed", "sv":"Ej bedömd"}, "ingen_sekretess": {"en":"No confidentiality", "sv":"Ingen sekretess"}, "sekretess_forekommer": {"en":"Contains confidential information", "sv":"Sekretess förekommer"}, "helt_sekretessbelagd": {"en":"Entirely confidential", "sv":"Helt sekretessbelagd"}}' optionsLabelI18nKeyPrefix="crosswalks.dissemination.html.eterna_admin.sekretess" xpath="//*:eternaAdmin/*:sekretess/string()"~}}
+{{~field name="sekretessgrund"    order="30" hidden="false" type="text"      labeli18n="crosswalks.dissemination.html.eterna_admin.sekretessgrund"    label='{"en": "Legal basis (OSL)", "sv": "Sekretessgrund (OSL-paragraf)"}' xpath="//*:eternaAdmin/*:sekretessgrund/string()"~}}
+
+{{~field name="puSection"         order="40" hidden="false" type="separator" labeli18n="crosswalks.dissemination.html.eterna_admin.puSection"         label='{"en": "Personal data", "sv": "Personuppgifter"}'~}}
+{{~field name="personuppgifter"   order="50" hidden="false" type="list"      labeli18n="crosswalks.dissemination.html.eterna_admin.personuppgifter"   label='{"en": "Personal data assessment", "sv": "Personuppgiftsbedömning"}' mandatory="true" value="ej_bedomd" options='["ej_bedomd","inga","forekommer","kansliga_forekommer"]' optionsLabels='{"ej_bedomd": {"en":"Not assessed", "sv":"Ej bedömd"}, "inga": {"en":"No personal data", "sv":"Inga personuppgifter"}, "forekommer": {"en":"Contains personal data", "sv":"Personuppgifter förekommer"}, "kansliga_forekommer": {"en":"Contains sensitive personal data", "sv":"Känsliga personuppgifter förekommer"}}' optionsLabelI18nKeyPrefix="crosswalks.dissemination.html.eterna_admin.personuppgifter" xpath="//*:eternaAdmin/*:personuppgifter/string()"~}}
+{{~field name="pulGrund"          order="60" hidden="false" type="text"      labeli18n="crosswalks.dissemination.html.eterna_admin.pulGrund"          label='{"en": "Legal basis for processing", "sv": "Rättslig grund (GDPR)"}' xpath="//*:eternaAdmin/*:pulGrund/string()"~}}
+
+{{~field name="granskningSection" order="70" hidden="false" type="separator" labeli18n="crosswalks.dissemination.html.eterna_admin.granskningSection" label='{"en": "Review", "sv": "Granskning"}'~}}
+{{~field name="granskningsdatum"  order="80" hidden="false" type="date"      labeli18n="crosswalks.dissemination.html.eterna_admin.granskningsdatum"  label='{"en": "Review date", "sv": "Granskningsdatum"}' xpath="//*:eternaAdmin/*:granskningsdatum/string()"~}}
+{{~field name="anteckning"        order="90" hidden="false" type="text-area" labeli18n="crosswalks.dissemination.html.eterna_admin.anteckning"        label='{"en": "Note", "sv": "Anteckning"}' xpath="//*:eternaAdmin/*:anteckning/string()"~}}
+<?xml version="1.0" encoding="UTF-8"?>
+<eternaAdmin xmlns="https://eterna.whitered.se/xml/eterna_admin/1">
+    <sekretess>{{#if sekretess}}{{sekretess}}{{else}}ej_bedomd{{/if}}</sekretess>
+    {{~#if sekretessgrund}}
+    <sekretessgrund>{{sekretessgrund}}</sekretessgrund>
+    {{~/if}}
+    <personuppgifter>{{#if personuppgifter}}{{personuppgifter}}{{else}}ej_bedomd{{/if}}</personuppgifter>
+    {{~#if pulGrund}}
+    <pulGrund>{{pulGrund}}</pulGrund>
+    {{~/if}}
+    {{~#if granskningsdatum}}
+    <granskningsdatum>{{granskningsdatum}}</granskningsdatum>
+    {{~/if}}
+    {{~#if anteckning}}
+    <anteckning>{{anteckning}}</anteckning>
+    {{~/if}}
+</eternaAdmin>

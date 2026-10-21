@@ -13,6 +13,7 @@ import jakarta.servlet.annotation.WebServlet;
 import org.apache.commons.configuration.ConfigurationException;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.model.utils.LdapUtility;
+import org.roda.wui.filter.OnOffFilter;
 import org.roda.wui.security.SecurityObserverImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +60,9 @@ public class RodaWuiServlet extends HttpServlet {
     } catch (ConfigurationException e) {
       LOGGER.error("RODA WUI configurations could not be injected!", e);
     }
+    // Filters must not read their on/off settings before roda-wui.properties is
+    // injected, otherwise they would permanently be turned off.
+    OnOffFilter.setWuiConfigurationLoaded();
 
     RodaCoreFactory.getPluginManager().registerSecurityObserver(new SecurityObserverImpl());
     RodaCoreFactory.addLogger("logback_wui.xml");
