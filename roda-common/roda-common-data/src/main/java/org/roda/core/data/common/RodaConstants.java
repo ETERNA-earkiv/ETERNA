@@ -1420,6 +1420,12 @@ public final class RodaConstants {
   // Parametrar för leveransspecifikationsvalidering
   public static final String PLUGIN_PARAMS_DO_DELIVERY_SPEC_VALIDATION = "parameter.do_delivery_spec_validation";
   public static final String PLUGIN_PARAMS_DELIVERY_SPEC_ID = "parameter.delivery_spec.id";
+  // Parametrar för massredigering av beskrivande metadata
+  public static final String PLUGIN_PARAMS_BULK_METADATA_TYPE = "parameter.bulk_update.metadata_type";
+  public static final String PLUGIN_PARAMS_BULK_FIELD_NAME = "parameter.bulk_update.field_name";
+  public static final String PLUGIN_PARAMS_BULK_NEW_VALUE = "parameter.bulk_update.new_value";
+  public static final String PLUGIN_PARAMS_BULK_MODE = "parameter.bulk_update.mode";
+  public static final String PLUGIN_PARAMS_BULK_EXPECTED_VALUE = "parameter.bulk_update.expected_value";
   public static final String PLUGIN_PARAMS_NEW_STATUS = "parameter.new_status";
   public static final String PLUGIN_PARAMS_ACCEPT = "parameter.accept";
   public static final String PLUGIN_PARAMS_REJECT_REASON = "parameter.reject_reason";
@@ -1930,7 +1936,9 @@ public final class RodaConstants {
 
   public enum VersionAction {
     CREATED("created"), REVERTED("reverted"), UPDATED("updated"), METADATA_TYPE_FORCED("metadata_type_forced"),
-    UPDATE_FROM_SIP("update_from_sip");
+    UPDATE_FROM_SIP("update_from_sip"),
+    // Binärversion skapad av massredigeringsjobb
+    BULK_UPDATED("bulk_updated");
 
     private final String text;
 
@@ -2165,6 +2173,8 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_CREATE_JOB = "org.roda.wui.api.v2.controller.JobsController.createJob";
   public static final String PERMISSION_METHOD_APPRAISAL = "org.roda.wui.api.v2.controller.AIPController.appraisal";
   public static final String PERMISSION_METHOD_CHANGE_AIP_TYPE = "org.roda.wui.api.v2.controller.AIPController.changeAIPType";
+  // Massredigering av beskrivande metadata
+  public static final String PERMISSION_METHOD_BULK_UPDATE_DESCRIPTIVE_METADATA = "org.roda.wui.api.v2.controller.AIPController.bulkUpdateDescriptiveMetadata";
   public static final String PERMISSION_METHOD_CHANGE_REPRESENTATION_TYPE = "org.roda.wui.api.v2.controller.RepresentationController.changeRepresentationType";
   public static final String PERMISSION_METHOD_RENAME_FOLDER = "org.roda.wui.api.v2.controller.FilesController.renameFolder";
   public static final String PERMISSION_METHOD_MOVE_FILES = "org.roda.wui.api.v2.controller.FilesController.moveFileToFolder";
