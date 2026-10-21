@@ -63,7 +63,7 @@
         <spring.version>6.2.18</spring.version>
         <solr.version>9.10.1</solr.version>
         <pekko.version>1.1.4</pekko.version>
-        <httpcomponents.version>5.5</httpcomponents.version>
+        <httpcomponents.version>5.6.3</httpcomponents.version>
         <commons_ip2.version>2.10.0</commons_ip2.version>
         <metrics.version>3.2.6</metrics.version>
         <roda_community_url>https://www.whitered.se/eterna</roda_community_url>
@@ -459,23 +459,23 @@
             <dependency>
                 <groupId>org.apache.tomcat.embed</groupId>
                 <artifactId>tomcat-embed-core</artifactId>
-                <version>10.1.55</version>
+                <version>10.1.61</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.tomcat.embed</groupId>
                 <artifactId>tomcat-embed-el</artifactId>
-                <version>10.1.55</version>
+                <version>10.1.61</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.tomcat.embed</groupId>
                 <artifactId>tomcat-embed-websocket</artifactId>
-                <version>10.1.55</version>
+                <version>10.1.61</version>
             </dependency>
             <!-- Override PostgreSQL before Spring Boot BOM -->
             <dependency>
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
-                <version>42.7.11</version>
+                <version>42.7.12</version>
             </dependency>
             <dependency>
                 <!-- Import dependency management from Spring Boot -->
@@ -884,13 +884,23 @@
             <dependency>
                 <groupId>org.apache.httpcomponents.client5</groupId>
                 <artifactId>httpclient5</artifactId>
-                <version>5.5</version>
+                <version>5.6.3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents.core5</groupId>
+                <artifactId>httpcore5</artifactId>
+                <version>5.4.3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents.core5</groupId>
+                <artifactId>httpcore5-h2</artifactId>
+                <version>5.4.3</version>
             </dependency>
             <!-- Templating system dependencies -->
             <dependency>
                 <groupId>com.github.jknack</groupId>
                 <artifactId>handlebars</artifactId>
-                <version>4.4.0</version>
+                <version>4.5.2</version>
             </dependency>
             <dependency>
                 <groupId>xmlunit</groupId>
@@ -942,12 +952,12 @@
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk18on</artifactId>
-                <version>1.84</version>
+                <version>1.85</version>
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcpkix-jdk18on</artifactId>
-                <version>1.84</version>
+                <version>1.85</version>
             </dependency>
             <!-- mguimaraes: 2022-12-15 -->
             <!-- Forcing transitive dependencies upgrade due to vulnerabilities -->
@@ -1021,27 +1031,27 @@
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-codec</artifactId>
-                <version>4.1.133.Final</version>
+                <version>4.1.137.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-handler</artifactId>
-                <version>4.1.133.Final</version>
+                <version>4.1.137.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-transport</artifactId>
-                <version>4.1.133.Final</version>
+                <version>4.1.137.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-common</artifactId>
-                <version>4.1.133.Final</version>
+                <version>4.1.137.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-buffer</artifactId>
-                <version>4.1.133.Final</version>
+                <version>4.1.137.Final</version>
             </dependency>
             <dependency>
                 <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
