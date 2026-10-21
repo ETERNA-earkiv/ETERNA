@@ -45,9 +45,15 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
     // 2) virus check
     steps.add(new IngestStep(AntivirusPlugin.class.getName(), RodaConstants.PLUGIN_PARAMS_DO_VIRUS_CHECK, true, false,
       true, true));
-    // 3) descriptive metadata validation
+    // 3) descriptive metadata validation. Steget är obligatoriskt, men pluginen
+    // läser sin egen parameter (parameter.validate_descriptive_metadata, standard
+    // false) och validerade därför aldrig mot XSD i inleveransprocessen – tvinga
+    // på den här så att schemafel stoppar leveransen.
+    Map<String, String> metadataValidationStepParameters = new HashMap<>();
+    metadataValidationStepParameters.put(RodaConstants.PLUGIN_PARAMS_VALIDATE_DESCRIPTIVE_METADATA, "true");
     steps.add(new IngestStep(DescriptiveMetadataValidationPlugin.class.getName(),
-      RodaConstants.PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION, true, true, true, true));
+      RodaConstants.PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION, true, true, true, true,
+      metadataValidationStepParameters));
     // 4) create file fixity information
     steps.add(new IngestStep(PremisSkeletonPlugin.class.getName(), RodaConstants.PLUGIN_PARAMS_CREATE_PREMIS_SKELETON,
       true, true, true, true));
