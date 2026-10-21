@@ -20,6 +20,14 @@
 	<xsl:param name="i18n.granskningSection" select="'Review'"/>
 	<xsl:param name="i18n.granskningsdatum" select="'Review date'"/>
 	<xsl:param name="i18n.anteckning" select="'Note'"/>
+	<xsl:param name="i18n.sekretess.ej_bedomd" select="'Not assessed'"/>
+	<xsl:param name="i18n.sekretess.ingen_sekretess" select="'No confidentiality'"/>
+	<xsl:param name="i18n.sekretess.sekretess_forekommer" select="'Contains confidential information'"/>
+	<xsl:param name="i18n.sekretess.helt_sekretessbelagd" select="'Entirely confidential'"/>
+	<xsl:param name="i18n.personuppgifter.ej_bedomd" select="'Not assessed'"/>
+	<xsl:param name="i18n.personuppgifter.inga" select="'No personal data'"/>
+	<xsl:param name="i18n.personuppgifter.forekommer" select="'Contains personal data'"/>
+	<xsl:param name="i18n.personuppgifter.kansliga_forekommer" select="'Contains sensitive personal data'"/>
 
 	<xsl:template match="/">
 		<div class="descriptiveMetadata">
@@ -28,6 +36,7 @@
 			</div>
 			<xsl:call-template name="fieldWithVocab">
 				<xsl:with-param name="label" select="$i18n.sekretess" />
+				<xsl:with-param name="vocab" select="'sekretess'" />
 				<xsl:with-param name="value" select="normalize-space(//ea:eternaAdmin/ea:sekretess)" />
 			</xsl:call-template>
 			<xsl:call-template name="field">
@@ -40,6 +49,7 @@
 			</div>
 			<xsl:call-template name="fieldWithVocab">
 				<xsl:with-param name="label" select="$i18n.personuppgifter" />
+				<xsl:with-param name="vocab" select="'personuppgifter'" />
 				<xsl:with-param name="value" select="normalize-space(//ea:eternaAdmin/ea:personuppgifter)" />
 			</xsl:call-template>
 			<xsl:call-template name="field">
@@ -80,6 +90,7 @@
 	<xsl:template name="fieldWithVocab">
 		<xsl:param name="label" />
 		<xsl:param name="value" />
+		<xsl:param name="vocab" />
 		<xsl:if test="$value != ''">
 			<div class="field">
 				<div class="label">
@@ -87,13 +98,14 @@
 				</div>
 				<div class="value prewrap">
 					<xsl:choose>
-						<xsl:when test="$value = 'ej_bedomd'">Ej bedömd</xsl:when>
-						<xsl:when test="$value = 'ingen_sekretess'">Ingen sekretess</xsl:when>
-						<xsl:when test="$value = 'sekretess_forekommer'">Sekretess förekommer</xsl:when>
-						<xsl:when test="$value = 'helt_sekretessbelagd'">Helt sekretessbelagd</xsl:when>
-						<xsl:when test="$value = 'inga'">Inga personuppgifter</xsl:when>
-						<xsl:when test="$value = 'forekommer'">Personuppgifter förekommer</xsl:when>
-						<xsl:when test="$value = 'kansliga_forekommer'">Känsliga personuppgifter förekommer</xsl:when>
+						<xsl:when test="$vocab = 'sekretess' and $value = 'ej_bedomd'"><xsl:value-of select="$i18n.sekretess.ej_bedomd" /></xsl:when>
+						<xsl:when test="$vocab = 'sekretess' and $value = 'ingen_sekretess'"><xsl:value-of select="$i18n.sekretess.ingen_sekretess" /></xsl:when>
+						<xsl:when test="$vocab = 'sekretess' and $value = 'sekretess_forekommer'"><xsl:value-of select="$i18n.sekretess.sekretess_forekommer" /></xsl:when>
+						<xsl:when test="$vocab = 'sekretess' and $value = 'helt_sekretessbelagd'"><xsl:value-of select="$i18n.sekretess.helt_sekretessbelagd" /></xsl:when>
+						<xsl:when test="$vocab = 'personuppgifter' and $value = 'ej_bedomd'"><xsl:value-of select="$i18n.personuppgifter.ej_bedomd" /></xsl:when>
+						<xsl:when test="$vocab = 'personuppgifter' and $value = 'inga'"><xsl:value-of select="$i18n.personuppgifter.inga" /></xsl:when>
+						<xsl:when test="$vocab = 'personuppgifter' and $value = 'forekommer'"><xsl:value-of select="$i18n.personuppgifter.forekommer" /></xsl:when>
+						<xsl:when test="$vocab = 'personuppgifter' and $value = 'kansliga_forekommer'"><xsl:value-of select="$i18n.personuppgifter.kansliga_forekommer" /></xsl:when>
 						<xsl:otherwise>
 							<xsl:value-of select="$value" />
 						</xsl:otherwise>
