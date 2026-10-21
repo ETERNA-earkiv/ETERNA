@@ -88,6 +88,13 @@ public interface ModelObservable {
 
     ReturnWithExceptionsWrapper notifyGroupUpdated(Group group);
 
+    /**
+     * Same as {@link #notifyGroupUpdated(Group)}, but lets bulk re-indexing
+     * (which already re-indexes every user) skip the re-indexing of the
+     * group's members.
+     */
+    ReturnWithExceptionsWrapper notifyGroupUpdated(Group group, boolean reindexMembers);
+
     ReturnWithExceptionsWrapper notifyGroupDeleted(String groupID);
 
     ReturnWithExceptionsWrapper notifyPreservationMetadataCreated(

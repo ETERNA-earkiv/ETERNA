@@ -19,6 +19,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,6 +27,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.csv.CSVFormat;
@@ -46,6 +49,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
@@ -61,6 +65,7 @@ import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
@@ -312,7 +317,7 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
           break;
         case "org.roda.core.data.v2.user.RODAMember":
           try (IterableIndexResult<RODAMember> results = index.findAll(RODAMember.class, filter, user, true,
-            exportFields)) {
+            getSolrFieldsToReturn(exportClass, exportFields))) {
             for (RODAMember member : results) {
               printer.printRecord(buildCsvRowMember(member, exportFields));
             }
@@ -400,7 +405,7 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
           break;
         default:
           try (IterableIndexResult<IndexedAIP> results = index.findAll(IndexedAIP.class, filter, user, true,
-            exportFields)) {
+            getSolrFieldsToReturn(exportClass, exportFields))) {
             for (IndexedAIP aip : results) {
               printer.printRecord(buildCsvRow(aip, exportFields, index, parentTitleCache));
             }
@@ -471,9 +476,62 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
         return formatDateTime(aip.getCreatedOn());
       case "updatedOn":
         return formatDateTime(aip.getUpdatedOn());
+      case "readGroups":
+        return aip.getPermissions() != null
+          ? permissionMembers(aip.getPermissions().getGroups(), PermissionType.READ) : "";
+      case "readUsers":
+        return aip.getPermissions() != null
+          ? permissionMembers(aip.getPermissions().getUsers(), PermissionType.READ) : "";
       default:
         return "";
     }
+  }
+
+  private static String permissionMembers(Map<PermissionType, Set<String>> permissionMap, PermissionType type) {
+    return permissionMap != null ? joinSorted(permissionMap.get(type)) : "";
+  }
+
+  /**
+   * Maps the configured export field names to the Solr fields that have to be
+   * fetched for the row builders to see the values. The list is passed to Solr
+   * as 'fl', so export field names that differ from the Solr field names would
+   * otherwise come back empty. Names that already match are passed through.
+   *
+   * @param exportClass fully qualified name of the exported class
+   * @param fields      configured export field names
+   * @return Solr field names to return, without duplicates
+   */
+  public static List<String> getSolrFieldsToReturn(String exportClass, List<String> fields) {
+    List<String> ret = new ArrayList<>();
+    if (fields == null) return ret;
+    boolean isMember = "org.roda.core.data.v2.user.RODAMember".equals(exportClass);
+    // mirrors afterAllExecute(): anything that is not a known class is exported as AIPs
+    boolean isAip = !isMember && (exportClass == null || getConfigKeyPrefix(exportClass) == null
+      || "org.roda.core.data.v2.ip.IndexedAIP".equals(exportClass));
+    for (String field : fields) {
+      String solrField = field != null ? field.trim() : "";
+      if (solrField.isEmpty()) continue;
+      if (isMember) {
+        switch (solrField) {
+          case "active": solrField = RodaConstants.MEMBERS_IS_ACTIVE; break;
+          case "directRoles": solrField = RodaConstants.MEMBERS_ROLES_DIRECT; break;
+          case "allRoles": solrField = RodaConstants.MEMBERS_ROLES_ALL; break;
+          default: break;
+        }
+      } else if (isAip) {
+        switch (solrField) {
+          case "readGroups": solrField = RodaConstants.INDEX_PERMISSION_GROUPS_PREFIX + PermissionType.READ; break;
+          case "readUsers": solrField = RodaConstants.INDEX_PERMISSION_USERS_PREFIX + PermissionType.READ; break;
+          default: break;
+        }
+      }
+      if (!ret.contains(solrField)) ret.add(solrField);
+    }
+    if (isMember && !ret.contains(RodaConstants.MEMBERS_IS_USER)) {
+      // MemberCollection.fromSolrDocument needs isUser to build a User rather than a Group
+      ret.add(RodaConstants.MEMBERS_IS_USER);
+    }
+    return ret;
   }
 
   private static String resolveParentTitle(String parentId, IndexService index,
@@ -628,8 +686,11 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
       case "name": return nullToEmpty(member.getName());
       case "fullName": return nullToEmpty(member.getFullName());
       case "active": return member.isActive() ? "Ja" : "Nej";
-      case "directRoles":
-        return member.getDirectRoles() != null ? String.join("; ", member.getDirectRoles()) : "";
+      case "directRoles": return joinSorted(member.getDirectRoles());
+      case "allRoles": return joinSorted(member.getAllRoles());
+      case "email": return member instanceof User ? nullToEmpty(((User) member).getEmail()) : "";
+      case "groups": return member instanceof User ? joinSorted(((User) member).getGroups()) : "";
+      case "users": return member instanceof Group ? joinSorted(((Group) member).getUsers()) : "";
       default: return "";
     }
   }
@@ -928,6 +989,11 @@ public class SearchExportPlugin extends AbstractPlugin<Void> {
       case "isDirectory": return file.isDirectory() ? "Ja" : "Nej";
       default: return "";
     }
+  }
+
+  private static String joinSorted(Collection<String> values) {
+    if (values == null || values.isEmpty()) return "";
+    return values.stream().filter(Objects::nonNull).sorted().collect(Collectors.joining("; "));
   }
 
   private static String nullToEmpty(String s) {
