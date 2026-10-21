@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:common="urn:import:org.roda.wui.client.common">
+
+	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
+
+	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
+		<g:FlowPanel addStyleNames="row full_width skip_padding">
+			<g:FlowPanel addStyleNames="col_12 content">
+				<common:TitlePanel text="{messages.permissionOverviewTitle}" ui:field="title" />
+				<g:FlowPanel addStyleNames="page-description" ui:field="permissionOverviewDescription" />
+				<g:FlowPanel addStyleNames="permissionOverviewWarnings" ui:field="warningsPanel" />
+				<g:FlowPanel addStyleNames="permissionOverviewToolbar">
+					<g:Button ui:field="buttonHtml" addStyleNames="btn btn-default btn-print btn-separator-right" text="{messages.permissionOverviewDownloadHtml}" />
+					<g:Button ui:field="buttonCsv" addStyleNames="btn btn-default btn-download" text="{messages.permissionOverviewDownloadCsv}" />
+				</g:FlowPanel>
+				<g:Label ui:field="generatedLabel" addStyleNames="permissionOverviewGenerated" />
+				<g:FlowPanel ui:field="tabsContainer" />
+			</g:FlowPanel>
+		</g:FlowPanel>
+	</g:FlowPanel>
+</ui:UiBinder>
