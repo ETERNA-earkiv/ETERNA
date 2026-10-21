@@ -117,7 +117,7 @@ public class DeliverySpecValidationPlugin extends AbstractPlugin<AIP> {
   public static PluginParameter buildSpecIdParameter() {
     return PluginParameter
       .getBuilder(RodaConstants.PLUGIN_PARAMS_DELIVERY_SPEC_ID, "Leveransspecifikation", PluginParameterType.DROPDOWN)
-      .withPossibleValues(DeliverySpecRegistry.getSpecIds()).isMandatory(true)
+      .withPossibleValues(DeliverySpecRegistry.getSpecIds()).isMandatory(false)
       .withDescription("Identifierare för den leveransspecifikation som leveransen ska valideras mot "
         + "(konfigureras i core.deliveryspec.*, se registret över leveransspecifikationer)")
       .build();
@@ -151,8 +151,14 @@ public class DeliverySpecValidationPlugin extends AbstractPlugin<AIP> {
     PluginState state;
     String details;
 
+    // Spec-id är inte obligatoriskt i parameterlistan (ett tomt register får
+    // inte stoppa inleveranser utan validering); kravet gäller när steget körs
     Optional<DeliverySpec> maybeSpec = DeliverySpecRegistry.getSpec(specId);
-    if (maybeSpec.isEmpty()) {
+    if (specId == null || specId.isBlank()) {
+      state = PluginState.FAILURE;
+      details = "Ingen leveransspecifikation är vald. Tillgängliga specifikationer: "
+        + DeliverySpecRegistry.getSpecIds();
+    } else if (maybeSpec.isEmpty()) {
       state = PluginState.FAILURE;
       details = "Leveransspecifikationen '" + specId + "' är inte konfigurerad (core.deliveryspec.*). "
         + "Tillgängliga specifikationer: " + DeliverySpecRegistry.getSpecIds();
@@ -195,6 +201,7 @@ public class DeliverySpecValidationPlugin extends AbstractPlugin<AIP> {
         "Leveransspecifikation: '" + specId + "'. " + details, true, cachedJob);
     } catch (Exception e) {
       LOGGER.error("Could not create preservation event for AIP {}: {}", aip.getId(), e.getMessage(), e);
+      reportItem.addPluginDetails(" Varning: PREMIS-händelsen (VALIDATION) kunde inte skapas: " + e.getMessage());
     }
 
     report.addReport(reportItem);
