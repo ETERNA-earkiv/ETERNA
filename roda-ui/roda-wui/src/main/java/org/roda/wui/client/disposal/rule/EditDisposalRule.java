@@ -125,19 +125,14 @@ public class EditDisposalRule extends Composite {
       }
       disposalRule.setType(disposalRuleUpdated.getType());
 
-      if (disposalRuleUpdated.getConditionKey() != null) {
-        if (!disposalRule.getConditionKey().equals(disposalRuleUpdated.getConditionKey())) {
-          runApplyRulesPlugin = true;
-        }
-        disposalRule.setConditionKey(disposalRuleUpdated.getConditionKey());
+      // Compare the normalised conditions so that a change in any condition (including added/removed ones for
+      // multi-condition METADATA_FIELD rules) triggers re-applying the rules.
+      if (!disposalRule.getMetadataConditions().equals(disposalRuleUpdated.getMetadataConditions())) {
+        runApplyRulesPlugin = true;
       }
-
-      if (disposalRuleUpdated.getConditionValue() != null) {
-        if (!disposalRule.getConditionValue().equals(disposalRuleUpdated.getConditionValue())) {
-          runApplyRulesPlugin = true;
-        }
-        disposalRule.setConditionValue(disposalRuleUpdated.getConditionValue());
-      }
+      disposalRule.setConditions(disposalRuleUpdated.getConditions());
+      disposalRule.setConditionKey(disposalRuleUpdated.getConditionKey());
+      disposalRule.setConditionValue(disposalRuleUpdated.getConditionValue());
 
       if (!runApplyRulesPlugin) {
         Services services = new Services("Update disposal rule", "update");
