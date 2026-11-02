@@ -146,7 +146,7 @@ Create a personal account per administrator under **Administration → Users and
 
 | Key | Default | Meaning |
 |---|---|---|
-| `core.access_rules.enabled` | `false` | Master switch; set to `true` to use access rules. `false` ⇒ nothing is evaluated (observer, jobs, ingest step skip; nothing is restored). |
+| `core.access_rules.enabled` | `true` | Master switch. Nothing is restricted until the rule file is also enabled (`"enabled": true` in `access-rules.json`). `false` ⇒ nothing is evaluated (observer, jobs, ingest step skip; nothing is restored). |
 | `core.access_rules.file` | `access-rules.json` | Rule file name relative to `RODA_HOME/config` (paths outside are rejected). Missing ⇒ built-in default (no rules, `enabled=false`). |
 | `core.access_rules.observer.enabled` | `true` | Evaluate immediately on assessment change, permission change and move; `false` ⇒ ingest step and jobs only. |
 | `core.access_rules.observer.create_event` | `true` | Preservation event when the observer changes permissions. |
