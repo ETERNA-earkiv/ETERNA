@@ -127,6 +127,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        // Inline search mirrors the #search page, which requires the UI role
+        // search.global (ui.menu.search.role). Blocked until the role is confirmed.
+        let searchAllowed = false;
+
+        function removeSearch() {
+            const box = document.getElementById(inputId);
+            if (box && box.parentElement) box.parentElement.remove();
+            if (results) results.remove();
+        }
+
         fetch('api/v2/members/users/authenticated', { credentials: 'same-origin' })
             .then(r => r.ok ? r.json() : null)
             .then(u => {
@@ -134,14 +144,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     const firstName = u.fullName.split(' ')[0];
                     label.textContent = timeGreeting(isSv) + ', ' + firstName;
                 }
+                searchAllowed = !!(u && Array.isArray(u.allRoles) && u.allRoles.includes('search.global'));
+                if (!searchAllowed) removeSearch();
             })
-            .catch(() => {});
+            .catch(removeSearch);
 
         if (!btn || !inp) return;
 
         // --- Inline search ---
         function doSearch(q) {
-            if (!results) return;
+            if (!results || !searchAllowed) return;
             if (!q) {
                 results.innerHTML = '';
                 results.classList.remove('is-open');
