@@ -168,7 +168,7 @@ Knappen **Rapport (HTML)** öppnar en utskriftsvänlig rapport (`behorighetsover
 
 | Nyckel | Standard | Betydelse |
 |---|---|---|
-| `core.access_rules.enabled` | `false` | Huvudbrytare; sätt till `true` för att använda åtkomstregler. `false` ⇒ ingen regel utvärderas alls (observer, jobb och inleveranssteg hoppar över, inget återställs). |
+| `core.access_rules.enabled` | `true` | Huvudbrytare. Ingenting begränsas förrän även regelfilen slås på (`"enabled": true` i `access-rules.json`). `false` ⇒ ingen regel utvärderas alls (observer, jobb och inleveranssteg hoppar över, inget återställs). |
 | `core.access_rules.file` | `access-rules.json` | Regelfilens namn, relativt `RODA_HOME/config`. En sökväg utanför konfigurationskatalogen avvisas. Saknas filen används standardfilen på klassvägen (tom regellista, `enabled=false`). |
 | `core.access_rules.observer.enabled` | `true` | `true` ⇒ reglerna utvärderas direkt vid ändrad bedömning, behörighetsändring och flytt. `false` ⇒ bara via inleveranssteg och jobb. |
 | `core.access_rules.observer.create_event` | `true` | Bevarandehändelse när observern ändrar behörigheter. |
