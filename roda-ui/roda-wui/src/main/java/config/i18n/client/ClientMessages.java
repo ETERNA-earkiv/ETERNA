@@ -3057,4 +3057,10 @@ public interface ClientMessages extends Messages {
   String bulkEditMetadataStartButton();
 
   String bulkEditMetadataMissingValue();
+
+  String bulkEditMetadataConfirmTitle();
+
+  String bulkEditMetadataConfirmMessage(String field, String newValue, long count, String mode);
+
+  String bulkEditMetadataConfirmCondition(String expectedValue);
 }
