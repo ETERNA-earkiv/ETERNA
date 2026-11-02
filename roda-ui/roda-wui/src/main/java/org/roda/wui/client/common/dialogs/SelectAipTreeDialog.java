@@ -23,12 +23,12 @@ import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
-import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.wui.client.common.utils.TreeLevelFilter;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -497,16 +497,14 @@ public class SelectAipTreeDialog extends DialogBox
 
   /**
    * Builds a query filter: the caller's base filter (if any), the given extra parameters, plus the
-   * always-present exclusion of the {@code file} and {@code item} levels so only logical units are shown.
+   * level restriction configured in {@code ui.tree.levels} (see {@link TreeLevelFilter}).
    */
   static Filter buildTreeFilter(Filter baseFilter, FilterParameter... extraParameters) {
     Filter filter = baseFilter != null ? new Filter(baseFilter) : new Filter();
     for (FilterParameter parameter : extraParameters) {
       filter.add(parameter);
     }
-    filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file"));
-    filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "item"));
-    return filter;
+    return TreeLevelFilter.apply(filter);
   }
 
   /** A flat search-result row: level icon, title, and an ancestor breadcrumb. */

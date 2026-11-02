@@ -20,13 +20,13 @@ import java.util.Set;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.wui.client.common.utils.TreeLevelFilter;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -209,10 +209,7 @@ public class CatalogTreeNode extends Composite {
     toggleHtml.setHTML(ICON_TOGGLE_LOADING);
 
     FindRequest findRequest = new FindRequest.FindRequestBuilder(
-      new Filter(
-        new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aipId),
-        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file"),
-        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "item")),
+      TreeLevelFilter.apply(new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aipId))),
       false)
       .withSorter(new Sorter(new SortParameter(RodaConstants.AIP_TITLE_SORT, false)))
       .withSublist(new Sublist(0, TREE_MAX_CHILDREN))
@@ -254,10 +251,7 @@ public class CatalogTreeNode extends Composite {
    */
   private void loadGhostChildrenFallback(final Command onComplete) {
     FindRequest findRequest = new FindRequest.FindRequestBuilder(
-      new Filter(
-        new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipId),
-        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file"),
-        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "item")),
+      TreeLevelFilter.apply(new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipId))),
       false)
       .withSorter(new Sorter(new SortParameter(RodaConstants.AIP_TITLE_SORT, false)))
       .withSublist(new Sublist(0, TREE_MAX_CHILDREN))
