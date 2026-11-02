@@ -61,12 +61,14 @@ public class BulkEditMetadataDialog {
   private final Button startButton;
 
   private final SelectedItems<IndexedAIP> selected;
+  private final long totalCount;
   private final Map<String, MetadataValue> fieldsById = new LinkedHashMap<>();
   private MetadataValue currentField = null;
   private boolean jobInProgress = false;
 
   public BulkEditMetadataDialog(SelectedItems<IndexedAIP> selected, long totalCount) {
     this.selected = selected;
+    this.totalCount = totalCount;
 
     dialogBox = new DialogBox(false, true);
     dialogBox.setText(messages.bulkEditMetadataDialogTitle());
@@ -226,6 +228,38 @@ public class BulkEditMetadataDialog {
       return;
     }
 
+    String mode = modeList.getSelectedValue();
+    String expected = expectedValueBox.getValue();
+    String condition = MODE_OVERWRITE.equals(mode) && expected != null && !expected.trim().isEmpty() ? expected.trim()
+      : null;
+
+    // Bekräftelse innan jobbet startas, för att undvika felaktig massredigering
+    String confirmMessage = messages.bulkEditMetadataConfirmMessage(fieldList.getSelectedItemText(), newValue.trim(),
+      totalCount, modeList.getSelectedItemText());
+    if (condition != null) {
+      confirmMessage += " " + messages.bulkEditMetadataConfirmCondition(condition);
+    }
+
+    Dialogs.showConfirmDialog(messages.bulkEditMetadataConfirmTitle(), confirmMessage, messages.cancelButton(),
+      messages.bulkEditMetadataStartButton(), new AsyncCallback<Boolean>() {
+        @Override
+        public void onFailure(Throwable caught) {
+          // inget att göra
+        }
+
+        @Override
+        public void onSuccess(Boolean confirmed) {
+          if (Boolean.TRUE.equals(confirmed)) {
+            submitJob(newValue.trim(), mode, condition);
+          }
+        }
+      });
+  }
+
+  private void submitJob(String newValue, String mode, String condition) {
+    if (jobInProgress) {
+      return;
+    }
     jobInProgress = true;
     startButton.setEnabled(false);
 
@@ -233,11 +267,10 @@ public class BulkEditMetadataDialog {
     request.setItems(SelectedItemsUtils.convertToRESTRequest(selected));
     request.setMetadataType(typeList.getSelectedValue());
     request.setFieldName(currentField.getId());
-    request.setNewValue(newValue.trim());
-    request.setMode(modeList.getSelectedValue());
-    String expected = expectedValueBox.getValue();
-    if (MODE_OVERWRITE.equals(modeList.getSelectedValue()) && expected != null && !expected.trim().isEmpty()) {
-      request.setExpectedValue(expected.trim());
+    request.setNewValue(newValue);
+    request.setMode(mode);
+    if (condition != null) {
+      request.setExpectedValue(condition);
     }
 
     Services services = new Services("Bulk update descriptive metadata", "update");
