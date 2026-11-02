@@ -16,6 +16,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.FindRequest;
@@ -23,7 +24,9 @@ import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
+import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
@@ -61,7 +64,7 @@ import config.i18n.client.ClientMessages;
 
 /**
  * Tree-based parent-node selector. Replaces the flat list of {@link SelectAipDialog} with a lazy-loading
- * tree of logical units (levels {@code file}/{@code item} excluded), used when picking a parent node during
+ * tree of logical units (levels limited by {@code ui.tree.levels}), used when picking a parent node during
  * ingest, move and disposal-rule editing (#301).
  *
  * <p>
@@ -242,19 +245,95 @@ public class SelectAipTreeDialog extends DialogBox
           return;
         }
         List<IndexedAIP> roots = result.getResults();
-        if (roots.isEmpty()) {
-          Label emptyLabel = new Label(messages.selectAipTreeNoResults());
-          emptyLabel.addStyleName("catalogTreeNodeError");
-          treeBody.add(emptyLabel);
+        Set<String> rootIds = new HashSet<>();
+        for (IndexedAIP aip : roots) {
+          rootIds.add(aip.getId());
+        }
+        // Tillåtna AIP:er vars förfäder alla har dolda nivåer visas som rötter, så att en dold
+        // toppnivå inte tar med sig sina tillåtna ättlingar ur dialogen.
+        findOrphanedDescendants(baseFilter, justActive, null, rootIds, orphans -> {
+          if (myGeneration != loadGeneration) {
+            return;
+          }
+          List<IndexedAIP> allRoots = new ArrayList<>(roots);
+          allRoots.addAll(orphans);
+          if (allRoots.isEmpty()) {
+            Label emptyLabel = new Label(messages.selectAipTreeNoResults());
+            emptyLabel.addStyleName("catalogTreeNodeError");
+            treeBody.add(emptyLabel);
+            return;
+          }
+          for (IndexedAIP aip : allRoots) {
+            SelectAipTreeNode node = new SelectAipTreeNode(aip, 0, this, baseFilter, justActive, disabledSubtreeIds,
+              isInDisabledSubtree(aip));
+            rootNodes.put(aip.getId(), node);
+            treeBody.add(node);
+          }
+        });
+      });
+  }
+
+  /**
+   * Hämtar tillåtna AIP:er under {@code ancestorId} (hela arkivet om {@code null}) som inte nås via någon
+   * annan tillåten nod, eftersom alla förfäder däremellan har en nivå som döljs av {@code ui.tree.levels}
+   * (eller inte är tillgängliga). De ska visas direkt under närmaste synliga förfader. {@code shownIds} är de
+   * noder som redan visas på den nivån. Anropar alltid {@code onResult}; vid fel med en tom lista.
+   */
+  static void findOrphanedDescendants(Filter baseFilter, boolean justActive, String ancestorId,
+    Set<String> shownIds, Consumer<List<IndexedAIP>> onResult) {
+    Filter filter = ancestorId == null ? buildTreeFilter(baseFilter)
+      : buildTreeFilter(baseFilter, new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, ancestorId),
+        new NotSimpleFilterParameter(RodaConstants.AIP_PARENT_ID, ancestorId));
+    FindRequest findRequest = new FindRequest.FindRequestBuilder(filter, justActive)
+      .withSorter(new Sorter(new SortParameter(RodaConstants.AIP_TITLE_SORT, false)))
+      .withSublist(new Sublist(0, TREE_MAX_CHILDREN))
+      .build();
+
+    Services service = new Services(messages.catalogTreeReasonListChildren(), "get");
+    service.rodaEntityRestService(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
+      IndexedAIP.class).whenComplete((result, error) -> {
+        if (error != null) {
+          LOGGER.warn("Could not look up descendants under hidden levels; tree may be incomplete: "
+            + error.getMessage());
+          onResult.accept(new ArrayList<>());
           return;
         }
-        for (IndexedAIP aip : roots) {
-          SelectAipTreeNode node = new SelectAipTreeNode(aip, 0, this, baseFilter, justActive, disabledSubtreeIds,
-            false);
-          rootNodes.put(aip.getId(), node);
-          treeBody.add(node);
+        List<IndexedAIP> candidates = result.getResults();
+        if (candidates.size() == TREE_MAX_CHILDREN) {
+          LOGGER.warn("Descendant lookup capped at " + TREE_MAX_CHILDREN + " AIPs; tree may be incomplete");
         }
+        Set<String> reachable = new HashSet<>(shownIds);
+        for (IndexedAIP candidate : candidates) {
+          reachable.add(candidate.getId());
+        }
+        List<IndexedAIP> orphans = new ArrayList<>();
+        for (IndexedAIP candidate : candidates) {
+          if (!shownIds.contains(candidate.getId()) && !hasReachableAncestor(candidate, ancestorId, reachable)) {
+            orphans.add(candidate);
+          }
+        }
+        onResult.accept(orphans);
       });
+  }
+
+  /**
+   * Om någon förfader till {@code aip} under {@code stopAt} (eller någon alls om {@code null}) finns i
+   * {@code reachable}. En toppnod utan förfäder räknas som nåbar, den visas redan som rot.
+   */
+  private static boolean hasReachableAncestor(IndexedAIP aip, String stopAt, Set<String> reachable) {
+    List<String> ancestors = aip.getAncestors(); // bottom-to-top från Solr
+    if (ancestors == null || ancestors.isEmpty()) {
+      return true;
+    }
+    for (String ancestorId : ancestors) {
+      if (ancestorId.equals(stopAt)) {
+        return false;
+      }
+      if (reachable.contains(ancestorId)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private void showRootLoadError() {
@@ -365,12 +444,20 @@ public class SelectAipTreeDialog extends DialogBox
   }
 
   private boolean isInDisabledSubtree(IndexedAIP aip) {
-    if (disabledSubtreeIds.contains(aip.getId())) {
+    return isInSubtree(aip, disabledSubtreeIds);
+  }
+
+  /** Om {@code aip} eller någon av dess förfäder finns i {@code subtreeRootIds}. */
+  static boolean isInSubtree(IndexedAIP aip, Set<String> subtreeRootIds) {
+    if (subtreeRootIds == null) {
+      return false;
+    }
+    if (subtreeRootIds.contains(aip.getId())) {
       return true;
     }
     if (aip.getAncestors() != null) {
       for (String ancestorId : aip.getAncestors()) {
-        if (disabledSubtreeIds.contains(ancestorId)) {
+        if (subtreeRootIds.contains(ancestorId)) {
           return true;
         }
       }
