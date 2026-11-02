@@ -7,6 +7,8 @@
  */
 package org.roda.wui.client.common.dialogs;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -203,33 +205,43 @@ public class SelectAipTreeNode extends Composite implements Selectable {
     Services service = new Services(messages.catalogTreeReasonListChildren(), "get");
     service.rodaEntityRestService(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
       IndexedAIP.class).whenComplete((result, error) -> {
-        loading = false;
         if (error != null) {
+          loading = false;
           LOGGER.error("Failed to load children for AIP " + aip.getId(), error);
           toggleHtml.setHTML(ICON_TOGGLE_COLLAPSED);
           showLoadError();
           return;
         }
         List<IndexedAIP> children = result.getResults();
-        if (children.isEmpty()) {
-          markAsLeaf();
+        Set<String> childIds = new HashSet<>();
+        for (IndexedAIP child : children) {
+          childIds.add(child.getId());
+        }
+        // Tillåtna ättlingar under direktbarn med dold nivå visas direkt under denna nod.
+        SelectAipTreeDialog.findOrphanedDescendants(baseFilter, justActive, aip.getId(), childIds, orphans -> {
+          loading = false;
+          List<IndexedAIP> allChildren = new ArrayList<>(children);
+          allChildren.addAll(orphans);
+          if (allChildren.isEmpty()) {
+            markAsLeaf();
+            if (onComplete != null) {
+              onComplete.execute();
+            }
+            return;
+          }
+          loaded = true;
+          for (IndexedAIP child : allChildren) {
+            SelectAipTreeNode childNode = new SelectAipTreeNode(child, depth + 1, listener, baseFilter, justActive,
+              disabledSubtreeIds, disabled || SelectAipTreeDialog.isInSubtree(child, disabledSubtreeIds));
+            childrenPanel.add(childNode);
+          }
+          childrenPanel.setVisible(true);
+          expanded = true;
+          toggleHtml.setHTML(ICON_TOGGLE_EXPANDED);
           if (onComplete != null) {
             onComplete.execute();
           }
-          return;
-        }
-        loaded = true;
-        for (IndexedAIP child : children) {
-          SelectAipTreeNode childNode = new SelectAipTreeNode(child, depth + 1, listener, baseFilter, justActive,
-            disabledSubtreeIds, disabled);
-          childrenPanel.add(childNode);
-        }
-        childrenPanel.setVisible(true);
-        expanded = true;
-        toggleHtml.setHTML(ICON_TOGGLE_EXPANDED);
-        if (onComplete != null) {
-          onComplete.execute();
-        }
+        });
       });
   }
 

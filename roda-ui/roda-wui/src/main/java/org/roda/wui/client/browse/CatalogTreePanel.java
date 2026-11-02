@@ -22,12 +22,12 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.wui.client.common.utils.TreeLevelFilter;
 import org.roda.wui.client.services.Services;
 
 import org.roda.wui.common.client.ClientLogger;
@@ -196,10 +196,7 @@ public class CatalogTreePanel extends Composite {
     rootsLoaded = false;
     rootsLoading = true;
     FindRequest findRequest = new FindRequest.FindRequestBuilder(
-      new Filter(
-        new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID),
-        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file"),
-        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "item")),
+      TreeLevelFilter.apply(new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID))),
       true)
       .withSorter(new Sorter(new SortParameter(RodaConstants.AIP_TITLE_SORT, false)))
       .withSublist(new Sublist(0, TREE_MAX_CHILDREN))
@@ -242,9 +239,7 @@ public class CatalogTreePanel extends Composite {
    */
   private void loadSupplementaryGhostRoots(Set<String> accessibleRootIds, int myGeneration) {
     FindRequest findRequest = new FindRequest.FindRequestBuilder(
-      new Filter(
-        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file"),
-        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "item")),
+      TreeLevelFilter.apply(new Filter()),
       true)
       .withSorter(new Sorter(new SortParameter(RodaConstants.AIP_TITLE_SORT, false)))
       .withSublist(new Sublist(0, TREE_MAX_CHILDREN))
@@ -378,9 +373,7 @@ public class CatalogTreePanel extends Composite {
     final int myGeneration = loadGeneration;
     rootsLoading = true;
     FindRequest findRequest = new FindRequest.FindRequestBuilder(
-      new Filter(
-        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "file"),
-        new NotSimpleFilterParameter(RodaConstants.AIP_LEVEL, "item")),
+      TreeLevelFilter.apply(new Filter()),
       true)
       .withSorter(new Sorter(new SortParameter(RodaConstants.AIP_TITLE_SORT, false)))
       .withSublist(new Sublist(0, TREE_MAX_CHILDREN))
@@ -465,33 +458,38 @@ public class CatalogTreePanel extends Composite {
 
   /**
    * Bygger en nod-kedja top-till-bottom. Förfäder vars ID finns i resolvedAncestors
-   * får riktiga noder; övriga blir ghost-noder. Noder dedupliceras via nodeMap.
+   * får riktiga noder; övriga blir ghost-noder. Tillgängliga förfäder med en nivå som
+   * döljs av ui.tree.levels hoppas över, så att deras ättlingar hängs på närmaste
+   * synliga förfader. Noder dedupliceras via nodeMap.
    */
   private void insertChain(List<String> ancestorIds, IndexedAIP targetAip,
       Map<String, IndexedAIP> resolvedAncestors, Map<String, CatalogTreeNode> nodeMap,
       List<CatalogTreeNode> roots) {
     CatalogTreeNode parent = null;
-    for (int i = 0; i < ancestorIds.size(); i++) {
-      String ancId = ancestorIds.get(i);
+    int nodeDepth = 0;
+    for (String ancId : ancestorIds) {
       if (nodeMap.containsKey(ancId)) {
         parent = nodeMap.get(ancId);
+        nodeDepth++;
         continue;
       }
       CatalogTreeNode node;
       if (resolvedAncestors.containsKey(ancId)) {
         IndexedAIP anc = resolvedAncestors.get(ancId);
-        node = new CatalogTreeNode(anc.getId(), anc.getTitle(), anc.getLevel(), i);
+        if (!TreeLevelFilter.isShown(anc.getLevel())) continue;
+        node = new CatalogTreeNode(anc.getId(), anc.getTitle(), anc.getLevel(), nodeDepth);
       } else {
-        node = CatalogTreeNode.createGhostNode(i);
+        node = CatalogTreeNode.createGhostNode(nodeDepth);
       }
       nodeMap.put(ancId, node);
       if (parent == null) roots.add(node);
       else parent.addPrebuiltChild(node);
       parent = node;
+      nodeDepth++;
     }
     if (nodeMap.containsKey(targetAip.getId())) return;
     CatalogTreeNode targetNode = new CatalogTreeNode(
-      targetAip.getId(), targetAip.getTitle(), targetAip.getLevel(), ancestorIds.size());
+      targetAip.getId(), targetAip.getTitle(), targetAip.getLevel(), nodeDepth);
     nodeMap.put(targetAip.getId(), targetNode);
     if (parent == null) roots.add(targetNode);
     else parent.addPrebuiltChild(targetNode);

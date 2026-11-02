@@ -2072,6 +2072,7 @@ public final class RodaConstants {
 
   /* Description level configuration Constants */
   public static final String LEVELS_CLASSIFICATION_PLAN = "levels.classificationplan";
+  public static final String UI_TREE_LEVELS = "ui.tree.levels";
   public static final String LEVELS_ICONS_PREFIX = "levels.icon";
   public static final String LEVELS_ICONS_AIP_GHOST = "levels.internal.icon.aip.ghost";
   public static final String LEVELS_ICONS_AIP_CHILDREN = "levels.internal.icon.aip.children";
