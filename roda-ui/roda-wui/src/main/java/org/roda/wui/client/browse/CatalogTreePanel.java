@@ -458,33 +458,38 @@ public class CatalogTreePanel extends Composite {
 
   /**
    * Bygger en nod-kedja top-till-bottom. Förfäder vars ID finns i resolvedAncestors
-   * får riktiga noder; övriga blir ghost-noder. Noder dedupliceras via nodeMap.
+   * får riktiga noder; övriga blir ghost-noder. Tillgängliga förfäder med en nivå som
+   * döljs av ui.tree.levels hoppas över, så att deras ättlingar hängs på närmaste
+   * synliga förfader. Noder dedupliceras via nodeMap.
    */
   private void insertChain(List<String> ancestorIds, IndexedAIP targetAip,
       Map<String, IndexedAIP> resolvedAncestors, Map<String, CatalogTreeNode> nodeMap,
       List<CatalogTreeNode> roots) {
     CatalogTreeNode parent = null;
-    for (int i = 0; i < ancestorIds.size(); i++) {
-      String ancId = ancestorIds.get(i);
+    int nodeDepth = 0;
+    for (String ancId : ancestorIds) {
       if (nodeMap.containsKey(ancId)) {
         parent = nodeMap.get(ancId);
+        nodeDepth++;
         continue;
       }
       CatalogTreeNode node;
       if (resolvedAncestors.containsKey(ancId)) {
         IndexedAIP anc = resolvedAncestors.get(ancId);
-        node = new CatalogTreeNode(anc.getId(), anc.getTitle(), anc.getLevel(), i);
+        if (!TreeLevelFilter.isShown(anc.getLevel())) continue;
+        node = new CatalogTreeNode(anc.getId(), anc.getTitle(), anc.getLevel(), nodeDepth);
       } else {
-        node = CatalogTreeNode.createGhostNode(i);
+        node = CatalogTreeNode.createGhostNode(nodeDepth);
       }
       nodeMap.put(ancId, node);
       if (parent == null) roots.add(node);
       else parent.addPrebuiltChild(node);
       parent = node;
+      nodeDepth++;
     }
     if (nodeMap.containsKey(targetAip.getId())) return;
     CatalogTreeNode targetNode = new CatalogTreeNode(
-      targetAip.getId(), targetAip.getTitle(), targetAip.getLevel(), ancestorIds.size());
+      targetAip.getId(), targetAip.getTitle(), targetAip.getLevel(), nodeDepth);
     nodeMap.put(targetAip.getId(), targetNode);
     if (parent == null) roots.add(targetNode);
     else parent.addPrebuiltChild(targetNode);

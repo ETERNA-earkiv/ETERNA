@@ -35,4 +35,13 @@ public final class TreeLevelFilter {
     }
     return filter;
   }
+
+  /**
+   * Om en nod med nivån {@code level} ska visas i trädet. Samma regel som {@link #apply}
+   * för AIP:er som hämtats utan nivåfilter, t.ex. förfäder som slagits upp via UUID.
+   */
+  public static boolean isShown(String level) {
+    List<String> levels = ConfigurationManager.getStringList(RodaConstants.UI_TREE_LEVELS);
+    return levels.isEmpty() || levels.contains(level);
+  }
 }

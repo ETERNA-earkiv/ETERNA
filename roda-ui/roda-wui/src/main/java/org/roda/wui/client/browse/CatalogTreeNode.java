@@ -409,16 +409,20 @@ public class CatalogTreeNode extends Composite {
     if (currentNodeIndex == -1) return;
 
     CatalogTreeNode parent = null;
+    int nodeDepth = depth + 1;
     for (int i = currentNodeIndex + 1; i < ancestorIds.size(); i++) {
       String ancId = ancestorIds.get(i);
-      int nodeDepth = depth + (i - currentNodeIndex);
       if (localNodeMap.containsKey(ancId)) {
         parent = localNodeMap.get(ancId);
+        nodeDepth++;
         continue;
       }
       CatalogTreeNode node;
       if (resolvedAncestors.containsKey(ancId)) {
         IndexedAIP anc = resolvedAncestors.get(ancId);
+        // Tillgänglig förfader med dold nivå (ui.tree.levels): hoppa över, ättlingarna
+        // hängs på närmaste synliga förfader.
+        if (!TreeLevelFilter.isShown(anc.getLevel())) continue;
         node = new CatalogTreeNode(anc.getId(), anc.getTitle(), anc.getLevel(), nodeDepth);
       } else {
         node = CatalogTreeNode.createGhostNode(nodeDepth);
@@ -427,12 +431,12 @@ public class CatalogTreeNode extends Composite {
       if (parent == null) directChildren.add(node);
       else parent.addPrebuiltChild(node);
       parent = node;
+      nodeDepth++;
     }
 
     if (!localNodeMap.containsKey(targetAip.getId())) {
-      int targetDepth = depth + (ancestorIds.size() - currentNodeIndex);
       CatalogTreeNode targetNode = new CatalogTreeNode(
-        targetAip.getId(), targetAip.getTitle(), targetAip.getLevel(), targetDepth);
+        targetAip.getId(), targetAip.getTitle(), targetAip.getLevel(), nodeDepth);
       localNodeMap.put(targetAip.getId(), targetNode);
       if (parent == null) directChildren.add(targetNode);
       else parent.addPrebuiltChild(targetNode);
