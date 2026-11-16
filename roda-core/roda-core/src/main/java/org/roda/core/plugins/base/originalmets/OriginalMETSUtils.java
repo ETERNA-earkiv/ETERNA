@@ -9,6 +9,10 @@ package org.roda.core.plugins.base.originalmets;
 
 import java.nio.file.Path;
 
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
+import java.util.GregorianCalendar;
+
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -25,6 +29,9 @@ import org.roda.core.model.ModelService;
 import org.roda.core.storage.StorageService;
 import org.roda_project.commons_ip2.model.IPConstants;
 
+/**
+ * @author Paul Hedberg <paul.hedberg@skane.se>
+ */
 public class OriginalMETSUtils {
 
 	public static StorageService mainStorageService;
@@ -49,5 +56,18 @@ public class OriginalMETSUtils {
 
 	public static XMLGregorianCalendar currentDateAndTime() throws DatatypeConfigurationException {
 		 return DatatypeFactory.newInstance().newXMLGregorianCalendar(LocalDateTime.now().toString());
+	}
+	
+	public static XMLGregorianCalendar dateAndTimeFromUTC(String utc) 
+			throws 
+				DatatypeConfigurationException,
+				DateTimeParseException {
+		
+		OffsetDateTime odt = OffsetDateTime.parse(utc);
+		
+		GregorianCalendar gc = GregorianCalendar.from(odt.toZonedDateTime());
+		
+		return DatatypeFactory.newInstance()
+                .newXMLGregorianCalendar(gc);
 	}
 }

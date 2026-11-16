@@ -102,12 +102,12 @@ public class CreateLogicalMETS {
 			ObjectFactory of = new ObjectFactory();
 			Mets mets = of.createMets();
 			mets.setOBJID(aip.getId());
-			mets.setLABEL("");
 			mets.setPROFILE(PROFILE);
 			mets.setTYPE("MIXED");
 			mets.setOTHERTYPE("OTHERTYPE");
 
 			MetsType.MetsHdr metsHeader = new MetsType.MetsHdr();
+			metsHeader.setRECORDSTATUS("NEW");
 			metsHeader.setCREATEDATE(OriginalMETSUtils.currentDateAndTime());
 			metsHeader.setLASTMODDATE(OriginalMETSUtils.currentDateAndTime());
 
@@ -116,7 +116,7 @@ public class CreateLogicalMETS {
 			agent.setROLE("CREATOR");
 			agent.setTYPE("OTHER");
 			agent.setOTHERTYPE("SOFTWARE");
-			agent.setName("RODA");
+			agent.setName("ETERNA");
 			Note note = new Note();
 			note.setNOTETYPE("SOFTWARE VERSION");
 			note.setValue(softwareVersion);
@@ -130,7 +130,12 @@ public class CreateLogicalMETS {
 			amdSec.setID("uuid-" + UUID.randomUUID().toString());
 			mets.getAmdSec().add(amdSec);
 			
-	    	mets.getStructMap().add(UpdateOriginalMETS.createStructMap("RelatedPackage"));
+			StructMapType structMapType = new StructMapType();
+			structMapType.setID("uuid-" + UUID.randomUUID().toString());
+	    	structMapType.setTYPE(UpdateOriginalMETS.getStructmapTypePhysical());
+	    	structMapType.setLABEL(UpdateOriginalMETS.getStructmapLabelCsip());
+	    	structMapType.setDiv(UpdateOriginalMETS.getStructMapPackageDiv(structMapType));
+			mets.getStructMap().add(structMapType);
 	    	
 			modelService.getStorage().createBinary(metsPath, new StringContentPayload(XMLUtils.getXMLFromObject(mets)), false);
 			handleParentAIP(aip, aipPath, modelService);
@@ -146,13 +151,14 @@ public class CreateLogicalMETS {
         		| RequestNotValidException 
         		| SAXException e) {
 
-	    	LOG.error("Then create the logical METS file {} - Error: {}", aip.getId(), e);
+	    	LOG.error("Then create the logical METS file {} - Error: ", aip.getId(), e);
 		}
 	}
 	
 	private static void handleParentAIP(AIP aip, StoragePath aipPath, ModelService modelService) 
 			throws 
         	AuthorizationDeniedException, 
+        	DatatypeConfigurationException,
         	GenericException, 
         	IOException, 
         	IPException, 

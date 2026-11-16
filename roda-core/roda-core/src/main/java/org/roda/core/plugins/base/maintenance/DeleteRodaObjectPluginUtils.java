@@ -253,7 +253,7 @@ public class DeleteRodaObjectPluginUtils {
     try {
       processLinkedDIP(file, index, model, report, reportItem, jobPluginInfo, job, plugin);
       model.deleteFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), job.getUsername(),
-        true);
+        true, file);
     } catch (NotFoundException e) {
       state = PluginState.FAILURE;
       reportItem.addPluginDetails("Could not delete FILE: " + e.getMessage());

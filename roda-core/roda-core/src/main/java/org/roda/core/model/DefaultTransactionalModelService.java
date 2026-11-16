@@ -1081,12 +1081,12 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
 
   @Override
   public void deleteFile(String aipId, String representationId, List<String> directoryPath, String fileId,
-    String deletedBy, boolean notify)
+    String deletedBy, boolean notify, File file)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     List<TransactionalModelOperationLog> operationLogs = operationRegistry.registerOperationForFile(aipId,
       representationId, directoryPath, fileId, OperationType.DELETE);
     try {
-      getModelService().deleteFile(aipId, representationId, directoryPath, fileId, deletedBy, notify);
+      getModelService().deleteFile(aipId, representationId, directoryPath, fileId, deletedBy, notify, file);
       operationRegistry.updateOperationState(operationLogs, OperationState.SUCCESS);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       operationRegistry.updateOperationState(operationLogs, OperationState.FAILURE);

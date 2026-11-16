@@ -45,6 +45,8 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -674,8 +676,7 @@ public class DefaultModelService implements ModelService {
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    StoragePath aipPath = ModelUtils.getAIPStoragePath(aipId);
-    
+    StoragePath aipPath = ModelUtils.getAIPStoragePath(aipId); 
     AIP aip = this.retrieveAIP(aipId);
     AIP aip2 = null;
     AIP parentAip = null;
@@ -685,10 +686,8 @@ public class DefaultModelService implements ModelService {
 		parentAip = new AIP();
 		parentAip.setId(aip.getParentId());
     }
-    
     storage.deleteResource(aipPath);
-    aip = null;
-    
+    aip = null; 
     if (parentAip != null) {
     	updateOriginalMETS(aip2, parentAip, ModelService.JobName.DELETE_AIP);
     	aip2 = null;
@@ -723,6 +722,8 @@ public class DefaultModelService implements ModelService {
     AIP aip = retrieveAIP(aipId);
     aip.setType(type);
     AIP updatedAIP = updateAIPMetadata(aip, updatedBy);
+    
+    updateOriginalMETS(aip, null, ModelService.JobName.UPDATE_AIP_TYPE); 
     notifyAipUpdated(updatedAIP).failOnError();
   }
 
@@ -1183,6 +1184,9 @@ public class DefaultModelService implements ModelService {
         representation.setType(type);
         representation.setUpdatedOn(new Date());
         representation.setUpdatedBy(updatedBy);
+        
+        updateOriginalMETS(representation, null, ModelService.JobName.UPDATE_REPRESENTATION_TYPE);
+        
         notifyRepresentationUpdated(representation).failOnError();
         break;
       }
@@ -1319,12 +1323,9 @@ public class DefaultModelService implements ModelService {
       if (representation.getId().equals(representationId)) {
     	Representation representation2 = new Representation();
     	representation2.setId(representationId);
-    	
         it.remove();
- 
         updateOriginalMETS(aip, representation2, ModelService.JobName.DELETE_REPRESENTATION);
         representation2 = null;
-        
         break;
       }
     }
@@ -1518,17 +1519,22 @@ public class DefaultModelService implements ModelService {
 
   @Override
   public void deleteFile(String aipId, String representationId, List<String> directoryPath, String fileId,
-    String deletedBy, boolean notify)
+    String deletedBy, boolean notify, File file)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
-
+    
     StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representationId, directoryPath, fileId);
     storage.deleteResource(filePath);
-
+    
     changeRepresentationUpdateOn(aipId, representationId, deletedBy, notify);
-
+    
     if (notify) {
       notifyFileDeleted(aipId, representationId, directoryPath, fileId).failOnError();
+    }
+    
+    if (file != null) {
+    	updateOriginalMETS(file, null, ModelService.JobName.DELETE_FILESYSTEM_OBJECT);
+    	file = null;
     }
   }
 
@@ -1553,7 +1559,7 @@ public class DefaultModelService implements ModelService {
         }
       }
     } else {
-      deleteFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), deletedBy, notify);
+      deleteFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), deletedBy, notify, file);
     }
   }
 
@@ -1571,6 +1577,9 @@ public class DefaultModelService implements ModelService {
       newFolderPathList.add(newName);
       StoragePath newFileStoragePath = DefaultStoragePath.parse(newFolderPathList);
       storage.move(storage, folderStoragePath, newFileStoragePath);
+      
+      File newFolder = new File(newName, folder.getAipId(), folder.getRepresentationId(), folder.getPath(), folder.isDirectory());
+      updateOriginalMETS(folder, newFolder, ModelService.JobName.RENAME_FILESYSTEM_OBJECT);
 
       if (reindexResources) {
         notifyAipUpdated(folder.getAipId());
@@ -1603,6 +1612,8 @@ public class DefaultModelService implements ModelService {
     StoragePath newFileStoragePath = ModelUtils.getFileStoragePath(newFile);
 
     storage.move(storage, fileStoragePath, newFileStoragePath);
+    
+    updateOriginalMETS(file, newFile, ModelService.JobName.MOVE_FILESYSTEM_OBJECT);
 
     if (reindexResources) {
       notifyRepresentationUpdated(retrieveRepresentation(newAipId, newRepresentationId)).failOnError();
@@ -5908,8 +5919,16 @@ public class DefaultModelService implements ModelService {
 			  CreateLogicalMETS.create((AIP) object1, this);
 		  }
 		
-	  } else if (jobName == ModelService.JobName.DELETE_AIP) { 
-		  updateOriginalMETSAipDeleted(object1.getId(), object2.getId());
+	  } else if (jobName == ModelService.JobName.DELETE_AIP) {
+		  if (object1 instanceof AIP && object2 instanceof AIP) {
+			  LOGGER.debug("updateOriginalMETS -> UpdateOriginalMETS.handleParentWhenRemovedAIP (aipId {} and parentAipId {})", object1.getId(), object2.getId());
+			  try {
+				  UpdateOriginalMETS.handleParentWhenRemovedAIP(this, object1.getId(), object2.getId());
+				
+			  } catch (DatatypeConfigurationException | IOException | IPException | JAXBException | SAXException e) {
+				  throw new GenericException(e.getMessage(), e.getCause());	
+			  }
+		  }
 		  
 	  } else if (jobName == ModelService.JobName.CREATE_REPRESENTATION) {
 		  if (object1 instanceof Representation) {
@@ -5918,41 +5937,51 @@ public class DefaultModelService implements ModelService {
 		  }
 		  
 	  } else if (jobName == ModelService.JobName.DELETE_REPRESENTATION) {
-		  updateOriginalMETSRepresentationDeleted(object1.getId(), object2.getId());
+		  if (object1 instanceof AIP && object2 instanceof Representation) {
+			  LOGGER.debug("updateOriginalMETS -> UpdateOriginalMETS.removeRepresentationFromMETS (aipId {} and representationId {})", object1.getId(), object2.getId());	
+			  try {
+				  UpdateOriginalMETS.removeRepresentationFromMETS(this, object1.getId(), object2.getId());
+				
+			  } catch (DatatypeConfigurationException | IOException | IPException | JAXBException | SAXException  e) {
+				  throw new GenericException(e.getMessage(), e.getCause());	
+			  }
+		  }
+		  
+	  } else if (jobName == ModelService.JobName.CREATE_FILESYSTEM_OBJECT) {
+		  if (object1 instanceof File) {
+			  LOGGER.debug("updateOriginalMETS -> UpdateOriginalMETS.addFilesystemObjectToMETS (manually created) (" + object1.getId()+ ")");
+			  UpdateOriginalMETS.addFilesystemObjectToMETS((File) object1, this);
+		  }
+		  
+	  } else if (jobName == ModelService.JobName.DELETE_FILESYSTEM_OBJECT) {
+		  if (object1 instanceof File) {
+			  LOGGER.debug("updateOriginalMETS -> UpdateOriginalMETS.removeFilesystemObjectFromMETS (" + object1.getId()+ ")");
+			  UpdateOriginalMETS.removeFilesystemObjectFromMETS((File) object1, this);
+		  }
+		  
+	  } else if (jobName == ModelService.JobName.MOVE_FILESYSTEM_OBJECT) {
+		  if (object1 instanceof File && object2 instanceof File) {
+			  LOGGER.debug("updateOriginalMETS -> UpdateOriginalMETS.moveFilesystemObjectInMETS (" + object1.getId()+ ")");
+			  UpdateOriginalMETS.moveFilesystemObjectInMETS((File) object1, (File) object2, this);
+		  }
+		  
+	  } else if (jobName == ModelService.JobName.RENAME_FILESYSTEM_OBJECT) {
+		  if (object1 instanceof File && object2 instanceof File) {
+			  LOGGER.debug("updateOriginalMETS -> UpdateOriginalMETS.renameFilesystemObjectInMETS (" + object1.getId()+ ")");
+			  UpdateOriginalMETS.renameFilesystemObjectInMETS((File) object1, (File) object2, this);
+		  }
+		  
+	  } else if (jobName == ModelService.JobName.UPDATE_AIP_TYPE) {
+		  if (object1 instanceof AIP) {
+			  LOGGER.debug("updateOriginalMETS -> UpdateOriginalMETS.updateAIPTypeInMETS (" + object1.getId()+ ")");
+			  UpdateOriginalMETS.updateAIPTypeInMETS((AIP) object1, this);
+		  }
+		  
+	  } else if (jobName == ModelService.JobName.UPDATE_REPRESENTATION_TYPE) {
+		  if (object1 instanceof Representation) {
+			  LOGGER.debug("updateOriginalMETS -> UpdateOriginalMETS.updateRepresentationTypeInMETS (" + object1.getId()+ ")");
+			  UpdateOriginalMETS.updateRepresentationTypeInMETS((Representation) object1, this);
+		  }
 	  }
-  }
-  
-  private void updateOriginalMETSAipDeleted(String aipId, String parentAipId)
-    throws 
-	    AuthorizationDeniedException, 
-	    GenericException,
-	    NotFoundException,
-	    RequestNotValidException {
-	  
-	LOGGER.debug("updateOriginalMETSAipDeleted -> UpdateOriginalMETS.handleParentWhenRemovedAIP (aipId {} and parentAipId {})", aipId, parentAipId);
-	
-	try {
-		UpdateOriginalMETS.handleParentWhenRemovedAIP(this, aipId, parentAipId);
-	
-	} catch (IOException | IPException | JAXBException | SAXException e) {
-		throw new GenericException(e.getMessage(), e.getCause());	
-	}	  
-  }
-  
-  private void updateOriginalMETSRepresentationDeleted(String aipId, String representationId)
-    throws 
-	    AuthorizationDeniedException, 
-	    GenericException,
-	    NotFoundException,
-	    RequestNotValidException {
-	  
-	LOGGER.debug("updateOriginalMETSRepresentationDeleted -> UpdateOriginalMETS.handleMETSWhenRemovedRepresentation (aipId {} and representationId {})", aipId, representationId);
-	
-	try {
-		UpdateOriginalMETS.handleMETSWhenRemovedRepresentation(this, aipId, representationId);
-	
-	} catch (IOException | IPException | JAXBException | SAXException  e) {
-		throw new GenericException(e.getMessage(), e.getCause());	
-	}	  
   }
 }

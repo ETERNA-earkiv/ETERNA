@@ -33,7 +33,7 @@ import org.roda_project.commons_ip2.mets_v1_12.beans.StructMapType;
 import org.roda_project.commons_ip2.mets_v1_12.beans.MetsType.FileSec;
 import org.roda_project.commons_ip2.mets_v1_12.beans.MetsType.FileSec.FileGrp;
 import org.roda_project.commons_ip2.model.IPConstants;
-
+import org.roda_project.commons_ip2.model.MetsWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,7 +74,6 @@ public class CreateRepresentationMETS {
 			ObjectFactory of = new ObjectFactory();
 			Mets mets = of.createMets();
 			mets.setOBJID(representation.getId());
-			mets.setLABEL("");
 			mets.setPROFILE(PROFILE);
 			mets.setTYPE(representation.getType());
 			mets.setCONTENTINFORMATIONTYPE(representation.getType());
@@ -82,7 +81,7 @@ public class CreateRepresentationMETS {
 			MetsType.MetsHdr metsHeader = new MetsType.MetsHdr();
 			metsHeader.setCREATEDATE(OriginalMETSUtils.currentDateAndTime());
 			metsHeader.setLASTMODDATE(OriginalMETSUtils.currentDateAndTime());
-			metsHeader.setRECORDSTATUS("COMPLETE");
+			metsHeader.setRECORDSTATUS("NEW");
 			metsHeader.setOAISPACKAGETYPE("AIP");
 			mets.setMetsHdr(metsHeader);
 
@@ -94,18 +93,16 @@ public class CreateRepresentationMETS {
 			amdSecType.setID("uuid-" + UUID.randomUUID().toString());
 			mets.getAmdSec().add(amdSecType);
 
-			FileGrp fileGrp = of.createMetsTypeFileSecFileGrp();
-			fileGrp.setID("uuid-" + UUID.randomUUID().toString());
-			FileSec fileSec = of.createMetsTypeFileSec();
-			fileSec.setID("uuid-" + UUID.randomUUID().toString());
-			fileSec.getFileGrp().add(fileGrp);
+			FileSec fileSec = new FileSec();
 			mets.setFileSec(fileSec);
-
-			StructMapType structMapType = of.createStructMapType();
+			FileGrp fileGrp = UpdateOriginalMETS.createFileGrpRepresentation();
+			fileSec.getFileGrp().add(fileGrp);
+			
+			StructMapType structMapType = new StructMapType();
 			structMapType.setID("uuid-" + UUID.randomUUID().toString());
-			DivType dt = new DivType();
-            dt.setID("uuid-" + UUID.randomUUID().toString());
-            structMapType.setDiv(dt);
+	    	structMapType.setTYPE(UpdateOriginalMETS.getStructmapTypePhysical());
+	    	structMapType.setLABEL(UpdateOriginalMETS.getStructmapLabelCsip()); 
+			UpdateOriginalMETS.createStructMapRepresentationDiv(structMapType, representation.getId(), fileGrp);
 			mets.getStructMap().add(structMapType);
 
 			modelService.getStorage().createBinary(path, new StringContentPayload(XMLUtils.getXMLFromObject(mets)), false);
@@ -123,7 +120,7 @@ public class CreateRepresentationMETS {
         		| RequestNotValidException
         		| SAXException e) {
 
-	    	LOG.error("Then create the representation {} METS file {} - Error: {}", representation.getId(), representation.getAipId(), e);
+	    	LOG.error("Then create the representation {} METS file and AIP {} - Error: ", representation.getId(), representation.getAipId(), e);
 		}
 	}
 }

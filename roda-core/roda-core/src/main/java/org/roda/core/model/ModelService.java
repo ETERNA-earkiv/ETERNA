@@ -96,7 +96,13 @@ public interface ModelService extends ModelObservable {
 	  CREATE_AIP,
 	  DELETE_AIP,
 	  CREATE_REPRESENTATION,
-      DELETE_REPRESENTATION
+      DELETE_REPRESENTATION,
+      CREATE_FILESYSTEM_OBJECT,
+      DELETE_FILESYSTEM_OBJECT,
+      MOVE_FILESYSTEM_OBJECT,
+      RENAME_FILESYSTEM_OBJECT,
+      UPDATE_AIP_TYPE,
+      UPDATE_REPRESENTATION_TYPE
   }
     
   StorageService getStorage();
@@ -312,7 +318,7 @@ public interface ModelService extends ModelObservable {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
 
   void deleteFile(String aipId, String representationId, List<String> directoryPath, String fileId, String deletedBy,
-    boolean notify) throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException;
+    boolean notify, File file) throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException;
 
   void deleteFile(File file, String deletedBy, boolean notify)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException;

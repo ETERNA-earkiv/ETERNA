@@ -956,8 +956,8 @@ public class IndexModelObserver implements ModelObserver {
           if (opm.isPresent()) {
             PreservationMetadata pm = opm.get();
             if (PreservationMetadataType.REPRESENTATION.equals(pm.getType())) {
-              LOGGER.debug("representationCreated -> UpdateOriginalMETS.handleRepresentation ( {} )", pm.getId());
-              UpdateOriginalMETS.handleRepresentation(representation.getAipId(), representation.getId(), IdUtils.getRepresentationId(representation.getAipId(), representation.getId()), model);
+              LOGGER.debug("representationCreated -> UpdateOriginalMETS.addPremisToNewRepresentation ( {} )", pm.getId());
+              UpdateOriginalMETS.addPremisToNewRepresentation(representation.getAipId(), representation.getId(), IdUtils.getRepresentationId(representation.getAipId(), representation.getId()), model);
             }
           }
         }
@@ -1138,8 +1138,8 @@ public class IndexModelObserver implements ModelObserver {
     PreservationMetadataType type = pm.getType();
 
     if (pm != null && pm.getAipId() != null && pm.getId() != null) {
-      LOGGER.debug("preservationMetadataCreated -> UpdateOriginalMETS.update ( {} )", pm.getId());
-      UpdateOriginalMETS.update(pm, model);
+      LOGGER.debug("preservationMetadataCreated -> UpdateOriginalMETS.addPremisToMETS ( {} )", pm.getId());
+      UpdateOriginalMETS.addPremisToMETS(pm, model);
     }
 
     if (PreservationMetadataType.EVENT.equals(type)) {

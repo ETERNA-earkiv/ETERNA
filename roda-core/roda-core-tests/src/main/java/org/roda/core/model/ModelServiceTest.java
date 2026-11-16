@@ -848,7 +848,7 @@ public class ModelServiceTest {
       RodaConstants.ADMIN);
 
     model.deleteFile(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.REPRESENTATION_1_FILE_1_PATH,
-      CorporaConstants.REPRESENTATION_1_FILE_1_ID, RodaConstants.ADMIN, true);
+      CorporaConstants.REPRESENTATION_1_FILE_1_ID, RodaConstants.ADMIN, true, null);
 
     // check if it deleted
     try {
