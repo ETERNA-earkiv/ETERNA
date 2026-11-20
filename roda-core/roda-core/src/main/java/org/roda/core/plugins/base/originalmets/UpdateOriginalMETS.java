@@ -7,8 +7,8 @@
  */
 package org.roda.core.plugins.base.originalmets;
 
+import com.google.common.util.concurrent.Striped;
 import jakarta.xml.bind.JAXBException;
-
 import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
@@ -19,8 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.Lock;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -135,7 +134,7 @@ public class UpdateOriginalMETS {
     
     private static final String HREF_DATA_PREFIX = "data/";
     
-    private static final ConcurrentHashMap<Path, ReentrantLock> FILE_LOCKS = new ConcurrentHashMap<>();
+    private static final Striped<Lock> FILE_LOCKS = Striped.lock(64);
 
     public static void addPremisToMETS(
         PreservationMetadata pm,
@@ -1927,16 +1926,13 @@ public class UpdateOriginalMETS {
 	
 	private static <E extends Exception> void executeWithLock(Path metsPath, ThrowingRunnable<E> action) throws E {
 		Path normalizedPath = metsPath.toAbsolutePath().normalize();
-		ReentrantLock lock = FILE_LOCKS.computeIfAbsent(normalizedPath, k -> new ReentrantLock());
+		Lock lock = FILE_LOCKS.get(normalizedPath);
 		lock.lock();
 		try {
 			action.run();
 			
 		} finally {
 			lock.unlock();
-			if (!lock.hasQueuedThreads()) {
-				FILE_LOCKS.remove(normalizedPath, lock);
-			}
 		}
 	}    
 }
