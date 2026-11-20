@@ -19,6 +19,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -77,6 +79,11 @@ import io.jsonwebtoken.lang.Arrays;
  */
 public class UpdateOriginalMETS {
 
+	@FunctionalInterface
+	private interface ThrowingRunnable<E extends Exception> {
+		void run() throws E;
+	}
+	
     public static Logger getLog() {
         return LOG;
     }
@@ -127,6 +134,8 @@ public class UpdateOriginalMETS {
     private static final String STRUCTMAP_LABEL_CSIP = "CSIP";
     
     private static final String HREF_DATA_PREFIX = "data/";
+    
+    private static final ConcurrentHashMap<Path, ReentrantLock> FILE_LOCKS = new ConcurrentHashMap<>();
 
     public static void addPremisToMETS(
         PreservationMetadata pm,
@@ -1783,22 +1792,24 @@ public class UpdateOriginalMETS {
         if (isMETSExists(modelService, aip)) {
         	StoragePath aipPath = ModelUtils.getAIPStoragePath(aip.getId());
         	Path metsPath = OriginalMETSUtils.metsPath(modelService, aipPath);
-        	MetsWrapper metsWrapper = new MetsWrapper(
-                    METSUtils.instantiateMETSFromFile(metsPath),
-                    metsPath
-                );
         	
-        	metsWrapper.getMets().getMetsHdr()
-        		.setLASTMODDATE(OriginalMETSUtils.currentDateAndTime());
+        	executeWithLock(metsPath, () -> {
+        		try (FileChannel channel = FileChannel.open(metsPath, StandardOpenOption.WRITE);
+ 			           @SuppressWarnings("unused") FileLock fileLock = channel.lock()) {
         	
-			try (FileChannel channel = FileChannel.open(
-					metsPath, StandardOpenOption.WRITE);
-					FileLock lock = channel.lock()) {
-				
-				METSUtils.marshallMETS(metsWrapper.getMets(), metsPath, true);	
-				
-				channel.force(true);
-			}
+		        	MetsWrapper metsWrapper = new MetsWrapper(
+		                    METSUtils.instantiateMETSFromFile(metsPath),
+		                    metsPath);
+		        	
+		        	metsWrapper.getMets().getMetsHdr()
+		        		.setLASTMODDATE(OriginalMETSUtils.currentDateAndTime());
+		        	
+					METSUtils.marshallMETS(metsWrapper.getMets(), metsPath, true);
+					
+        		} catch (Exception e) {
+        			throw new GenericException(e.getMessage(), e);
+        		}
+        	});
         }
     	
     	if (aip.getParentId() != null) {
@@ -1848,46 +1859,48 @@ public class UpdateOriginalMETS {
                 aipPath
         );
 		
-        MetsWrapper metsWrapper = new MetsWrapper(
-            METSUtils.instantiateMETSFromFile(metsPath),
-            metsPath
-        );
+		executeWithLock(metsPath, () -> {
+			try (FileChannel channel = FileChannel.open(metsPath, StandardOpenOption.WRITE);
+			           @SuppressWarnings("unused") FileLock fileLock = channel.lock()) {
+			
+			
+		        MetsWrapper metsWrapper = new MetsWrapper(
+		            METSUtils.instantiateMETSFromFile(metsPath),
+		            metsPath
+		        );
+		
+				java.io.File file = modelService
+		            .getStorage()
+		            .getDirectAccess(aipPath)
+		            .getPath()
+		            .resolve(Path.of(IPConstants.REPRESENTATIONS))
+		            .resolve(representationId)
+		            .resolve(IPConstants.METS_FILE)
+		            .toFile();
 	
-		java.io.File file = modelService
-            .getStorage()
-            .getDirectAccess(aipPath)
-            .getPath()
-            .resolve(Path.of(IPConstants.REPRESENTATIONS))
-            .resolve(representationId)
-            .resolve(IPConstants.METS_FILE)
-            .toFile();
-
-        if (file.exists() && metsWrapper.getMets().getFileSec() != null) {
-        	for (FileGrp fileGrp : metsWrapper.getMets().getFileSec().getFileGrp()) {
-        		if (fileGrp.getUSE() != null
-        				&& fileGrp.getUSE().equals(REPRESENTATIONS + "/" + representationId)) {
-        			
-        			FileType fileType = fileGrp.getFile().getFirst();
-        			fileType.setCHECKSUM(
-        					DigestUtils.md5Hex(
-                	                java.nio.file.Files.readAllBytes(file.toPath())
-                	            ).toUpperCase());
-        			fileType.setCHECKSUMTYPE("MD5");
-        			fileType.setSIZE(FileUtils.sizeOf(file));
-        			
-        			try (FileChannel channel = FileChannel.open(
-        					metsPath, StandardOpenOption.WRITE);
-        					FileLock lock = channel.lock()) {
-        				
-        				METSUtils.marshallMETS(metsWrapper.getMets(), metsPath, true);	
-        				
-        				channel.force(true);
-        			}
-        			
-        			break;
-        		}
-        	}
-        }
+		        if (file.exists() && metsWrapper.getMets().getFileSec() != null) {
+		        	for (FileGrp fileGrp : metsWrapper.getMets().getFileSec().getFileGrp()) {
+		        		if (fileGrp.getUSE() != null
+		        				&& fileGrp.getUSE().equals(REPRESENTATIONS + "/" + representationId)) {
+		        			
+			    			FileType fileType = fileGrp.getFile().getFirst();
+			    			fileType.setCHECKSUM(
+			    					DigestUtils.md5Hex(
+			            	                java.nio.file.Files.readAllBytes(file.toPath())
+			            	            ).toUpperCase());
+			    			fileType.setCHECKSUMTYPE("MD5");
+			    			fileType.setSIZE(FileUtils.sizeOf(file));
+			    			
+				    		METSUtils.marshallMETS(metsWrapper.getMets(), metsPath, true);
+			    			break;
+		        		}
+		        	}
+		        }
+		        
+			} catch (Exception e) {
+    			throw new GenericException(e.getMessage(), e);
+    		}
+		});
     }
     
     private static boolean isMETSExists(ModelService modelService, AIP aip)
@@ -1911,4 +1924,19 @@ public class UpdateOriginalMETS {
         	return false;
         }
     }
+	
+	private static <E extends Exception> void executeWithLock(Path metsPath, ThrowingRunnable<E> action) throws E {
+		Path normalizedPath = metsPath.toAbsolutePath().normalize();
+		ReentrantLock lock = FILE_LOCKS.computeIfAbsent(normalizedPath, k -> new ReentrantLock());
+		lock.lock();
+		try {
+			action.run();
+			
+		} finally {
+			lock.unlock();
+			if (!lock.hasQueuedThreads()) {
+				FILE_LOCKS.remove(normalizedPath, lock);
+			}
+		}
+	}    
 }

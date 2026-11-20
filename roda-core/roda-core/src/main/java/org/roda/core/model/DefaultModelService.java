@@ -685,7 +685,6 @@ public class DefaultModelService implements ModelService {
     
     StoragePath aipPath = ModelUtils.getAIPStoragePath(aipId); 
     storage.deleteResource(aipPath);
-    notifyAipDeleted(aipId).failOnError();
     
     if (parentAip != null) {
     	updateOriginalMETS(aip, parentAip, ModelService.JobName.DELETE_AIP);
@@ -693,6 +692,8 @@ public class DefaultModelService implements ModelService {
     }
     
     aip = null; 
+    
+    notifyAipDeleted(aipId).failOnError();
   }
 
   private ValidationReport isAIPvalid(ModelService model, Directory directory,
