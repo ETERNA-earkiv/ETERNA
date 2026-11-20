@@ -6,6 +6,8 @@ Läs detta på: [Engelska](README.md) | [Svenska](README_sv_SE.md)
 
 # ETERNA - E-Arkiv
 
+<img width="1529" height="852" alt="screenshot_2026-11-09_14-30-15" src="https://github.com/user-attachments/assets/2a699db1-894f-49b2-90cb-8ee62fbad68b" />
+
 **ETERNA** är ett e-arkivsystem med helt öppen källkod som är utformat för att uppfylla kraven i OAIS-modellen, Open Archival Information System (OAIS) vilket ger myndigheter och organisationer en standardiserad lösning för långsiktigt digitalt bevarande. ETERNA säkerställer flexibilitet, hållbarhet och full kontroll över arkivprocesser och data.
 
 ## Egenskaper

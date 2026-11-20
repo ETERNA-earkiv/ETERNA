@@ -6,6 +6,9 @@ Read this in: [English](README.md) | [Svenska](README_sv_SE.md)
 
 # ETERNA - E-Archive
 
+<img width="1529" height="852" alt="screenshot_2026-11-09_14-30-15" src="https://github.com/user-attachments/assets/2a699db1-894f-49b2-90cb-8ee62fbad68b" />
+
+
 **ETERNA** is a fully open-source E-Archive system designed to meet the Open Archival Information System (OAIS) reference model requirements, providing institutions and organizations with a standardized solution for long-term digital preservation. ETERNA ensures flexibility, sustainability, and full control over archival processes and data.
 
 ## Key Features
