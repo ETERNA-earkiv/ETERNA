@@ -82,8 +82,6 @@ public class CopyOriginalMETS {
                 .getMetsHdr()
                 .setLASTMODDATE(OriginalMETSUtils.currentDateAndTime());
 
-            metsWrapper.getMets().getMetsHdr().setRECORDSTATUS("Complete");
-
             metsWrapper.getMets().setPROFILE(PROFILE);
 
             METSUtils.marshallMETS(mets, metsPath, true);
@@ -125,10 +123,6 @@ public class CopyOriginalMETS {
                             .setLASTMODDATE(
                                 OriginalMETSUtils.currentDateAndTime()
                             );
-                        repMetsWrapper
-                            .getMets()
-                            .getMetsHdr()
-                            .setRECORDSTATUS("Complete");
 
                         repMetsWrapper.getMets().setPROFILE(PROFILE);
 
@@ -159,7 +153,7 @@ public class CopyOriginalMETS {
                         | SAXException e
                     ) {
                         LOG.error(
-                            "Then update and copy original AIP {} representation {} METS file - Error: {}",
+                            "Then update and copy original AIP {} representation {} METS file - Error: ",
                             aipId,
                             r.getRepresentationID(),
                             e

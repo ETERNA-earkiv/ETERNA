@@ -179,8 +179,8 @@ public class FilesService {
       String outcomeText = "The file '" + file.getId() + "' has been manually created.";
       model.createEvent(aipId, representationId, null, null, RodaConstants.PreservationEventType.CREATION,
         eventDescription, null, targets, PluginState.SUCCESS, outcomeText, details, user.getName(), true, null);
-
       requestContext.getIndexService().commit(IndexedFile.class);
+      model.updateOriginalMETS(file, null, ModelService.JobName.CREATE_FILESYSTEM_OBJECT);
       return file;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | AlreadyExistsException e) {
@@ -220,9 +220,10 @@ public class FilesService {
       model.createUpdateAIPEvent(indexedRepresentation.getAipId(), indexedRepresentation.getId(), null, null,
         RodaConstants.PreservationEventType.CREATION, eventDescription, PluginState.SUCCESS, outcomeText, details,
         user.getName(), true, null);
-
       index.commit(IndexedFile.class);
-      return index.retrieve(IndexedFile.class, IdUtils.getFileId(newFolder), new ArrayList<>());
+      IndexedFile finalIndexedFile = index.retrieve(IndexedFile.class, IdUtils.getFileId(newFolder), new ArrayList<>());
+      model.updateOriginalMETS(newFolder, null, ModelService.JobName.CREATE_FILESYSTEM_OBJECT);
+      return finalIndexedFile;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       String outcomeText = "The folder '" + folderName + "' has not been manually created.";
       model.createUpdateAIPEvent(indexedRepresentation.getAipId(), indexedRepresentation.getId(), null, null,

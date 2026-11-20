@@ -864,7 +864,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                   newDIPFiles.add(f);
                 } else {
                   model.deleteFile(file1.getAipId(), newRepresentationID, file1.getPath(), file1.getId(),
-                      cachedJob.getUsername(), notify);
+                      cachedJob.getUsername(), notify, file);
                   File f = model.createFile(file1.getAipId(), newRepresentationID, file1.getPath(), newFileId, payload,
                       cachedJob.getUsername(), notify);
                   newFiles.add(f);

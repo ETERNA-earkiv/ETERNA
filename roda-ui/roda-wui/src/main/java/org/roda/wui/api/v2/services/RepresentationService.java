@@ -124,6 +124,7 @@ public class RepresentationService {
     try {
       Representation representation = model.createRepresentation(aipId, representationId, true, type, true,
         user.getName());
+      model.updateOriginalMETS(representation, null, ModelService.JobName.CREATE_REPRESENTATION);
 
       List<LinkingIdentifier> targets = new ArrayList<>();
       targets.add(PluginHelper.getLinkingIdentifier(aipId, representation.getId(),

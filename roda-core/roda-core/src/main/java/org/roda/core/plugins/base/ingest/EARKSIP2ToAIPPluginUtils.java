@@ -94,7 +94,8 @@ public class EARKSIP2ToAIPPluginUtils {
     for (IPRepresentation representation : sip.getRepresentations()) {
       processIPRepresentationInformation(model, representation, aip.getId(), notify, false, username, null);
     }
-    
+
+    LOGGER.debug("earkSIPToAIP -> CopyOriginalMETS.copy (" + aip.getId() + ")");
     CopyOriginalMETS.copy(aip.getId(), sip, model);
 
     // INFO 20190509 hsilva: this is required as the previous instructions
