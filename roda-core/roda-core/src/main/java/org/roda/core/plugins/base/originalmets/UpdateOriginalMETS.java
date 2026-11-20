@@ -12,9 +12,12 @@ import jakarta.xml.bind.JAXBException;
 import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -1788,7 +1791,14 @@ public class UpdateOriginalMETS {
         	metsWrapper.getMets().getMetsHdr()
         		.setLASTMODDATE(OriginalMETSUtils.currentDateAndTime());
         	
-        	METSUtils.marshallMETS(metsWrapper.getMets(), metsPath, true);
+			try (FileChannel channel = FileChannel.open(
+					metsPath, StandardOpenOption.WRITE);
+					FileLock lock = channel.lock()) {
+				
+				METSUtils.marshallMETS(metsWrapper.getMets(), metsPath, true);	
+				
+				channel.force(true);
+			}
         }
     	
     	if (aip.getParentId() != null) {
@@ -1836,7 +1846,8 @@ public class UpdateOriginalMETS {
 		Path metsPath = OriginalMETSUtils.metsPath(
                 modelService,
                 aipPath
-            );
+        );
+		
         MetsWrapper metsWrapper = new MetsWrapper(
             METSUtils.instantiateMETSFromFile(metsPath),
             metsPath
@@ -1851,7 +1862,7 @@ public class UpdateOriginalMETS {
             .resolve(IPConstants.METS_FILE)
             .toFile();
 
-        if (file.exists()) {
+        if (file.exists() && metsWrapper.getMets().getFileSec() != null) {
         	for (FileGrp fileGrp : metsWrapper.getMets().getFileSec().getFileGrp()) {
         		if (fileGrp.getUSE() != null
         				&& fileGrp.getUSE().equals(REPRESENTATIONS + "/" + representationId)) {
@@ -1863,7 +1874,16 @@ public class UpdateOriginalMETS {
                 	            ).toUpperCase());
         			fileType.setCHECKSUMTYPE("MD5");
         			fileType.setSIZE(FileUtils.sizeOf(file));
-        			METSUtils.marshallMETS(metsWrapper.getMets(), metsPath, true);
+        			
+        			try (FileChannel channel = FileChannel.open(
+        					metsPath, StandardOpenOption.WRITE);
+        					FileLock lock = channel.lock()) {
+        				
+        				METSUtils.marshallMETS(metsWrapper.getMets(), metsPath, true);	
+        				
+        				channel.force(true);
+        			}
+        			
         			break;
         		}
         	}
