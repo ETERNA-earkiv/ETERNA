@@ -956,8 +956,8 @@ public class IndexModelObserver implements ModelObserver {
           if (opm.isPresent()) {
             PreservationMetadata pm = opm.get();
             if (PreservationMetadataType.REPRESENTATION.equals(pm.getType())) {
-              LOGGER.debug("representationCreated -> UpdateOriginalMETS.addPremisToNewRepresentation ( {} )", pm.getId());
-              UpdateOriginalMETS.addPremisToNewRepresentation(representation.getAipId(), representation.getId(), IdUtils.getRepresentationId(representation.getAipId(), representation.getId()), model);
+              LOGGER.debug("representationCreated -> UpdateOriginalMETS.addPremisToIngestedRepresentation ( {} )", pm.getId());
+              UpdateOriginalMETS.addPremisToIngestedRepresentation(representation.getAipId(), representation.getId(), IdUtils.getRepresentationId(representation.getAipId(), representation.getId()), model);
             }
           }
         }

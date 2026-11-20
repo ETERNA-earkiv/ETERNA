@@ -676,25 +676,24 @@ public class DefaultModelService implements ModelService {
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    StoragePath aipPath = ModelUtils.getAIPStoragePath(aipId); 
+    notifyAipDeleted(aipId).failOnError();
+    
     AIP aip = this.retrieveAIP(aipId);
-    AIP aip2 = null;
     AIP parentAip = null;
     if (aip.getParentId() != null) {
-		aip2 = new AIP();
-		aip2.setId(aipId);
 		parentAip = new AIP();
 		parentAip.setId(aip.getParentId());
     }
+    
+    StoragePath aipPath = ModelUtils.getAIPStoragePath(aipId); 
     storage.deleteResource(aipPath);
-    aip = null; 
+    
     if (parentAip != null) {
-    	updateOriginalMETS(aip2, parentAip, ModelService.JobName.DELETE_AIP);
-    	aip2 = null;
+    	updateOriginalMETS(aip, parentAip, ModelService.JobName.DELETE_AIP);
         parentAip = null;
     }
     
-    notifyAipDeleted(aipId).failOnError();
+    aip = null; 
   }
 
   private ValidationReport isAIPvalid(ModelService model, Directory directory,
