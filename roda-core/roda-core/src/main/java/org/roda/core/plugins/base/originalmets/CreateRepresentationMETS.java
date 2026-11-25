@@ -85,10 +85,6 @@ public class CreateRepresentationMETS {
 			metsHeader.setOAISPACKAGETYPE("AIP");
 			mets.setMetsHdr(metsHeader);
 
-			MdSecType mdSecType = of.createMdSecType();
-			mdSecType.setID("uuid-" + UUID.randomUUID().toString());
-			mets.getDmdSec().add(mdSecType);
-
 			AmdSecType amdSecType = of.createAmdSecType();
 			amdSecType.setID("uuid-" + UUID.randomUUID().toString());
 			mets.getAmdSec().add(amdSecType);

@@ -102,7 +102,9 @@ public interface ModelService extends ModelObservable {
       MOVE_FILESYSTEM_OBJECT,
       RENAME_FILESYSTEM_OBJECT,
       UPDATE_AIP_TYPE,
-      UPDATE_REPRESENTATION_TYPE
+      UPDATE_REPRESENTATION_TYPE,
+      CREATE_DESCRIPTIVE_METADATA,
+      DELETE_DESCRIPTIVE_METADATA
   }
     
   StorageService getStorage();

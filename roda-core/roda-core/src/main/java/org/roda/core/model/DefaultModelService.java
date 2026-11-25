@@ -818,13 +818,16 @@ public class DefaultModelService implements ModelService {
 
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
     aip.addDescriptiveMetadata(descriptiveMetadata);
+    
+    updateOriginalMETS(descriptiveMetadata, null, ModelService.JobName.CREATE_DESCRIPTIVE_METADATA);
+    
     AIP updatedAIP = updateAIPMetadata(aip, createdBy);
     notifyAipUpdated(updatedAIP).failOnError();
-
+    
     if (notify) {
       notifyDescriptiveMetadataCreated(descriptiveMetadata).failOnError();
     }
-
+    
     return descriptiveMetadata;
   }
 
@@ -906,6 +909,10 @@ public class DefaultModelService implements ModelService {
     // update AIP metadata
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
     deleteDescriptiveMetadata(aip, representationId, descriptiveMetadataId);
+    
+    DescriptiveMetadata descriptiveMetadata = new DescriptiveMetadata(descriptiveMetadataId, aipId, representationId, null, null);
+    updateOriginalMETS(descriptiveMetadata, null, ModelService.JobName.DELETE_DESCRIPTIVE_METADATA);
+    descriptiveMetadata = null;
 
     AIP updateAIP = updateAIPMetadata(aip, deletedBy);
     notifyAipUpdated(updateAIP).failOnError();
@@ -5980,6 +5987,18 @@ public class DefaultModelService implements ModelService {
 		  if (object1 instanceof Representation) {
 			  LOGGER.debug("updateOriginalMETS -> UpdateOriginalMETS.updateRepresentationTypeInMETS (" + object1.getId()+ ")");
 			  UpdateOriginalMETS.updateRepresentationTypeInMETS((Representation) object1, this);
+		  }
+	  
+	  } else if (jobName == ModelService.JobName.CREATE_DESCRIPTIVE_METADATA) {
+		  if (object1 instanceof DescriptiveMetadata) {
+			  LOGGER.debug("updateOriginalMETS -> UpdateOriginalMETS.addDescriptiveMetadataToMETS (" + object1.getId()+ ")");
+			  UpdateOriginalMETS.addDescriptiveMetadataToMETS((DescriptiveMetadata) object1, this);
+			}
+		  
+	  } else if (jobName == ModelService.JobName.DELETE_DESCRIPTIVE_METADATA) {
+		  if (object1 instanceof DescriptiveMetadata) {
+			  LOGGER.debug("updateOriginalMETS -> UpdateOriginalMETS.removeDescriptiveMetadataToMETS (" + object1.getId()+ ")");
+			  UpdateOriginalMETS.removeDescriptiveMetadataFromMETS((DescriptiveMetadata) object1, this);
 		  }
 	  }
   }

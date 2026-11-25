@@ -70,4 +70,17 @@ public class OriginalMETSUtils {
 		return DatatypeFactory.newInstance()
                 .newXMLGregorianCalendar(gc);
 	}
+	
+	public static XMLGregorianCalendar dateAndTimeFromLong(Long timestamp) 
+			throws 
+				DatatypeConfigurationException,
+				DateTimeParseException {
+		
+		GregorianCalendar gc = new GregorianCalendar();
+		gc.setTimeInMillis(timestamp);
+		
+		return DatatypeFactory.newInstance()
+				.newXMLGregorianCalendar(gc);
+		
+	}
 }

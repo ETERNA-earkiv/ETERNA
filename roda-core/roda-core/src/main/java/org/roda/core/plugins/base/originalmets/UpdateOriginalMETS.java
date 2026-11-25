@@ -39,6 +39,7 @@ import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.model.ModelService;
@@ -54,6 +55,7 @@ import org.roda_project.commons_ip2.mets_v1_12.beans.DivType.Fptr;
 import org.roda_project.commons_ip2.mets_v1_12.beans.FileType;
 import org.roda_project.commons_ip2.mets_v1_12.beans.FileType.FLocat;
 import org.roda_project.commons_ip2.mets_v1_12.beans.MdSecType;
+import org.roda_project.commons_ip2.mets_v1_12.beans.MdSecType.MdRef;
 import org.roda_project.commons_ip2.mets_v1_12.beans.Mets;
 import org.roda_project.commons_ip2.mets_v1_12.beans.MetsType;
 import org.roda_project.commons_ip2.mets_v1_12.beans.ObjectFactory;
@@ -133,6 +135,8 @@ public class UpdateOriginalMETS {
     private static final String STRUCTMAP_LABEL_CSIP = "CSIP";
     
     private static final String HREF_DATA_PREFIX = "data/";
+    
+    private static final String XML_MIME = "application/xml";
     
     private static final Striped<Lock> FILE_LOCKS = Striped.lock(64);
 
@@ -788,15 +792,15 @@ public class UpdateOriginalMETS {
         ref.setSIZE(FileUtils.sizeOf(file));
         ref.setLOCTYPE("URL");
         ref.setMDTYPE("PREMIS");
-        ref.setMIMETYPE("text/xml");
-        ref.setCREATED(OriginalMETSUtils.currentDateAndTime());
+        ref.setMIMETYPE(XML_MIME);
+        ref.setCREATED(OriginalMETSUtils.dateAndTimeFromLong(file.lastModified()));
 
         mdSecType.setMdRef(ref);
 
         mets.getAmdSec().getFirst().getDigiprovMD().add(mdSecType);
         mets
             .getMetsHdr()
-            .setLASTMODDATE(OriginalMETSUtils.currentDateAndTime());
+            .setLASTMODDATE(OriginalMETSUtils.dateAndTimeFromLong(file.lastModified()));
 
         METSUtils.marshallMETS(mets, metsPath, isRoot);
     }
@@ -1934,5 +1938,167 @@ public class UpdateOriginalMETS {
 		} finally {
 			lock.unlock();
 		}
-	}    
+	}
+	
+	public static void addDescriptiveMetadataToMETS(DescriptiveMetadata descriptiveMetadata, ModelService modelService) {
+		try { 
+			StoragePath aipPath = ModelUtils.getAIPStoragePath(descriptiveMetadata.getAipId());
+			Path metsPath;
+			java.io.File file = null;
+			boolean isRoot = true;
+			
+			if (descriptiveMetadata.getRepresentationId() == null) {
+	            metsPath = OriginalMETSUtils.metsPath(
+	                modelService,
+	                aipPath);  
+	            
+	            file = modelService
+	                    .getStorage()
+	                    .getDirectAccess(aipPath)
+	                    .getPath()
+	                    .resolve(IPConstants.DESCRIPTIVE_FOLDER)
+	                    .resolve(descriptiveMetadata.getId())
+	                    .toFile();
+	            
+			} else {
+				Path representationPath = Path.of(
+	                    IPConstants.REPRESENTATIONS_FOLDER
+	                ).resolve(Path.of(descriptiveMetadata.getRepresentationId()));
+	
+	            metsPath = OriginalMETSUtils.metsPath(
+	                modelService,
+	                aipPath,
+	                representationPath);
+	            
+	            file = modelService
+	                    .getStorage()
+	                    .getDirectAccess(aipPath)
+	                    .getPath()
+	                    .resolve(IPConstants.REPRESENTATIONS_FOLDER)
+	                    .resolve(descriptiveMetadata.getRepresentationId())
+	                    .resolve(IPConstants.DESCRIPTIVE_FOLDER)
+	                    .resolve(descriptiveMetadata.getId())
+	                    .toFile();
+	            
+	            isRoot = false;
+			}
+			
+			if (file != null && file.exists()) {
+				MetsWrapper metsWrapper = new MetsWrapper(
+		                METSUtils.instantiateMETSFromFile(metsPath),
+		                metsPath);
+		           
+				MdSecType mdSecType = new MdSecType();
+				mdSecType.setID("uuid-" + UUID.randomUUID().toString());
+				mdSecType.setCREATED(OriginalMETSUtils.currentDateAndTime());
+				//mdSecType.setSTATUS("");
+				
+				String relativeFilePath =
+						IPConstants.DESCRIPTIVE_FOLDER +
+                        file.getName();
+				
+		        String md5Checksum;
+		        try (InputStream is = Files.newInputStream(file.toPath())) {
+		            md5Checksum = DigestUtils.md5Hex(is).toUpperCase();
+		        }
+				
+				MdRef mdRef = new MdRef();
+				mdRef.setID(descriptiveMetadata.getId());
+				mdRef.setLOCTYPE("URL");
+				mdRef.setType("simple");
+				mdRef.setMDTYPEVERSION(descriptiveMetadata.getVersion());
+				mdRef.setMDTYPE(descriptiveMetadata.getType().toUpperCase());
+				mdRef.setHref(relativeFilePath);
+				mdRef.setMIMETYPE(XML_MIME);
+				mdRef.setSIZE(Long.valueOf(FileUtils.sizeOf(file)));
+				mdRef.setCREATED(OriginalMETSUtils.dateAndTimeFromLong(file.lastModified()));
+				mdRef.setCHECKSUM(md5Checksum);
+				mdRef.setCHECKSUMTYPE("MD5");
+				
+				mdSecType.setMdRef(mdRef);
+				
+		        metsWrapper.getMets().getDmdSec().add(mdSecType);
+		        
+		        metsWrapper.getMets().getMetsHdr()
+        			.setLASTMODDATE(OriginalMETSUtils.currentDateAndTime());
+		        if (!isRoot) {
+		        	updateLastModDateInParentMETS(modelService.retrieveAIP(descriptiveMetadata.getAipId()), modelService);
+		        }
+		        METSUtils.marshallMETS(metsWrapper.getMets(), metsPath, isRoot);	
+			}
+		
+		} catch (AuthorizationDeniedException
+				| DatatypeConfigurationException
+				| IOException
+				| IPException
+				| JAXBException
+				| GenericException
+		    	| NotFoundException
+				| RequestNotValidException
+				| SAXException e) {
+			
+			LOG.error("Then added metadata description {} to the AIP {} - Error: ", descriptiveMetadata.getId(), descriptiveMetadata.getAipId(), e);
+		}
+		
+	}
+	
+	public static void removeDescriptiveMetadataFromMETS(DescriptiveMetadata descriptiveMetadata, ModelService modelService) {
+		try {
+			StoragePath aipPath = ModelUtils.getAIPStoragePath(descriptiveMetadata.getAipId());
+			Path metsPath;
+			boolean isRoot = true;
+			
+			if (descriptiveMetadata.getRepresentationId() == null) {
+	            metsPath = OriginalMETSUtils.metsPath(
+	                modelService,
+	                aipPath);  
+	    
+			} else {
+				Path representationPath = Path.of(
+	                    IPConstants.REPRESENTATIONS_FOLDER
+	                ).resolve(Path.of(descriptiveMetadata.getRepresentationId()));
+	
+	            metsPath = OriginalMETSUtils.metsPath(
+	                modelService,
+	                aipPath,
+	                representationPath);  
+	            
+	            isRoot = false;
+			}
+			
+			MetsWrapper metsWrapper = new MetsWrapper(
+	                METSUtils.instantiateMETSFromFile(metsPath),
+	                metsPath);
+			
+			MdSecType mdSecType = null;
+			for (MdSecType mst : metsWrapper.getMets().getDmdSec()) {
+				if (mst.getMdRef().getID().equals(descriptiveMetadata.getId())) {
+					mdSecType = mst;
+				}
+			}
+			
+			if (mdSecType != null) {
+				metsWrapper.getMets().getDmdSec().remove(mdSecType);
+				
+				metsWrapper.getMets().getMetsHdr()
+    				.setLASTMODDATE(OriginalMETSUtils.currentDateAndTime());
+		        if (!isRoot) {
+		        	updateLastModDateInParentMETS(modelService.retrieveAIP(descriptiveMetadata.getAipId()), modelService);
+		        }
+				METSUtils.marshallMETS(metsWrapper.getMets(), metsPath, isRoot);
+			}
+			
+		} catch (AuthorizationDeniedException
+				| DatatypeConfigurationException
+				| IOException
+				| IPException
+				| JAXBException
+				| GenericException
+		    	| NotFoundException
+				| RequestNotValidException
+				| SAXException e) {
+			
+			LOG.error("Then removed metadata description {} from the AIP {} - Error: ", descriptiveMetadata.getId(), descriptiveMetadata.getAipId(), e);
+		}
+	}
 }
